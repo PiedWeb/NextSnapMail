@@ -1,3 +1,13 @@
+## 0.1.6 – 2026-07-02
+
+### Fixed
+
+- Rebuild the Nextcloud release package from the 0.1.3 package base and apply
+  only the confirmed S/MIME signing fix to `app.js` and `app.min.js`.
+- Preserve UTF-8 encoding in the packaged JavaScript files so folder emojis and
+  other special characters are displayed correctly.
+
+
 ## 0.1.5 – 2026-07-02
 
 ### Fixed

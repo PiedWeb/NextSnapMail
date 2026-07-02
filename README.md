@@ -41,13 +41,19 @@ The following foundation and compatibility work has been completed on the
   sections, bundled available extensions with the app package, removed the
   dependency on the former SnappyMail package service for extension and core
   update checks, and sorted active extensions first in the admin extension list
-  ([#6](https://github.com/oe79/NextSnapMail/pull/6)).
+  ([#6](https://github.com/oe79/NextSnapMail/pull/6));
+- published signed Nextcloud app releases through the Nextcloud App Store and
+  fixed release package integrity issues caused by forbidden `.htaccess` files
+  in App Store installations;
+- fixed S/MIME signing with unencrypted private keys in the packaged Nextcloud
+  app while preserving UTF-8 encoded folder emojis and other special characters
+  in the JavaScript assets.
 
 The Nextcloud 34 compatibility, file transfer, and credential-preservation
 changes have also been tested manually on running Nextcloud installations.
 
 Important work still in progress includes removing the temporary
-`unsafe-eval` Content Security Policy allowance, finalizing the reproducible
+`unsafe-eval` Content Security Policy allowance, improving the reproducible
 Nextcloud-only release process, documenting the migration path for existing
 SnappyMail installations, and continuing signed Nextcloud app releases.
 
