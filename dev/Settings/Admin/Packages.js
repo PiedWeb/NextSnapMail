@@ -30,9 +30,7 @@ export class AdminSettingsPackages extends AbstractViewSettings {
 		);
 
 		addComputablesTo(this, {
-			packagesCurrent: () => sortInstalledPackages(
-				PackageAdminStore().filter(item => item?.installed && !item.canBeUpdated)
-			),
+			packagesCurrent: () => sortInstalledPackages(PackageAdminStore().filter(item => item?.installed && !item.canBeUpdated)),
 			packagesUpdate: () => PackageAdminStore().filter(item => item?.installed && item.canBeUpdated),
 			packagesAvailable: () => PackageAdminStore().filter(item => !item?.installed),
 
