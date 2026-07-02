@@ -171,6 +171,10 @@ function shouldExclude(string $relativePath): bool
 		return true;
 	}
 
+	if ($basename === '.htaccess') {
+		return true;
+	}
+
 	if ($basename === 'signature.json') {
 		return true;
 	}
