@@ -1,3 +1,11 @@
+## 0.1.5 – 2026-07-02
+
+### Fixed
+
+- Rebuild the release package from the 0.1.3 package base and apply only the
+  confirmed S/MIME signing fix for unencrypted private keys.
+
+
 ## 0.1.4 – 2026-07-02
 
 ### Fixed
