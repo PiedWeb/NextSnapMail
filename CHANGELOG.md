@@ -1,3 +1,12 @@
+## 0.1.3 – 2026-07-02
+
+### Fixed
+
+- Exclude exact `.htaccess` files from Nextcloud release packages so App Store
+  installations no longer report missing `.htaccess` files in the integrity
+  check.
+
+
 ## 0.1.2 – 2026-07-02
 
 ### Changed
