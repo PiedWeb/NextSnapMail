@@ -9,14 +9,6 @@ The project continues development of the existing SnappyMail codebase for the
 Nextcloud use case. It is not an official continuation of SnappyMail and is not
 affiliated with, endorsed by, or sponsored by Nextcloud GmbH.
 
-Recommended public wording:
-
-- Name: **NextSnapMail**
-- Short description: **A SnappyMail fork focused on integration with Nextcloud**
-
-Avoid descriptions that could imply official Nextcloud status, such as
-"Official Nextcloud Mail replacement".
-
 > [!WARNING]
 > NextSnapMail is under active development and is not yet ready for production
 > use. Anyone installing, testing, or using it does so at their own risk. There
@@ -57,7 +49,7 @@ changes have also been tested manually on running Nextcloud installations.
 Important work still in progress includes removing the temporary
 `unsafe-eval` Content Security Policy allowance, finalizing the reproducible
 Nextcloud-only release process, documenting the migration path for existing
-SnappyMail installations, and publishing the first signed NextSnapMail release.
+SnappyMail installations, and continuing signed Nextcloud app releases.
 
 ## Project status
 
@@ -66,8 +58,7 @@ NextSnapMail is currently in the initial restructuring phase.
 The repository still contains the inherited SnappyMail webmail core and several
 legacy integration and release files. The Nextcloud app identity has been
 separated as `nextsnapmail` and will be reviewed and migrated incrementally.
-Until a first signed NextSnapMail release is published, use the official
-SnappyMail releases for existing production installations.
+Please test NextSnapMail carefully before using it in production.
 
 ## Scope
 
@@ -145,6 +136,6 @@ copyright notices. Those notices remain applicable to their respective files.
 
 ## Trademarks
 
-NextSnapMail is an independent project. “Nextcloud” and the Nextcloud logo are
+NextSnapMail is an independent project. "Nextcloud" and the Nextcloud logo are
 trademarks of Nextcloud GmbH. The Nextcloud name is used only to describe
 compatibility and the intended platform. See [TRADEMARKS.md](TRADEMARKS.md).
