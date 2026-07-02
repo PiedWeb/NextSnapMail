@@ -1,3 +1,10 @@
+## 0.1.4 – 2026-07-02
+
+### Fixed
+
+- Fix S/MIME signing with unencrypted private keys.
+
+
 ## 0.1.3 – 2026-07-02
 
 ### Fixed
