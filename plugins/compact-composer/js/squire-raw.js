@@ -1867,7 +1867,6 @@
         const text = (_a = block.textContent) == null ? void 0 : _a.trimEnd().replace(ZWS, "");
         if (text === "*" || text === "1.") {
           event.preventDefault();
-          self.insertPlainText(" ", false);
           self._docWasChanged();
           self.saveUndoState(range);
           const walker = new TreeIterator(block, SHOW_TEXT);
@@ -1875,6 +1874,11 @@
           while (textNode = walker.nextNode()) {
             detach(textNode);
           }
+          fixCursor(block);
+          const selection = self.getSelection();
+          selection.selectNodeContents(block);
+          selection.collapse(true);
+          self.setSelection(selection);
           if (text === "*") {
             self.makeUnorderedList();
           } else {
