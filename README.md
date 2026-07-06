@@ -10,44 +10,48 @@ Nextcloud use case. It is not an official continuation of SnappyMail and is not
 affiliated with, endorsed by, or sponsored by Nextcloud GmbH.
 
 > [!WARNING]
-> NextSnapMail is under active development and is not yet ready for production
-> use. Anyone installing, testing, or using it does so at their own risk. There
-> is no warranty, and users are responsible for backups and for protecting
-> their own systems, accounts, credentials, and data.
+> NextSnapMail is under active development. Anyone installing, testing, or using
+> it does so at their own risk. There is no warranty, and users are responsible
+> for backups and for protecting their own systems, accounts, credentials, and
+> data.
 
 ## Current development status
 
-The following foundation and compatibility work has been completed on the
-`master` branch:
+The following foundation and compatibility work has been completed or prepared,
+with the newest changes listed first:
 
-- established the NextSnapMail project identity, scope, provenance, license,
-  and trademark documentation
-  ([#1](https://github.com/oe79/NextSnapMail/pull/1));
-- restored operation with Nextcloud 34 by replacing removed server APIs,
-  updating Content Security Policy integration, and bundling the required
-  Nextcloud plugin with app builds
-  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
-- added automatic PHP syntax checks for PHP 8.2, 8.3, 8.4, and 8.5
-  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
-- repaired saving messages and attachments to Nextcloud Files and attaching
-  files from Nextcloud, including verified file sizes, MIME types, modification
-  times, ETags, and duplicate filename handling
-  ([#3](https://github.com/oe79/NextSnapMail/pull/3));
-- preserved credentials stored in personal settings during temporary network,
-  DNS, TLS, or mail-server outages
-  ([#4](https://github.com/oe79/NextSnapMail/pull/4));
+- prepared an importer for existing SnappyMail installations that can copy
+  account preferences, encrypted login data, additional account definitions,
+  and existing app data from `snappymail` to `nextsnapmail` without modifying
+  the old SnappyMail installation by default;
+- fixed S/MIME signing with unencrypted private keys in the packaged Nextcloud
+  app while preserving UTF-8 encoded folder emojis and other special characters
+  in the JavaScript assets;
+- published signed Nextcloud app releases through the Nextcloud App Store and
+  fixed release package integrity issues caused by forbidden `.htaccess` files
+  in App Store installations;
 - separated the Nextcloud app identity as `nextsnapmail`, set the initial
   NextSnapMail app version to `0.1.0`, added dedicated NextSnapMail settings
   sections, bundled available extensions with the app package, removed the
   dependency on the former SnappyMail package service for extension and core
   update checks, and sorted active extensions first in the admin extension list
   ([#6](https://github.com/oe79/NextSnapMail/pull/6));
-- published signed Nextcloud app releases through the Nextcloud App Store and
-  fixed release package integrity issues caused by forbidden `.htaccess` files
-  in App Store installations;
-- fixed S/MIME signing with unencrypted private keys in the packaged Nextcloud
-  app while preserving UTF-8 encoded folder emojis and other special characters
-  in the JavaScript assets.
+- preserved credentials stored in personal settings during temporary network,
+  DNS, TLS, or mail-server outages
+  ([#4](https://github.com/oe79/NextSnapMail/pull/4));
+- repaired saving messages and attachments to Nextcloud Files and attaching
+  files from Nextcloud, including verified file sizes, MIME types, modification
+  times, ETags, and duplicate filename handling
+  ([#3](https://github.com/oe79/NextSnapMail/pull/3));
+- added automatic PHP syntax checks for PHP 8.2, 8.3, 8.4, and 8.5
+  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
+- restored operation with Nextcloud 34 by replacing removed server APIs,
+  updating Content Security Policy integration, and bundling the required
+  Nextcloud plugin with app builds
+  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
+- established the NextSnapMail project identity, scope, provenance, license,
+  and trademark documentation
+  ([#1](https://github.com/oe79/NextSnapMail/pull/1)).
 
 The Nextcloud 34 compatibility, file transfer, and credential-preservation
 changes have also been tested manually on running Nextcloud installations.
@@ -64,7 +68,8 @@ NextSnapMail is currently in the initial restructuring phase.
 The repository still contains the inherited SnappyMail webmail core and several
 legacy integration and release files. The Nextcloud app identity has been
 separated as `nextsnapmail` and will be reviewed and migrated incrementally.
-Please test NextSnapMail carefully before using it in production.
+Please test NextSnapMail carefully before relying on it, and keep current
+backups of your Nextcloud installation and mail-related data.
 
 ## Scope
 

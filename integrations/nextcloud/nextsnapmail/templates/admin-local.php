@@ -87,6 +87,14 @@
 			<br />
 
 			<p>
+				<button id="nextsnapmail-import-snappymail-button" type="button">
+					<?php echo($l->t('Import old SnappyMail data')); ?>
+				</button>
+				<div class="nextsnapmail-import-result-desc"></div>
+			</p>
+			<br />
+
+			<p>
 				<button id="nextsnapmail-save-button" name="nextsnapmail-save-button"><?php echo($l->t('Save')); ?></button>
 				<div class="nextsnapmail-result-desc" style="white-space: pre"></div>
 			</p>

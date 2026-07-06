@@ -1,3 +1,20 @@
+## 0.1.7 – 2026-07-06
+
+### Added
+
+- Add an administrator-facing importer for existing SnappyMail installations.
+  The importer can copy account preferences, encrypted login data, additional
+  account definitions, and app data from `snappymail` to `nextsnapmail` while
+  leaving the old SnappyMail installation untouched by default.
+- Add guarded cleanup actions for imported NextSnapMail account data and old
+  SnappyMail data, including confirmation and server-side validation.
+
+### Fixed
+
+- Preserve automatic ordered and unordered list creation in the mail editor
+  while avoiding the Squire space-handler bug that could remove `1. ` input.
+
+
 ## 0.1.6 – 2026-07-02
 
 ### Fixed
