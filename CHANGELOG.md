@@ -1,3 +1,12 @@
+## 0.1.9 – 2026-07-14
+
+### Fixed
+
+- Rebuild the Nextcloud App Store package with the complete generated
+  SnappyMail static assets so the app can load `boot.min.css` and related
+  frontend files after installation or update.
+
+
 ## 0.1.8 – 2026-07-14
 
 ### Fixed
