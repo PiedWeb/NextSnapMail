@@ -1,21 +1,3 @@
-## 0.1.9 – 2026-07-14
-
-### Fixed
-
-- Rebuild the Nextcloud App Store package with the complete generated
-  SnappyMail static assets so the app can load `boot.min.css` and related
-  frontend files after installation or update.
-
-
-## 0.1.8 – 2026-07-14
-
-### Fixed
-
-- Avoid PHP deprecation log entries on newer PHP versions by replacing
-  deprecated shell backtick execution in SnappyMail GPG helpers and by keeping
-  explicit nullable parameter types in inherited PGP/GPG helper signatures.
-
-
 ## 0.1.7 – 2026-07-06
 
 ### Added
