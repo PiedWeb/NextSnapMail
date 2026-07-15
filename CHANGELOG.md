@@ -1,12 +1,3 @@
-## 0.1.8 – 2026-07-14
-
-### Fixed
-
-- Avoid PHP deprecation log entries on newer PHP versions by replacing
-  deprecated shell backtick execution in SnappyMail GPG helpers and by keeping
-  explicit nullable parameter types in inherited PGP/GPG helper signatures.
-
-
 ## 0.1.7 – 2026-07-06
 
 ### Added
