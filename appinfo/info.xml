@@ -17,9 +17,8 @@
 NextSnapMail is an independent community fork of SnappyMail for the Nextcloud
 use case. It is not affiliated with, endorsed by, or sponsored by Nextcloud GmbH.
 
-NextSnapMail is under active development and provided as-is. Please test it
-carefully before using it in production. Installation and use are at your own
-risk.
+NextSnapMail is under active development and provided as-is. Installation and
+use are at your own risk.
 
 **Lightweight & fast email client.**
 
@@ -39,11 +38,15 @@ After enabling the app, administrators can configure the integration in the
 dedicated "NextSnapMail" section of the Nextcloud administration settings.
 Users can add their initial mailbox credentials in the dedicated
 "NextSnapMail" section of their personal settings.
+
+Administrators can import existing SnappyMail account settings and app data from
+the NextSnapMail administration settings. The import copies data into
+NextSnapMail and leaves the old SnappyMail installation untouched by default.
 	]]></description>
 	<namespace>NextSnapMail</namespace>
 	<documentation>
-		<user>https://github.com/oe79/NextSnapMail/blob/master/integrations/nextcloud/nextsnapmail/README.md</user>
-		<admin>https://github.com/oe79/NextSnapMail/blob/master/integrations/nextcloud/nextsnapmail/README.md</admin>
+		<user>https://github.com/oe79/NextSnapMail/blob/master/README.md</user>
+		<admin>https://github.com/oe79/NextSnapMail/blob/master/README.md</admin>
 		<developer>https://github.com/oe79/NextSnapMail</developer>
 		<website>https://github.com/oe79/NextSnapMail</website>
 	</documentation>

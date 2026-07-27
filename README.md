@@ -1,117 +1,105 @@
 # NextSnapMail
 
-NextSnapMail is now maintained as a dedicated Nextcloud app. The repository
-root is the installable app directory that belongs in a Nextcloud `apps/`
-folder as `nextsnapmail`.
+NextSnapMail is a SnappyMail fork focused on integration with Nextcloud.
 
-The previous SnappyMail-oriented repository layout, including Docker,
-standalone packaging, upstream build tooling, and non-Nextcloud integrations,
-has been moved to `legacy-upstream/` for reference. It is not part of the
-active NextSnapMail Nextcloud App Store release workflow.
+It provides a lightweight webmail interface inside Nextcloud, using the
+embedded SnappyMail application for IMAP/SMTP mail access.
 
-Use at your own risk.
+This project is now maintained as a dedicated Nextcloud app. The repository root
+is the installable app directory that belongs in a Nextcloud `apps/` folder as
+`nextsnapmail`.
 
-## Previous Nextcloud app documentation
+## About this project
 
-# nextsnapmail-nextcloud
+I maintain NextSnapMail primarily for my own private use, because I wanted to
+continue using SnappyMail inside Nextcloud after upstream development slowed
+down.
 
-nextsnapmail-nextcloud is a plugin for Nextcloud to use the excellent NextSnapMail Webmail (https://snappymail.eu/).
+Everyone is welcome to use it, but please do so at your own risk. I am happy to
+receive bug reports, hints, and practical feedback, and I will try to help where
+I can. However, there is no guarantee of support, fixes, compatibility, or
+continued maintenance.
 
-Thank you to all contributors to SnappyMail for nextcloud:
-- RainLoop Team, who initiated it
-- [pierre-alain-b](https://github.com/pierre-alain-b/rainloop-nextcloud)
-- Tab Fitts (@tabp0le)
-- Nextgen Networks (@nextgen-networks)
-- [All testers of issue 96](https://github.com/the-djmaze/snappymail/issues/96)
+## Current development status
 
-## How to Install
+Newest changes first:
 
-Start within Nextcloud as user with administrator rights and click on the "+ Apps" button in the upper-right corner dropdown menu:
+- Added tools in the NextSnapMail admin settings to import existing SnappyMail
+  accounts and app data into NextSnapMail.
+- Added controls to remove imported NextSnapMail account entries and old
+  SnappyMail data where needed.
+- Fixed Squire list handling so numbered lists such as `1. ` do not disappear
+  while composing messages.
+- Added a confirmed S/MIME signing fix to the shipped SnappyMail frontend files.
+- Introduced NextSnapMail as a standalone Nextcloud app id.
+- Restored compatibility with newer Nextcloud versions.
+- Bundled SnappyMail plugins so installations do not depend on the external
+  SnappyMail package server.
+- Improved Nextcloud file handling for saving to and uploading from Nextcloud.
+- Preserved stored personal login credentials when a mail server is temporarily
+  unreachable.
 
-![Image1](https://raw.githubusercontent.com/the-djmaze/snappymail/master/integrations/nextcloud/screenshots/help_a1.png)
+## Installation
 
-Then, enable the SnappyMail plugin that you will find in the "Social & communication" section:
+Install NextSnapMail from the Nextcloud App Store, or place this app directory
+as `nextsnapmail` in your Nextcloud `apps/` directory.
 
-![Image2](https://raw.githubusercontent.com/the-djmaze/snappymail/master/integrations/nextcloud/screenshots/help_a2.png)
+After installation, enable the app in Nextcloud.
 
-After a quick wait, SnappyMail is installed. Now you should configure it before use: open the Nextcloud admin panel (upper-right corner dropdown menu -> Settings) and go to "Additional settings" under the "Administration" section. There, click on the "Go to NextSnapMail Webmail admin panel" link.
+## Configuration
 
-![Image3](https://raw.githubusercontent.com/the-djmaze/snappymail/master/integrations/nextcloud/screenshots/nextcloud-admin.png)
+NextSnapMail can be configured in two places:
 
-To enter SnappyMail admin area, you must be Nextcloud admin (so you get logged in automatically) or else use the admin login credentials.
-The default login is "admin" and the default password will be generated in `[nextcloud-data]/app_nextsnapmail/_data_/_default_/admin_password.txt`. Don't forget to change it once in the admin panel!
+- Nextcloud administration settings: instance-wide NextSnapMail settings
+- Nextcloud personal settings: user-specific login credentials for automatic
+  login
 
-From that point, all instance-wide SnappyMail settings can be tweaked as you wish. One important point is the "Domains" section where you should set up the IMAP/SMTP parameters that will be associated with the email adresses of your users. Basically, if a user of the Nextcloud instance starts SnappyMail and puts "firstname@domain.tld" as an email address, then SnappyMail should know how to connect to the IMAP & SMTP of domain.tld. You can fill in this information in the "Domains" section of the SnappyMail admin settings. For more information how to configure an automatic login for your Nextcloud users see [How to auto-connect to SnappyMail?](#how-to-auto-connect-to-snappymail)
+The embedded NextSnapMail webmail admin panel can be opened from the
+NextSnapMail administration settings in Nextcloud.
 
-![grafik](https://user-images.githubusercontent.com/63400209/199767908-fbef0f50-ecb7-47ae-9ac1-771959d4b7f5.png)
+If you previously used the original SnappyMail Nextcloud app, you can use the
+NextSnapMail admin settings to import existing SnappyMail accounts and app data.
+The import is intended to copy data into NextSnapMail. It does not automatically
+overwrite the old SnappyMail installation.
 
-![grafik](https://user-images.githubusercontent.com/63400209/199768097-7bd939a7-56d0-47ba-b481-aeac08776fb4.png)
+## Relationship to SnappyMail
 
-## App Integrations
-### Contacts
-SnappyMail automatically connects with the Nextcloud contacts app. Download and install the [contacts app](https://apps.nextcloud.com/apps/contacts) for SnappyMail to obtain access to all registered users on the Nextcloud system, as well as users' personal contacts saved in here.
+NextSnapMail is based on SnappyMail and keeps the focus on Nextcloud
+integration. General SnappyMail functionality, concepts, and upstream history
+belong to the original SnappyMail project and its contributors.
 
-## SnappyMail Settings, Where Are They?
+The previous SnappyMail-oriented repository structure has been moved to
+`legacy-upstream/` for reference. It is not part of the active Nextcloud App
+Store release workflow.
 
-SnappyMail for Nextcloud is highly configurable. But settings are available in multiple places and this can be misleading for first-time users.
+## Development
 
-### SnappyMail admin settings
-NextSnapMail admin settings can be reached only by the Nextcloud administrator. Open the Nextcloud admin panel ("Admin" in the upper-right corner dropdown menu) and go to "Additionnal settings". There, click on the "Go to NextSnapMail Webmail admin panel" link. Alternatively, you may use the following link: https://path.to.nextcloud/index.php/apps/nextsnapmail/?admin.
+The repository root is the installable Nextcloud app. The old upstream-oriented
+repository layout is kept in `legacy-upstream/` for reference only.
 
-SnappyMail admin settings include all settings that will apply to all SnappyMail users (default login rules, branding, management of plugins, security rules and domains).
+Nextcloud App Store releases must be built from the repository root app
+structure only. Do not build release packages from `legacy-upstream/`.
 
-### SnappyMail user settings
-Each user of SnappyMail can also change user-specific behaviors in the SnappyMail user settings. SnappyMail user settings are found within SnappyMail by clicking on the user button (in the upper-right corner of SnappyMail) and then choosing "Settings" in the dropdown menu.
+## License
 
-SnappyMail user settings include management of contacts, of email accounts, of folders, appearance and OpenPGP.
+NextSnapMail is licensed under the GNU Affero General Public License v3.0 only
+(`AGPL-3.0-only`).
 
-### The specificity of SnappyMail user accounts
-The plugin passes the login information of the user to the SnappyMail app which then creates and manages the user accounts. Accounts in SnappyMail are based soley on the authenticated email accounts, and do not take into account the nextcloud user which created them in the first place. If two or more Nextcloud users have the same email account in additional settings, they will in fact share the same 'email account' in SnappyMail including any additional email accounts that they may have added subsequently to their main account.
-This is to be kept in mind for the use case where multiple users shall have the same email account but may be also tempted to add additionnal acounts to their SnappyMail.
+See [LICENSE](LICENSE).
 
-## How to auto-connect to SnappyMail?
+## Credits
 
-### Default Domain
-As already said SnappyMail uses the domain part (@example.com) to choose the IMAP/SMTP server to use. If in the following settings the username passed to SnappyMail does not contain a domain, the "default domain" is added to this username. In this way SnappyMail can lookup the "Domain" configuration to use (IMAP, SMTP, SIEVE server ecc.).
-Example: if the username `john` is passed to SnappyMail, the "default domain" `example.com` would be added to the username basing on your configuration. So SnappyMail would try to login the user with the username `john@example.com`.
+NextSnapMail is based on SnappyMail.
 
-You can configure the "default domain" and connected settings in the SnappyMail Admin Panel under the menu "Login".
+Thanks to:
 
-### Auto-connect options
-The Nextcloud administrator can choose how SnappyMail tries to automatically login when a user clicks on the icon of SnappyMail within Nextcloud. There are different options that can be found in the Nextcloud "Settings -> Administration -> Additional settings":
+- SnappyMail contributors
+- RainLoop Team
+- Pierre-Alain Bandinelli
+- Tab Fitts
+- Nextgen Networks
+- Nathan Kinkade
+- everyone who contributed to the previous Nextcloud integration work
 
-#### Option 1: Users will login manually, or define credentials in their personal settings for automatic logins.
-If the user sets his credentials for the mailbox in his personal account under "Settings -> Additional settings", these credentials are used by SnappyMail to login.
-If no personal credentials are defined the user is prompted by SnappyMail to insert his credentials every time he tries to open the SnappyMail App within Nextcloud.
-
-#### Option 2: Attempt to automatically login users with their Nextcloud username and password, or user-defined credentials, if set.
-If the user sets his credentials for the mailbox in his personal account under "Settings -> Additional settings", these credentials are used by SnappyMail to login.
-If no personal credentials are defined the Nextcloud username and password is used by SnappyMail to login (eventually adding the [default domain](#default-domain)).
-
-If your IMAP server only accepts usernames without a domain (for example the ldap username of your user) the automatic addition of the "default domain" would block your users from logging in to your IMAP server - but on the other side it is needed by SnappyMail to determine the server settings to use. In such a case you must configure SnappyMail to strip off the domain part before sending the credentials to your IMAP server. This is done by entering to the SnappyMail Admin Panel -> Domains -> clicking on your default domain -> flagging the checkbox "Use short login" under IMAP and SMTP.
-
-#### Option 3: Attempt to automatically login users with their Nextcloud email and password, or user-defined credentials, if set.
-If the user sets his credentials for the mailbox in his personal account under "Settings -> Additional settings", these credentials are used by SnappyMail to login.
-If no personal credentials are defined the mail address of the Nextcloud user and his password are used by SnappyMail to login. SnappyMail will lookup the "Domain" settings for a configuration that meets the domain part of the mail address passed as username.
-
-#### Option 4: Attempt to automatically login with OIDC when active
-
-### Auto-connection for all Nextcloud users
-If your Nextcloud users base is synchronized with an email system, then it is possible that Nextcloud credentials could be used right away to access the centralized email system. In the SnappyMail admin settings, the Nextcloud administrator can then tick the "Automatically login with Nextcloud/Nextcloud user credentials" checkbox.
-
-Beware, if you tick this box, all Nextcloud users will *not* be able to use the override it with the setting below.
-
-### Auto-connection for one user at a time
-Except if the above setting is activated, any Nextcloud user can have Nextcloud and SnappyMail keep in mind the default email/password to connect to SnappyMail. There, logging in Nextcloud is sufficient to then access SnappyMail within Nextcloud.
-
-To fill in the default email address and password to use, each Nextcloud user should go in the personal settings: choose "Settings" in the upper-right corner dropdown menu. Under "Personal" select the "Additional settings" section where you can find the "NextSnapMail Webmail" settings. You can also use this direct link: https://path.to.nextcloud/settings/user/additional.
-
-
-## How to Activate SnappyMail Logging and then Find Logs
-
-You can activate SnappyMail logging here: `/path/to/nextcloud/data/appdata_nextsnapmail/_data_/_default_/configs/application.ini`
-```
-[logs]
-enable = On
-```
-Logs are then available in `/path/to/nextcloud/data/appdata_nextsnapmail/_data_/_default_/logs/`
+NextSnapMail-specific maintenance and Nextcloud-focused development by
+Erhard Scharf.
