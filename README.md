@@ -1,152 +1,105 @@
 # NextSnapMail
 
-NextSnapMail is an independent community fork of
-[SnappyMail](https://github.com/the-djmaze/snappymail), focused exclusively on
-providing and maintaining the webmail client as an app for
-[Nextcloud](https://nextcloud.com/).
+NextSnapMail is a SnappyMail fork focused on integration with Nextcloud.
 
-The project continues development of the existing SnappyMail codebase for the
-Nextcloud use case. It is not an official continuation of SnappyMail and is not
-affiliated with, endorsed by, or sponsored by Nextcloud GmbH.
+It provides a lightweight webmail interface inside Nextcloud, using the
+embedded SnappyMail application for IMAP/SMTP mail access.
 
-> [!WARNING]
-> NextSnapMail is under active development. Anyone installing, testing, or using
-> it does so at their own risk. There is no warranty, and users are responsible
-> for backups and for protecting their own systems, accounts, credentials, and
-> data.
+This project is now maintained as a dedicated Nextcloud app. The repository root
+is the installable app directory that belongs in a Nextcloud `apps/` folder as
+`nextsnapmail`.
+
+## About this project
+
+I maintain NextSnapMail primarily for my own private use, because I wanted to
+continue using SnappyMail inside Nextcloud after upstream development slowed
+down.
+
+Everyone is welcome to use it, but please do so at your own risk. I am happy to
+receive bug reports, hints, and practical feedback, and I will try to help where
+I can. However, there is no guarantee of support, fixes, compatibility, or
+continued maintenance.
 
 ## Current development status
 
-The following foundation and compatibility work has been completed or prepared,
-with the newest changes listed first:
+Newest changes first:
 
-- prepared an importer for existing SnappyMail installations that can copy
-  account preferences, encrypted login data, additional account definitions,
-  and existing app data from `snappymail` to `nextsnapmail` without modifying
-  the old SnappyMail installation by default;
-- fixed S/MIME signing with unencrypted private keys in the packaged Nextcloud
-  app while preserving UTF-8 encoded folder emojis and other special characters
-  in the JavaScript assets;
-- published signed Nextcloud app releases through the Nextcloud App Store and
-  fixed release package integrity issues caused by forbidden `.htaccess` files
-  in App Store installations;
-- separated the Nextcloud app identity as `nextsnapmail`, set the initial
-  NextSnapMail app version to `0.1.0`, added dedicated NextSnapMail settings
-  sections, bundled available extensions with the app package, removed the
-  dependency on the former SnappyMail package service for extension and core
-  update checks, and sorted active extensions first in the admin extension list
-  ([#6](https://github.com/oe79/NextSnapMail/pull/6));
-- preserved credentials stored in personal settings during temporary network,
-  DNS, TLS, or mail-server outages
-  ([#4](https://github.com/oe79/NextSnapMail/pull/4));
-- repaired saving messages and attachments to Nextcloud Files and attaching
-  files from Nextcloud, including verified file sizes, MIME types, modification
-  times, ETags, and duplicate filename handling
-  ([#3](https://github.com/oe79/NextSnapMail/pull/3));
-- added automatic PHP syntax checks for PHP 8.2, 8.3, 8.4, and 8.5
-  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
-- restored operation with Nextcloud 34 by replacing removed server APIs,
-  updating Content Security Policy integration, and bundling the required
-  Nextcloud plugin with app builds
-  ([#2](https://github.com/oe79/NextSnapMail/pull/2));
-- established the NextSnapMail project identity, scope, provenance, license,
-  and trademark documentation
-  ([#1](https://github.com/oe79/NextSnapMail/pull/1)).
+- Added tools in the NextSnapMail admin settings to import existing SnappyMail
+  accounts and app data into NextSnapMail.
+- Added controls to remove imported NextSnapMail account entries and old
+  SnappyMail data where needed.
+- Fixed Squire list handling so numbered lists such as `1. ` do not disappear
+  while composing messages.
+- Added a confirmed S/MIME signing fix to the shipped SnappyMail frontend files.
+- Introduced NextSnapMail as a standalone Nextcloud app id.
+- Restored compatibility with newer Nextcloud versions.
+- Bundled SnappyMail plugins so installations do not depend on the external
+  SnappyMail package server.
+- Improved Nextcloud file handling for saving to and uploading from Nextcloud.
+- Preserved stored personal login credentials when a mail server is temporarily
+  unreachable.
 
-The Nextcloud 34 compatibility, file transfer, and credential-preservation
-changes have also been tested manually on running Nextcloud installations.
+## Installation
 
-Important work still in progress includes removing the temporary
-`unsafe-eval` Content Security Policy allowance, improving the reproducible
-Nextcloud-only release process, documenting the migration path for existing
-SnappyMail installations, and continuing signed Nextcloud app releases.
+Install NextSnapMail from the Nextcloud App Store, or place this app directory
+as `nextsnapmail` in your Nextcloud `apps/` directory.
 
-## Project status
+After installation, enable the app in Nextcloud.
 
-NextSnapMail is currently in the initial restructuring phase.
+## Configuration
 
-The repository still contains the inherited SnappyMail webmail core and several
-legacy integration and release files. The Nextcloud app identity has been
-separated as `nextsnapmail` and will be reviewed and migrated incrementally.
-Please test NextSnapMail carefully before relying on it, and keep current
-backups of your Nextcloud installation and mail-related data.
+NextSnapMail can be configured in two places:
 
-## Scope
+- Nextcloud administration settings: instance-wide NextSnapMail settings
+- Nextcloud personal settings: user-specific login credentials for automatic
+  login
 
-NextSnapMail intends to maintain:
+The embedded NextSnapMail webmail admin panel can be opened from the
+NextSnapMail administration settings in Nextcloud.
 
-- the SnappyMail webmail core required by the Nextcloud app;
-- integration with current supported Nextcloud releases;
-- IMAP, SMTP, Sieve, contacts, calendar, and file integration used through
-  Nextcloud;
-- a self-contained Nextcloud app package and release process;
-- security, compatibility, accessibility, and localization fixes.
+If you previously used the original SnappyMail Nextcloud app, you can use the
+NextSnapMail admin settings to import existing SnappyMail accounts and app data.
+The import is intended to copy data into NextSnapMail. It does not automatically
+overwrite the old SnappyMail installation.
 
-The project does not intend to publish or maintain separate distributions for:
+## Relationship to SnappyMail
 
-- Docker or standalone container images;
-- ownCloud;
-- Cloudron, cPanel, CyberPanel, HestiaCP, Virtualmin, or similar hosting panels;
-- Debian, Arch Linux, or other system packages;
-- standalone SnappyMail installations outside Nextcloud.
+NextSnapMail is based on SnappyMail and keeps the focus on Nextcloud
+integration. General SnappyMail functionality, concepts, and upstream history
+belong to the original SnappyMail project and its contributors.
 
-This scope describes the direction of the project. Files for unsupported
-targets remain in the repository during the initial migration and will only be
-removed after their dependencies have been reviewed.
+The previous SnappyMail-oriented repository structure has been moved to
+`legacy-upstream/` for reference. It is not part of the active Nextcloud App
+Store release workflow.
 
-## Planned first milestones
+## Development
 
-1. Establish the NextSnapMail project identity and preserve provenance.
-2. Stabilize the new Nextcloud app identifier and document the migration path.
-3. Bundle the required Nextcloud integration without relying on the former
-   SnappyMail package service.
-4. Introduce a reproducible Nextcloud-only build and test process.
-5. Modernize the integration for supported Nextcloud and PHP versions.
-6. Publish signed, source-backed Nextcloud app releases.
+The repository root is the installable Nextcloud app. The old upstream-oriented
+repository layout is kept in `legacy-upstream/` for reference only.
 
-## Contributing
-
-The contribution workflow and compatibility targets are still being prepared.
-Bug reports and changes should be submitted to the
-[NextSnapMail repository](https://github.com/oe79/NextSnapMail).
-
-Please avoid large mechanical renames of the internal `RainLoop` and
-`SnappyMail` namespaces. They are part of the inherited architecture and will
-be migrated only where doing so is technically justified.
-
-## Provenance and modifications
-
-NextSnapMail is based on SnappyMail, which is itself a fork of RainLoop Webmail
-Community Edition.
-
-The NextSnapMail project began modifying and restructuring the codebase on
-2026-06-18. A summary of inherited projects and contributors is maintained in
-[CREDITS.md](CREDITS.md). Project changes are recorded in Git history and will
-be documented in release notes.
-
-Copyright notices from SnappyMail, RainLoop, and bundled third-party components
-must remain intact:
-
-- Copyright (c) 2020 - 2024 SnappyMail
-- Copyright (c) 2013 - 2022 RainLoop
-- Copyright for NextSnapMail modifications belongs to their respective
-  contributors
+Nextcloud App Store releases must be built from the repository root app
+structure only. Do not build release packages from `legacy-upstream/`.
 
 ## License
 
-This project remains licensed under the **GNU Affero General Public License,
-version 3 (AGPLv3)**. See [LICENSE](LICENSE) for the complete terms.
+NextSnapMail is licensed under the GNU Affero General Public License v3.0 only
+(`AGPL-3.0-only`).
 
-Modified versions must retain applicable notices, identify modifications, and
-remain available under the AGPL. Users interacting with a modified version over
-a network must be offered access to its corresponding source code as required
-by section 13 of the AGPLv3.
+See [LICENSE](LICENSE).
 
-Bundled third-party components may carry additional compatible license and
-copyright notices. Those notices remain applicable to their respective files.
+## Credits
 
-## Trademarks
+NextSnapMail is based on SnappyMail.
 
-NextSnapMail is an independent project. "Nextcloud" and the Nextcloud logo are
-trademarks of Nextcloud GmbH. The Nextcloud name is used only to describe
-compatibility and the intended platform. See [TRADEMARKS.md](TRADEMARKS.md).
+Thanks to:
+
+- SnappyMail contributors
+- RainLoop Team
+- Pierre-Alain Bandinelli
+- Tab Fitts
+- Nextgen Networks
+- Nathan Kinkade
+- everyone who contributed to the previous Nextcloud integration work
+
+NextSnapMail-specific maintenance and Nextcloud-focused development by
+Erhard Scharf.
