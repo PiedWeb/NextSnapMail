@@ -251,7 +251,7 @@ abstract class Base
 	/**
 	 * Verifies a signed text
 	 */
-	public function verify(string $signed_text, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verify(string $signed_text, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		return false;
 	}
@@ -259,7 +259,7 @@ abstract class Base
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyFile(string $filename, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verifyFile(string $filename, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		return false;
 	}
@@ -267,7 +267,7 @@ abstract class Base
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyStream($fp, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verifyStream($fp, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		return false;
 	}
@@ -487,7 +487,7 @@ abstract class Base
 
 	protected static function findBinary($name) : ?string
 	{
-		$binary = \function_exists('shell_exec') ? \trim((string) `which $name`) : '';
+		$binary = \function_exists('shell_exec') ? \trim((string) \shell_exec('command -v ' . \escapeshellarg($name))) : '';
 		if ($binary && \RainLoop\Utils::inOpenBasedir($binary) && \is_executable($binary)) {
 			return $binary;
 		}

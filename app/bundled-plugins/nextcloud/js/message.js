@@ -54,31 +54,39 @@
 			view.saveNextcloudLoading = ko.observable(false);
 			view.saveNextcloud = () => {
 				const
-					hashes = (view.message()?.attachments || [])
+					attachments = view.message()?.attachments,
+					hashes = (attachments ? attachments() : [])
 					.map(item => item?.checked() /*&& !item?.isLinked()*/ ? item.download : '')
 					.filter(v => v);
 				if (hashes.length) {
 					view.saveNextcloudLoading(true);
 					rl.nextcloud.selectFolder().then(folder => {
 						if (folder) {
-							rl.fetchJSON('./?/Json/&q[]=/0/', {}, {
-								Action: 'AttachmentsActions',
-								target: 'nextcloud',
-								hashes: hashes,
-								NcFolder: folder
-							})
-							.then(result => {
-								view.saveNextcloudLoading(false);
-								if (result?.Result) {
-									// success
-								} else {
-									view.saveNextcloudError(true);
+							const saveNext = index => {
+								if (index >= hashes.length) {
+									view.saveNextcloudLoading(false);
+									return;
 								}
-							})
-							.catch(() => {
-								view.saveNextcloudLoading(false);
-								view.saveNextcloudError(true);
-							});
+								rl.fetchJSON('./?/Json/&q[]=/0/', {}, {
+									Action: 'AttachmentsActions',
+									target: 'nextcloud',
+									hashes: [hashes[index]],
+									NcFolder: folder
+								})
+								.then(result => {
+									if (result?.Result) {
+										saveNext(index + 1);
+									} else {
+										view.saveNextcloudLoading(false);
+										view.saveNextcloudError(true);
+									}
+								})
+								.catch(() => {
+									view.saveNextcloudLoading(false);
+									view.saveNextcloudError(true);
+								});
+							};
+							saveNext(0);
 						} else {
 							view.saveNextcloudLoading(false);
 						}

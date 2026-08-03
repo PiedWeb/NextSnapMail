@@ -94,6 +94,14 @@
 			</p>
 			<br />
 
+			<p style="margin-top: 2em;">
+				<button id="nextsnapmail-reset-button" type="button" style="background-color: #d32f2f; border-color: #d32f2f; color: #fff;">
+					<?php echo($l->t('Reset Nextsnapmail')); ?>
+				</button>
+				<div class="nextsnapmail-reset-result-desc" style="white-space: pre-wrap"></div>
+			</p>
+			<br />
+
 			<p>
 				<button id="nextsnapmail-save-button" name="nextsnapmail-save-button"><?php echo($l->t('Save')); ?></button>
 				<div class="nextsnapmail-result-desc" style="white-space: pre"></div>

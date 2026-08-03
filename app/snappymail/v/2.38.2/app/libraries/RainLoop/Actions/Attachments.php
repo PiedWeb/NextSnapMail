@@ -148,7 +148,7 @@ trait Attachments
 		}
 
 		foreach ($aData as $aItem) {
-			$aItem['fileHash'] && $oFilesProvider->Clear($oAccount, $aItem['fileHash']);
+			!empty($aItem['fileHash']) && $oFilesProvider->Clear($oAccount, $aItem['fileHash']);
 		}
 
 		return $this->DefaultResponse($bError ? false : $mResult);
