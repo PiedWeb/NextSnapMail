@@ -217,31 +217,42 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 				$sSaveFolder = static::NormalizePath($sSaveFolder, true);
 				$oTargetFolder = static::FolderAtPath($sSaveFolder);
 				$aSavedFiles = [];
+				$aUsedFileNames = [];
 				foreach ($data->items as $aItem) {
-					$sSavedFileName = \MailSo\Base\Utils::SecureFileName(
-						empty($aItem['fileName']) ? 'file.dat' : $aItem['fileName']
-					);
-					$sSavedFileName = $sSavedFileName ?: 'file.dat';
-					$sSavedFileName = $oTargetFolder->getNonExistingName($sSavedFileName);
-					$oFile = null;
-					if (!empty($aItem['data'])) {
-						$oFile = $oTargetFolder->newFile($sSavedFileName, $aItem['data']);
-					} else if (!empty($aItem['fileHash'])) {
-						$fFile = $data->filesProvider->GetFile($data->account, $aItem['fileHash'], 'rb');
-						if (\is_resource($fFile)) {
-							try {
-								$oFile = $oTargetFolder->newFile($sSavedFileName, $fFile);
-							} finally {
-								\fclose($fFile);
+					try {
+						$sSavedFileName = \MailSo\Base\Utils::SecureFileName(
+							empty($aItem['fileName']) ? 'file.dat' : $aItem['fileName']
+						);
+						$sSavedFileName = $sSavedFileName ?: 'file.dat';
+						$sSavedFileName = static::NextcloudNonExistingName($oTargetFolder, $sSavedFileName, $aUsedFileNames);
+						$aUsedFileNames[\mb_strtolower($sSavedFileName)] = true;
+						$oFile = null;
+						if (!empty($aItem['data'])) {
+							$oFile = $oTargetFolder->newFile($sSavedFileName, $aItem['data']);
+						} else if (!empty($aItem['fileHash'])) {
+							$fFile = $data->filesProvider->GetFile($data->account, $aItem['fileHash'], 'rb');
+							if (\is_resource($fFile)) {
+								try {
+									$oFile = $oTargetFolder->newFile($sSavedFileName, $fFile);
+								} finally {
+									\fclose($fFile);
+								}
 							}
 						}
+						if (!$oFile instanceof \OCP\Files\File) {
+							throw new \RuntimeException('An attachment could not be read');
+						}
+						$aSavedFiles[] = static::FileMetadata($oFile);
+					} catch (\Throwable $oException) {
+						\SnappyMail\Log::error('Nextcloud', 'Could not save attachment "' . ($aItem['fileName'] ?? 'file.dat') . '": ' . $oException->getMessage());
 					}
-					if (!$oFile instanceof \OCP\Files\File) {
-						throw new \RuntimeException('An attachment could not be read');
-					}
-					$aSavedFiles[] = static::FileMetadata($oFile);
 				}
-				$data->result = ['success' => true, 'files' => $aSavedFiles];
+				$data->result = [
+					'success' => \count($aSavedFiles) === \count($data->items),
+					'files' => $aSavedFiles,
+					'requested' => \count($data->items),
+					'saved' => \count($aSavedFiles)
+				];
 			} catch (\Throwable $oException) {
 				\SnappyMail\Log::error('Nextcloud', $oException->getMessage());
 				$data->result = false;
@@ -476,5 +487,30 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			'mtime' => (int) $oFile->getMTime(),
 			'etag' => $oFile->getEtag()
 		];
+	}
+
+	private static function NextcloudNonExistingName(\OCP\Files\Folder $oFolder, string $sFileName, array $aUsedFileNames) : string
+	{
+		$sFileName = $oFolder->getNonExistingName($sFileName);
+		if (empty($aUsedFileNames[\mb_strtolower($sFileName)])) {
+			return $sFileName;
+		}
+
+		$sExtension = '';
+		$sBaseName = $sFileName;
+		$iDotPosition = \strrpos($sFileName, '.');
+		if (false !== $iDotPosition && 0 < $iDotPosition) {
+			$sBaseName = \substr($sFileName, 0, $iDotPosition);
+			$sExtension = \substr($sFileName, $iDotPosition);
+		}
+
+		$iCounter = 2;
+		do {
+			$sCandidate = "{$sBaseName} ({$iCounter}){$sExtension}";
+			$sCandidate = $oFolder->getNonExistingName($sCandidate);
+			++$iCounter;
+		} while (!empty($aUsedFileNames[\mb_strtolower($sCandidate)]));
+
+		return $sCandidate;
 	}
 }

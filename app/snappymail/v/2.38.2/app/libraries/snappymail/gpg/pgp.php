@@ -50,7 +50,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 		// How to use gpgme-json ?
 		$this->binary = static::findBinary('gpg');
 
-		$info = \preg_replace('/\R +/', ' ', `$this->binary --with-colons --list-config`);
+		$info = $this->binary ? \preg_replace('/\R +/', ' ', (string) \shell_exec(\escapeshellarg($this->binary) . ' --with-colons --list-config')) : '';
 		if (\preg_match('/cfg:version:([0-9]+\\.[0-9]+\\.[0-9]+)/', $info, $match)) {
 			$this->version = $match[1];
 		}
@@ -739,7 +739,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed text
 	 */
-	public function verify(string $signed_text, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verify(string $signed_text, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		return $this->_verify($signed_text, $signature);
 	}
@@ -747,7 +747,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyFile(string $filename, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verifyFile(string $filename, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		$fp = \fopen($filename, 'rb');
 		try {
@@ -763,7 +763,7 @@ class PGP extends Base implements \SnappyMail\PGP\PGPInterface
 	/**
 	 * Verifies a signed file
 	 */
-	public function verifyStream($fp, string $signature, string &$plaintext = null) /*: array|false*/
+	public function verifyStream($fp, string $signature, ?string &$plaintext = null) /*: array|false*/
 	{
 		if (!$fp || !\is_resource($fp)) {
 			throw new \Exception('Invalid stream resource');

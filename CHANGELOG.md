@@ -1,3 +1,31 @@
+## 0.1.10 – 2026-07-27
+
+### Added
+
+- Add an administrator-facing Reset NextSnapMail action that removes
+  NextSnapMail account preferences, clears the NextSnapMail data folder,
+  recreates a clean data structure, and clears the active NextSnapMail browser
+  session state.
+- Document the SnappyMail import and NextSnapMail reset features in the
+  Nextcloud app metadata.
+
+### Changed
+
+- Harden the SnappyMail import so existing valid NextSnapMail crypt keys,
+  additional accounts, and PGP private key backups can be preserved safely.
+- Re-encrypt imported additional accounts and PGP private key backups for the
+  target NextSnapMail account instead of copying encrypted data blindly.
+
+### Fixed
+
+- Save all selected message attachments to Nextcloud Files instead of only the
+  first attachment.
+- Keep attachment filenames unique when saving multiple files to Nextcloud.
+- Fix account switching for imported additional accounts by reading the SMTP
+  password from the selected account token.
+- Avoid PHP deprecation warnings on newer PHP versions in PGP/GPG/SMIME helper
+  code.
+
 ## 0.1.7 – 2026-07-06
 
 ### Added

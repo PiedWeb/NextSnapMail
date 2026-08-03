@@ -14,6 +14,7 @@ document.onreadystatechange = () => {
 		let form = document.querySelector('form.nextsnapmail');
 		form && SnappyMailFormHelper(form);
 		setupSnappyMailImportPreview();
+		setupNextSnapMailReset();
 		setupUnifiedSearchListener()
 	}
 };
@@ -167,6 +168,54 @@ function setupSnappyMailImportPreview()
 		.then(data => {
 			button.textContent = originalText;
 			renderOldSnappyMailAccounts(data, result);
+		})
+		.catch(error => {
+			button.textContent = originalText;
+			if (result) {
+				result.textContent = error?.message || t('nextsnapmail', 'Error');
+			}
+		});
+	});
+}
+
+function setupNextSnapMailReset()
+{
+	const button = document.getElementById('nextsnapmail-reset-button');
+	if (!button) {
+		return;
+	}
+
+	const result = document.querySelector('.nextsnapmail-reset-result-desc');
+	button.addEventListener('click', event => {
+		event.preventDefault();
+
+		if (!confirm(t('nextsnapmail', 'Do you really want to remove all accounts from the database and delete the data folder?'))) {
+			return;
+		}
+
+		const confirmationCode = 'RESET';
+		const confirmation = prompt(t('nextsnapmail', 'To confirm reset, type: {code}', {code: confirmationCode}));
+		if (confirmation !== confirmationCode) {
+			if (result) {
+				result.textContent = t('nextsnapmail', 'NextSnapMail data was not reset because the confirmation code was missing or invalid.');
+			}
+			return;
+		}
+
+		const originalText = button.textContent;
+		button.textContent = '...';
+		if (result) {
+			result.textContent = '';
+		}
+
+		nextsnapmailAdminRequest({
+			'nextsnapmail-reset-data': '1',
+			'nextsnapmail-reset-confirmation': confirmation
+		})
+		.then(response => response.json())
+		.then(responseData => {
+			button.textContent = originalText;
+			renderOldSnappyMailAccounts(responseData, result);
 		})
 		.catch(error => {
 			button.textContent = originalText;
