@@ -15,6 +15,7 @@ document.onreadystatechange = () => {
 		form && SnappyMailFormHelper(form);
 		setupSnappyMailImportPreview();
 		setupNextSnapMailReset();
+		setupNextSnapMailPluginUpload();
 		setupUnifiedSearchListener()
 	}
 };
@@ -216,6 +217,80 @@ function setupNextSnapMailReset()
 		.then(responseData => {
 			button.textContent = originalText;
 			renderOldSnappyMailAccounts(responseData, result);
+		})
+		.catch(error => {
+			button.textContent = originalText;
+			if (result) {
+				result.textContent = error?.message || t('nextsnapmail', 'Error');
+			}
+		});
+	});
+}
+
+function setupNextSnapMailPluginUpload()
+{
+	const button = document.getElementById('nextsnapmail-upload-plugin-button');
+	if (!button) {
+		return;
+	}
+
+	const fileInput = document.getElementById('nextsnapmail-plugin-package');
+	const overwriteInput = document.getElementById('nextsnapmail-plugin-overwrite');
+	const result = document.querySelector('.nextsnapmail-plugin-upload-result-desc');
+
+	button.addEventListener('click', event => {
+		event.preventDefault();
+
+		const file = fileInput?.files?.[0];
+		if (!file) {
+			if (result) {
+				result.textContent = t('nextsnapmail', 'Please select a plugin package first.');
+			}
+			return;
+		}
+
+		if (!confirm(t('nextsnapmail', 'Only upload trusted plugin packages. Plugins are executable PHP code. Continue?'))) {
+			return;
+		}
+
+		const originalText = button.textContent;
+		button.textContent = '...';
+		if (result) {
+			result.textContent = '';
+		}
+
+		const data = new FormData();
+		data.set('appname', 'nextsnapmail');
+		data.set('nextsnapmail-upload-plugin', '1');
+		data.set('nextsnapmail-plugin-package', file);
+		if (overwriteInput?.checked) {
+			data.set('nextsnapmail-plugin-overwrite', '1');
+		}
+
+		const requestToken = document.getElementById('requesttoken');
+		if (requestToken) {
+			data.set('requesttoken', requestToken.value);
+		}
+
+		fetch(OC.filePath('nextsnapmail', 'fetch', 'admin.php'), {
+			mode: 'same-origin',
+			cache: 'no-cache',
+			redirect: 'error',
+			referrerPolicy: 'no-referrer',
+			credentials: 'same-origin',
+			method: 'POST',
+			headers: {},
+			body: data
+		})
+		.then(response => response.json())
+		.then(data => {
+			button.textContent = originalText;
+			if (result) {
+				result.textContent = data?.Message || t('nextsnapmail', 'Error');
+			}
+			if ('success' === data?.status && fileInput) {
+				fileInput.value = '';
+			}
 		})
 		.catch(error => {
 			button.textContent = originalText;

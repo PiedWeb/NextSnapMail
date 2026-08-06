@@ -16,6 +16,7 @@ class FetchController extends Controller {
 	private const RESET_NEXTSNAPMAIL_CONFIRMATION = 'RESET';
 	private const MAX_ADDITIONAL_ACCOUNTS_BYTES = 1048576;
 	private const MAX_PGP_BACKUP_KEY_BYTES = 1048576;
+	private const MAX_PLUGIN_UPLOAD_BYTES = 5242880;
 
 	private IConfig $config;
 	private IAppManager $appManager;
@@ -105,6 +106,15 @@ class FetchController extends Controller {
 						return new JSONResponse([
 							'status' => 'success',
 							'Message' => \implode("\n", $this->resetNextSnapMailData())
+						]);
+					});
+				}
+
+				if (!empty($_POST['nextsnapmail-upload-plugin'])) {
+					return $this->safeJsonResponse(function (): JSONResponse {
+						return new JSONResponse([
+							'status' => 'success',
+							'Message' => \implode("\n", $this->installUploadedPluginPackage())
 						]);
 					});
 				}
@@ -325,6 +335,232 @@ class FetchController extends Controller {
 		}
 
 		return $scan;
+	}
+
+	private function installUploadedPluginPackage(): array {
+		SnappyMailHelper::loadApp();
+
+		$file = $this->getUploadedPluginFile();
+		if (!$file) {
+			throw new \RuntimeException($this->l->t('No plugin package was uploaded.'));
+		}
+
+		$name = (string) ($file['name'] ?? '');
+		$tmpName = (string) ($file['tmp_name'] ?? '');
+		$error = (int) ($file['error'] ?? \UPLOAD_ERR_NO_FILE);
+		$size = (int) ($file['size'] ?? 0);
+
+		if (\UPLOAD_ERR_OK !== $error || '' === $tmpName || !\is_file($tmpName)) {
+			throw new \RuntimeException($this->l->t('The uploaded plugin package could not be read.'));
+		}
+		if ($size < 1 || $size > self::MAX_PLUGIN_UPLOAD_BYTES) {
+			throw new \RuntimeException($this->l->t('The uploaded plugin package is too large.'));
+		}
+		if (!\preg_match('/\.(?:tgz|tar\.gz|zip)$/i', $name)) {
+			throw new \RuntimeException($this->l->t('Only .tgz, .tar.gz and .zip plugin packages are supported.'));
+		}
+
+		$base = $this->normalizePath(APP_PRIVATE_DATA . 'plugin-uploads');
+		if (!\is_dir($base) && !\mkdir($base, 0700, true) && !\is_dir($base)) {
+			throw new \RuntimeException($this->l->t('Could not create directory') . ': ' . $base);
+		}
+
+		$work = $base . '/' . \bin2hex(\random_bytes(12));
+		$extract = $work . '/extract';
+		if (!\mkdir($extract, 0700, true) && !\is_dir($extract)) {
+			throw new \RuntimeException($this->l->t('Could not create directory') . ': ' . $extract);
+		}
+
+		$extension = \preg_match('/\.zip$/i', $name) ? '.zip' : '.tar.gz';
+		$archive = $work . '/package' . $extension;
+
+		try {
+			if (\is_uploaded_file($tmpName)) {
+				if (!\move_uploaded_file($tmpName, $archive)) {
+					throw new \RuntimeException($this->l->t('The uploaded plugin package could not be stored.'));
+				}
+			} else if (!\copy($tmpName, $archive)) {
+				throw new \RuntimeException($this->l->t('The uploaded plugin package could not be stored.'));
+			}
+
+			$this->extractPluginArchive($archive, $extract, '.zip' === $extension);
+			$plugin = $this->validateExtractedPluginPackage($extract);
+			$pluginId = $plugin['id'];
+			$source = $plugin['path'];
+
+			if ('nextcloud' === $pluginId) {
+				throw new \RuntimeException($this->l->t('The required Nextcloud extension cannot be replaced by upload.'));
+			}
+
+			$target = $this->normalizePath(APP_PLUGINS_PATH . $pluginId);
+			$overwrite = !empty($_POST['nextsnapmail-plugin-overwrite']);
+			$lines = [];
+
+			if (\is_dir($target)) {
+				if (!$overwrite) {
+					throw new \RuntimeException($this->l->t('Plugin already exists. Enable overwrite to replace it.') . ': ' . $pluginId);
+				}
+				$backupRoot = $base . '/backups';
+				if (!\is_dir($backupRoot) && !\mkdir($backupRoot, 0700, true) && !\is_dir($backupRoot)) {
+					throw new \RuntimeException($this->l->t('Could not create directory') . ': ' . $backupRoot);
+				}
+				$backup = $backupRoot . '/' . $pluginId . '-' . \date('Ymd-His');
+				$this->copyDirectoryForReset($target, $backup);
+				$this->deleteDirectoryTree($target, APP_PLUGINS_PATH);
+				$lines[] = $this->l->t('Existing plugin was backed up before overwrite.') . ': ' . $backup;
+			}
+
+			$this->copyDirectoryForReset($source, $target);
+			\file_put_contents($target . '/.user-installed-nextsnapmail-plugin', \gmdate('c') . "\n");
+			$this->writeUserInstalledPluginRegistry($pluginId);
+
+			$lines[] = $this->l->t('Plugin package was installed.') . ': ' . $pluginId;
+			$lines[] = $this->l->t('Open the NextSnapMail admin panel and enable the plugin under Extensions.');
+
+			return $lines;
+		} finally {
+			if (\is_dir($work)) {
+				$this->deleteDirectoryTree($work, $base);
+			}
+		}
+	}
+
+	private function getUploadedPluginFile(): ?array {
+		$file = \method_exists($this->request, 'getUploadedFile')
+			? $this->request->getUploadedFile('nextsnapmail-plugin-package')
+			: null;
+		if (\is_array($file)) {
+			return $file;
+		}
+		return isset($_FILES['nextsnapmail-plugin-package']) && \is_array($_FILES['nextsnapmail-plugin-package'])
+			? $_FILES['nextsnapmail-plugin-package']
+			: null;
+	}
+
+	private function extractPluginArchive(string $archive, string $destination, bool $zip): void {
+		if ($zip) {
+			if (!\class_exists(\ZipArchive::class)) {
+				throw new \RuntimeException($this->l->t('ZIP plugin uploads are not supported on this server.'));
+			}
+			$zipArchive = new \ZipArchive();
+			if (true !== $zipArchive->open($archive)) {
+				throw new \RuntimeException($this->l->t('Could not open plugin package.'));
+			}
+			try {
+				for ($i = 0; $i < $zipArchive->numFiles; $i++) {
+					$name = (string) $zipArchive->getNameIndex($i);
+					$this->assertSafeArchivePath($name);
+				}
+				if (!$zipArchive->extractTo($destination)) {
+					throw new \RuntimeException($this->l->t('Could not extract plugin package.'));
+				}
+			} finally {
+				$zipArchive->close();
+			}
+			return;
+		}
+
+		if (!\class_exists(\PharData::class)) {
+			throw new \RuntimeException($this->l->t('TAR plugin uploads are not supported on this server.'));
+		}
+
+		$phar = new \PharData($archive);
+		$iterator = new \RecursiveIteratorIterator($phar);
+		foreach ($iterator as $item) {
+			$this->assertSafeArchivePath($iterator->getSubPathName());
+		}
+		$phar->extractTo($destination, null, true);
+	}
+
+	private function assertSafeArchivePath(string $path): void {
+		$path = \str_replace('\\', '/', $path);
+		if ('' === $path || '/' === $path[0] || \str_contains($path, "\0")) {
+			throw new \RuntimeException($this->l->t('Unsafe plugin package path rejected.'));
+		}
+		foreach (\explode('/', $path) as $part) {
+			if ('' === $part || '.' === $part || '..' === $part) {
+				throw new \RuntimeException($this->l->t('Unsafe plugin package path rejected.'));
+			}
+		}
+	}
+
+	private function validateExtractedPluginPackage(string $extract): array {
+		$extract = $this->realDirectoryPath($extract);
+		if (null === $extract) {
+			throw new \RuntimeException($this->l->t('Could not validate plugin package.'));
+		}
+
+		$top = [];
+		foreach (new \DirectoryIterator($extract) as $item) {
+			if ($item->isDot()) {
+				continue;
+			}
+			if (!$item->isDir() || $item->isLink()) {
+				throw new \RuntimeException($this->l->t('Plugin package must contain exactly one plugin folder.'));
+			}
+			$top[] = $item->getPathname();
+		}
+
+		if (1 !== \count($top)) {
+			throw new \RuntimeException($this->l->t('Plugin package must contain exactly one plugin folder.'));
+		}
+
+		$pluginPath = $this->normalizePath($top[0]);
+		$this->ensurePathIsInsideDirectory($pluginPath, $extract);
+		$pluginId = \basename($pluginPath);
+		if (!\preg_match('/^[a-z0-9][a-z0-9\-]*[a-z0-9]$/', $pluginId)) {
+			throw new \RuntimeException($this->l->t('Invalid plugin folder name.') . ': ' . $pluginId);
+		}
+		if (!\is_file($pluginPath . '/index.php')) {
+			throw new \RuntimeException($this->l->t('Plugin package must contain an index.php file.'));
+		}
+
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator($pluginPath, \FilesystemIterator::SKIP_DOTS),
+			\RecursiveIteratorIterator::SELF_FIRST
+		);
+		foreach ($iterator as $item) {
+			$path = $this->normalizePath($item->getPathname());
+			$this->ensurePathIsInsideDirectory($path, $pluginPath);
+			if ($item->isLink()) {
+				throw new \RuntimeException($this->l->t('Plugin package must not contain symbolic links.'));
+			}
+		}
+
+		$className = $this->pluginClassNameFromId($pluginId);
+		$index = (string) \file_get_contents($pluginPath . '/index.php');
+		if (!\preg_match('/\bclass\s+' . \preg_quote($className, '/') . '\b/i', $index)) {
+			throw new \RuntimeException($this->l->t('Plugin class does not match the plugin folder name.') . ': ' . $className);
+		}
+
+		return [
+			'id' => $pluginId,
+			'path' => $pluginPath
+		];
+	}
+
+	private function pluginClassNameFromId(string $pluginId): string {
+		return \implode('', \array_map('ucfirst', \array_map('strtolower',
+			\explode(' ', \preg_replace('/[^a-z0-9]+/', ' ', $pluginId))
+		))) . 'Plugin';
+	}
+
+	private function writeUserInstalledPluginRegistry(string $pluginId): void {
+		$registryFile = APP_PRIVATE_DATA . 'configs/user-installed-plugins.json';
+		$registry = [];
+		if (\is_file($registryFile)) {
+			$data = \json_decode((string) \file_get_contents($registryFile), true);
+			if (\is_array($data)) {
+				$registry = $data;
+			}
+		}
+
+		$registry[$pluginId] = [
+			'installedAt' => \gmdate('c'),
+			'source' => 'manual-upload'
+		];
+
+		\RainLoop\Utils::saveFile($registryFile, \json_encode($registry, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES));
 	}
 
 	private function importOldSnappyMailAppData(): array {
@@ -1142,8 +1378,8 @@ class FetchController extends Controller {
 			\copy(APP_VERSION_ROOT_PATH . 'app/.htaccess', $target . '/.htaccess');
 		}
 
-		$this->installBundledPluginsAfterReset($privateData . 'plugins/');
-		$lines[] = $this->l->t('Reinstalled bundled NextSnapMail extensions.');
+		$this->installNextcloudPluginAfterReset($privateData . 'plugins/');
+		$lines[] = $this->l->t('Reinstalled the required Nextcloud extension.');
 
 		$oConfig = \RainLoop\Api::Config();
 		$oConfig->Set('webmail', 'app_path', $this->appManager->getAppWebPath('nextsnapmail') . '/app/');
@@ -1182,19 +1418,14 @@ class FetchController extends Controller {
 		return $lines;
 	}
 
-	private function installBundledPluginsAfterReset(string $pluginsPath): void {
+	private function installNextcloudPluginAfterReset(string $pluginsPath): void {
 		$appDir = \dirname(\dirname(__DIR__)) . '/app';
-		$bundledPluginsRoot = $appDir . '/bundled-plugins';
-		if (!\is_dir($bundledPluginsRoot)) {
+		$nextcloudPlugin = $appDir . '/bundled-plugins/nextcloud';
+		if (!\is_dir($nextcloudPlugin)) {
 			return;
 		}
 
-		foreach (new \DirectoryIterator($bundledPluginsRoot) as $plugin) {
-			if ($plugin->isDot() || !$plugin->isDir()) {
-				continue;
-			}
-			$this->copyDirectoryForReset($plugin->getPathname(), $pluginsPath . $plugin->getFilename());
-		}
+		$this->copyDirectoryForReset($nextcloudPlugin, $pluginsPath . 'nextcloud');
 	}
 
 	private function copyDirectoryForReset(string $source, string $destination): void {
@@ -1250,6 +1481,40 @@ class FetchController extends Controller {
 				}
 			} else if (!\unlink($item->getPathname())) {
 				throw new \RuntimeException($this->l->t('Could not delete file') . ': ' . $item->getPathname());
+			}
+		}
+
+		if (!\rmdir($directory)) {
+			throw new \RuntimeException($this->l->t('Could not delete directory') . ': ' . $directory);
+		}
+	}
+
+	private function deleteDirectoryTree(string $directory, string $allowedBaseDirectory): void {
+		$directory = $this->realDirectoryPath($directory);
+		$baseDirectory = $this->realDirectoryPath($allowedBaseDirectory);
+		if (null === $directory || null === $baseDirectory) {
+			throw new \RuntimeException($this->l->t('Refusing to delete unexpected folder'));
+		}
+
+		$this->ensurePathIsInsideDirectory($directory, $baseDirectory);
+		if ($directory === $baseDirectory) {
+			throw new \RuntimeException($this->l->t('Refusing to delete unexpected folder') . ': ' . $directory);
+		}
+
+		$iterator = new \RecursiveIteratorIterator(
+			new \RecursiveDirectoryIterator($directory, \FilesystemIterator::SKIP_DOTS),
+			\RecursiveIteratorIterator::CHILD_FIRST
+		);
+
+		foreach ($iterator as $item) {
+			$path = $item->getPathname();
+			$this->ensurePathIsInsideDirectory($path, $baseDirectory);
+			if ($item->isDir() && !$item->isLink()) {
+				if (!\rmdir($path)) {
+					throw new \RuntimeException($this->l->t('Could not delete directory') . ': ' . $path);
+				}
+			} else if (!\unlink($path)) {
+				throw new \RuntimeException($this->l->t('Could not delete file') . ': ' . $path);
 			}
 		}
 

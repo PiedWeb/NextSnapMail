@@ -4,8 +4,7 @@ namespace SnappyMail;
 
 abstract class Repository
 {
-	// snappyMailRepo
-	const BASE_URL = 'https://snappymail.eu/repository/v2/';
+	const BASE_URL = 'https://oe79.github.io/NextSnapMail-plugins/repository/v2/';
 
 	private static function get(string $path) : string
 	{
@@ -101,8 +100,6 @@ abstract class Repository
 		foreach (static::getBundledPackages() as $sId => $aItem) {
 			$aResult[$sId] = $aItem;
 		}
-		$bReal = true;
-		return $aResult;
 
 		try {
 			foreach (static::getRepositoryDataByUrl($bReal) as $oItem) {
@@ -151,6 +148,9 @@ abstract class Repository
 			}
 
 			$sId = $oItem->getFilename();
+			if ('nextcloud' !== $sId) {
+				continue;
+			}
 			$aResult[$sId] = array(
 				'type' => 'plugin',
 				'id' => $sId,
@@ -273,11 +273,11 @@ abstract class Repository
 		foreach ($aInstalled as $aItem) {
 			if ($aItem) {
 				if (isset($aList[$aItem[0]])) {
-					$aList[$aItem[0]]['installed'] = $aItem[1];
-					$aList[$aItem[0]]['enabled'] = \in_array(\strtolower($aItem[0]), $aEnabledPlugins);
-					$aList[$aItem[0]]['canBeDeleted'] = true;
-					$aList[$aItem[0]]['canBeUpdated'] = \version_compare($aItem[1], $aList[$aItem[0]]['version'], '<');
-				} else {
+				$aList[$aItem[0]]['installed'] = $aItem[1];
+				$aList[$aItem[0]]['enabled'] = \in_array(\strtolower($aItem[0]), $aEnabledPlugins);
+				$aList[$aItem[0]]['canBeDeleted'] = 'nextcloud' !== \strtolower($aItem[0]);
+				$aList[$aItem[0]]['canBeUpdated'] = \version_compare($aItem[1], $aList[$aItem[0]]['version'], '<');
+			} else {
 					\array_push($aList, array(
 						'type' => 'plugin',
 						'id' => $aItem[0],
@@ -288,7 +288,7 @@ abstract class Repository
 						'file' => '',
 						'release' => '',
 						'desc' => $aItem[3],
-						'canBeDeleted' => true,
+					'canBeDeleted' => 'nextcloud' !== \strtolower($aItem[0]),
 						'canBeUpdated' => false
 					));
 				}
@@ -335,7 +335,7 @@ abstract class Repository
 		try {
 			if ('plugin' === $sType) {
 				$sBundledPlugin = APP_INDEX_ROOT_PATH . 'bundled-plugins/' . $sId;
-				if (\preg_match('/^[a-z0-9\-]+$/', $sId) && \is_dir($sBundledPlugin)) {
+				if ('nextcloud' === $sId && \preg_match('/^[a-z0-9\-]+$/', $sId) && \is_dir($sBundledPlugin)) {
 					if (!static::deletePackageDir($sId)) {
 						throw new \Exception('Cannot remove previous plugin folder: '.$sId);
 					}

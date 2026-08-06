@@ -94,6 +94,23 @@
 			</p>
 			<br />
 
+			<p>
+				<strong><?php echo($l->t('Install plugin package')); ?></strong><br />
+				<span><?php echo($l->t('Upload only trusted SnappyMail/NextSnapMail plugin packages. Plugins are executable PHP code.')); ?></span><br />
+				<input id="nextsnapmail-plugin-package" name="nextsnapmail-plugin-package" type="file" accept=".tgz,.tar.gz,.zip">
+				<br />
+				<label for="nextsnapmail-plugin-overwrite">
+					<input id="nextsnapmail-plugin-overwrite" name="nextsnapmail-plugin-overwrite" type="checkbox" class="checkbox">
+					<?php echo($l->t('Overwrite existing plugin after creating a backup')); ?>
+				</label>
+				<br />
+				<button id="nextsnapmail-upload-plugin-button" type="button">
+					<?php echo($l->t('Upload and install plugin')); ?>
+				</button>
+				<div class="nextsnapmail-plugin-upload-result-desc" style="white-space: pre-wrap"></div>
+			</p>
+			<br />
+
 			<p style="margin-top: 2em;">
 				<button id="nextsnapmail-reset-button" type="button" style="background-color: #d32f2f; border-color: #d32f2f; color: #fff;">
 					<?php echo($l->t('Reset Nextsnapmail')); ?>
