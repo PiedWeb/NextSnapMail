@@ -37,17 +37,10 @@ class InstallStep implements IRepairStep
 		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
 //		$app_dir = \rtrim(APP_INDEX_ROOT_PATH, '\\/');
 
-		$bundledPluginsRoot = $app_dir . '/bundled-plugins';
-		if (\is_dir($bundledPluginsRoot)) {
-			foreach (new \DirectoryIterator($bundledPluginsRoot) as $plugin) {
-				if ($plugin->isDot() || !$plugin->isDir()) {
-					continue;
-				}
-
-				$pluginName = $plugin->getFilename();
-				$output->info("Install bundled extension: {$pluginName}");
-				static::copyDirectory($plugin->getPathname(), APP_PLUGINS_PATH . $pluginName);
-			}
+		$nextcloudPlugin = $app_dir . '/bundled-plugins/nextcloud';
+		if (\is_dir($nextcloudPlugin)) {
+			$output->info('Install bundled extension: nextcloud');
+			static::copyDirectory($nextcloudPlugin, APP_PLUGINS_PATH . 'nextcloud');
 		}
 
 		// https://github.com/the-djmaze/snappymail/issues/790#issuecomment-1366527884
