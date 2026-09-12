@@ -1,5 +1,14 @@
 # Releases
 
+## 1.7.3 activation completed, 2026-09-12
+
+The remaining Nextcloud wrapper was caused by web OPcache still executing plugin 1.7.2.
+Targeted authenticated invalidation activated the already installed 1.7.3 release.
+The actual desktop and mobile mail now fill the viewport and the native app grid works.
+Temporary maintenance code was removed, configuration restored exactly, and all 39
+installation checks passed. Runtime files, release tag and archive are unchanged.
+See [deployment evidence](docs/deployments/1.7.3.md).
+
 ## 1.7.3, 2026-09-12
 
 Mail now fills the window while Pied Web is active in Nextcloud. The native applications

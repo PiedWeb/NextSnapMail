@@ -38,6 +38,8 @@ The 15 existing metadata/native-dispatch cases pass. These simulate transport an
 navigation; they do not flag, send or delete real mail. Previews under `previews/1.7.3`
 contain fictional mail. Private live before/after images stay outside Git.
 
-The live session became unavailable during mobile verification. Refer to the actual
-[deployment record](deployments/1.7.3.md) for final web activation evidence, not the
-local previews. The web OPcache procedure in MAINTENANCE.md still applies.
+Authenticated desktop and 390 px mobile verification was completed on 2026-09-12 after
+targeted web OPcache invalidation activated the installed 1.7.3 release. The surrounding
+header now has a zero-sized box, the mail fills the viewport, and the original 15-link
+app menu opens. See the [deployment record](deployments/1.7.3.md) for measured evidence.
+The web OPcache procedure in MAINTENANCE.md still applies to future PHP changes.
