@@ -1,0 +1,107 @@
+[
+  {
+    "name": "Production version",
+    "ok": true,
+    "detail": "1.0.3"
+  },
+  {
+    "name": "Desktop editor fills height",
+    "ok": true,
+    "detail": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900,
+      "top": 0,
+      "right": 1440,
+      "bottom": 900,
+      "left": 0
+    }
+  },
+  {
+    "name": "Editor fills desktop width without app rail",
+    "ok": true,
+    "detail": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900,
+      "top": 0,
+      "right": 1440,
+      "bottom": 900,
+      "left": 0
+    }
+  },
+  {
+    "name": "Nested frame has no redundant header or gap",
+    "ok": true,
+    "detail": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900,
+      "top": 0,
+      "right": 1440,
+      "bottom": 900,
+      "left": 0
+    }
+  },
+  {
+    "name": "Editor app launcher is hidden",
+    "ok": true
+  },
+  {
+    "name": "Native Close file remains visible",
+    "ok": true
+  },
+  {
+    "name": "Mobile keeps full document width",
+    "ok": true,
+    "detail": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844,
+      "top": 0,
+      "right": 390,
+      "bottom": 844,
+      "left": 0
+    }
+  },
+  {
+    "name": "Mobile has no app strip",
+    "ok": true,
+    "detail": {
+      "outer": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "inner": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "width": 390
+    }
+  },
+  {
+    "name": "Mobile shell has no horizontal overflow",
+    "ok": true,
+    "detail": 390
+  },
+  {
+    "name": "Closing document restores Nextcloud",
+    "ok": true
+  }
+]

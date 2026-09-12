@@ -1,0 +1,202 @@
+{
+  "release": "1.7.3",
+  "checks": [
+    {
+      "check": "Nextcloud version",
+      "ok": true,
+      "detail": "34.0.4"
+    },
+    {
+      "check": "NextSnapMail version",
+      "ok": true,
+      "detail": "0.1.11"
+    },
+    {
+      "check": "SnappyMail version",
+      "ok": true,
+      "detail": "2.38.2"
+    },
+    {
+      "check": "plugin/pied-web-ux/AttachmentImage.php",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/FilteredSelection.php",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/UnreadDrafts.php",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/app-shell.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/attachment-images.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/background-send.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/composer-icons.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/composer-icons.json",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/composer-images.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/composer-toolbar.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/filtered-selection.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/image-compression-license.txt",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/image-compression-source.json",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/image-tools.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/image-vendor.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/index.php",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/list-interactions.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/list-metadata.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/lucide-license.txt",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/lucide-settings.svg",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/lucide-source.json",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/markdown-dependencies.json",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/markdown-licenses.txt",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/markdown-vendors.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/markdown.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/message-flag.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/quote-readability.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/send-delay.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/studio.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/unread-drafts.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/ux.css",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "plugin/pied-web-ux/ux.js",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "theme/PiedWeb/snappymail/preview.png",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "theme/PiedWeb/snappymail/style.css",
+      "ok": true,
+      "detail": "match"
+    },
+    {
+      "check": "Plugin enabled",
+      "ok": true,
+      "detail": "Only plugin activation was read; no configuration values are printed."
+    },
+    {
+      "check": "Core unread patch",
+      "ok": true,
+      "detail": "Optional patch fingerprint. A mismatch requires checking upstream PR #41, not blindly reapplying."
+    }
+  ],
+  "files_and_versions_match": true,
+  "limitation": "File checks do not prove UI/API compatibility. Run browser checks after upgrading."
+}

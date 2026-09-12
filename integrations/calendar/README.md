@@ -12,7 +12,7 @@ apps retain their normal shell. The original Vue app-menu instance is mounted in
 focus trap includes it. A placeholder restores it on exit; no handlers or app lists are cloned. If expected markup is missing, the
 standard Nextcloud header stays available.
 
-Compatibility target: Nextcloud 34.0.3 and Calendar 6.5.4. Recheck selectors, keyboard
+Compatibility target: Nextcloud 34.0.4 and Calendar 6.5.4. Recheck selectors, keyboard
 navigation and mobile after upstream updates; this is not a promise of compatibility
 with future versions.
 

@@ -1,5 +1,14 @@
 # Releases
 
+## Nextcloud 34.0.4 compatibility verified, 2026-09-12
+
+Nextcloud updated from 34.0.3 to 34.0.4. Its native app upgrade also installed
+NextSnapMail 0.1.11. Mail 1.7.3, Calendar workspace 1.0.1 and Office workspace
+1.0.3 remain active. The app update replaced the five unread-account patch files;
+a pristine 0.1.11 checkout accepted the reviewed patch, all nine patch tests passed,
+and the restored payload matches its original fingerprints exactly. Other custom
+payload files were preserved. See [full verification](docs/deployments/nextcloud-34.0.4.md).
+
 ## Calendar workspace 1.0.1, 2026-09-12
 
 Calendar fills the viewport, with its native app grid before the event filter. A separate

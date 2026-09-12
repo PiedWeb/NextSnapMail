@@ -14,3 +14,8 @@ php tests/account-unread-counts.php
 ```
 
 Changing the five application files can trigger Nextcloud's application integrity check. An app update replaces them. Do not disable integrity checks or apply old minified bundles over a newer version. Check the upstream PR before porting or deploying this optional fix.
+
+Verified again on NextSnapMail 0.1.11 (tag commit `aef1e4e`) after Nextcloud 34.0.4
+automatically updated the app. All five pristine target hashes matched the tag; the
+patch applied without changes and all eight JS tests plus the PHP routing test passed.
+The exact same patched payload was restored. See `docs/deployments/nextcloud-34.0.4.md`.
