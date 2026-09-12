@@ -398,3 +398,35 @@ html:not(.pw-theme) #V-PopupsCompose :is(.pw-image-tools,.pw-image-outline,.pw-i
   html.pw-theme #V-PopupsCompose .pw-image-handle {width:44px;height:44px;right:-20px;bottom:-20px;}
   html.pw-theme #V-PopupsCompose .pw-image-handle::after {inset:17px;}
 }
+
+/* Unread drafts share the Inbox feed, with their own folder-scoped rows. */
+html.pw-theme #V-MailMessageList .pw-unread-drafts {border-bottom:1px solid var(--nc-color-border);padding-bottom:8px;margin-bottom:8px;}
+html.pw-theme #V-MailMessageList .pw-unread-drafts[hidden] {display:none!important;}
+html.pw-theme #V-MailMessageList .pw-unread-drafts header {display:flex;align-items:center;gap:7px;padding:14px 20px 6px;}
+html.pw-theme #V-MailMessageList .pw-unread-drafts h2 {margin:0;font-family:inherit;font-size:12px;line-height:1.5;font-weight:600;}
+html.pw-theme #V-MailMessageList .pw-unread-drafts header > span {font-size:12px;color:var(--nc-color-text-maxcontrast);}
+html.pw-theme #V-MailMessageList .pw-draft-row {
+  display:grid;grid-template-columns:18px minmax(0,1fr) auto auto;gap:5px 7px;align-items:center;
+  width:100%;min-height:68px;box-sizing:border-box;padding:9px 20px;margin:0;
+  border:0!important;border-radius:0!important;background:transparent;color:var(--nc-color-main-text);
+  text-align:start;font:inherit;white-space:normal;cursor:pointer;
+}
+html.pw-theme #V-MailMessageList .pw-draft-row:hover {background:var(--nc-color-background-hover);}
+html.pw-theme #V-MailMessageList .pw-draft-row:focus-visible,
+html.pw-theme #V-MailMessageList .pw-drafts-more:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:-2px;}
+html.pw-theme #V-MailMessageList .pw-draft-row:disabled {opacity:.6;cursor:progress;}
+html.pw-theme #V-MailMessageList .pw-draft-icon {grid-column:1;color:var(--nc-color-text-maxcontrast);font-size:15px;}
+html.pw-theme #V-MailMessageList .pw-draft-recipient {grid-column:2;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;}
+html.pw-theme #V-MailMessageList .pw-draft-row time {grid-column:4;font-size:11px;color:var(--nc-color-text-maxcontrast);white-space:nowrap;}
+html.pw-theme #V-MailMessageList .pw-draft-badge {grid-column:3;font-size:11px;line-height:1.5;padding:1px 5px;border:1px solid var(--nc-color-border);border-radius:3px;color:var(--nc-color-text-maxcontrast);}
+html.pw-theme #V-MailMessageList .pw-draft-subject {grid-column:2/5;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:600;}
+html.pw-theme #V-MailMessageList .pw-drafts-more {margin:4px 12px;min-height:36px;padding:6px 8px;border:0!important;background:transparent;color:var(--nc-color-main-text);font:inherit;font-size:12px;cursor:pointer;}
+html.pw-theme #V-MailMessageList .pw-drafts-more[hidden],
+html.pw-theme #V-MailMessageList .pw-draft-status[hidden],
+html.pw-theme #V-MailMessageList .pw-has-unread-drafts > .listEmptyMessage {display:none!important;}
+html.pw-theme #V-MailMessageList .pw-draft-status {margin:6px 20px;font-size:12px;line-height:1.5;color:var(--nc-color-text-maxcontrast);}
+@media(max-width:799px) {
+  html.pw-theme #V-MailMessageList .pw-draft-row {min-height:74px;padding:10px 16px;}
+  html.pw-theme #V-MailMessageList .pw-unread-drafts header {padding-inline:16px;}
+  html.pw-theme #V-MailMessageList .pw-drafts-more {min-height:44px;}
+}

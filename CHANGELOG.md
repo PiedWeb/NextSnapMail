@@ -1,5 +1,24 @@
 # Releases
 
+## 1.7.0, 2026-09-12
+
+Genuinely unread drafts now appear in a dedicated section at the top of the first Inbox
+page. The server uses the current account’s configured Drafts folder and native UNSEEN
+search; read and deleted drafts are excluded. Three reminders appear initially, with further
+results available through Show more. Clicking resumes native Draft composition with its
+original UID, recipients, attachments and reply references.
+
+The section deliberately keeps draft UIDs outside the received-message selection, because
+native multi-select commands assume a single folder. Search and later Inbox pages remain
+unchanged. Account changes invalidate pending requests; refresh, retry, empty-Inbox,
+mobile and dark-mode behavior are covered. See `docs/UNREAD_DRAFTS.md` for limits.
+
+Validation: 25 browser draft scenarios, 19 native parser/endpoint checks, 22 editor image
+regressions, 25 filtered-selection checks, 10 attachment storage checks and 5 installation
+diagnostics. Native models are used with fictional mail and mocked transport/popup opening;
+no real mail operations or authenticated live browser session. Payload syntax and reproducible
+theme build passed; the deployment record documents actual server compilation and hashes.
+
 ## 1.6.6, 2026-09-12
 
 The compose Image button now opens the native Nextcloud file selector. Selected raster images

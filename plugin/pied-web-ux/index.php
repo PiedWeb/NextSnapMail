@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.6.6',
+        VERSION = '1.7.0',
         RELEASE = '2026-09-12',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -29,8 +29,21 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('image-tools.js');
         $this->addJs('composer-images.js');
         $this->addJs('attachment-images.js');
+        $this->addJs('unread-drafts.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
+        $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
+    }
+
+    public function UnreadDrafts(): array
+    {
+        require_once __DIR__ . '/UnreadDrafts.php';
+        try {
+            $result = PiedWebUnreadDrafts::list(\RainLoop\Api::Actions());
+        } catch (\Throwable $error) {
+            $result = ['error' => 'drafts'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebUnreadDrafts', $result);
     }
 
     public function AttachmentImage(): array

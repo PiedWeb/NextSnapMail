@@ -16,6 +16,7 @@ Use a separate source checkout of the NextSnapMail revision recorded in `release
 ```sh
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
@@ -40,6 +41,7 @@ dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
+dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
@@ -50,3 +52,9 @@ construction, native selection/cancellation, inline compression, Nextcloud/resto
 failure/retry, draft changes, HTML-only image paste and mixed-format selection feedback.
 
 This curated harness accompanies the baseline's image/editor validation. It does not claim to cover every legacy customization or substitute for testing the upgraded application in an authenticated test mailbox.
+
+The unread-draft fixture uses `?drafts=1&mode=list&side=1`, extracting the actual native
+MessageCollectionModel, MessageModel, EmailModel and attachment models from the reference
+engine. IMAP/network, popup opening and the HTML rendering helper are simulated. Cases cover
+actual UNSEEN filtering, folder/UID collisions, native draft metadata, account races,
+pagination, search exclusion, empty Inbox, retry, text escaping and mobile geometry.

@@ -30,6 +30,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   download through authenticated same-origin WebDAV, compress locally and insert inline.
   Drag/drop remains a normal attachment; Compress is explicit on attachment cards.
 
+- Since 1.7.0, only actual unread Drafts-folder messages appear above the first Inbox page.
+  A distinct section protects single-folder native UID selection; clicking resumes Draft mode.
+  Read drafts are not reminders. See `UNREAD_DRAFTS.md` for scope and refresh rules.
+
 ## Native contracts that previously caused regressions
 
 - Squire installs a capture paste listener on the editable root. Our file handler must
@@ -37,6 +41,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Native Knockout exposes `ko.computed(fn, {pure:true})`, not `ko.pureComputed` here.
 - Reader delegated flag clicks historically depended on the `subjectParent` ancestor.
   The plugin now uses the native message-list action directly with pending/error handling.
+- Inbox/Drafts UIDs can collide. Never insert multiple-folder items into native Inbox selection.
+  Native ComposeType.Draft is 5; revive the full Message response and restore isHtml explicitly.
 - Native attachment callbacks mark complete before setting MIME type and tempName.
   Subscribe to those metadata changes too. Commit a replacement only after upload succeeds.
 - Async image operations must hold the originating draft epoch and cursor range.
@@ -55,6 +61,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 | 1.6.0–1.6.2 | Background Undo Send, direct native flag action, Lucide settings icon and functional Nextcloud Contacts link. |
 | 1.6.3–1.6.4 | Interleaved quote readability and native compose toolbar redesign. |
 | 1.6.5 | Inline resize/alt/remove, compression on clipboard/local attachments; first standalone GitHub release of all accumulated changes. |
+| 1.7.0 | Actual unread drafts in the Inbox feed; account-safe native draft resume. |
 | 1.6.6 | Nextcloud image picker, compression for Nextcloud/restored attachments and embedded HTML image paste; repository maintenance memory. |
 
 Earlier critique screenshots used native-template fixtures with fictional mail, not an authenticated
