@@ -20,5 +20,22 @@
   "postdeploy_compiled_css_scenarios": 5,
   "installation_diagnostic_tests": 5,
   "real_mail_operations": 0,
-  "previous_live_session_mismatch_root_cause": "unconfirmed"
+  "previous_live_session_mismatch_root_cause": "unconfirmed",
+  "web_activation_followup": {
+    "date": "2026-09-12",
+    "url": "https://nc.robin-d.fr/apps/nextsnapmail/",
+    "previous_web_version": "1.6.4",
+    "web_version_after_targeted_invalidation": "1.7.2",
+    "sapi": "litespeed",
+    "opcache_validate_timestamps": false,
+    "web_plugins_hash": "9e35e4c379f4c903fc91fda40528b7c4",
+    "configuration_restored_exactly": true,
+    "temporary_plugin_removed": true,
+    "actual_inbox_metadata_version": "1.7.2",
+    "actual_counter_border_width_px": 0,
+    "unread_drafts_module_mounted": true,
+    "all_payload_checks_still_match": true,
+    "runtime_payload_changed": false,
+    "record": "1.7.2-web-runtime-repair.md"
+  }
 }

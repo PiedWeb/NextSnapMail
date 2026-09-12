@@ -21,8 +21,11 @@ The administrative **Reset NextSnapMail data** action is different from updating
 1. Keep the repository/release and current plugin/theme backup outside the Nextcloud installation. Back up data/configuration separately; Nextcloud's updater does not back up the data directory or database.
 2. Finish/cancel pending outgoing messages, then perform the supported Nextcloud/NextSnapMail update.
 3. Run `tools/check-install.py`. An untested version must be reviewed, even if all custom files remain present.
-4. Check the list, account menu, responsive folders, compose toolbar, Markdown round trip, image paste/resize, attachments and Undo Send. Use a test mailbox for delivery tests.
-5. Review the optional core patch separately. Do not blindly overwrite a new application's bundled JS with the old version. Keep integrity verification enabled.
+4. Verify web PHP activation, not only CLI hashes. On this n0c host, timestamp validation
+   in OPcache is disabled. Follow [MAINTENANCE.md](MAINTENANCE.md) for targeted authenticated
+   invalidation after changing PHP, including rollback.
+5. Check the list, account menu, responsive folders, compose toolbar, Markdown round trip, image paste/resize, attachments and Undo Send. Use a test mailbox for delivery tests.
+6. Review the optional core patch separately. Do not blindly overwrite a new application's bundled JS with the old version. Keep integrity verification enabled.
 
 ## GitHub's role
 

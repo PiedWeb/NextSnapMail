@@ -34,3 +34,14 @@ upstream source; do not apply old generated JS blindly.
 The bundled `nextcloud` plugin was compared with the upstream source on 2026-09-12:
 there were no content changes apart from line endings. It needs no separate custom patch.
 Its native configuration is deliberately excluded from this repository.
+
+## Web PHP validation is mandatory on this host
+
+On 2026-09-12, LiteSpeed OPcache had `validate_timestamps=0` and still executed the
+1.6.4 plugin index after the 1.7.2 files were installed. A CLI checksum or compilation
+cannot certify web activation. Verify through an authenticated **nc.robin-d.fr** session.
+If the web version is stale, use the targeted authenticated maintenance workflow in
+[`tools/web-runtime-maintenance/README.md`](../tools/web-runtime-maintenance/README.md).
+Invalidate changed PHP for both deployment and rollback, remove the temporary helper,
+and confirm fresh AppData/bundle markers and the actual DOM after reload. Never report
+“deployed and visible” from SSH-only checks. See the [incident record](deployments/1.7.2-web-runtime-repair.md).

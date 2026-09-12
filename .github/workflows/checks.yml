@@ -17,5 +17,8 @@ jobs:
           persist-credentials: false
       - name: Payload, syntax and reproducible theme
         run: python3 tools/verify.py
+      - name: Temporary maintenance helper syntax
+        run: |
+          for file in tools/web-runtime-maintenance/*.php; do php -l "$file"; done
       - name: Read-only update diagnostics
         run: python3 -m unittest discover -s tests -p 'test_*.py'

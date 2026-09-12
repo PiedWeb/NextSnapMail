@@ -21,6 +21,15 @@ minute while visible. Refreshing reloads the first ten matching drafts. Switchin
 discards stale responses. Network failures expose a Retry action. Subjects and recipients
 are always inserted as text, never interpreted as interface HTML.
 
+## If the section is missing
+
+First check the authenticated web bundle includes `pwUnreadDrafts` and the module is
+mounted. The 2026-09-12 [OPcache incident](deployments/1.7.2-web-runtime-repair.md) hid
+this entire feature despite correct files. Then compare the current account’s real
+UNSEEN Drafts search with the normal folder count: saved drafts are normally Seen,
+so having drafts does not imply having unread reminders. Never mark all drafts unread
+as an implicit repair.
+
 ## Why a distinct section
 
 SnappyMail 2.38.2's checkbox, move and delete commands assume that selected UIDs belong to

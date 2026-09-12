@@ -1,5 +1,16 @@
 # Releases
 
+## 1.7.2 activation repair, 2026-09-12
+
+An authenticated session finally identified the missing changes: LiteSpeed OPcache was
+still executing plugin 1.6.4 with timestamp validation disabled. Targeted invalidation
+activated the existing 1.7.2 payload. The framed counter is gone in the live Inbox and
+the unread-draft module now loads. No unread drafts were present on the checked account.
+The temporary maintenance helper was removed and configuration restored exactly.
+Runtime files/tag remain unchanged; the repository now records the guarded maintenance
+workflow and requires web validation after PHP deployment/rollback.
+See [web activation repair](docs/deployments/1.7.2-web-runtime-repair.md).
+
 ## 1.7.2, 2026-09-12
 
 Followed messages have a filled amber star, a stronger star surface and a tinted row;

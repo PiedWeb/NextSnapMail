@@ -22,6 +22,9 @@ asks that every change remain recoverable after an upstream update.
 - For a deployment, compare current installed hashes with the prior release, make an
   external backup, install assets before `index.php`, compile through the actual server
   runtime, and preserve account/Sieve/calendar configuration. Document any mismatch.
+- On this n0c host, web OPcache has timestamp validation disabled. CLI compilation does not
+  prove web activation. Follow docs/MAINTENANCE.md for targeted authenticated invalidation
+  after changed PHP (including rollback), then verify the actual web bundle and DOM.
 - Retain French/English labels, keyboard support, visible focus, mobile and dark-mode behavior.
 
 ## Dev-browser startup

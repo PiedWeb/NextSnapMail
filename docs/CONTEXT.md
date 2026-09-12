@@ -38,6 +38,13 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   A distinct section protects single-folder native UID selection; clicking resumes Draft mode.
   Read drafts are not reminders. See `UNREAD_DRAFTS.md` for scope and refresh rules.
 
+## Deployment runtime contract
+
+The live URL is nc.robin-d.fr. On n0c, web LiteSpeed OPcache can retain old plugin PHP
+with `opcache.validate_timestamps=0`, even after successful CLI/hash checks. Version
+1.7.2 only became visible after targeted web invalidation of the old 1.6.4 index.
+Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web evidence.
+
 ## Native contracts that previously caused regressions
 
 - Squire installs a capture paste listener on the editable root. Our file handler must
