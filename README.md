@@ -23,6 +23,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Genuinely unread drafts at the top of the Inbox feed, with one-click resume.
 
 The optional linked-account unread counter correction is a separate [upstream PR](https://github.com/oe79/NextSnapMail/pull/41) and [version-specific patch](patches/README.md).
+Selected UX enhancements are proposed for upstream integration in [NextSnapMail issue #46](https://github.com/oe79/NextSnapMail/issues/46). The proposal asks the maintainer which focused changes to accept; it does not expose this private repository or claim the plugin can be merged as-is.
 
 This does **not** implement scheduled delivery, a unified inbox or a new vacation responder. Nextcloud invitation import and Sieve use the existing integrations and administrator configuration. Undo Send is a browser delay before SMTP submission, not recall after delivery or a server scheduler.
 
