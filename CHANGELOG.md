@@ -1,5 +1,23 @@
 # Releases
 
+## 1.7.2, 2026-09-12
+
+Followed messages have a filled amber star, a stronger star surface and a tinted row;
+selection retains its teal treatment. Conversation metadata styling now ships in the
+compiled Pied Web theme, independent of the plugin initialization class. Without JavaScript,
+the original numeric text still displays with a quiet borderless style and no chevron.
+The optional labels and keyboard controls also initialize if the native view event was missed.
+A theme stylesheet marker governs activation and native style replacement restores attributes.
+
+The owner still saw the old 13/4 badge after 1.7.1. Installed hashes matched and the actual
+server-compiled CSS rendered the new badge locally. The live authenticated session was
+unavailable (HTTP 401); a stale browser/FPM resource was not confirmed. This release hardens
+the style/init boundary and improves followed-message visibility; it does not claim that
+the previous session mismatch was diagnosed. See the deployment record for verification.
+
+Validation: 15 native-dispatch metadata checks, 5 theme-only/late-init checks, desktop,
+390/320 px and dark previews, payload syntax, reproducible theme and installation diagnostics.
+
 ## 1.7.1, 2026-09-12
 
 Conversation counts now separate the total from an explicit unread label, for example

@@ -28,7 +28,7 @@ This does **not** implement scheduled delivery, a unified inbox or a new vacatio
 
 ## Install and maintain
 
-Release **1.7.1**, tested with Nextcloud **34.0.3**, NextSnapMail **0.1.10**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.7.2**, tested with Nextcloud **34.0.3**, NextSnapMail **0.1.10**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

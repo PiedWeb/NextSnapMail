@@ -4132,6 +4132,92 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
  #rl-app #V-SystemDropDown .dropdown-menu a { min-height:44px; }
 }
 
+/* List metadata: a quiet total, explicit unread count, and an always-visible star. */
+#rl-app {
+    --pw-list-metadata-version:1.7.2;
+    --pw-flag-ink:color-mix(in oklch,oklch(0.68 0.15 75) 72%,var(--nc-color-main-text));
+    --pw-follow-surface:color-mix(in oklab,var(--pw-flag-ink) 12%,var(--nc-color-main-background));
+    --pw-star-filled-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
+    display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
+    width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;
+    opacity:1;border:0;border-radius:5px;cursor:pointer;font-size:0;line-height:1;
+    color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .flagParent::after {
+    content:'';display:block;width:19px;height:19px;opacity:1;color:inherit;background:currentColor;
+    mask:var(--pw-star-icon) center/contain no-repeat;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent {
+    color:var(--pw-flag-ink);
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent::after {
+    mask-image:var(--pw-star-filled-icon);
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .flagParent:hover,
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent:hover {background:var(--pw-selected);}
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent {color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));}
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent::before {width:20px;height:20px;}
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent.flagOn {color:var(--pw-flag-ink);}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;align-self:center;
+    height:24px;min-height:24px;margin:0;padding:0 6px;border:0;border-radius:4px;
+    background:color-mix(in oklch,var(--nc-color-main-text) 7%,var(--pw-paper));
+    color:var(--nc-color-main-text);font:500 12px/1 var(--pw-font);font-variant-numeric:tabular-nums;
+    white-space:nowrap;cursor:pointer;box-shadow:none;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-total] {font-size:0;}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-total]::before {content:attr(data-pw-total);font:500 12px/1 var(--pw-font);}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len::after {content:none;}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
+    content:attr(data-pw-unread);font:600 10px/1 var(--pw-font);color:var(--pw-flag-ink);
+    padding-inline-start:5px;border-inline-start:1px solid var(--pw-line);
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len:hover {background:var(--pw-selected);}
+#rl-app #rl-right #V-MailMessageList .messageListItem :is(.flagParent,.threads-len):focus-visible {
+    outline:2px solid var(--nc-color-primary-element);outline-offset:2px;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-muted);margin:0;min-width:16px;font-size:14px;}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
+    grid-template-columns:minmax(0,1fr) auto auto auto 32px;grid-template-rows:minmax(24px,auto) auto;column-gap:6px;align-items:center;
+}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-area:1/5/3/6;align-self:center;}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {grid-area:1/2;}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {grid-area:1/3;}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time {grid-area:1/4;}
+html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/5;}
+@media(max-width:799px) {
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto auto auto 44px;grid-template-rows:minmax(32px,auto) auto;column-gap:4px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {width:44px;min-width:44px;height:44px;min-height:44px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {height:32px;min-height:32px;padding-inline:5px;gap:4px;}
+}
+/* Very narrow phones keep the sender readable by placing conversation metadata below the subject. */
+@media(max-width:360px) {
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto 44px;grid-template-rows:minmax(24px,auto) auto auto;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-area:1/3/3/4;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time {grid-area:1/2;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/3;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {grid-area:3/1;justify-self:start;margin-top:3px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {grid-area:3/2;justify-self:end;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent:not(:has(> i[class*="icon-"])) {display:none;}
+}
+
+/* Following is visible at row level; selection retains its established teal surface. */
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage):not(.selected):not(.checked) {
+    background:var(--pw-follow-surface)!important;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent,
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent.flagOn {
+    background:color-mix(in oklab,var(--pw-flag-ink) 19%,var(--nc-color-main-background));
+    color:var(--pw-flag-ink);
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent::after {width:22px;height:22px;}
+/* Unread counts retain teal; amber is reserved for followed messages. */
+#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
+    color:color-mix(in oklch,var(--nc-color-primary-element) 70%,var(--nc-color-main-text));
+}
+
 #rl-app .b-folders .b-folders-system a[data-icon="📥"] { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m4%204-3%2010v6h22v-6L20%204Z%20M1%2014h6l2%203h6l2-3h6%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app .b-folders .b-folders-system a[data-icon="📧"] { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m22%202-7%2020-4-9-9-4Z%20M11%2013%2022%202%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app .b-folders .b-folders-system a[data-icon="🗎"] { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m16%203%205%205-12%2012-6%201%201-6Z%20M13%206l5%205%22%2F%3E%3C%2Fsvg%3E"); }

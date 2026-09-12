@@ -1,16 +1,17 @@
 /* Keep native bindings and delegated click commands; only improve their presentation. */
 (() => {
     'use strict';
-    addEventListener('rl-view-model', ({detail:vm}) => {
-        if (vm.viewModelTemplateID !== 'MailMessageList' || vm.pwListMetadata) return;
-        vm.pwListMetadata = true;
-        const dom = vm.viewModelDom;
+    const mounted = new WeakSet();
+    const mount = dom => {
+        if (!dom || mounted.has(dom)) return;
+        mounted.add(dom);
+        dom.dataset.pwMetadataVersion = '1.7.2';
         let frame;
         const originals = new WeakMap(), attributes = ['title','role','tabindex','aria-label','aria-pressed'];
         const remember = control => {
             if (!originals.has(control)) originals.set(control,attributes.map(name => control.getAttribute(name)));
         };
-        const active = () => document.documentElement.classList.contains('pw-theme');
+        const active = () => getComputedStyle(dom).getPropertyValue('--pw-list-metadata-version').trim() === '1.7.2';
         const update = () => {
             frame = 0;
             if (!active()) {
@@ -49,7 +50,9 @@
         const observer = new MutationObserver(schedule);
         observer.observe(dom,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['class','data-unseen']});
         const theme = new MutationObserver(schedule);
-        theme.observe(document.documentElement,{attributes:true,attributeFilter:['class','lang']});
+        theme.observe(document.documentElement,{attributes:true,attributeFilter:['class','lang','data-theme','data-themes']});
+        const themeStyle = document.getElementById('app-theme-style');
+        if (themeStyle) theme.observe(themeStyle,{attributes:true,childList:true,characterData:true,subtree:true});
         const keyboard = event => {
             if (!active() || !['Enter',' '].includes(event.key) || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
             const control = event.target.closest('.messageListItem .flagParent,.messageListItem .threads-len');
@@ -61,5 +64,17 @@
         ko.utils.domNodeDisposal.addDisposeCallback(dom,() => {
             observer.disconnect(); theme.disconnect(); cancelAnimationFrame(frame); dom.removeEventListener('keydown',keyboard,true);
         });
+    };
+    addEventListener('rl-view-model', ({detail:vm}) => {
+        if (vm.viewModelTemplateID === 'MailMessageList') mount(vm.viewModelDom);
     });
+    // Also mount when the plugin is loaded after the native view event.
+    const discover = () => mount(document.getElementById('V-MailMessageList'));
+    if (document.getElementById('V-MailMessageList')) discover();
+    else {
+        const discovery = new MutationObserver(() => {
+            if (document.getElementById('V-MailMessageList')) { discover(); discovery.disconnect(); }
+        });
+        discovery.observe(document.documentElement,{childList:true,subtree:true});
+    }
 })();

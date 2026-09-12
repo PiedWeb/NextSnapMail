@@ -40,9 +40,9 @@ await p.evaluate(()=>document.querySelector('.threads-len').style.display='none'
 check('Native hidden counts remain hidden',await p.evaluate(()=>document.querySelector('.threads-len').getClientRects().length===0));
 await p.evaluate(()=>{document.querySelector('.threads-len').style.display='';document.documentElement.lang='en';});await p.waitForFunction(()=>document.querySelector('.threads-len').title.startsWith('Open conversation'));
 check('Labels follow the interface language',await p.evaluate(()=>document.querySelector('.messageListItem .flagParent').title==='Remove star'));
-await p.evaluate(()=>document.documentElement.classList.remove('pw-theme'));await p.waitForFunction(()=>!document.querySelector('.threads-len').hasAttribute('data-pw-total'));
+await p.evaluate(()=>{document.querySelector('link[href*="theme/style.css"]').disabled=true;document.documentElement.classList.remove('pw-theme');});await p.waitForFunction(()=>!document.querySelector('.threads-len').hasAttribute('data-pw-total'));
 check('Leaving the theme restores native attributes',await p.evaluate(()=>!document.querySelector('.threads-len').hasAttribute('role')&&!document.querySelector('.messageListItem .flagParent').hasAttribute('tabindex')));
-await p.evaluate(()=>{document.documentElement.lang='fr';document.documentElement.classList.add('pw-theme');demoMessages.forEach((m,i)=>{m.checked(false);m.flagged=i===1;demoRows[i].classList.toggle('msgflag-\\flagged',m.flagged);});const b=document.querySelector('.threads-len');b.textContent='13/4';b.dataset.unseen='4';});await p.waitForSelector('.threads-len[data-pw-total]');
+await p.evaluate(()=>{document.documentElement.lang='fr';document.querySelector('link[href*="theme/style.css"]').disabled=false;document.documentElement.classList.add('pw-theme');demoMessages.forEach((m,i)=>{m.checked(false);m.flagged=i===1;demoRows[i].classList.toggle('msgflag-\\flagged',m.flagged);});const b=document.querySelector('.threads-len');b.textContent='13/4';b.dataset.unseen='4';});await p.waitForSelector('.threads-len[data-pw-total]');
 await p.locator('.threads-len').first().blur();await p.screenshot({path:'list-metadata-desktop.png'});
 for(const [width,dark] of [[390,false],[320,false],[390,true]]){
  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:dark?'dark':'light'});
