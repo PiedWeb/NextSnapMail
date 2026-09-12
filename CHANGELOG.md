@@ -1,3 +1,23 @@
+## 0.1.11 – 2026-09-12
+
+### Added
+
+- Integrate Gmail / Google OAuth2 login directly into the Nextcloud app, so
+  Gmail accounts can be connected as the main account from the personal settings
+  and as additional accounts from the webmail UI.
+- Add Nextcloud admin settings for Gmail / Google OAuth2 client configuration,
+  including the authorized redirect URI for the Google Cloud Console.
+- Add support for a separate NextSnapMail plugin repository and administrator
+  upload of custom plugins.
+
+### Changed
+
+- Include Gmail / Google OAuth2 configuration in the guarded NextSnapMail reset
+  cleanup so a reset removes the stored client ID, client secret and related
+  OAuth settings.
+- Document the integrated Gmail / Google OAuth2 support in the README and
+  Nextcloud app metadata.
+
 ## 0.1.10 – 2026-07-27
 
 ### Added
