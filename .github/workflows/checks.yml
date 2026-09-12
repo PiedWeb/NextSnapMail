@@ -1,0 +1,21 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Payload, syntax and reproducible theme
+        run: python3 tools/verify.py
+      - name: Read-only update diagnostics
+        run: python3 -m unittest discover -s tests -p 'test_*.py'

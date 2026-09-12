@@ -1,0 +1,9 @@
+{
+  "library": "Lucide",
+  "icon": "settings",
+  "source": "https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/settings.svg",
+  "license": "https://raw.githubusercontent.com/lucide-icons/lucide/main/LICENSE",
+  "retrieved": "2026-09-09",
+  "sha256": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
+  "embedding": "Whitespace normalized, stroke black for CSS alpha mask; geometry unchanged."
+}
