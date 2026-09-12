@@ -125,6 +125,21 @@ class FetchController extends Controller {
 					isset($_POST['nextsnapmail-autologin']) ? '2' === $_POST['nextsnapmail-autologin'] : false);
 				$this->config->setAppValue('nextsnapmail', 'nextsnapmail-no-embed', isset($_POST['nextsnapmail-no-embed']));
 				$this->config->setAppValue('nextsnapmail', 'nextsnapmail-autologin-oidc', isset($_POST['nextsnapmail-autologin-oidc']));
+				$this->config->setAppValue('nextsnapmail', 'gmail-oauth-client-id',
+					\trim((string) ($_POST['nextsnapmail-gmail-oauth-client-id'] ?? '')));
+				if (isset($_POST['nextsnapmail-gmail-oauth-client-secret'])
+					&& '' !== \trim((string) $_POST['nextsnapmail-gmail-oauth-client-secret'])) {
+					$this->config->setAppValue('nextsnapmail', 'gmail-oauth-client-secret',
+						SnappyMailHelper::encodePassword(
+							\trim((string) $_POST['nextsnapmail-gmail-oauth-client-secret']),
+							'nextsnapmail-gmail-oauth-client-secret'
+						)
+					);
+				}
+				$this->config->setAppValue('nextsnapmail', 'gmail-oauth-domains',
+					\trim((string) ($_POST['nextsnapmail-gmail-oauth-domains'] ?? "gmail.com\ngooglemail.com")));
+				$this->config->setAppValue('nextsnapmail', 'gmail-oauth-auto-configure',
+					isset($_POST['nextsnapmail-gmail-oauth-auto-configure']) ? '1' : '0');
 			} else {
 				return new JSONResponse([
 					'status' => 'error',
@@ -1294,6 +1309,10 @@ class FetchController extends Controller {
 		$deletedPreferences = $query->executeStatement();
 
 		$lines[] = $this->l->t('Deleted NextSnapMail database entries') . ': ' . $deletedPreferences;
+		$deletedAppConfig = $this->deleteNextSnapMailAppConfig();
+		if ($deletedAppConfig) {
+			$lines[] = $this->l->t('Deleted NextSnapMail app configuration entries') . ': ' . $deletedAppConfig;
+		}
 
 		$paths = $this->getAppDataImportPaths();
 		$existingSalt = \is_file($paths['target'] . '/SALT.php')
@@ -1313,6 +1332,29 @@ class FetchController extends Controller {
 		$lines[] = $this->l->t('NextSnapMail reset completed. Reload the page before using the app again.');
 
 		return $lines;
+	}
+
+	private function deleteNextSnapMailAppConfig(): int {
+		$keys = [
+			'gmail-oauth-client-id',
+			'gmail-oauth-client-secret',
+			'gmail-oauth-domains',
+			'gmail-oauth-auto-configure',
+			'nextsnapmail-autologin',
+			'nextsnapmail-autologin-with-email',
+			'nextsnapmail-no-embed',
+			'nextsnapmail-debug',
+			'nextsnapmail-force-language'
+		];
+		$deleted = 0;
+		foreach ($keys as $key) {
+			if ('' !== $this->config->getAppValue('nextsnapmail', $key, '')) {
+				++$deleted;
+			}
+			$this->config->deleteAppValue('nextsnapmail', $key);
+		}
+
+		return $deleted;
 	}
 
 	private function clearNextSnapMailRuntimeSession(): void {
