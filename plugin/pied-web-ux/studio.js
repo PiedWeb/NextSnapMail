@@ -3,32 +3,7 @@
     const fr = () => (document.documentElement.lang || 'fr').startsWith('fr');
     const icons = {'GLOBAL/CLOSE':'close','GLOBAL/TO_ARCHIVE':'archive','GLOBAL/TO_SPAM':'spam','GLOBAL/DELETE':'trash','GLOBAL/MORE':'more','GLOBAL/MOVE_TO':'folder','FOLDER_LIST/BUTTON_NEW_MESSAGE':'compose','MESSAGE_LIST/BUTTON_RELOAD':'refresh','MESSAGE_LIST/SORT':'sort','MESSAGE/BUTTON_REPLY':'reply','MESSAGE/BUTTON_REPLY_ALL':'reply-all','MESSAGE_LIST/MENU_UNSET_SEEN':'unread','GLOBAL/CONTACTS':'contacts'};
     let title, readerVM;
-    // The embedding container is owned by NextSnapMail; preserve Nextcloud's navigation.
-    const integrateShell = () => {
-        try {
-            const frame = parent.document.getElementById('rliframe');
-            if (parent === window || frame?.contentWindow !== window) return;
-            let style = parent.document.getElementById('pied-web-integration-style');
-            if (!style) {
-                style = parent.document.createElement('style'); style.id = 'pied-web-integration-style';
-                parent.document.head.append(style);
-            }
-            const colors=getComputedStyle(document.getElementById('rl-app') || document.documentElement);
-            const background=colors.getPropertyValue('--nc-color-main-background').trim(), foreground=colors.getPropertyValue('--nc-color-main-text').trim();
-            const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
-            ctx.fillStyle=background;ctx.fillRect(0,0,1,1);
-            const [r,g,b]=ctx.getImageData(0,0,1,1).data;
-            const invert=(.2126*r+.7152*g+.0722*b)>128 ? 'invert(1)' : 'none';
-            style.textContent = 'body:has(#content.app-nextsnapmail){--header-height:48px}#content.app-nextsnapmail{margin:var(--header-height) 0 0!important;width:100%!important;height:calc(100dvh - var(--header-height))!important;border-radius:0!important}#content.app-nextsnapmail #rliframe{height:100%!important;display:block}'
-                + `body:has(#content.app-nextsnapmail) #header{background:${background};--color-background-plain:${background};--color-background-plain-text:${foreground};--background-image-invert-if-bright:${invert};color:${foreground};box-shadow:inset 0 -1px color-mix(in oklch,${foreground} 12%,${background})}`;
-            style.disabled = !document.documentElement.classList.contains('pw-theme');
-        } catch (_) { /* Standalone webmail or cross-origin host. */ }
-    };
-    integrateShell();
-    const activeTheme = document.getElementById('app-theme-style');
-    if (activeTheme) new MutationObserver(integrateShell).observe(activeTheme,{attributes:true,attributeFilter:['data-name']});
-    new MutationObserver(integrateShell).observe(document.documentElement,{attributes:true,attributeFilter:['class','data-themes','data-theme']});
-    matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>requestAnimationFrame(integrateShell));
+    // Nextcloud shell integration is handled by app-shell.js for both embedding modes.
     const syncTitle = () => {
         if (!title) return;
         const selected = document.querySelector('#V-MailFolderList a.selectable.selected');
@@ -278,7 +253,7 @@
                 const mobile = matchMedia('(max-width:799px)').matches && document.documentElement.classList.contains('pw-theme');
                 const piedWeb = document.documentElement.classList.contains('pw-theme');
                 search.querySelector('input').tabIndex=piedWeb ? 0 : -1;
-                if(mobile) compose.before(search); else if(search.previousSibling!==inputHome) inputHome.after(search);
+                if(mobile && !document.documentElement.classList.contains('pw-mail-shell')) compose.before(search); else if(search.previousSibling!==inputHome) inputHome.after(search);
                 const single=piedWeb && !mobile && !toolbar.classList.contains('hasChecked') && !toolbar.querySelector('#V-SystemDropDown');
                 dom.classList.toggle('pw-single-toolbar',single);
                 if(single) toolbar.prepend(searchbar); else if(searchbar.previousSibling!==searchHome) searchHome.after(searchbar);

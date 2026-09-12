@@ -1,5 +1,21 @@
 # Releases
 
+## 1.7.3, 2026-09-12
+
+Mail now fills the window while Pied Web is active in Nextcloud. The native applications
+grid stays at top left beside the account; the surrounding Nextcloud bar disappears.
+Mobile search expands from an icon below the single mail header. The original launcher
+and search bindings are preserved, with safe theme/host restoration.
+
+Message checkboxes align vertically with stars. Checked rows have a stronger teal surface
+and thin full outline, distinct from the current message and unread subject weight.
+
+Validation: 18 shell/selection cases (desktop, 390/320 px, dark, theme changes, compact
+rail and iframe) plus 15 native metadata cases. Actual desktop launcher/selection geometry
+was also previewed in the authenticated session. See docs/MAIL_SHELL.md and the deployment
+record for the final installation and web activation checks.
+
+
 ## 1.7.2 activation repair, 2026-09-12
 
 An authenticated session finally identified the missing changes: LiteSpeed OPcache was

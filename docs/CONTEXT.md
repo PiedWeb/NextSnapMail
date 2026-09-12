@@ -7,6 +7,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 ## Decisions to preserve
 
 - Pied Web branding, neutral surfaces and teal selection/primary actions; local licensed fonts/icons.
+- Since 1.7.3 mail fills the Nextcloud window. Preserve the native app grid at top left;
+  hide surrounding Nextcloud chrome only with Pied Web, restore it on exit. Mobile search
+  expands below the single header. Checked message rows have a stronger teal surface and
+  centered checkboxes. See MAIL_SHELL.md for native launcher ownership and fallbacks.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars stay visible,

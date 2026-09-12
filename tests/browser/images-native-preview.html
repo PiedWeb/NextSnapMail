@@ -1,7 +1,7 @@
 <!doctype html><html lang="fr" data-themes="light"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pied Web UX, aperçu de validation</title>
 <link rel="stylesheet" href="/app/snappymail/v/2.38.2/static/css/app.css">
-<link rel="stylesheet" href="/.local-work/theme/style.css?images=172a">
+<link rel="stylesheet" href="/.local-work/theme/style.css?images=173b">
 <link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css?images=172a">
 <style id="app-theme-style" data-name="PiedWeb@nextcloud">
 .nc-shell{height:48px;display:flex;align-items:center;gap:4px;padding:0 14px;color:#fff;font:14px system-ui;box-sizing:border-box}
@@ -402,7 +402,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?images=166a"></script><script src="/.local-work/pied-web-ux/studio.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=172a"></script>
+</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?images=166a"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=172a"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 const demoRows=[...document.querySelectorAll('.messageListItem')];
@@ -431,7 +431,7 @@ const contact=document.querySelector('.buttonContacts');contact.removeAttribute(
 ko.applyBindingAccessorsToNode(contact,{visible:()=>folderVM.allowContacts,click:()=>folderVM.contactsClick},folderVM);
 window.nativeHeaderMarkup=document.querySelector('#V-MailMessageView .messageItemHeader').innerHTML;
 window.fixtureMenuTemplate=document.querySelector('#more-view-dropdown-id').parentNode.querySelector('[class="dividerbar"]:last-child')?.innerHTML;
-for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
+for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/app-shell-fixture.js"></script><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
 <script src="/.local-work/pied-web-ux/markdown-vendors.js?images=166a"></script>
 <script src="/.local-work/pied-web-ux/markdown.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=166a"></script>
 <style>
