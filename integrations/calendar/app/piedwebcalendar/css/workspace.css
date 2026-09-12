@@ -1,0 +1,92 @@
+/* SPDX-License-Identifier: AGPL-3.0-or-later */
+html.pw-calendar-workspace,
+html.pw-calendar-workspace body {
+    --header-height: 0px;
+    --body-container-margin: 0px;
+}
+html.pw-calendar-workspace body { background: var(--color-main-background); }
+html.pw-calendar-workspace #content.app-calendar,
+html.pw-calendar-workspace #content-vue.app-calendar {
+    margin: 0 !important;
+    border-radius: 0 !important;
+    width: 100%;
+    height: 100dvh;
+    min-height: 0;
+    box-shadow: none;
+}
+html.pw-calendar-workspace #content-vue > .app-navigation,
+html.pw-calendar-workspace #content-vue > .app-content {
+    border-radius: 0 !important;
+}
+/* The mobile drawer must remain opaque above the month grid. */
+html.pw-calendar-workspace #content-vue > .app-navigation {
+    background: var(--color-main-background);
+}
+html.pw-calendar-workspace #header {
+    position: fixed;
+    inset: 0 auto auto 0;
+    width: 0;
+    height: 0;
+    min-height: 0;
+    background: none;
+    box-shadow: none;
+    overflow: visible;
+    pointer-events: none;
+    z-index: 2010;
+}
+html.pw-calendar-workspace #header #nextcloud,
+html.pw-calendar-workspace #header .header-end,
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__current-app {
+    display: none !important;
+}
+/* The original menu is mounted in the filter row, within the mobile focus trap. */
+html.pw-calendar-workspace .pw-calendar-app-menu {
+    position: relative;
+    inset: auto;
+    flex: 0 0 44px;
+    align-self: center;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    padding: 0;
+    pointer-events: auto;
+}
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__waffle {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    border-radius: 8px;
+    color: var(--pw-calendar-ink) !important;
+    background: transparent;
+    opacity: 1;
+}
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__waffle svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__waffle:hover,
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__waffle[aria-expanded="true"] {
+    background: var(--pw-calendar-hover);
+}
+html.pw-calendar-workspace .pw-calendar-app-menu .app-menu__waffle:focus-visible {
+    outline: 2px solid var(--pw-calendar-focus);
+    outline-offset: -3px;
+}
+html.pw-calendar-workspace .app-navigation-header__filter {
+    box-sizing: border-box;
+    gap: 4px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+}
+html.pw-calendar-workspace .app-navigation-header__filter > .app-navigation-search__input {
+    min-width: 0;
+    width: auto;
+    flex: 1;
+}
+/* Collapsed navigation naturally hides the grid and makes it inert with its filter. */

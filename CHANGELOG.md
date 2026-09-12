@@ -1,5 +1,13 @@
 # Releases
 
+## Calendar workspace 1.0.1, 2026-09-12
+
+Calendar fills the viewport, with its native app grid before the event filter. A separate
+`piedwebcalendar` add-on preserves Mail 1.7.3. Fourteen live desktop/390/320 px checks passed.
+Native navigation to Files and back and dark colors also passed. The initial 1.0.0 trial
+revealed a mobile focus-trap conflict; 1.0.1 mounts the original menu inside the drawer.
+See [deployment evidence](docs/deployments/calendar-1.0.1.md).
+
 ## 1.7.3 activation completed, 2026-09-12
 
 The remaining Nextcloud wrapper was caused by web OPcache still executing plugin 1.7.2.

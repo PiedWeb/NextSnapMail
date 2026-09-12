@@ -28,6 +28,9 @@ This does **not** implement scheduled delivery, a unified inbox or a new vacatio
 
 ## Install and maintain
 
+[Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
+with the native app grid beside the event filter. It is installed and versioned separately.
+
 Release **1.7.2**, tested with Nextcloud **34.0.3**, NextSnapMail **0.1.10**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).

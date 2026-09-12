@@ -42,6 +42,15 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   A distinct section protects single-folder native UID selection; clicking resumes Draft mode.
   Read drafts are not reminders. See `UNREAD_DRAFTS.md` for scope and refresh rules.
 
+## Calendar workspace
+
+The separate add-on in `integrations/calendar` removes Calendar’s frame and puts the native
+app grid beside its event filter. Calendar’s mobile focus trap requires the original menu
+inside its drawer, unlike Mail/Office’s fixed launchers. Preserve its Vue instance and
+restoration placeholder. A fixed launcher outside the trap breaks mobile pointer/keyboard
+access. Collapsed navigation reveals the grid through its native drawer button. No event
+data/settings are changed. See `deployments/calendar-1.0.1.md`.
+
 ## Deployment runtime contract
 
 The live URL is nc.robin-d.fr. On n0c, web LiteSpeed OPcache can retain old plugin PHP
