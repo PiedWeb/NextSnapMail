@@ -78,7 +78,7 @@ abstract class Repository
 			$sRep = static::get($sRepoFile);
 			if ($sRep) {
 				$aRep = \json_decode($sRep);
-				$bReal = \is_array($aRep) && \count($aRep);
+				$bReal = \is_array($aRep);
 				if ($bReal) {
 					$oCache->Set($sCacheKey, $sRep);
 					$oCache->SetTimer($sCacheKey);
@@ -88,7 +88,7 @@ abstract class Repository
 			}
 		} else if ($sRep) {
 			$aRep = \json_decode($sRep, false, 10);
-			$bReal = \is_array($aRep) && \count($aRep);
+			$bReal = \is_array($aRep);
 		}
 
 		return \is_array($aRep) ? $aRep : [];
