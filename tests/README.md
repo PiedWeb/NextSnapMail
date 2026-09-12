@@ -42,6 +42,7 @@ dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
+dev-browser --timeout 40 < tests/browser/test-list-metadata.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
@@ -58,3 +59,7 @@ MessageCollectionModel, MessageModel, EmailModel and attachment models from the 
 engine. IMAP/network, popup opening and the HTML rendering helper are simulated. Cases cover
 actual UNSEEN filtering, folder/UID collisions, native draft metadata, account races,
 pagination, search exclusion, empty Inbox, retry, text escaping and mobile geometry.
+
+The metadata script uses the actual native list click dispatcher with mocked flag updates
+and conversation navigation. It checks pointer/keyboard actions, existing multi-selection
+semantics, unread updates, language/theme restoration and responsive geometry.

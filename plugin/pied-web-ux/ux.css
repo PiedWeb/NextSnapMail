@@ -430,3 +430,72 @@ html.pw-theme #V-MailMessageList .pw-draft-status {margin:6px 20px;font-size:12p
   html.pw-theme #V-MailMessageList .pw-unread-drafts header {padding-inline:16px;}
   html.pw-theme #V-MailMessageList .pw-drafts-more {min-height:44px;}
 }
+
+/* List metadata: a quiet total, explicit unread count, and an always-visible star. */
+html.pw-theme #rl-app {
+    --pw-flag-ink:color-mix(in oklch,var(--nc-color-primary-element) 70%,var(--nc-color-main-text));
+    --pw-star-filled-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .flagParent {
+    display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
+    width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;
+    opacity:1;border:0;border-radius:5px;cursor:pointer;font-size:0;line-height:1;
+    color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .flagParent::after {
+    content:'';display:block;width:19px;height:19px;opacity:1;color:inherit;background:currentColor;
+    mask:var(--pw-star-icon) center/contain no-repeat;
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent {
+    color:var(--pw-flag-ink);
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent::after {
+    mask-image:var(--pw-star-filled-icon);
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .flagParent:hover,
+html.pw-theme #rl-app #V-MailMessageView .messageItemHeader .flagParent:hover {background:var(--pw-selected);}
+html.pw-theme #rl-app #V-MailMessageView .messageItemHeader .flagParent {color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));}
+html.pw-theme #rl-app #V-MailMessageView .messageItemHeader .flagParent::before {width:20px;height:20px;}
+html.pw-theme #rl-app #V-MailMessageView .messageItemHeader .flagParent.flagOn {color:var(--pw-flag-ink);}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len {
+    display:inline-flex;align-items:center;justify-content:center;gap:5px;align-self:center;
+    height:24px;min-height:24px;margin:0;padding:0 6px;border:0;border-radius:4px;
+    background:color-mix(in oklch,var(--nc-color-main-text) 7%,var(--pw-paper));
+    color:var(--nc-color-main-text);font:500 12px/1 var(--pw-font);font-variant-numeric:tabular-nums;
+    white-space:nowrap;cursor:pointer;box-shadow:none;
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len[data-pw-total] {font-size:0;}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len[data-pw-total]::before {content:attr(data-pw-total);font:500 12px/1 var(--pw-font);}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len::after {content:none;}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
+    content:attr(data-pw-unread);font:600 10px/1 var(--pw-font);color:var(--pw-flag-ink);
+    padding-inline-start:5px;border-inline-start:1px solid var(--pw-line);
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .threads-len:hover {background:var(--pw-selected);}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem :is(.flagParent,.threads-len):focus-visible {
+    outline:2px solid var(--nc-color-primary-element);outline-offset:2px;
+}
+html.pw-theme #rl-app #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-muted);margin:0;min-width:16px;font-size:14px;}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem > div + div {
+    grid-template-columns:minmax(0,1fr) auto auto auto 32px;grid-template-rows:minmax(24px,auto) auto;column-gap:6px;align-items:center;
+}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .flagParent {grid-area:1/5/3/6;align-self:center;}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .attachmentParent {grid-area:1/2;}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .threads-len {grid-area:1/3;}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem time {grid-area:1/4;}
+html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/5;}
+@media(max-width:799px) {
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto auto auto 44px;grid-template-rows:minmax(32px,auto) auto;column-gap:4px;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .flagParent {width:44px;min-width:44px;height:44px;min-height:44px;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .threads-len {height:32px;min-height:32px;padding-inline:5px;gap:4px;}
+}
+/* Very narrow phones keep the sender readable by placing conversation metadata below the subject. */
+@media(max-width:360px) {
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto 44px;grid-template-rows:minmax(24px,auto) auto auto;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .flagParent {grid-area:1/3/3/4;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem time {grid-area:1/2;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/3;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .threads-len {grid-area:3/1;justify-self:start;margin-top:3px;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .attachmentParent {grid-area:3/2;justify-self:end;}
+    html.pw-theme:is(.sm-msgView-side,.rl-mobile) #rl-app #V-MailMessageList .messageListItem .attachmentParent:not(:has(> i[class*="icon-"])) {display:none;}
+}

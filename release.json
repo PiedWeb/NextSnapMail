@@ -1,5 +1,5 @@
 {
-  "version": "1.7.0",
+  "version": "1.7.1",
   "tested": {
     "nextcloud": "34.0.3",
     "nextsnapmail": "0.1.10",
@@ -20,8 +20,9 @@
     "plugin/pied-web-ux/image-compression-source.json": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
-    "plugin/pied-web-ux/index.php": "bf036bb7192c316d495c226fc0322c90e237740e1221f671ae77306e99e60002",
+    "plugin/pied-web-ux/index.php": "63980b6a8eece485a1ef3c77f43fb7a712793a5117302f22a570e070d242e01d",
     "plugin/pied-web-ux/list-interactions.js": "d6cce2c0dc7d737de50f689f8b3fc98785e437556bd19fe473ff191b2a441ac6",
+    "plugin/pied-web-ux/list-metadata.js": "1bb0d71b821e706830e301b0d936dcebb77b566f1fb0d43122c45e1806f59e63",
     "plugin/pied-web-ux/lucide-license.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
     "plugin/pied-web-ux/lucide-settings.svg": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
     "plugin/pied-web-ux/lucide-source.json": "4086a72f095493c1ce45228883fa7c2c247372cc1f336823f0b88ea054385fd2",
@@ -34,7 +35,7 @@
     "plugin/pied-web-ux/send-delay.js": "827eeff6bd93ed7d058cf3120b158083ae7de1a0a7c809b203c4cecbf0ba6452",
     "plugin/pied-web-ux/studio.js": "f6f73008f2329b1cdd55719f8a61975d316ba6007cbbc583840adac60c226e48",
     "plugin/pied-web-ux/unread-drafts.js": "e848d0a055c17a9cd039fd518c9b78ae7fb786001356d2cd53dc6641fab55181",
-    "plugin/pied-web-ux/ux.css": "22089cbabb7b26570273f27a65fa26f1b16870e43198be744c346c0751f4be76",
+    "plugin/pied-web-ux/ux.css": "1957cd2e0844b86152bb2ed71a6a9c2abd83a71cfc46352d3dc6fdf30f82100d",
     "plugin/pied-web-ux/ux.js": "c0f6baf307df47acc87e001a626e1e2356c05dbe5279782a8d5ae2e54b1669b6",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
     "theme/PiedWeb/snappymail/style.css": "257aa494d525dbabf657c2f8ecc84f9f8123470a59438c41e52e6dd4e5479123"

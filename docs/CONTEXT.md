@@ -9,6 +9,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Pied Web branding, neutral surfaces and teal selection/primary actions; local licensed fonts/icons.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
+- Conversation totals and unread counts are visually distinct; list stars stay visible,
+  use an outlined/filled pair, and preserve native folder/selection commands.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
@@ -61,6 +63,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 | 1.6.0–1.6.2 | Background Undo Send, direct native flag action, Lucide settings icon and functional Nextcloud Contacts link. |
 | 1.6.3–1.6.4 | Interleaved quote readability and native compose toolbar redesign. |
 | 1.6.5 | Inline resize/alt/remove, compression on clipboard/local attachments; first standalone GitHub release of all accumulated changes. |
+| 1.7.1 | Clear conversation metadata and always-visible, accessible stars. |
 | 1.7.0 | Actual unread drafts in the Inbox feed; account-safe native draft resume. |
 | 1.6.6 | Nextcloud image picker, compression for Nextcloud/restored attachments and embedded HTML image paste; repository maintenance memory. |
 

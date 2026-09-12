@@ -1,5 +1,22 @@
 # Releases
 
+## 1.7.1, 2026-09-12
+
+Conversation counts now separate the total from an explicit unread label, for example
+13 and “4 non lus”, with a quiet background and an explanatory accessible tooltip.
+List stars remain visible at rest, with a filled accent star for followed messages.
+They align on the right in split/mobile lists and retain a 44 px phone target. On screens
+up to 360 px, conversation metadata moves below the subject to preserve sender width.
+Reader stars also have a stronger contrast and a 20 px glyph.
+
+Native Knockout text bindings, conversation navigation and flag/multi-selection commands
+are preserved. Enter/Space activate the same native controls; labels follow French/English
+and restore original attributes when leaving Pied Web.
+
+Validation: 15 metadata browser checks and 25 unread-draft regressions using the extracted native list click dispatcher with mocked
+flag transport; desktop, 390/320 px and dark-mode snapshots. No actual mail flag changes.
+Payload syntax/build and installation diagnostics passed. See the deployment record.
+
 ## 1.7.0, 2026-09-12
 
 Genuinely unread drafts now appear in a dedicated section at the top of the first Inbox
