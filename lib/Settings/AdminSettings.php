@@ -65,6 +65,12 @@ class AdminSettings implements ISettings
 		}
 		$parameters['nextsnapmail-app_path'] = $oConfig->Get('webmail', 'app_path', false);
 		$parameters['nextsnapmail-nc-lang'] = !$oConfig->Get('webmail', 'allow_languages_on_settings', true);
+		$parameters['gmail-oauth-client-id'] = $this->config->getAppValue('nextsnapmail', 'gmail-oauth-client-id', '');
+		$parameters['gmail-oauth-client-secret-set'] = '' !== $this->config->getAppValue('nextsnapmail', 'gmail-oauth-client-secret', '');
+		$parameters['gmail-oauth-domains'] = $this->config->getAppValue('nextsnapmail', 'gmail-oauth-domains', "gmail.com\ngooglemail.com");
+		$parameters['gmail-oauth-auto-configure'] = $this->config->getAppValue('nextsnapmail', 'gmail-oauth-auto-configure', '1');
+		$parameters['gmail-oauth-callback-url'] = \OC::$server->get(\OCP\IURLGenerator::class)
+			->linkToRouteAbsolute('nextsnapmail.page.index') . '?NextSnapMailGmailOauth';
 
 		\OCP\Util::addScript('nextsnapmail', 'nextsnapmail');
 		return new TemplateResponse('nextsnapmail', 'admin-local', $parameters);

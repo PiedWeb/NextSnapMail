@@ -90,6 +90,7 @@
     "Converted additional accounts" : "Umgewandelte zusätzliche Konten",
     "Skipped additional accounts" : "Übersprungene zusätzliche Konten",
     "Deleted NextSnapMail database entries" : "NextSnapMail-Datenbankeinträge gelöscht",
+    "Deleted NextSnapMail app configuration entries" : "NextSnapMail-App-Konfigurationseinträge gelöscht",
     "Deleted NextSnapMail app data folder" : "NextSnapMail-Appdatenordner gelöscht",
     "NextSnapMail app data folder was not found." : "Der NextSnapMail-Appdatenordner wurde nicht gefunden.",
     "Reinstalled bundled NextSnapMail extensions." : "Gebündelte NextSnapMail-Erweiterungen wurden neu installiert.",
@@ -133,6 +134,18 @@
     "may have some" : "möglicherweise einige",
     "security considerations" : "Sicherheitsüberlegungen benötigt",
     "Enter an email and password to auto-login to SnappyMail." : "E-Mail-Adresse und Passwort für die automatische Anmeldung bei SnappyMail eingeben.",
+    "Connect Gmail / Google account" : "Gmail-/Google-Konto verbinden",
+    "This will replace the saved main account credentials for NextSnapMail with a Google OAuth login." : "Dies ersetzt die gespeicherten Zugangsdaten des Hauptkontos für NextSnapMail durch eine Google-OAuth-Anmeldung.",
+    "Gmail / Google OAuth2" : "Gmail / Google OAuth2",
+    "Configure this to let users connect Gmail or Google Workspace accounts without a password." : "Konfigurieren Sie dies, damit Benutzer Gmail- oder Google-Workspace-Konten ohne Passwort verbinden können.",
+    "Client ID" : "Client-ID",
+    "Client Secret" : "Client-Secret",
+    "Leave empty to keep existing secret" : "Leer lassen, um das vorhandene Secret beizubehalten",
+    "Email domains" : "E-Mail-Domains",
+    "Automatically configure Gmail domains" : "Gmail-Domains automatisch konfigurieren",
+    "Authorized redirect URI for Google Cloud Console:" : "Autorisierte Weiterleitungs-URI für die Google Cloud Console:",
+    "Gmail OAuth2 client_id/client_secret is not configured." : "Gmail-OAuth2-Client-ID/Client-Secret ist nicht konfiguriert.",
+    "Gmail / Google account connected:" : "Gmail-/Google-Konto verbunden:",
     "Password" : "Passwort"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

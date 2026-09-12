@@ -87,6 +87,40 @@
 			<br />
 
 			<p>
+				<strong><?php echo($l->t('Gmail / Google OAuth2')); ?></strong><br />
+				<span><?php echo($l->t('Configure this to let users connect Gmail or Google Workspace accounts without a password.')); ?></span>
+			</p>
+			<p>
+				<label for="nextsnapmail-gmail-oauth-client-id">
+					<?php echo($l->t('Client ID')); ?>
+				</label>
+				<input id="nextsnapmail-gmail-oauth-client-id" name="nextsnapmail-gmail-oauth-client-id" type="text" <?php echo 'value="'.\htmlspecialchars($_['gmail-oauth-client-id']).'"'; ?> style="width:40em">
+			</p>
+			<p>
+				<label for="nextsnapmail-gmail-oauth-client-secret">
+					<?php echo($l->t('Client Secret')); ?>
+				</label>
+				<input id="nextsnapmail-gmail-oauth-client-secret" name="nextsnapmail-gmail-oauth-client-secret" type="password" placeholder="<?php echo $_['gmail-oauth-client-secret-set'] ? \htmlspecialchars($l->t('Leave empty to keep existing secret')) : ''; ?>" style="width:40em">
+			</p>
+			<p>
+				<label for="nextsnapmail-gmail-oauth-domains">
+					<?php echo($l->t('Email domains')); ?>
+				</label><br />
+				<textarea id="nextsnapmail-gmail-oauth-domains" name="nextsnapmail-gmail-oauth-domains" rows="3" style="width:40em"><?php echo \htmlspecialchars($_['gmail-oauth-domains']); ?></textarea>
+			</p>
+			<p>
+				<label for="nextsnapmail-gmail-oauth-auto-configure">
+					<input id="nextsnapmail-gmail-oauth-auto-configure" name="nextsnapmail-gmail-oauth-auto-configure" type="checkbox" class="checkbox" <?php if ($_['gmail-oauth-auto-configure']) echo 'checked="checked"'; ?>>
+					<?php echo($l->t('Automatically configure Gmail domains')); ?>
+				</label>
+			</p>
+			<p class="settings-hint">
+				<?php echo($l->t('Authorized redirect URI for Google Cloud Console:')); ?>
+				<code><?php echo \htmlspecialchars($_['gmail-oauth-callback-url'], ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8'); ?></code>
+			</p>
+			<br />
+
+			<p>
 				<button id="nextsnapmail-import-snappymail-button" type="button">
 					<?php echo($l->t('Import old SnappyMail data')); ?>
 				</button>

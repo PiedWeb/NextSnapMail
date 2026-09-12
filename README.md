@@ -24,6 +24,14 @@ continued maintenance.
 
 Newest changes first:
 
+- Integrated Gmail / Google OAuth2 login directly into the Nextcloud app, so
+  Gmail accounts can be connected from the personal settings and as additional
+  accounts without requiring a separate plugin.
+- Added Nextcloud admin settings for Gmail / Google OAuth2 client configuration,
+  including the redirect URI that has to be entered in the Google Cloud Console.
+- Added support for a separate NextSnapMail plugin repository and admin-side
+  upload of custom plugins, so optional plugins do not have to be bundled with
+  every app release.
 - Added tools in the NextSnapMail admin settings to import existing SnappyMail
   accounts and app data into NextSnapMail.
 - Added controls to remove imported NextSnapMail account entries and old

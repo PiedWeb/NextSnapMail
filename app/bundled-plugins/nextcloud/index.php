@@ -10,6 +10,16 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '2.38.0';
 
+	const
+		GMAIL_OAUTH_TOKEN_PREFIX = 'login-gmail-oauth:',
+		GMAIL_OAUTH_LEGACY_TOKEN_PREFIX = 'gmail2026:',
+		GMAIL_OAUTH_START_PART = 'NextSnapMailGmailOauthStart',
+		GMAIL_OAUTH_CALLBACK_PART = 'NextSnapMailGmailOauth',
+		GMAIL_OAUTH_STATE_KEY = 'nextsnapmail_gmail_oauth_state',
+		GMAIL_OAUTH_LOGIN_URI = 'https://accounts.google.com/o/oauth2/v2/auth',
+		GMAIL_OAUTH_TOKEN_URI = 'https://oauth2.googleapis.com/token',
+		GMAIL_OAUTH_USERINFO_URI = 'https://openidconnect.googleapis.com/v1/userinfo';
+
 	public function Init() : void
 	{
 		if (static::IsIntegrated()) {
@@ -23,6 +33,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$this->addCss('style.css');
 
 			$this->addJs('js/webdav.js');
+			$this->addJs('js/gmail-oauth.js');
 
 			$this->addJs('js/message.js');
 			$this->addHook('json.attachments', 'DoAttachmentsActions');
@@ -41,10 +52,36 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$this->addHook('imap.before-login', 'beforeLogin');
 			$this->addHook('smtp.before-login', 'beforeLogin');
 			$this->addHook('sieve.before-login', 'beforeLogin');
+			$this->addPartHook(static::GMAIL_OAUTH_START_PART, 'ServiceStartGmailOauth');
+			$this->addPartHook(static::GMAIL_OAUTH_CALLBACK_PART, 'ServiceCallbackGmailOauth');
+			$this->addHook('filter.http-paths', 'httpPaths');
 		} else {
 			\SnappyMail\Log::debug('Nextcloud', 'NOT integrated');
 			// \OC::$server->getConfig()->getAppValue('nextsnapmail', 'nextsnapmail-no-embed');
 			$this->addHook('main.content-security-policy', 'ContentSecurityPolicy');
+		}
+	}
+
+	public function httpPaths(array &$aPaths) : void
+	{
+		$path = isset($aPaths[0]) ? \rtrim((string) $aPaths[0], '=') : '';
+		if (!$path && !empty($_SERVER['QUERY_STRING'])) {
+			$path = (string) \preg_replace('/[=&].*$/', '', $_SERVER['QUERY_STRING']);
+		}
+
+		if (\in_array($path, [static::GMAIL_OAUTH_START_PART, static::GMAIL_OAUTH_CALLBACK_PART], true)) {
+			$aPaths[0] = $path;
+			$this->allowGoogleOAuthRedirect();
+		}
+	}
+
+	private function allowGoogleOAuthRedirect() : void
+	{
+		$oConfig = \RainLoop\Api::Config();
+		$rule = 'mode=navigate,dest=document,site=cross-site';
+		$current = \trim($oConfig->Get('security', 'secfetch_allow', ''));
+		if (!\preg_match('/(?:^|;)\s*' . \preg_quote($rule, '/') . '\s*(?:;|$)/', $current)) {
+			$oConfig->Set('security', 'secfetch_allow', \trim($current . ';' . $rule, ';'));
 		}
 	}
 
@@ -89,6 +126,10 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 	public function beforeLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\NetClient $oClient, \MailSo\Net\ConnectSettings $oSettings) : void
 	{
+		if ($this->applyGmailOauthLogin($oAccount, $oSettings)) {
+			return;
+		}
+
 		// Only login with OIDC access token if
 		// it is enabled in config, the user is currently logged in with OIDC,
 		// the current snappymail account is the OIDC account and no account defined explicitly
@@ -101,6 +142,464 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 			$oSettings->passphrase = \OC::$server->get(\OCP\ISession::class)->get('oidc_access_token');
 			\array_unshift($oSettings->SASLMechanisms, 'OAUTHBEARER');
 		}
+	}
+
+	public function ServiceStartGmailOauth() : string
+	{
+		$oActions = \RainLoop\Api::Actions();
+		$oActions->Http()->ServerNoCache();
+
+		try {
+			$client = $this->gmailOauthClient();
+			if (!$client) {
+				throw new \RuntimeException('Gmail OAuth2 client_id/client_secret is not configured.');
+			}
+
+			$state = \bin2hex(\random_bytes(16));
+			$mode = (string) ($_GET['mode'] ?? 'main');
+			$mode = 'additional' === $mode ? 'additional' : 'main';
+			\OC::$server->get(\OCP\ISession::class)->set(static::GMAIL_OAUTH_STATE_KEY, [
+				'state' => $state,
+				'mode' => $mode
+			]);
+
+			$oActions->Location($client->getAuthenticationUrl(
+				static::GMAIL_OAUTH_LOGIN_URI,
+				$this->gmailOauthCallbackUrl(),
+				[
+					'scope' => \implode(' ', [
+						'openid',
+						'email',
+						'profile',
+						'https://mail.google.com/'
+					]),
+					'state' => $state,
+					'access_type' => 'offline',
+					'prompt' => 'consent'
+				]
+			));
+		} catch (\Throwable $oException) {
+			$this->redirectToPersonalSettingsWithGmailStatus('', $oException->getMessage());
+		}
+		exit;
+	}
+
+	public function ServiceCallbackGmailOauth() : string
+	{
+		$oActions = \RainLoop\Api::Actions();
+		$oActions->Http()->ServerNoCache();
+
+		try {
+			if (isset($_GET['error'])) {
+				$message = (string) $_GET['error'];
+				if (!empty($_GET['error_description'])) {
+					$message .= ': ' . (string) $_GET['error_description'];
+				}
+				throw new \RuntimeException($message);
+			}
+
+			$state = (string) ($_GET['state'] ?? '');
+			$session = \OC::$server->get(\OCP\ISession::class);
+			$stateData = $session->get(static::GMAIL_OAUTH_STATE_KEY);
+			$session->remove(static::GMAIL_OAUTH_STATE_KEY);
+			$expectedState = \is_array($stateData) ? (string) ($stateData['state'] ?? '') : (string) $stateData;
+			$mode = \is_array($stateData) ? (string) ($stateData['mode'] ?? 'main') : 'main';
+			if (!$state || !$expectedState || !\hash_equals($expectedState, $state)) {
+				throw new \RuntimeException('Invalid Gmail OAuth2 state.');
+			}
+
+			if (empty($_GET['code'])) {
+				throw new \RuntimeException('Missing Gmail OAuth2 authorization code.');
+			}
+
+			$client = $this->gmailOauthClient();
+			if (!$client) {
+				throw new \RuntimeException('Gmail OAuth2 client_id/client_secret is not configured.');
+			}
+
+			$expiresAt = \time();
+			$token = $this->successfulGmailOauthResponse(
+				$client->getAccessToken(
+					static::GMAIL_OAUTH_TOKEN_URI,
+					'authorization_code',
+					[
+						'code' => (string) $_GET['code'],
+						'redirect_uri' => $this->gmailOauthCallbackUrl()
+					]
+				),
+				'Gmail OAuth2 token exchange failed.'
+			);
+
+			if (empty($token['access_token'])) {
+				throw new \RuntimeException('Gmail OAuth2 access_token missing.');
+			}
+			if (empty($token['refresh_token'])) {
+				throw new \RuntimeException('Gmail OAuth2 refresh_token missing. Please revoke access in Google and try again.');
+			}
+
+			$expiresAt += (int) ($token['expires_in'] ?? 3600);
+			$client->setAccessToken($token['access_token']);
+			$client->setAccessTokenType(\OAuth2\Client::ACCESS_TOKEN_BEARER);
+
+			$userInfo = $this->successfulGmailOauthResponse(
+				$client->fetch(static::GMAIL_OAUTH_USERINFO_URI),
+				'Gmail OAuth2 userinfo request failed.'
+			);
+
+			$email = (string) ($userInfo['email'] ?? '');
+			if (!$email) {
+				throw new \RuntimeException('Gmail OAuth2 userinfo email missing.');
+			}
+
+			$auth = [
+				'access_token' => $token['access_token'],
+				'refresh_token' => $token['refresh_token'],
+				'expires_in' => (int) ($token['expires_in'] ?? 3600),
+				'expires' => $expiresAt
+			];
+
+			$this->ensureGmailDomain($email);
+			if ('additional' === $mode) {
+				$this->createOrUpdateGmailAdditionalAccount($email, $auth);
+				$oActions->Location($this->appUrl());
+				exit;
+			}
+
+			$this->storeGmailMainAccount($email, $auth);
+			$this->redirectToPersonalSettingsWithGmailStatus('Gmail / Google account connected: ' . $email);
+		} catch (\Throwable $oException) {
+			$this->redirectToPersonalSettingsWithGmailStatus('', $oException->getMessage());
+		}
+		exit;
+	}
+
+	private function applyGmailOauthLogin(\RainLoop\Model\Account $oAccount, \MailSo\Net\ConnectSettings $oSettings) : bool
+	{
+		try {
+			$auth = $this->gmailOauthAuthFromAccount($oAccount);
+			if (empty($auth['expires']) || empty($auth['access_token']) || empty($auth['refresh_token'])) {
+				return false;
+			}
+
+			if (\time() >= ((int) $auth['expires'] - 60)) {
+				$auth = $this->refreshGmailOauthToken($auth);
+				if (empty($auth['access_token'])) {
+					return false;
+				}
+				$this->persistGmailOauthAuth($oAccount, $auth);
+			}
+
+			$oSettings->passphrase = $auth['access_token'];
+			\array_unshift($oSettings->SASLMechanisms, 'OAUTHBEARER', 'XOAUTH2');
+			return true;
+		} catch (\Throwable $oException) {
+			\SnappyMail\Log::warning('Nextcloud', 'Gmail OAuth2 login preparation failed: ' . $oException->getMessage());
+			return false;
+		}
+	}
+
+	private function gmailOauthAuthFromAccount(\RainLoop\Model\Account $oAccount) : array
+	{
+		$password = (string) $oAccount->ImapPass();
+		if ($this->isGmailOauthStoredToken($password)) {
+			return $this->decodeGmailOauthStoredToken($password);
+		}
+
+		$oActions = \RainLoop\Api::Actions();
+		$sessionAuth = $oActions->StorageProvider()->Get(
+			$oAccount,
+			\RainLoop\Providers\Storage\Enumerations\StorageType::SESSION,
+			\RainLoop\Utils::GetSessionToken()
+		);
+		if ($sessionAuth) {
+			$auth = \SnappyMail\Crypt::DecryptFromJSON($sessionAuth, $oAccount->CryptKey());
+			return \is_array($auth) ? $auth : [];
+		}
+
+		return [];
+	}
+
+	private function refreshGmailOauthToken(array $auth) : array
+	{
+		$client = $this->gmailOauthClient();
+		if (!$client) {
+			return $auth;
+		}
+
+		$expiresAt = \time();
+		$response = $client->getAccessToken(
+			static::GMAIL_OAUTH_TOKEN_URI,
+			'refresh_token',
+			['refresh_token' => $auth['refresh_token']]
+		);
+		$refresh = $this->successfulGmailOauthResponse($response, 'Gmail OAuth2 token refresh failed.');
+
+		if (!empty($refresh['access_token'])) {
+			$auth['access_token'] = $refresh['access_token'];
+			$auth['expires_in'] = (int) ($refresh['expires_in'] ?? 3600);
+			$auth['expires'] = $expiresAt + $auth['expires_in'];
+		}
+
+		return $auth;
+	}
+
+	private function persistGmailOauthAuth(\RainLoop\Model\Account $oAccount, array $auth) : void
+	{
+		$storedAuth = $this->encodeGmailOauthStoredToken($auth);
+		if ($oAccount instanceof \RainLoop\Model\AdditionalAccount && $this->isGmailOauthStoredToken((string) $oAccount->ImapPass())) {
+			$oActions = \RainLoop\Api::Actions();
+			$oMainAccount = $oActions->getMainAccountFromToken();
+			if ($oMainAccount instanceof \RainLoop\Model\MainAccount) {
+				$accounts = $oActions->GetAccounts($oMainAccount);
+				if (isset($accounts[$oAccount->Email()])) {
+					$sensitiveAuth = new \SnappyMail\SensitiveString($storedAuth);
+					$oAccount->setImapPass($sensitiveAuth);
+					$oAccount->setSmtpPass($sensitiveAuth);
+					$accounts[$oAccount->Email()] = \array_replace(
+						$accounts[$oAccount->Email()],
+						$oAccount->asTokenArray($oMainAccount)
+					);
+					$oActions->SetAccounts($oMainAccount, $accounts);
+				}
+			}
+			return;
+		}
+
+		if ($oAccount instanceof \RainLoop\Model\MainAccount && static::IsIntegrated()) {
+			$user = \OC::$server->get(\OCP\IUserSession::class)->getUser();
+			if ($user) {
+				$config = \OC::$server->get(\OCP\IConfig::class);
+				$config->setUserValue(
+					$user->getUID(),
+					'nextsnapmail',
+					'passphrase',
+					\OCA\NextSnapMail\Util\SnappyMailHelper::encodePassword($storedAuth, \md5($oAccount->Email()))
+				);
+			}
+		}
+	}
+
+	private function storeGmailMainAccount(string $email, array $auth) : void
+	{
+		$user = \OC::$server->get(\OCP\IUserSession::class)->getUser();
+		if (!$user) {
+			throw new \RuntimeException('No active Nextcloud user found.');
+		}
+
+		$config = \OC::$server->get(\OCP\IConfig::class);
+		$storedAuth = $this->encodeGmailOauthStoredToken($auth);
+		$config->setUserValue($user->getUID(), 'nextsnapmail', 'nextsnapmail-email', $email);
+		$config->setUserValue(
+			$user->getUID(),
+			'nextsnapmail',
+			'passphrase',
+			\OCA\NextSnapMail\Util\SnappyMailHelper::encodePassword($storedAuth, \md5($email))
+		);
+		$config->deleteUserValue($user->getUID(), 'nextsnapmail', 'nextsnapmail-password');
+	}
+
+	private function createOrUpdateGmailAdditionalAccount(string $email, array $auth) : void
+	{
+		$oActions = \RainLoop\Api::Actions();
+		if (!$oActions->GetCapa(\RainLoop\Enumerations\Capa::ADDITIONAL_ACCOUNTS)) {
+			throw new \RuntimeException('Additional accounts are disabled.');
+		}
+
+		$oMainAccount = $oActions->getMainAccountFromToken();
+		if (!$oMainAccount instanceof \RainLoop\Model\MainAccount) {
+			throw new \RuntimeException('No active main account found.');
+		}
+
+		$oDomain = $oActions->DomainProvider()->getByEmailAddress($email);
+		if (!$oDomain) {
+			throw new \RuntimeException('No Gmail domain configuration found for ' . $email);
+		}
+
+		$storedAuth = new \SnappyMail\SensitiveString($this->encodeGmailOauthStoredToken($auth));
+		$oAdditionalAccount = new \RainLoop\Model\AdditionalAccount();
+		$oAdditionalAccount->setCredentials(
+			$oDomain,
+			$email,
+			$oDomain->ImapSettings()->fixUsername($email),
+			$storedAuth,
+			$oDomain->SmtpSettings()->fixUsername($email),
+			$storedAuth
+		);
+
+		$accounts = $oActions->GetAccounts($oMainAccount);
+		$accounts[$oAdditionalAccount->Email()] = $oAdditionalAccount->asTokenArray($oMainAccount);
+		$accounts[$oAdditionalAccount->Email()]['name'] = 'Gmail';
+		$accounts[$oAdditionalAccount->Email()]['nextsnapmail-gmail-oauth'] = true;
+		$oActions->SetAccounts($oMainAccount, $accounts);
+	}
+
+	private function ensureGmailDomain(string $email) : void
+	{
+		$config = \OC::$server->get(\OCP\IConfig::class);
+		if (!$config->getAppValue('nextsnapmail', 'gmail-oauth-auto-configure', '1')) {
+			return;
+		}
+
+		$domain = \strtolower((string) \substr(\strrchr($email, '@') ?: '', 1));
+		if (!$domain || !$this->isConfiguredGmailDomain($email)) {
+			return;
+		}
+
+		$oProvider = \RainLoop\Api::Actions()->DomainProvider();
+		$oDomain = $oProvider->Load($domain, false) ?: new \RainLoop\Model\Domain($domain);
+		$oDomain->ImapSettings()->host = 'imap.gmail.com';
+		$oDomain->ImapSettings()->port = 993;
+		$oDomain->ImapSettings()->type = \MailSo\Net\Enumerations\ConnectionSecurityType::SSL;
+		$oDomain->ImapSettings()->shortLogin = false;
+		$oDomain->ImapSettings()->lowerLogin = true;
+		$oDomain->ImapSettings()->SASLMechanisms = ['XOAUTH2', 'OAUTHBEARER'];
+
+		$oDomain->SieveSettings()->enabled = false;
+		$oDomain->SieveSettings()->host = '';
+		$oDomain->SieveSettings()->port = 4190;
+		$oDomain->SieveSettings()->type = \MailSo\Net\Enumerations\ConnectionSecurityType::NONE;
+
+		$oDomain->SmtpSettings()->host = 'smtp.gmail.com';
+		$oDomain->SmtpSettings()->port = 587;
+		$oDomain->SmtpSettings()->type = \MailSo\Net\Enumerations\ConnectionSecurityType::STARTTLS;
+		$oDomain->SmtpSettings()->shortLogin = false;
+		$oDomain->SmtpSettings()->lowerLogin = true;
+		$oDomain->SmtpSettings()->useAuth = true;
+		$oDomain->SmtpSettings()->SASLMechanisms = ['XOAUTH2', 'OAUTHBEARER'];
+
+		$oProvider->Save($oDomain);
+	}
+
+	private function isConfiguredGmailDomain(string $email) : bool
+	{
+		$domain = \strtolower((string) \substr(\strrchr($email, '@') ?: '', 1));
+		if (!$domain) {
+			return false;
+		}
+
+		$raw = \strtolower(\OC::$server->get(\OCP\IConfig::class)->getAppValue('nextsnapmail', 'gmail-oauth-domains', "gmail.com\ngooglemail.com"));
+		$domains = \preg_split('/[\s,;]+/', $raw, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+		$domains = \array_values(\array_unique(\array_map(
+			static fn (string $domain) : string => \ltrim(\trim($domain), '@'),
+			$domains
+		)));
+
+		return \in_array($domain, $domains, true);
+	}
+
+	private function gmailOauthClient() : ?\OAuth2\Client
+	{
+		$config = \OC::$server->get(\OCP\IConfig::class);
+		$clientId = \trim($config->getAppValue('nextsnapmail', 'gmail-oauth-client-id', ''));
+		$clientSecret = $this->gmailOauthClientSecret();
+		if (!$clientId || !$clientSecret) {
+			return null;
+		}
+
+		$client = new \OAuth2\Client($clientId, $clientSecret, \OAuth2\Client::AUTH_TYPE_FORM);
+		$client->setAccessTokenType(\OAuth2\Client::ACCESS_TOKEN_BEARER);
+
+		$sProxy = \RainLoop\Api::Config()->Get('labs', 'curl_proxy', '');
+		if (\strlen($sProxy)) {
+			$client->setCurlOption(CURLOPT_PROXY, $sProxy);
+			$sProxyAuth = \RainLoop\Api::Config()->Get('labs', 'curl_proxy_auth', '');
+			if (\strlen($sProxyAuth)) {
+				$client->setCurlOption(CURLOPT_PROXYUSERPWD, $sProxyAuth);
+			}
+		}
+
+		return $client;
+	}
+
+	private function gmailOauthCallbackUrl() : string
+	{
+		return \OC::$server->get(\OCP\IURLGenerator::class)->linkToRouteAbsolute('nextsnapmail.page.index')
+			. '?' . static::GMAIL_OAUTH_CALLBACK_PART;
+	}
+
+	private function appUrl() : string
+	{
+		return \OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('nextsnapmail.page.index');
+	}
+
+	private function redirectToPersonalSettingsWithGmailStatus(string $message = '', string $error = '') : void
+	{
+		$session = \OC::$server->get(\OCP\ISession::class);
+		if ('' !== $message) {
+			$session->set('nextsnapmail-gmail-oauth-message', $message);
+		}
+		if ('' !== $error) {
+			$session->set('nextsnapmail-gmail-oauth-error', 'Gmail OAuth2 login failed: ' . $error);
+		}
+
+		\RainLoop\Api::Actions()->Location(
+			\OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('settings.PersonalSettings.index', ['section' => 'nextsnapmail'])
+		);
+	}
+
+	private function gmailOauthClientSecret() : string
+	{
+		$encrypted = \OC::$server->get(\OCP\IConfig::class)->getAppValue('nextsnapmail', 'gmail-oauth-client-secret', '');
+		if ('' === $encrypted) {
+			return '';
+		}
+
+		$secret = \OCA\NextSnapMail\Util\SnappyMailHelper::decodePassword($encrypted, 'nextsnapmail-gmail-oauth-client-secret');
+		return $secret ? (string) $secret : '';
+	}
+
+	private function successfulGmailOauthResponse(array $response, string $defaultMessage) : array
+	{
+		if (200 === (int) ($response['code'] ?? 0) && \is_array($response['result'] ?? null)) {
+			return $response['result'];
+		}
+
+		$result = \is_array($response['result'] ?? null) ? $response['result'] : [];
+		$message = $defaultMessage;
+		if (!empty($result['error'])) {
+			$message .= ' ' . $result['error'];
+			if (!empty($result['error_description'])) {
+				$message .= ': ' . $result['error_description'];
+			}
+		} else if (!empty($response['code'])) {
+			$message .= ' HTTP ' . $response['code'];
+		}
+
+		throw new \RuntimeException($message);
+	}
+
+	private function encodeGmailOauthStoredToken(array $auth) : string
+	{
+		return static::GMAIL_OAUTH_TOKEN_PREFIX . \rtrim(\strtr(\base64_encode(\json_encode($auth)), '+/', '-_'), '=');
+	}
+
+	private function decodeGmailOauthStoredToken(string $value) : array
+	{
+		$prefix = $this->gmailOauthStoredTokenPrefix($value);
+		if ('' === $prefix) {
+			return [];
+		}
+		$encoded = \substr($value, \strlen($prefix));
+		$json = \base64_decode(\strtr($encoded, '-_', '+/'), true);
+		$data = $json ? \json_decode($json, true) : null;
+
+		return \is_array($data) ? $data : [];
+	}
+
+	private function isGmailOauthStoredToken(string $value) : bool
+	{
+		return '' !== $this->gmailOauthStoredTokenPrefix($value);
+	}
+
+	private function gmailOauthStoredTokenPrefix(string $value) : string
+	{
+		foreach ([static::GMAIL_OAUTH_TOKEN_PREFIX, static::GMAIL_OAUTH_LEGACY_TOKEN_PREFIX] as $prefix) {
+			if (\str_starts_with($value, $prefix)) {
+				return $prefix;
+			}
+		}
+
+		return '';
 	}
 
 	/*
@@ -274,8 +773,16 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 				'CalDAV' => $this->Config()->Get('plugin', 'calendar', false)
 //				'WebDAV_files' => $sWebDAV . '/files/' . $sUID
 			];
+			$config = \OC::$server->get(\OCP\IConfig::class);
+			$gmailClientSecret = $config->getAppValue('nextsnapmail', 'gmail-oauth-client-secret', '');
+			if ($config->getAppValue('nextsnapmail', 'gmail-oauth-client-id', '') && $gmailClientSecret) {
+				$aResult['NextSnapMailGmailOAuth'] = [
+					'StartUrl' => \OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('nextsnapmail.page.index')
+						. '?' . static::GMAIL_OAUTH_START_PART,
+					'AddAccountLabel' => 'Add Gmail / Google account'
+				];
+			}
 			if (empty($aResult['Auth'])) {
-				$config = \OC::$server->get(\OCP\IConfig::class);
 				$sEmail = '';
 				// Only store the user's password in the current session if they have
 				// enabled auto-login using Nextcloud username or email address.

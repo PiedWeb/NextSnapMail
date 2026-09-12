@@ -16,6 +16,26 @@
 				<button id="nextsnapmail-save-button" name="nextsnapmail-save-button"><?php echo($l->t('Save')); ?></button>
 				&nbsp;&nbsp;<span class="nextsnapmail-result-desc"></span>
 			</p>
+			<?php if (!empty($_['gmail-oauth-enabled'])): ?>
+				<p>
+					<a class="button" href="<?php echo \htmlspecialchars($_['gmail-oauth-url'], ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8'); ?>">
+						<?php echo($l->t('Connect Gmail / Google account')); ?>
+					</a>
+				</p>
+				<p class="settings-hint">
+					<?php echo($l->t('This will replace the saved main account credentials for NextSnapMail with a Google OAuth login.')); ?>
+				</p>
+			<?php endif; ?>
+			<?php if (!empty($_['gmail-oauth-message'])): ?>
+				<p class="nextsnapmail-success">
+					<?php echo \htmlspecialchars($_['gmail-oauth-message'], ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8'); ?>
+				</p>
+			<?php endif; ?>
+			<?php if (!empty($_['gmail-oauth-error'])): ?>
+				<p class="nextsnapmail-error">
+					<?php echo \htmlspecialchars($_['gmail-oauth-error'], ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8'); ?>
+				</p>
+			<?php endif; ?>
 		</fieldset>
 	</form>
 </div>
