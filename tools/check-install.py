@@ -28,7 +28,8 @@ def inspect(root, data, app, release):
     record('SnappyMail version', engine == release['tested']['snappymail'], engine)
     private = data / 'appdata_nextsnapmail/_data_/_default_'
     for relative, expected in release['files'].items():
-        path = private / 'plugins' / relative.removeprefix('plugin/') if relative.startswith('plugin/') else root / 'themes' / relative.removeprefix('theme/')
+        # The hosting account may still provide Python 3.8 (no str.removeprefix).
+        path = private / 'plugins' / relative[len('plugin/'):] if relative.startswith('plugin/') else root / 'themes' / relative[len('theme/'):]
         status = 'missing' if not path.is_file() else ('match' if hashlib.sha256(path.read_bytes()).hexdigest() == expected else 'modified')
         record(relative, status == 'match', status)
     config = configparser.ConfigParser(interpolation=None, strict=False)

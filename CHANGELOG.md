@@ -1,5 +1,29 @@
 # Releases
 
+## 1.6.6, 2026-09-12
+
+The compose Image button now opens the native Nextcloud file selector. Selected raster images
+are downloaded with the current authenticated session, compressed locally and inserted inline.
+Compression also handles clipboard HTML containing a single embedded image. Local file paste
+and drag/drop keep their established inline/attachment behavior.
+
+Compress now appears on Nextcloud-imported and restored JPEG/PNG/WebP attachments, which
+previously lacked a browser File. An authenticated, account-scoped image-read endpoint retrieves
+the temporary original on demand. The original is retained unless the smaller replacement
+uploads successfully. Metadata subscriptions handle native completion ordering. Compress has a contrasting surface
+and border so it no longer blends into the attachment card.
+
+Repository maintenance memory now lives in `AGENTS.md`, `docs/CONTEXT.md`, `docs/MAINTENANCE.md`
+and deployment records. The verifier also rejects missing payload files and version mismatches; the installation
+diagnostic supports hosting accounts without Python’s newer `str.removeprefix`.
+Image behavior and limits are documented in `docs/IMAGES.md`.
+
+Validation: 17 Nextcloud/native picker scenarios, 10 native storage/endpoint checks, 22 image
+checks, 11 edge cases, 23 toolbar and 25 Markdown regressions; 25 filtered-selection checks,
+5 installation diagnostics, syntax and reproducible theme. Browser transport/popup lifecycle
+and mail transport are mocked; no real mail is sent or deleted. See the deployment record
+for actual server compilation and installed fingerprint verification.
+
 ## 1.6.5, 2026-09-12
 
 First standalone distribution of the complete Pied Web customization. Plugin and compiled theme are byte-identical to the validated deployed baseline. Repository packaging adds no production behavior change.

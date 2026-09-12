@@ -41,7 +41,7 @@ The check reads versions, payload fingerprints and plugin activation, never acco
 - Contacts navigation uses the installed Nextcloud Contacts app.
 - Invitation import uses the existing Nextcloud integration's calendar option; enable it in that plugin's settings if needed. This package contains no personal calendar settings.
 - Sieve host, port, encryption and authentication are configured for each mail domain using the mail provider's actual settings. This package neither enables a responder nor modifies Sieve scripts.
-- Newly added JPEG, PNG and WebP attachments have Compress while their local File is available. Restored drafts and attachments imported from Nextcloud do not retain that browser File and do not show this action.
+- The Image toolbar uses the native Nextcloud file picker for compressed inline insertion. JPEG, PNG and WebP attachment cards expose Compress, including Nextcloud imports and restored attachments. See [image usage and limits](IMAGES.md).
 
 ## Remove or restore
 

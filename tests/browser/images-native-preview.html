@@ -1,8 +1,8 @@
 <!doctype html><html lang="fr" data-themes="light"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pied Web UX, aperçu de validation</title>
 <link rel="stylesheet" href="/app/snappymail/v/2.38.2/static/css/app.css">
-<link rel="stylesheet" href="/.local-work/theme/style.css?images=165e">
-<link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css?images=165e">
+<link rel="stylesheet" href="/.local-work/theme/style.css?images=166a">
+<link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css?images=166a">
 <style id="app-theme-style" data-name="PiedWeb@nextcloud">
 .nc-shell{height:48px;display:flex;align-items:center;gap:4px;padding:0 14px;color:#fff;font:14px system-ui;box-sizing:border-box}
 .nc-shell a{display:flex;align-items:center;justify-content:center;width:44px;height:48px;opacity:.72;position:relative}.nc-shell a.current,.nc-shell .nc-brand{opacity:1}.nc-shell .current:after{content:'';position:absolute;bottom:3px;width:20px;height:3px;border-radius:3px;background:currentColor}.nc-shell svg{width:22px;height:22px}.nc-shell .nc-brand{margin-right:20px}.nc-shell .nc-brand svg{width:36px;height:32px}.nc-spacer{flex:1}.nc-user{width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:#ffffff26;margin-left:12px;font-weight:600}
@@ -402,7 +402,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/send-delay.js?images=165e"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=165e"></script><script src="/.local-work/pied-web-ux/ux.js?images=165e"></script><script src="/.local-work/pied-web-ux/studio.js?images=165e"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=165e"></script>
+</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?images=166a"></script><script src="/.local-work/pied-web-ux/studio.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=166a"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 const demoRows=[...document.querySelectorAll('.messageListItem')];
@@ -431,9 +431,9 @@ const contact=document.querySelector('.buttonContacts');contact.removeAttribute(
 ko.applyBindingAccessorsToNode(contact,{visible:()=>folderVM.allowContacts,click:()=>folderVM.contactsClick},folderVM);
 window.nativeHeaderMarkup=document.querySelector('#V-MailMessageView .messageItemHeader').innerHTML;
 window.fixtureMenuTemplate=document.querySelector('#more-view-dropdown-id').parentNode.querySelector('[class="dividerbar"]:last-child')?.innerHTML;
-for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=165e"></script>
-<script src="/.local-work/pied-web-ux/markdown-vendors.js?images=165e"></script>
-<script src="/.local-work/pied-web-ux/markdown.js?images=165e"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=165e"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=165e"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=165e"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=165e"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=165e"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=165e"></script>
+for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
+<script src="/.local-work/pied-web-ux/markdown-vendors.js?images=166a"></script>
+<script src="/.local-work/pied-web-ux/markdown.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=166a"></script>
 <style>
 /* Fixture-only address fields; editor/tab/template/styles are native. */
 .fixture-addresses {padding:12px 18px;display:grid;gap:6px;}
@@ -476,7 +476,12 @@ window.XMLHttpRequest=class {constructor(){this.upload={};}open(method,url){this
 window.fixtureFetch=window.fetch;
 window.fetch=async function(url,options){if(url!=='/fixture-upload')return fixtureFetch.apply(this,arguments);const file=options.body.get('uploader');uploadCalls.push({kind:'replacement',file});if(window.holdUpload)await new Promise(resolve=>window.releaseUpload=resolve);if(options.signal?.aborted)throw new Error('aborted');if(window.failUpload)return new Response('failure',{status:500});return new Response(JSON.stringify({Result:{Attachment:{name:file.name,size:file.size,tempName:'compressed-'+uploadCalls.length,mimeType:file.type}}}));};
 const cmd=()=>{window.fixtureSendCalls=(window.fixtureSendCalls||0)+1;};cmd.canExecute=()=>true;
-window.imageCompose=Object.assign({viewModelTemplateID:'PopupsCompose',viewModelDom:dialog,sendCommand:cmd,saveCommand:cmd,attachments:ko.observableArray([]),sending:ko.observable(false),saving:ko.observable(false),dragAndDropOver:ko.observable(false),dragAndDropVisible:ko.observable(true),addAttachmentEnabled:ko.observable(true),attachmentsArea:()=>{}},NativeImageCompose);
+window.imageCompose=Object.assign({viewModelTemplateID:'PopupsCompose',viewModelDom:dialog,sendCommand:cmd,saveCommand:cmd,attachments:ko.observableArray([]),sending:ko.observable(false),saving:ko.observable(false),dragAndDropOver:ko.observable(false),dragAndDropVisible:ko.observable(false),addAttachmentEnabled:ko.observable(true),attachmentsArea:()=>{}},NativeImageCompose);
+if (new URLSearchParams(location.search).has('nextcloud')) {
+ const {setupNextcloudImages} = await import('/.local-work/nextcloud-image-fixture.js'); await setupNextcloudImages();
+ // SnappyMail 2.38.2 addAttachmentHelper, using the native attachment model.
+ imageCompose.addAttachmentHelper = function(id, name, size) { const attachment = new NativeComposeAttachment(id, name, size); this.addAttachment(attachment, 1); return attachment; };
+}
 dispatchEvent(new CustomEvent('rl-view-model.create',{detail:imageCompose}));
 ko.applyBindingAccessorsToNode(attachmentPanel.querySelector('.b-attachment-place'),{visible:()=>imageCompose.dragAndDropVisible()},imageCompose);
 ko.applyBindingAccessorsToNode(attachmentPanel.querySelector('.attachmentList'),{foreach:()=>imageCompose.attachments},imageCompose);

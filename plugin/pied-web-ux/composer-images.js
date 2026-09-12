@@ -1,7 +1,7 @@
 /* Image controls live outside the editable message and never enter its HTML. */
 (() => {
     'use strict';
-    const {compress, busy, active, t} = window.PiedWebUx.images;
+    const {compress, busy, active, t, fromData, nextcloudFile} = window.PiedWebUx.images;
     addEventListener('squire-toolbar', ({detail:{squire:editor, actions}}) => {
         const container = editor.container, dialog = container.closest('#V-PopupsCompose');
         if (!dialog) return;
@@ -84,28 +84,46 @@
             if (['ArrowLeft','ArrowRight'].includes(e.key)) { e.preventDefault(); e.stopPropagation(); setWidth(selected.getBoundingClientRect().width+(e.key==='ArrowLeft'?-1:1)*(e.shiftKey?50:10)); }
         });
         const read = file => new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = () => resolve(reader.result); reader.onerror = reject; reader.readAsDataURL(file); });
-        async function insert(file) {
-            const version = epoch, range = squire.getSelection().cloneRange();
+        const capture = () => ({version:epoch, range:squire.getSelection().cloneRange()});
+        const current = ({version, range}) => version === epoch && !disposed && active()
+            && editor.mode === 'wysiwyg' && body.contains(range.startContainer);
+        async function insert(source, context = capture()) {
+            const {range} = context;
+            if (!current(context)) return;
             announce(t('Préparation de l’image…', 'Preparing image…'));
-            await busy(async () => {
+            return busy(async () => {
                 try {
+                    const file = typeof source === 'function' ? await source() : source;
                     let result;
                     try { result = await compress(file); } catch { result = file; }
                     const src = await read(result);
                     const image = new Image(); image.src = src; await image.decode();
-                    if (version !== epoch || disposed || !usable() || !body.contains(range.startContainer)) return;
+                    if (!current(context)) return;
                     squire.setSelection(range); squire.saveUndoState();
                     const node = squire.insertImage(src, {alt:'', width:Math.min(600,image.naturalWidth), style:'max-width:100%;height:auto'});
                     node.addEventListener('load', position, {once:true});
                     select(node);
-                    announce(result.size < file.size ? t('Image compressée · ', 'Image compressed · ')+Math.round((1-result.size/file.size)*100)+t(' % de moins','% smaller') : '');
-                } catch { announce(t('Impossible d’insérer cette image. Réessayez avec le bouton Image.', 'Could not insert this image. Try the Image button.')); }
+                    announce(result.size < file.size ? t('Image compressée · ', 'Image compressed · ')+Math.round((1-result.size/file.size)*100)+t(' % de moins','% smaller') : t('Image insérée · original conservé', 'Image inserted · original kept'));
+                    return true;
+                } catch { if (current(context)) announce(t('Image non insérée. Choisissez un JPEG, PNG, WebP ou GIF de moins de 20 Mo accessible dans vos fichiers.', 'Image not inserted. Choose an accessible JPEG, PNG, WebP or GIF under 20 MB.')); }
             });
         }
         const paste = e => {
             if (!usable() || !body.contains(e.target)) return;
             const file = [...(e.clipboardData?.items || [])].find(item => item.kind === 'file' && item.type.startsWith('image/'))?.getAsFile();
-            if (file) { e.preventDefault(); e.stopImmediatePropagation(); void insert(file); }
+            if (file) { e.preventDefault(); e.stopImmediatePropagation(); void insert(file); return; }
+            // A copied embedded image can arrive as HTML only. Never fetch external clipboard URLs.
+            const html = e.clipboardData?.getData('text/html');
+            if (html) {
+                const fragment = new DOMParser().parseFromString(html, 'text/html').body;
+                const images = fragment.querySelectorAll('img');
+                if (images.length === 1 && !fragment.textContent.trim() && images[0].getAttribute('src')?.startsWith('data:image/')) {
+                    try {
+                        const embedded = fromData(images[0].getAttribute('src'), 'image-collee');
+                        e.preventDefault(); e.stopImmediatePropagation(); void insert(embedded);
+                    } catch { /* Keep native paste for unsupported clipboard formats. */ }
+                }
+            }
         };
         // Squire registers its own capture listener on the editable root first.
         // Intercept files on its parent so the native PNG insertion cannot run too.
@@ -113,7 +131,35 @@
         const picker = document.createElement('input'); picker.type = 'file'; picker.accept = 'image/*';
         picker.addEventListener('change', () => { if (picker.files[0]) void insert(picker.files[0]); picker.value = ''; });
         const originalUpload = actions.targets.imageUpload.cmd;
-        actions.targets.imageUpload.cmd = (...args) => usable() ? picker.click() : originalUpload(...args);
+        actions.targets.imageUpload.cmd = async (...args) => {
+            if (!usable()) return originalUpload(...args);
+            if (!rl.nextcloud?.selectFiles) return picker.click();
+            const context = capture();
+            try {
+                const files = await rl.nextcloud.selectFiles();
+                if (!files?.length || !current(context)) return;
+                let range = context.range;
+                await busy(async () => {
+                    let inserted = 0;
+                    for (const file of files) {
+                        if (!current(context)) break;
+                        if (await insert(() => nextcloudFile(file), {...context, range})) ++inserted;
+                        range = squire.getSelection().cloneRange();
+                    }
+                    if (files.length > 1 && inserted !== files.length && current(context)) {
+                        announce(inserted + t(' image(s) insérée(s). ', ' image(s) inserted. ') + (files.length-inserted)
+                            + t(' fichier(s) non inséré(s) : format, taille ou accès incompatible.', ' file(s) not inserted: unsupported format, size or access.'));
+                    }
+                });
+            } catch { if (current(context)) announce(t('Impossible d’ouvrir les fichiers Nextcloud.', 'Could not open Nextcloud files.')); }
+        };
+        queueMicrotask(() => {
+            const button = container.querySelector('[data-action="imageUpload"]');
+            if (button && rl.nextcloud?.selectFiles && active()) {
+                button.title = t('Insérer une image Nextcloud · compression automatique', 'Insert a Nextcloud image · automatic compression');
+                button.setAttribute('aria-label', button.title);
+            }
+        });
         const setData = editor.setData;
         editor.setData = function(...args) { ++epoch; hide(); announce(''); return setData.apply(this,args); };
         editor.on('mode', hide);

@@ -15,9 +15,12 @@ Use a separate source checkout of the NextSnapMail revision recorded in `release
 
 ```sh
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
+The image endpoint checks use the native account-scoped file storage with temporary, fictional images.
+They verify login/POST requirements, account isolation, format/size/path rejection and unchanged originals.
 
 ## Browser fixtures
 
@@ -36,8 +39,14 @@ dev-browser --timeout 60 < tests/browser/test-composer-images.js
 dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
+dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
+
+The Nextcloud script uses `?nextcloud=1`, which loads the actual bundled WebDAV picker and
+attachment command. Popup lifecycle and network are mocked. It verifies authenticated URL
+construction, native selection/cancellation, inline compression, Nextcloud/restored attachments,
+failure/retry, draft changes, HTML-only image paste and mixed-format selection feedback.
 
 This curated harness accompanies the baseline's image/editor validation. It does not claim to cover every legacy customization or substitute for testing the upgraded application in an authenticated test mailbox.

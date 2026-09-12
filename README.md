@@ -4,7 +4,7 @@ A responsive theme and companion plugin for NextSnapMail inside Nextcloud. Clear
 
 Independent customization, not an official NextSnapMail or Nextcloud release.
 
-![Inline image controls](docs/screenshots/compose-images-desktop.png)
+![Inline image controls](docs/screenshots/nextcloud-images-desktop.png)
 
 ## Included
 
@@ -18,7 +18,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Markdown editing and formatted Markdown paste, alongside HTML source and visual editing.
 - A lighter editor toolbar with advanced controls behind More.
 - Inline image sizing, pointer/keyboard resize, alt text and removal.
-- Browser-side compression for clipboard images and newly uploaded image attachments.
+- Browser-side compression for clipboard images and local, Nextcloud or restored image attachments.
+- Nextcloud files from the Image toolbar, compressed and inserted directly in the message body.
 
 The optional linked-account unread counter correction is a separate [upstream PR](https://github.com/oe79/NextSnapMail/pull/41) and [version-specific patch](patches/README.md).
 
@@ -26,7 +27,7 @@ This does **not** implement scheduled delivery, a unified inbox or a new vacatio
 
 ## Install and maintain
 
-Release **1.6.5**, tested with Nextcloud **34.0.3**, NextSnapMail **0.1.10**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.6.6**, tested with Nextcloud **34.0.3**, NextSnapMail **0.1.10**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).
@@ -37,6 +38,8 @@ python3 tools/check-install.py --nextcloud /path/to/nextcloud
 ```
 
 The plugin is stored in NextSnapMail's data directory, and the theme under Nextcloud's custom themes. Normal updates generally preserve those files. Preserved files do not guarantee compatibility with new DOM, editor or PHP APIs. The optional core patch is overwritten when the app is replaced.
+
+[Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
 
 ## Develop
 
@@ -52,7 +55,7 @@ python3 tools/package.py
 
 [Tests and browser fixtures](tests/README.md) use a separate upstream source checkout and fictional mail data. [Release notes](CHANGELOG.md) record the published baseline and its validation boundaries.
 
-<img src="docs/screenshots/compose-images-mobile.png" alt="Image controls on mobile" width="300"> <img src="docs/screenshots/compose-images-dark.png" alt="Dark theme" width="300">
+<img src="docs/screenshots/nextcloud-images-mobile.png" alt="Image controls on mobile" width="300"> <img src="docs/screenshots/nextcloud-images-dark.png" alt="Dark theme" width="300">
 
 ## License
 

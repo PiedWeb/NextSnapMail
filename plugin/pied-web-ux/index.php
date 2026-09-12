@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.6.5',
+        VERSION = '1.6.6',
         RELEASE = '2026-09-12',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -30,6 +30,24 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('composer-images.js');
         $this->addJs('attachment-images.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
+        $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
+    }
+
+    public function AttachmentImage(): array
+    {
+        // The native JSON dispatcher checks CSRF; the provider scopes keys to the logged-in account.
+        if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') throw new \RuntimeException('POST required');
+        $actions = \RainLoop\Api::Actions();
+        $account = $actions->getAccountFromToken();
+        if (!$account) throw new \RuntimeException('Login required');
+        try {
+            require_once __DIR__ . '/AttachmentImage.php';
+            $result = PiedWebAttachmentImage::read($actions->FilesProvider(), $account,
+                (string) $actions->GetActionParam('tempName', ''));
+        } catch (\Throwable $error) {
+            $result = ['error' => 'image'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebAttachmentImage', $result);
     }
 
     public function FilteredSelection(): array
