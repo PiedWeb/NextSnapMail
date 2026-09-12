@@ -3,7 +3,7 @@
 	<id>nextsnapmail</id>
 	<name>NextSnapMail</name>
 	<summary>A SnappyMail fork focused on integration with Nextcloud</summary>
-	<version>0.1.10</version>
+	<version>0.1.11</version>
 	<licence>AGPL-3.0-only</licence>
 	<author homepage="https://github.com/oe79">Erhard Scharf</author>
 	<author homepage="https://github.com/the-djmaze/snappymail">SnappyMail contributors</author>
@@ -30,6 +30,9 @@ risk.
 - **Integration with Nextcloud Unified Search**
 - **Integration with other Nextcloud apps** (Contacts, Files and Calendar)
 - **Multiple mail accounts and identities**
+- **Integrated Gmail / Google OAuth2 login**, including main account setup from
+  the personal settings and additional Gmail accounts from the webmail account
+  menu
 - **Admin-assisted import from existing SnappyMail installations**, including
   stored mailbox credentials, additional accounts and app data
 - **Admin reset option** to remove NextSnapMail account settings and recreate a
