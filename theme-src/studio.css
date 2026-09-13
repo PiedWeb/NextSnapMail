@@ -715,6 +715,10 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group > .btn { width:34px; min-width:34px; height:32px; min-height:32px; border-radius:4px; background:transparent; color:var(--pw-muted); }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions { border-inline-end:1px solid var(--pw-line); margin-inline-end:4px; padding-inline-end:4px; border-radius:0; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-reply { color:var(--nc-color-primary-element); }
+#rl-app [data-pw-icon="copy-md"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='13' rx='1.5'/%3E%3Cpath d='M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2'/%3E%3C/svg%3E"); }
+#rl-app #V-MailMessageView .pw-copy-md[disabled] { opacity:.4; cursor:default; }
+#rl-app #V-MailMessageView .pw-copy-md[data-state="copied"] { color:var(--nc-color-primary-element); }
+#rl-app .pw-copy-md-status { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 #rl-app #V-MailMessageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:14px; }
 #rl-app #messageItem > .messageItemHeader { padding-top:2px; }
 #rl-app .pw-sender-name { font-weight:550; }

@@ -7,9 +7,16 @@
     const parser = new deps.marked.Marked({gfm: true, breaks: false, async: false});
     // Noninteractive task markers survive mail clients and the native paste cleaner.
     parser.use({renderer: {checkbox: ({checked}) => checked ? '☑ ' : '☐ '}});
-    const converter = new TurndownService({headingStyle: 'atx', codeBlockStyle: 'fenced',
-        bulletListMarker: '-', emDelimiter: '*'});
-    converter.use(deps['turndown-plugin-gfm'].gfm);
+    const createConverter = () => {
+        const service = new TurndownService({headingStyle: 'atx', codeBlockStyle: 'fenced',
+            bulletListMarker: '-', emDelimiter: '*'});
+        service.use(deps['turndown-plugin-gfm'].gfm);
+        return service;
+    };
+    const converter = createConverter();
+    // Reading a message should yield Markdown, not the raw styled HTML that
+    // the compose view keeps to protect signatures when a draft is edited.
+    const messageConverter = createConverter();
     converter.addRule('piedWebRichHtml', {
         filter: node => node.matches('.rl-signature, [style], [align], [dir], img[width], img[height], img[src^="cid:"]'),
         replacement: (_content, node) => {
@@ -23,7 +30,8 @@
         USE_PROFILES: {html: true}, FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
         FORBID_ATTR: ['id', 'name'], ALLOW_DATA_ATTR: false
     });
-    api.markdown = {render, fromHtml: html => converter.turndown(html)};
+    api.markdown = {render, fromHtml: html => converter.turndown(html),
+        fromMessageHtml: html => messageConverter.turndown(html)};
 
     addEventListener('squire-toolbar', event => {
         const {squire: editor, actions} = event.detail;

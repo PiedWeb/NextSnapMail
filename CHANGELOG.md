@@ -1,5 +1,16 @@
 # Releases
 
+## 1.7.4, 2026-09-13
+
+The reader toolbar now has a **Copier en MD / Copy as Markdown** button beside
+the message actions. It copies the currently displayed message body as Markdown,
+including collapsed quotations, without changing the message or its read state.
+The compose Markdown view still preserves rich HTML when editing drafts.
+
+Validation: seven reader-copy browser fixture checks cover formatting, keyboard
+activation, quotations, clipboard fallback and narrow mobile layout. See
+`docs/COPY_MARKDOWN.md` and the deployment record for installation and web checks.
+
 ## Nextcloud 34.0.4 compatibility verified, 2026-09-12
 
 Nextcloud updated from 34.0.3 to 34.0.4. Its native app upgrade also installed

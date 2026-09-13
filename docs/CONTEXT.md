@@ -27,6 +27,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - The five-second Undo Send floats after closing compose, while mailbox use continues.
   It delays browser submission; there is no recall after delivery or server scheduled send.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
+- Reader Copy as Markdown uses the displayed message body, expands quoted text in the copy,
+  and leaves the message and its native actions unchanged. See `COPY_MARKDOWN.md`.
 - Interleaved quotes stay open; trailing history can remain folded. Keep manual quote choices.
 - Formatting has a compact main row and More options. Use the existing Lucide icon assets.
 - Images paste into the body, with browser compression modeled on Pushword's multi-upload:
@@ -80,6 +82,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 | Version | Main change |
 | --- | --- |
 | 1.3 | Shell/list/reader redesign; 30 screenshot-only critique attempts. Final 8.2/10, best 8.3, stopped at requested cap; never claimed 9/10. |
+| 1.7.4 | Copy the open reader body as Markdown from the action bar, including collapsed quotes. |
 | 1.4.0–1.4.1 | Swipe/Delete, labeled reader menu, unsubscribe placement, checkbox geometry, account stacking and compact rail alignment. |
 | 1.5.1–1.5.2 | Markdown editor/paste and native flag ancestor/pressed-state repair. |
 | 1.6.0–1.6.2 | Background Undo Send, direct native flag action, Lucide settings icon and functional Nextcloud Contacts link. |

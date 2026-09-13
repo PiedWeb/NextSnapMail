@@ -99,7 +99,46 @@
             const reply = toolbar?.querySelector('.pw-message-actions');
             if (reply) toolbar.prepend(reply);
             const commands=document.createElement('div');commands.className='pw-reader-commands';commands.setAttribute('role','group');commands.setAttribute('aria-label',fr() ? 'Actions du message' : 'Message actions');
-            const groups=[reply,toolbar.querySelector('[data-pw-icon="archive"]')?.closest('.btn-group')].filter(Boolean).map(node=>{const marker=document.createComment('Native message command group');node.before(marker);return [node,marker];});
+            const copyGroup=document.createElement('div');copyGroup.className='btn-group pw-copy-md-group';
+            const copy=document.createElement('button');copy.type='button';copy.className='btn pw-copy-md';copy.dataset.pwIcon='copy-md';copy.textContent='MD';
+            const copyLabel=fr() ? 'Copier en MD' : 'Copy as Markdown';
+            copy.title=copyLabel;copy.setAttribute('aria-label',copyLabel);
+            const copyStatus=document.createElement('span');copyStatus.className='pw-copy-md-status';copyStatus.setAttribute('role','status');copyStatus.setAttribute('aria-live','polite');
+            copyGroup.append(copy,copyStatus);
+            toolbar.querySelector('.buttonUp')?.closest('.btn-group')?.before(copyGroup);
+            const updateCopy=()=>{copy.disabled=!vm.messageVisible?.();};
+            vm.messageVisible?.subscribe(updateCopy);updateCopy();
+            let copyTimer;
+            copy.addEventListener('click',async()=>{
+                const message=vm.message?.(),body=message?.body;
+                if (copy.disabled || !body || body.hidden || !dom.querySelector('.bodyText')?.contains(body)) return;
+                try {
+                    const content=body.cloneNode(true);
+                    content.querySelectorAll('details.sm-bq-switcher').forEach(details=>{
+                        const quote=details.querySelector(':scope > blockquote');
+                        if (quote) details.replaceWith(quote);
+                    });
+                    content.querySelectorAll('script,style,template,[hidden],[aria-hidden="true"]').forEach(node=>node.remove());
+                    const markdown=window.PiedWebUx?.markdown?.fromMessageHtml(content.innerHTML);
+                    if (!markdown?.trim()) throw new Error('Empty message body');
+                    const fallbackCopy=()=>{
+                        const field=document.createElement('textarea');field.value=markdown;field.style.position='fixed';field.style.top='-9999px';document.body.append(field);field.select();
+                        try { if (!document.execCommand('copy')) throw new Error('Clipboard unavailable'); }
+                        finally { field.remove();copy.focus(); }
+                    };
+                    if (navigator.clipboard?.writeText) {
+                        try { await navigator.clipboard.writeText(markdown); }
+                        catch (_error) { fallbackCopy(); }
+                    } else fallbackCopy();
+                    copyStatus.textContent=fr() ? 'Copié en MD' : 'Copied as Markdown';
+                    copy.dataset.state='copied';
+                } catch (_error) {
+                    copyStatus.textContent=fr() ? 'Copie impossible. Réessayez.' : 'Could not copy. Try again.';
+                    copy.dataset.state='error';
+                }
+                clearTimeout(copyTimer);copyTimer=setTimeout(()=>{copyStatus.textContent='';delete copy.dataset.state;},3000);
+            });
+            const groups=[reply,toolbar.querySelector('[data-pw-icon="archive"]')?.closest('.btn-group'),copyGroup].filter(Boolean).map(node=>{const marker=document.createComment('Message command group');node.before(marker);return [node,marker];});
             toolbar.prepend(commands);
             const adaptCommands=()=>groups.forEach(([node,marker])=>document.documentElement.classList.contains('pw-theme') && !document.documentElement.classList.contains('rl-fullscreen') ? commands.append(node) : marker.after(node));
             new MutationObserver(adaptCommands).observe(document.documentElement,{attributes:true,attributeFilter:['class']});adaptCommands();
