@@ -15,6 +15,10 @@ check('Reader toolbar has a labeled, available Markdown copy action',await p.eva
     const button=document.querySelector('.pw-copy-md');
     return button.closest('.pw-reader-commands') && button.title==='Copier en MD' && !button.disabled;
 }));
+const restingStyle=await p.evaluate(()=>{
+    const button=document.querySelector('.pw-copy-md');
+    return {background:getComputedStyle(button).backgroundColor,icon:getComputedStyle(button).getPropertyValue('--pw-icon')};
+});
 await button.click();
 await p.waitForFunction(()=>document.querySelector('.pw-copy-md').dataset.state==='copied');
 check('Click copies only the formatted body as Markdown',await p.evaluate(()=>{
@@ -24,6 +28,11 @@ check('Click copies only the formatted body as Markdown',await p.evaluate(()=>{
         && !text.includes('Les pistes pour la nouvelle identité')
         && document.querySelector('.pw-copy-md-status').textContent==='Copié en MD';
 }));
+check('A successful copy shows a contrasting checkmark on the button',await p.evaluate(defaults=>{
+    const button=document.querySelector('.pw-copy-md'),style=getComputedStyle(button);
+    return style.backgroundColor!==defaults.background && style.getPropertyValue('--pw-icon')!==defaults.icon
+        && button.title==='Copié en MD' && getComputedStyle(button,'::before').animationName==='pw-copy-confirm';
+},restingStyle));
 await p.evaluate(()=>{readerVM.message().body.innerHTML='<p>Réponse</p><details class="sm-bq-switcher"><summary>Afficher la citation</summary><blockquote><p>Texte cité</p></blockquote></details>';});
 await button.press('Enter');
 await p.waitForFunction(()=>copiedMarkdown.length===2);
@@ -35,6 +44,19 @@ await p.evaluate(()=>{
 await button.click();
 await p.waitForFunction(()=>copiedMarkdown.length===3);
 check('Legacy clipboard fallback works after a rejected write',await p.evaluate(()=>copiedMarkdown[2].includes('> Texte cité')&&document.activeElement.classList.contains('pw-copy-md')));
+await p.evaluate(()=>{document.execCommand=()=>false;});
+await button.click();
+await p.waitForFunction(()=>document.querySelector('.pw-copy-md').dataset.state==='error');
+check('A failed copy has distinct visible and accessible feedback',await p.evaluate(defaults=>{
+    const button=document.querySelector('.pw-copy-md'),style=getComputedStyle(button);
+    return style.backgroundColor!==defaults.background && style.getPropertyValue('--pw-icon')!==defaults.icon
+        && button.title==='Copie impossible. Réessayez.' && document.querySelector('.pw-copy-md-status').textContent===button.title;
+},restingStyle));
+await new Promise(resolve=>setTimeout(resolve,2500));
+check('Feedback clears and the copy icon returns',await p.evaluate(defaults=>{
+    const button=document.querySelector('.pw-copy-md'),style=getComputedStyle(button);
+    return !button.dataset.state && button.title==='Copier en MD' && style.getPropertyValue('--pw-icon')===defaults.icon;
+},restingStyle));
 await p.evaluate(()=>readerVM.messageVisible(false));
 check('Copy is unavailable when the native reader has no visible message',await p.evaluate(()=>document.querySelector('.pw-copy-md').disabled));
 await p.evaluate(()=>readerVM.messageVisible(true));

@@ -1,5 +1,5 @@
 {
-  "version": "1.7.5",
+  "version": "1.7.6",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.11",
@@ -21,7 +21,7 @@
     "plugin/pied-web-ux/image-compression-source.json": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
-    "plugin/pied-web-ux/index.php": "2047e9ea0b303e3d7205fc7325b73047fb328207fbe6edeb8a83b98fa6d806c5",
+    "plugin/pied-web-ux/index.php": "2555a2c17844a17c406112a2f35adb743693d1356d7873fab1f2404866cb0d86",
     "plugin/pied-web-ux/list-interactions.js": "d6cce2c0dc7d737de50f689f8b3fc98785e437556bd19fe473ff191b2a441ac6",
     "plugin/pied-web-ux/list-metadata.js": "9f52eaaebbffb99e1ed1e7a64a8c70dff6d1e14df988a9f65b05886e558b3346",
     "plugin/pied-web-ux/lucide-license.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
@@ -34,12 +34,12 @@
     "plugin/pied-web-ux/message-flag.js": "3101a2ff0861644e6d86c68a796f2e9e3b37cd5f1d60d6ea3bfcbc194d09aa33",
     "plugin/pied-web-ux/quote-readability.js": "38df449da67cc3bd2b15545d50d23620ab794c60071eed4a407d459dde2a746c",
     "plugin/pied-web-ux/send-delay.js": "827eeff6bd93ed7d058cf3120b158083ae7de1a0a7c809b203c4cecbf0ba6452",
-    "plugin/pied-web-ux/studio.js": "3006b9925d9eb5b1534d97235ee45903fbfbc61c2f7e9054e98ce136b38bdc68",
+    "plugin/pied-web-ux/studio.js": "a1728109aed71017f42d98755e307ba78b05d4648aeb920ed30889cb7035aec0",
     "plugin/pied-web-ux/unread-drafts.js": "e848d0a055c17a9cd039fd518c9b78ae7fb786001356d2cd53dc6641fab55181",
     "plugin/pied-web-ux/ux.css": "22089cbabb7b26570273f27a65fa26f1b16870e43198be744c346c0751f4be76",
     "plugin/pied-web-ux/ux.js": "c0f6baf307df47acc87e001a626e1e2356c05dbe5279782a8d5ae2e54b1669b6",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
-    "theme/PiedWeb/snappymail/style.css": "e4db7cd0c91018cb9da43567248410567db2c68a79abb94c21d0a3fbb946658c"
+    "theme/PiedWeb/snappymail/style.css": "4625e6a5ed5a9837ef473f64309b352f3523580cbf0306cdf18ea8dcff9f8b35"
   },
   "core_patch": {
     "pull_request": "https://github.com/oe79/NextSnapMail/pull/41",

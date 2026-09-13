@@ -4,8 +4,10 @@ In the message reader, the copy icon between Delete and More is labelled **Copie
 in French and **Copy as Markdown** in English. It copies only the body of the open message,
 not the subject, headers or attachments. Bold text, headings, lists, links, tables and
 quotations become Markdown. A collapsed quotation is included in full without its
-“Show quote” control text. The button gives a short success or failure indication and
-is disabled when no message is open.
+“Show quote” control text. On success, the button briefly turns into a contrasting
+checkmark; on failure, it shows a distinct cross. Both states announce the result to
+screen readers and return to the copy icon after 2.4 seconds. Motion is suppressed
+when the system requests reduced motion. The button is disabled when no message is open.
 
 Common image-heavy signature tables are flattened to a short contact block: name,
 role, organization, phone, email, website and address remain as text or links, while

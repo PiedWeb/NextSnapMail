@@ -1,5 +1,17 @@
 # Releases
 
+## 1.7.6, 2026-09-13
+
+The reader's Copy as Markdown button now confirms a completed copy with a brief
+contrasting checkmark, or shows a distinct failure mark if clipboard access fails.
+The existing French/English status announcement remains; the button returns to its
+copy icon after 2.4 seconds and honors reduced-motion preferences. The feedback
+replays on consecutive copies without changing the clipboard result.
+
+Validation: reader-copy browser checks including visual success, failure and reset;
+signature and compose-Markdown regression checks. See `docs/COPY_MARKDOWN.md` and
+the deployment record for production activation.
+
 ## 1.7.5, 2026-09-13
 
 Copy as Markdown now recognizes common image-heavy HTML signature tables and
