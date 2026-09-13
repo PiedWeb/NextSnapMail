@@ -16,7 +16,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Readable interleaved quotations and native message flag controls.
 - Floating five-second Undo Send while continuing to use the mailbox.
 - Markdown editing and formatted Markdown paste, alongside HTML source and visual editing.
-- Copy a received message body as Markdown from the reader toolbar.
+- Copy an open message body as Markdown from the reader toolbar, with compact text for common HTML signatures.
 - A lighter editor toolbar with advanced controls behind More.
 - Inline image sizing, pointer/keyboard resize, alt text and removal.
 - Browser-side compression for clipboard images and local, Nextcloud or restored image attachments.
@@ -33,7 +33,7 @@ This does **not** implement scheduled delivery, a unified inbox or a new vacatio
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.7.4**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.7.5**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

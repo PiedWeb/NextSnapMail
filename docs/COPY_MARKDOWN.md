@@ -7,6 +7,13 @@ quotations become Markdown. A collapsed quotation is included in full without it
 “Show quote” control text. The button gives a short success or failure indication and
 is disabled when no message is open.
 
+Common image-heavy signature tables are flattened to a short contact block: name,
+role, organization, phone, email, website and address remain as text or links, while
+logos, tiny icons, empty spacing cells and layout markup are omitted. This also applies
+inside quoted messages. The detection is deliberately conservative: it looks for a
+compact table with contact details and decorative images, and leaves tables with data
+headers alone. Unusual signatures may still need manual cleanup.
+
 Conversion runs in the browser from SnappyMail's rendered message body. It uses the
 same pinned Turndown/GFM dependencies as the compose Markdown view, with a separate
 converter so presentation styles are not copied as raw HTML. The compose converter

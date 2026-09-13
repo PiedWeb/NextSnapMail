@@ -1,5 +1,17 @@
 # Releases
 
+## 1.7.5, 2026-09-13
+
+Copy as Markdown now recognizes common image-heavy HTML signature tables and
+replaces their layout with compact contact lines. Names, roles, phone numbers,
+addresses and useful email/site links remain; logos, tiny icons and empty spacer
+cells are omitted. Quoted signatures are cleaned too. Data tables with headers
+and the compose Markdown editor keep their existing behavior.
+
+Validation: six fictional signature fixture checks, seven reader-copy checks and
+25 existing compose-Markdown checks. See `docs/COPY_MARKDOWN.md` and the
+deployment record for installation and Web activation.
+
 ## 1.7.4, 2026-09-13
 
 The reader toolbar now has a **Copier en MD / Copy as Markdown** button beside

@@ -30,8 +30,59 @@
         USE_PROFILES: {html: true}, FORBID_TAGS: ['style', 'form', 'input', 'button', 'textarea', 'select'],
         FORBID_ATTR: ['id', 'name'], ALLOW_DATA_ATTR: false
     });
+    const cleanSignatureTables = html => {
+        const template = document.createElement('template');
+        template.innerHTML = html;
+        const tables = [...template.content.querySelectorAll('table')];
+        const signature = table => {
+            const text = table.textContent.replace(/\s+/g, ' ').trim();
+            const email = !!table.querySelector('a[href^="mailto:"]') || /[\w.+-]+@[\w.-]+\.[a-z]{2,}/i.test(text);
+            const phone = /(?:\+?\d[\d\s()./-]{7,}\d)/.test(text);
+            const website = !!table.querySelector('a[href^="http"]') || /\b(?:www\.|[a-z\d-]+\.(?:com|fr|org|net))\b/i.test(text);
+            return text.length >= 20 && text.length <= 900 && email && (phone || website)
+                && !table.querySelector('th,thead') && table.querySelector('img')
+                && (table.querySelector('table') || table.querySelectorAll('img').length >= 2);
+        };
+        const candidates = tables.filter(signature);
+        const topLevel = candidates.filter(table => !candidates.some(other => other !== table && other.contains(table)));
+        topLevel.forEach(table => {
+            const lines = [];
+            let parts = [];
+            const flush = () => {
+                const text = parts.map(part => typeof part === 'string' ? part : part.textContent).join('').replace(/\s+/g, ' ').trim();
+                if (text) lines.push(parts);
+                parts = [];
+            };
+            const walk = node => {
+                if (node.nodeType === Node.TEXT_NODE) { parts.push(node.textContent.replace(/\s+/g, ' ')); return; }
+                if (node.nodeType !== Node.ELEMENT_NODE || node.matches('img,svg,script,style,template,[hidden],[aria-hidden="true"]') || node.style.display === 'none') return;
+                if (node.tagName === 'BR') { flush(); return; }
+                if (node.tagName === 'A') {
+                    const href = node.getAttribute('href') || '';
+                    if (/^(https?:|mailto:|tel:)/i.test(href) && !/[\r\n]/.test(href)) {
+                        const link = document.createElement('a'); link.setAttribute('href', href); link.textContent = node.textContent;
+                        parts.push(link);
+                    } else parts.push(node.textContent);
+                    return;
+                }
+                const block = /^(?:TABLE|TBODY|THEAD|TFOOT|TR|TD|TH|DIV|P|H[1-6]|UL|OL|LI|SECTION|HEADER|FOOTER)$/.test(node.tagName);
+                if (block) flush();
+                [...node.childNodes].forEach(walk);
+                if (block) flush();
+            };
+            walk(table);
+            flush();
+            const paragraph = document.createElement('p');
+            lines.forEach((line, index) => {
+                if (index) paragraph.append(document.createElement('br'));
+                line.forEach(part => paragraph.append(typeof part === 'string' ? document.createTextNode(part) : part));
+            });
+            table.replaceWith(paragraph);
+        });
+        return template.innerHTML;
+    };
     api.markdown = {render, fromHtml: html => converter.turndown(html),
-        fromMessageHtml: html => messageConverter.turndown(html)};
+        fromMessageHtml: html => messageConverter.turndown(cleanSignatureTables(html))};
 
     addEventListener('squire-toolbar', event => {
         const {squire: editor, actions} = event.detail;

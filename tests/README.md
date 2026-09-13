@@ -41,6 +41,7 @@ dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser --timeout 30 < tests/browser/test-reader-copy-md.js
+dev-browser --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
 dev-browser --timeout 40 < tests/browser/test-list-metadata.js
