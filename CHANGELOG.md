@@ -1,5 +1,11 @@
 # Releases
 
+## 1.7.24, 2026-09-14
+
+Remove the extra top margin above the sender line in the desktop message
+reader. The rule still starts at 800 px, so the established phone layout is
+unchanged. A fictional browser check covers the computed desktop margin.
+
 ## 1.7.23, 2026-09-14
 
 Desktop Mail now uses a tighter, more consistent reader header, a clear divider

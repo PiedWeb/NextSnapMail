@@ -65,6 +65,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   the short preview cache when accounts change. Desktop-only CSS refines the
   header, actions, calendar import, file tiles and conversation count; the
   native resizers retain variable widths and the mobile layout stays intact.
+- Since 1.7.24, the desktop reader sender line sits directly below its preceding
+  header content with no extra top margin; the mobile breakpoint is unchanged.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

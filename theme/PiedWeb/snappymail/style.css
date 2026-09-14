@@ -4562,7 +4562,7 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
     font-size:18px; line-height:1.3; letter-spacing:-.25px;
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader .informationShort:has(.pw-from) {
-    margin-top:12px; font-size:14px; line-height:1.35;
+    margin-top:0; font-size:14px; line-height:1.35;
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader :is(.pw-sender-name,.pw-sender-address) {
     font-size:14px; line-height:1.35;

@@ -62,9 +62,11 @@ await reader.evaluate(()=>{
 check('Reader typography is compact and sender name and address share one size',await reader.evaluate(()=>{
     const name=document.querySelector('.pw-sender-name'),address=document.querySelector('.pw-sender-address');
     const subject=document.querySelector('.b-message > .messageItemHeader .subjectParent');
+    const senderLine=document.querySelector('.b-message > .messageItemHeader .informationShort:has(.pw-from)');
     return getComputedStyle(name).fontSize===getComputedStyle(address).fontSize
         &&getComputedStyle(subject).fontSize==='18px'
-        &&parseFloat(getComputedStyle(subject).lineHeight)<26;
+        &&parseFloat(getComputedStyle(subject).lineHeight)<26
+        &&getComputedStyle(senderLine).marginTop==='0px';
 }));
 check('The reply actions have a visible separator',await reader.evaluate(()=>{
     const style=getComputedStyle(document.querySelector('.pw-reading-actions'));
@@ -89,7 +91,9 @@ check('Phone keeps its native footer and attachment geometry',await reader.evalu
     const attachment=document.querySelector('.attachmentItem').getBoundingClientRect();
     const extras=document.querySelector('.pw-message-extras');
     const originalHeader=document.querySelector('.b-message > .messageItemHeader');
+    const senderLine=originalHeader.querySelector('.informationShort:has(.pw-from)');
     return footer.borderTopWidth==='0px'&&attachment.height!==72
+        &&getComputedStyle(senderLine).marginTop==='8px'
         &&originalHeader.nextElementSibling===extras
         &&document.documentElement.scrollWidth<=innerWidth;
 }));
