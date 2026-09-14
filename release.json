@@ -1,5 +1,5 @@
 {
-  "version": "1.7.7",
+  "version": "1.7.8",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.11",
@@ -7,6 +7,7 @@
   },
   "files": {
     "plugin/pied-web-ux/AttachmentImage.php": "f09aef246ff3b3757e68106111dc299146b503748670bb9d97cd1e530ece4ca2",
+    "plugin/pied-web-ux/ConversationReply.php": "e37b81ad2432439ef1b7dfdcb07f13a924aadde0d28f7b83e0b18fbbe1911102",
     "plugin/pied-web-ux/FilteredSelection.php": "67daf171ac6ded5b0fd417d29a979b2b76c63c371b630f970740e0fa6d863d80",
     "plugin/pied-web-ux/UnreadDrafts.php": "01ed714ed20bfa81d05f1632dfa77c3e80f33e6fd42b76df75141db7cb72ab55",
     "plugin/pied-web-ux/app-shell.js": "bc5b93380a191274631aba4cdeb06966919a2503d5c60bdf721de50924084574",
@@ -21,7 +22,7 @@
     "plugin/pied-web-ux/image-compression-source.json": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
-    "plugin/pied-web-ux/index.php": "0e52155bbfb27c183e7dd4cac235353c5069857fc7798da83e265dc52c21fdb8",
+    "plugin/pied-web-ux/index.php": "47434f026495992d4b74f7283fa015d065268350777e48bd41ace5a147f17c2b",
     "plugin/pied-web-ux/list-interactions.js": "d6cce2c0dc7d737de50f689f8b3fc98785e437556bd19fe473ff191b2a441ac6",
     "plugin/pied-web-ux/list-metadata.js": "9f52eaaebbffb99e1ed1e7a64a8c70dff6d1e14df988a9f65b05886e558b3346",
     "plugin/pied-web-ux/lucide-license.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",

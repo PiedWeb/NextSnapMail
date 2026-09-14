@@ -1,5 +1,18 @@
 # Releases
 
+## 1.7.8, 2026-09-14
+
+Newly sent replies are copied into the folder of the message being answered, so
+SnappyMail's folder-scoped conversation view can include them. The normal Sent copy
+is preserved. Reply all follows the same path; forwards and replies already saved
+in the original folder are not duplicated. The copy is marked read and keeps the
+native Message-ID/References headers. This applies to future sends only, and
+stores an additional message in the original folder. If that extra IMAP append
+fails, sending and the normal Sent copy continue.
+
+Validation: native 2.38.2 send-hook contract and eight fictional transport checks,
+including stream rewind and failed-copy fallback; release checks.
+
 ## 1.7.7, 2026-09-14
 
 The Conversations toggle now has a clearly visible pressed state in desktop and

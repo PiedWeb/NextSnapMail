@@ -20,6 +20,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - The Conversations toggle uses its existing `aria-pressed` state for a visible teal
   icon, background and full outline in every list toolbar layout. Keep the icon
   color tied to the button state, including mobile and dark mode.
+- Sent replies are copied into the replied-to folder after SMTP submission and before
+  the normal Sent append, because native IMAP threads are scoped to one folder.
+  The same prepared stream (including Bcc handling) is rewound for both appends.
+  Skip forwards and same-folder saves; never let a failed conversation append
+  prevent the native Sent copy. Existing sent mail is not backfilled.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
