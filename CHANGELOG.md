@@ -1,5 +1,11 @@
 # Releases
 
+## 1.7.14, 2026-09-14
+
+Desktop message rows now show a small amber dot for unread mail and a pale gray dot for read mail. Clicking or pressing Space on the dot uses SnappyMail's native seen/unseen action without selecting or opening the row. The checkbox remains a separate, centered control. Unstarred messages reveal their star on hover or keyboard focus; starred messages remain visible. Attachment indicators occupy a fixed column at the right of each row, freeing the subject line for scanning. These layout rules start at 1200 px. Mobile keeps its existing visible star and tap target because SnappyMail already uses row double-tap/double-click for another action.
+
+Fictional browser checks covered native read actions, keyboard use, hover, checkbox alignment, attachment placement, and theme exit. The 390 px mobile capture is pixel-identical to 1.7.13; no real message state was changed during validation.
+
 ## 1.7.13, 2026-09-14
 
 Desktop Confort refinement: restore the native 72 px icon rail when folders are collapsed, add a faint divider between message rows, and align each row checkbox with Select all while keeping its vertical center level with the star. These rules still begin at 1200 px; the 390 px fictional screenshot is pixel-identical to 1.7.12. The plugin version changes to give the compiled stylesheet a fresh cache key.

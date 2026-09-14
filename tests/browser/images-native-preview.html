@@ -1,7 +1,7 @@
 <!doctype html><html lang="fr" data-themes="light"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Pied Web UX, aperçu de validation</title>
 <link rel="stylesheet" href="/app/snappymail/v/2.38.2/static/css/app.css">
-<link rel="stylesheet" href="/.local-work/theme/style.css?images=173b">
+<link rel="stylesheet" href="/.local-work/theme/style.css?images=174b">
 <link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css?images=172a">
 <style id="app-theme-style" data-name="PiedWeb@nextcloud">
 .nc-shell{height:48px;display:flex;align-items:center;gap:4px;padding:0 14px;color:#fff;font:14px system-ui;box-sizing:border-box}
@@ -384,6 +384,7 @@ Object.assign(messageList,{mainSearch(value){actionCalls.push('search:'+value);}
 window.mockRequests=[]; window.mockCount=451; window.mockError='';
 rl.pluginRemoteRequest=(cb,action,params)=>{mockRequests.push({...params});setTimeout(()=>cb(0,{Result:mockError?{error:mockError}:params.operation==='prepare'?{token:'test-snapshot',count:mockCount,cursor:0,done:false,permanent:messages.folder==='Trash'}:{count:mockCount,cursor:Math.min(mockCount,params.cursor+200),done:params.cursor+200>=mockCount}}),30);};
 window.listVM={viewModelTemplateID:'MailMessageList',viewModelDom:document.getElementById('V-MailMessageList'),composeInEdit:ko.observable(false),composeClick(){actionCalls.push('compose');},reload(){actionCalls.push('reload');},messageList};
+rl.app.messageList=messageList;
 window.folderVM={currentFolder:ko.observable({localName:ko.observable('Boîte de réception'),fullName:'INBOX',unreadEmails:ko.observable(16)}),viewModelTemplateID:'MailFolderList',viewModelDom:document.getElementById('V-MailFolderList'),filterUnseen:ko.observable(false)};
 const params=new URLSearchParams(location.search), mode=params.get('mode')||'reader';
 document.getElementById('rl-right').classList.toggle('message-selected',mode==='reader');
@@ -402,11 +403,11 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?threads=179"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=172a"></script>
+</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?threads=179"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=166a"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 const demoRows=[...document.querySelectorAll('.messageListItem')];
-const demoMessages=demoRows.map((row,i)=>{const data={uid:i+1,folder:'INBOX',checked:ko.observable(false),threadsLen:()=>1,threads:()=>[]};
+const demoMessages=demoRows.map((row,i)=>{const data={uid:i+1,folder:'INBOX',checked:ko.observable(false),threadsLen:()=>1,threads:()=>[],isUnseen:()=>row.classList.contains('unseen')};
 ko.applyBindingAccessorsToNode(row,{css:()=>({checked:data.checked()})},data);
 const check=row.querySelector('.checkboxMessage');
 ko.applyBindingAccessorsToNode(check,{text:()=>data.checked()?'☑':'☐'},data);
@@ -416,6 +417,8 @@ listVM.groupedList=ko.observable([{label:'Aujourd’hui',messages:demoMessages.s
 listVM.listGrouped=ko.observable(false);
 
 Object.assign(demoMessages,{folder:'INBOX',search:''});messageList(demoMessages);
+window.fixtureSeenActions=[];
+messageList.setAction=(folder,action,messages)=>{fixtureSeenActions.push({folder,action,uids:messages.map(m=>m.uid)});messages.forEach(m=>demoRows[demoMessages.indexOf(m)].classList.toggle('unseen',action===1));};
 window.fixtureMoves=[];window.nativeReaderDelete=0;
 rl.app.moveMessagesToFolderType=(type,folder,uids)=>fixtureMoves.push({type,folder,uids:[...uids]});
 listVM.popupVisibility=ko.observable(false);
@@ -446,6 +449,7 @@ for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'Setting
 if (new URLSearchParams(location.search).has('drafts')) {
  const {setupUnreadDrafts} = await import('/.local-work/unread-drafts-native.js'); await setupUnreadDrafts(); return;
 }
+if (new URLSearchParams(location.search).has('listOnly')) return;
 const markup=await (await fetch('/app/snappymail/v/2.38.2/app/templates/Views/User/PopupsCompose.html')).text();
 const dialog=document.createElement('dialog');dialog.id='V-PopupsCompose';dialog.className='animate';dialog.innerHTML=markup;
 dialog.querySelectorAll('[data-bind]').forEach(el=>el.removeAttribute('data-bind'));

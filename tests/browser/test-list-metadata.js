@@ -25,7 +25,10 @@ await p.evaluate(async()=>{
 await p.waitForSelector('.threads-len[data-pw-total]');
 const results=[];const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
 check('Native count text is preserved; accessible label explains total and unread',await p.evaluate(()=>{const b=document.querySelector('.threads-len');return b.textContent==='13/4'&&b.dataset.pwTotal==='13'&&b.dataset.pwUnread==='4 non lus'&&b.getAttribute('aria-label').includes('13 messages, dont 4 non lus');}));
-check('Unstarred and starred controls stay visible at rest',await p.evaluate(()=>[...document.querySelectorAll('.messageListItem .flagParent')].every(b=>getComputedStyle(b).opacity==='1'&&getComputedStyle(b,'::after').opacity==='1'&&b.getBoundingClientRect().width>=31.9)));
+check('Desktop keeps the flagged star visible and reserves the unflagged hit area',await p.evaluate(()=>{const rows=document.querySelectorAll('.messageListItem'),plain=rows[0].querySelector('.flagParent'),flagged=rows[1].querySelector('.flagParent');return getComputedStyle(plain).opacity==='0'&&getComputedStyle(flagged).opacity==='1'&&plain.getBoundingClientRect().width>=31.9;}));
+await p.locator('.messageListItem').first().hover();
+await p.waitForFunction(()=>getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1');
+check('Hover reveals the unflagged star',await p.evaluate(()=>getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1'));
 await p.locator('.messageListItem .flagParent').first().click();await p.waitForFunction(()=>document.querySelector('.messageListItem .flagParent').getAttribute('aria-pressed')==='true');
 check('Pointer click uses the original native flag dispatcher once',await p.evaluate(()=>metadataActions.length===1&&metadataActions[0].action==='set'&&metadataActions[0].uids.join(',')==='1'));
 await p.locator('.messageListItem .flagParent').first().press('Space');
@@ -41,7 +44,7 @@ check('Native hidden counts remain hidden',await p.evaluate(()=>document.querySe
 await p.evaluate(()=>{document.querySelector('.threads-len').style.display='';document.documentElement.lang='en';});await p.waitForFunction(()=>document.querySelector('.threads-len').title.startsWith('Open conversation'));
 check('Labels follow the interface language',await p.evaluate(()=>document.querySelector('.messageListItem .flagParent').title==='Remove star'));
 await p.evaluate(()=>{document.querySelector('link[href*="theme/style.css"]').disabled=true;document.documentElement.classList.remove('pw-theme');});await p.waitForFunction(()=>!document.querySelector('.threads-len').hasAttribute('data-pw-total'));
-check('Leaving the theme restores native attributes',await p.evaluate(()=>!document.querySelector('.threads-len').hasAttribute('role')&&!document.querySelector('.messageListItem .flagParent').hasAttribute('tabindex')));
+check('Leaving the theme restores native attributes and removes desktop read controls',await p.evaluate(()=>!document.querySelector('.threads-len').hasAttribute('role')&&!document.querySelector('.messageListItem .flagParent').hasAttribute('tabindex')&&!document.querySelector('.pw-read-toggle')));
 await p.evaluate(()=>{document.documentElement.lang='fr';document.querySelector('link[href*="theme/style.css"]').disabled=false;document.documentElement.classList.add('pw-theme');demoMessages.forEach((m,i)=>{m.checked(false);m.flagged=i===1;demoRows[i].classList.toggle('msgflag-\\flagged',m.flagged);});const b=document.querySelector('.threads-len');b.textContent='13/4';b.dataset.unseen='4';});await p.waitForSelector('.threads-len[data-pw-total]');
 await p.locator('.threads-len').first().blur();await p.screenshot({path:'list-metadata-desktop.png'});
 for(const [width,dark] of [[390,false],[320,false],[390,true]]){

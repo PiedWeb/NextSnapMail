@@ -16,10 +16,15 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   unchanged; compare fictional 390 px screenshots when adjusting desktop CSS again.
 - Since 1.7.13 the desktop minimum width applies only while folders are expanded. A collapsed
   rail is 72 px; row checkboxes align with Select all and faint dividers separate messages.
+- Since 1.7.14 a desktop-only read-status dot precedes each checkbox and calls the native
+  seen/unseen action for a message in the active list. Attachment indicators sit in a fixed
+  right-hand column. Unstarred desktop stars appear on hover/focus; starred ones remain
+  visible. Mobile keeps its visible star and unchanged row geometry; SnappyMail's native
+  row double-tap already has another meaning.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
-- Conversation totals and unread counts are visually distinct; list stars stay visible,
-  use an outlined/filled pair, and preserve native folder/selection commands.
+- Conversation totals and unread counts are visually distinct; list stars use an
+  outlined/filled pair and preserve native folder/selection commands.
   Since 1.7.2 followed messages use an amber star and row tint. Metadata CSS belongs to the
   theme and works before plugin initialization; theme changes and late DOM mounting are tested.
 - The Conversations toggle uses its existing `aria-pressed` state for a visible teal

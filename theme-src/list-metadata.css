@@ -1,10 +1,11 @@
-/* List metadata: a quiet total, explicit unread count, and an always-visible star. */
+/* List metadata: a quiet total, explicit unread count, and native flag controls. */
 #rl-app {
-    --pw-list-metadata-version:1.7.2;
+    --pw-list-metadata-version:1.7.14;
     --pw-flag-ink:color-mix(in oklch,oklch(0.68 0.15 75) 72%,var(--nc-color-main-text));
     --pw-follow-surface:color-mix(in oklab,var(--pw-flag-ink) 12%,var(--nc-color-main-background));
     --pw-star-filled-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
 }
+#rl-app .pw-read-toggle {display:none;}
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
     display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
     width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;

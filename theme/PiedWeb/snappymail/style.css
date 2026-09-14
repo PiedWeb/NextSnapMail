@@ -4160,13 +4160,14 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
  #rl-app #V-SystemDropDown .dropdown-menu a { min-height:44px; }
 }
 
-/* List metadata: a quiet total, explicit unread count, and an always-visible star. */
+/* List metadata: a quiet total, explicit unread count, and native flag controls. */
 #rl-app {
-    --pw-list-metadata-version:1.7.2;
+    --pw-list-metadata-version:1.7.14;
     --pw-flag-ink:color-mix(in oklch,oklch(0.68 0.15 75) 72%,var(--nc-color-main-text));
     --pw-follow-surface:color-mix(in oklab,var(--pw-flag-ink) 12%,var(--nc-color-main-background));
     --pw-star-filled-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
 }
+#rl-app .pw-read-toggle {display:none;}
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
     display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
     width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;
@@ -4363,12 +4364,44 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
     border-bottom: 1px solid color-mix(in oklch, var(--pw-line) 70%, var(--pw-paper)) !important;
   }
   #rl-app #V-MailMessageList .messageListItem .messageCheckbox { flex: 0 0 34px; }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle {
+    display:flex; align-items:center; justify-content:center; align-self:center;
+    flex:0 0 24px; width:24px; height:32px; margin:0 4px 0 0; padding:0;
+    border:0!important; border-radius:6px; background:transparent; cursor:pointer;
+  }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle::before {
+    content:''; display:block; width:8px; height:8px; border-radius:50%;
+    background:color-mix(in oklch,var(--nc-color-main-text) 25%,var(--pw-paper));
+  }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:#efc751; }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:hover { background:var(--pw-selected); }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
+  #rl-app #V-MailMessageList .messageListItem.unseen time::before { display:none; }
   #rl-app #V-MailMessageList .messageListItem .senderParent {
     font-size: 14px;
     line-height: 1.4;
   }
   #rl-app #V-MailMessageList .messageListItem .subjectParent { line-height: 1.5; }
   #rl-app #V-MailMessageList .messageListItem time { font-size: 12px; }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
+    grid-template-columns:minmax(0,1fr) auto auto 32px 24px;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .senderParent { grid-area:1/1; }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len { grid-area:1/2; }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem time { grid-area:1/3; }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent { grid-area:1/4/3/5; }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {
+    grid-area:1/5/3/6; display:flex; align-items:center; justify-content:center;
+    width:24px; min-width:24px; height:32px; margin:0;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent { grid-area:2/1/3/4; }
+  @media (hover:hover) and (pointer:fine) {
+    #rl-app #rl-right #V-MailMessageList .messageListItem:where(:not(.msgflag-\5c flagged):not(.hasFlaggedSubMessage)) .flagParent {
+      opacity:0; transition:opacity .12s ease;
+    }
+  }
+  #rl-app #rl-right #V-MailMessageList .messageListItem:hover .flagParent,
+  #rl-app #rl-right #V-MailMessageList .messageListItem:focus-within .flagParent { opacity:1; }
   #rl-app .pw-day-label,
   #rl-app .messageList .groupLabel { padding-block: 18px 8px; }
 
