@@ -48,6 +48,7 @@ await p.addScriptTag({url:fixtureBase+'/.local-work/pied-web-ux/conversation-thr
 await p.waitForFunction(()=>readerVM.pwConversationThread===true);
 await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===32
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3);
+await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
 const checks=[];const check=(label,ok)=>{if(!ok)throw new Error(label);checks.push(label);console.log('PASS '+label);};
 check('The newest Sent message opens in the native reader while three older messages stay one click away',await p.evaluate(()=>
     readerVM.message().folder==='Sent'&&readerVM.message().uid===32
@@ -56,6 +57,18 @@ check('The newest Sent message opens in the native reader while three older mess
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
 check('A reader built before the plugin script is mounted from its native Knockout view model',await p.evaluate(()=>
     readerVM.pwConversationThread===true&&!!document.querySelector('.pw-conversation-before')));
+check('A folded message has one border, and native Close sits beside the toolbar arrows',await p.evaluate(()=>{
+    const card=document.querySelector('.pw-conversation-card'),button=card.querySelector('button');
+    const close=document.querySelector('#V-MailMessageView .top-toolbar .buttonClose');
+    const next=document.querySelector('#V-MailMessageView .top-toolbar .buttonDown');
+    const subjectClose=document.querySelector('.b-message > .messageItemHeader .subjectParent > .close');
+    return getComputedStyle(card).borderTopWidth!=='0px'
+        &&getComputedStyle(button).borderTopWidth==='0px'
+        &&getComputedStyle(close).display!=='none'
+        &&close.getBoundingClientRect().left-next.getBoundingClientRect().right<=12
+        &&close.getBoundingClientRect().left>=next.getBoundingClientRect().right
+        &&getComputedStyle(subjectClose).display==='none';
+}));
 check('The stack includes both received messages and historical Sent replies without making copies',await p.evaluate(()=>
     threadRequests.every(request=>request.action==='MessageList')
     &&threadRequests.some(request=>request.folder==='INBOX'&&request.useThreads===1)
@@ -103,6 +116,11 @@ check('The visible conversation stack fits a narrow screen',await p.evaluate(()=
         const box=card.getBoundingClientRect();return box.width>0&&box.height>0&&box.left>=0&&box.right<=innerWidth;
     })&&document.documentElement.scrollWidth<=innerWidth;
 }));
+check('On mobile, the header Back action closes the reader without hiding other toolbar commands',await p.evaluate(()=>{
+    const back=document.querySelector('#rl-right > .pw-mobile-header > button[data-pw-icon="previous"]');
+    const copy=document.querySelector('#V-MailMessageView .pw-copy-md-group');
+    return back && getComputedStyle(back).display!=='none' && copy && getComputedStyle(copy).display!=='none';
+}));
 await p.evaluate(()=>{document.documentElement.classList.remove('pw-theme');});
 await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
 check('Leaving the theme restores the single native reader',await p.evaluate(()=>
@@ -144,4 +162,20 @@ await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.messag
 check('A single received message and its older Sent reply also form a native two-message stack',await p.evaluate(()=>
     document.querySelector('#messageItem > .bodyText').textContent==='Réponse envoyée seule'
     &&threadRequests.at(-1).account==='fixture-C'));
+await p.evaluate(()=>{
+    holdThreadSearch=true;releaseThreadSearch=null;
+    readerVM.message(NativeDraftCollection.reviveFromJson([{
+        ...sourceRaw,uid:60,hash:'INBOX-60',dateTimestamp:1789000700
+    }])[0]);
+});
+await p.waitForFunction(()=>!!window.releaseThreadSearch);
+check('The old native reader is concealed while a new conversation lookup is pending',await p.evaluate(()=>
+    document.querySelector('.b-message').classList.contains('pw-conversation-pending')
+    &&getComputedStyle(document.querySelector('.b-message > .messageItemHeader')).display==='none'
+    &&getComputedStyle(document.querySelector('#messageItem')).display==='none'
+    &&document.querySelector('.pw-conversation-before > p').textContent.includes('Recherche')));
+await p.evaluate(()=>{holdThreadSearch=false;releaseThreadSearch();});
+await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+check('The native reader reappears after the conversation lookup',await p.evaluate(()=>
+    getComputedStyle(document.querySelector('#messageItem')).display!=='none'));
 console.log(JSON.stringify({passed:checks.length}));

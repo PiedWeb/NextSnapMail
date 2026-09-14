@@ -1,8 +1,25 @@
 /* Read-only message choices surround SnappyMail's native expanded reader. */
+@media(min-width:800px) {
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar > .btn-group:has(.buttonClose) {
+  display:flex!important; order:1; margin-inline-start:4px;
+ }
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar > .pw-docked-account { order:2; }
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar .buttonClose[data-pw-icon="close"] {
+  display:inline-flex!important;
+ }
+}
+#rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent > .close {
+ display:none!important;
+}
+#rl-app #V-MailMessageView .b-message.pw-conversation-pending > .messageItemHeader,
+#rl-app #V-MailMessageView .b-message.pw-conversation-pending > #messageItem {
+ display:none!important;
+}
 #rl-app #V-MailMessageView .pw-conversation-before,
 #rl-app #V-MailMessageView .pw-conversation-after {
  flex:0 0 auto; margin:0 24px 18px; font-family:var(--pw-font);
 }
+#rl-app #V-MailMessageView .pw-conversation-before { margin-bottom:4px; }
 #rl-app #V-MailMessageView .pw-conversation-before[hidden],
 #rl-app #V-MailMessageView .pw-conversation-after[hidden],
 #rl-app #V-MailMessageView .pw-conversation-before > button[hidden] { display:none; }
@@ -27,9 +44,11 @@
  border:1px solid var(--pw-line); border-radius:8px; margin:0 0 10px;
  background:var(--pw-paper); overflow:hidden;
 }
+#rl-app #V-MailMessageView .pw-conversation-card:last-child { margin-bottom:0; }
 #rl-app #V-MailMessageView .pw-conversation-card-toggle {
  display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 16px;
- width:100%; min-height:80px; padding:12px 16px; border:0; background:transparent;
+ width:100%; height:auto!important; min-height:80px; padding:12px 16px;
+ border:0!important; border-radius:0; box-shadow:none!important; background:transparent;
  color:var(--nc-color-main-text); font:inherit; text-align:start; cursor:pointer;
 }
 #rl-app #V-MailMessageView .pw-conversation-card-toggle:hover { background:var(--pw-selected); }

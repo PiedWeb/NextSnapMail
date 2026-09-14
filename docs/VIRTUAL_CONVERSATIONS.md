@@ -25,6 +25,12 @@ folder's message list is not copied or altered. Searches are retried after a
 failure, and a 60-second refresh can pick up a new reply while the reader stays
 open. Account changes discard stale searches.
 
+Version 1.7.21 holds the native expanded message out of view while a newly
+opened conversation is being assembled. The reader and folded cards appear
+together after native loading, avoiding a visible jump when Sent results arrive.
+The native Close control is beside the previous/next arrows on desktop; mobile
+uses its existing header Back control. Folded cards have one border.
+
 No mailbox write, migration, copy or separate message store is involved.
 The lookup needs a configured Sent folder and matching Message-ID headers.
 Additional Sent folders configured per identity are not searched unless they

@@ -33,13 +33,13 @@
         const beforeCards = document.createElement('div'); beforeCards.className = 'pw-conversation-cards';
         const status = document.createElement('p'); status.setAttribute('role', 'status');
         const retry = document.createElement('button'); retry.type = 'button'; retry.hidden = true;
-        before.append(title,latestButton,beforeCards,status,retry); header.before(before);
+        before.append(title,latestButton,status,beforeCards,retry); header.before(before);
         const after = document.createElement('section'); after.className = 'pw-conversation-after'; after.hidden = true;
         const afterCards = document.createElement('div'); afterCards.className = 'pw-conversation-cards';
         after.append(afterCards); item.after(after);
 
         let generation = 0, timer, disposed = false, context = null, entries = [];
-        let loading = false, error = false;
+        let loading = false, error = false, silentRefresh = false;
         const account = () => String(rl.settings.get('accountHash') || '');
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
         const current = () => vm.message?.();
@@ -47,13 +47,17 @@
         const valid = (version, ctx) => !disposed && version === generation && context === ctx
             && account() === ctx.account && active() && !!currentKey()
             && (currentKey() === ctx.originKey || entries.some(entry => entry.key === currentKey()));
+        const settle = () => {
+            if (!loading && (!context?.followLatest || currentKey() === entries.at(-1)?.key)
+                && !vm.messageLoadingThrottle?.()) host.classList.remove('pw-conversation-pending');
+        };
 
         function showMessage(entry, followLatest = false) {
             const callback = listVM?.selector?.oCallbacks?.ItemSelect;
             const CollectionModel = rl.app.messageList?.()?.constructor;
             const model = entry.model || CollectionModel?.reviveFromJson?.([entry.raw])?.[0];
             if (typeof callback !== 'function' || !model || itemKey(model) !== entry.key) {
-                error = true; render(); return;
+                error = true; host.classList.remove('pw-conversation-pending'); render(); return;
             }
             context.followLatest = followLatest;
             callback(model); // Native reader fetch, attachments and actions use this message's real folder/UID.
@@ -86,13 +90,14 @@
 
         function render() {
             const index = entries.findIndex(entry => entry.key === currentKey());
-            const visible = active() && !!context && index >= 0 && (entries.length > 1 || loading || error);
+            const visible = active() && !!context && index >= 0
+                && (entries.length > 1 || loading && !silentRefresh || error);
             before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
             host.classList.toggle('pw-conversation-active', visible);
             title.textContent = t('Conversation', 'Conversation');
             latestButton.textContent = t('Afficher le dernier message', 'Show latest message');
             latestButton.hidden = !visible || index === entries.length - 1;
-            status.textContent = loading ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')
+            status.textContent = loading && !silentRefresh ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')
                 : error ? t('Conversation incomplète.', 'Conversation incomplete.') : '';
             retry.textContent = t('Réessayer', 'Try again'); retry.hidden = !error;
             beforeCards.replaceChildren(); afterCards.replaceChildren();
@@ -164,9 +169,10 @@
             return [...found.values()].map(raw => ({raw}));
         }
 
-        async function scan(ctx) {
+        async function scan(ctx, silent = false) {
             const version = ++generation, selectedBefore = currentKey();
-            loading = true; error = false; render();
+            loading = true; error = false; silentRefresh = silent;
+            if (!silent) render();
             let folderRows = [], sentRows = [];
             try { folderRows = await collectFolder(ctx,version); }
             catch { if (valid(version,ctx)) error = true; }
@@ -179,40 +185,53 @@
                 const key = itemKey(row.raw);
                 if (key && (!combined.has(key) || row.model)) combined.set(key,{...row,key});
             }
-            entries = [...combined.values()].sort((a,b) =>
+            const nextEntries = [...combined.values()].sort((a,b) =>
                 Number(a.raw.dateTimestamp || 0) - Number(b.raw.dateTimestamp || 0)
                 || a.key.localeCompare(b.key));
-            loading = false; render();
+            const changed = entries.map(entry => entry.key).join('\n') !== nextEntries.map(entry => entry.key).join('\n');
+            if (changed)
+                host.classList.add('pw-conversation-pending');
+            entries = nextEntries;
+            loading = silentRefresh = false; render();
             const latest = entries.at(-1);
             if (ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key)
                 showMessage(latest,true);
+            else if (changed) requestAnimationFrame(settle);
+            else settle();
         }
 
         function reset() {
-            ++generation; context = null; entries = []; loading = error = false; render();
+            ++generation; context = null; entries = []; loading = error = silentRefresh = false;
+            host.classList.remove('pw-conversation-pending'); render();
         }
         function update() {
             if (disposed || !currentKey()) { reset(); return; }
             if (!active() || document.hidden) {
-                ++generation; loading = false;
+                ++generation; loading = silentRefresh = false;
                 if (context) context.needsRefresh = true;
+                host.classList.remove('pw-conversation-pending');
                 render(); return;
             }
             if (context && account() === context.account && entries.some(entry => entry.key === currentKey())) {
                 if (context.needsRefresh) { context.needsRefresh = false; void scan(context); }
-                else render();
+                else { render(); settle(); }
                 return;
             }
             if (vm.messageLoadingThrottle?.()) return;
             const source = current(), origin = plain(source);
             const threads = source.threads?.() || [];
+            host.classList.add('pw-conversation-pending');
             context = {account:account(), folder:source.folder, sent:sentFolder(), origin,
                 originModel:source,originKey:itemKey(source),threadUid:threads.length > 1
                     ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:true};
             entries = [{raw:origin,model:source,key:context.originKey}];
             void scan(context);
         }
-        const schedule = () => { clearTimeout(timer); timer = setTimeout(update,160); };
+        const schedule = () => {
+            if (active() && currentKey() && (!context || !entries.some(entry => entry.key === currentKey())))
+                host.classList.add('pw-conversation-pending');
+            clearTimeout(timer); timer = setTimeout(update,context ? 160 : 0);
+        };
         latestButton.addEventListener('click', () => { const latest = entries.at(-1); if (latest) showMessage(latest,true); });
         retry.addEventListener('click', () => { if (context) void scan(context); });
         const subscriptions = [vm.message,vm.messageLoadingThrottle].filter(value => value?.subscribe)
@@ -221,7 +240,7 @@
         theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const wake = () => { if (!document.hidden) schedule(); };
         document.addEventListener('visibilitychange',wake);
-        const poll = setInterval(() => { if (context && active() && !loading) void scan(context); },60000);
+        const poll = setInterval(() => { if (context && active() && !loading) void scan(context,true); },60000);
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();

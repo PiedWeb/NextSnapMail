@@ -52,6 +52,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   opened messages. Since 1.7.10 the send hook no longer creates copies.
   Existing copies from 1.7.8/1.7.9 are not deleted. See
   `VIRTUAL_CONVERSATIONS.md`.
+- The 1.7.21 reader keeps SnappyMail's bound Close action beside previous/next
+  on desktop, with the mobile header Back action serving the same purpose. Hide
+  the expanded message until its first cross-folder lookup and native load
+  settle so newly found folded cards do not shift visible content.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

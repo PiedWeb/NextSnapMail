@@ -82,5 +82,6 @@ opposite setting request in desktop/mobile and light/dark fictional list fixture
 `test-virtual-conversation.js` opens the native reader fixture with fictional
 received and Sent messages. It verifies late mounting, the newest message from
 either folder opening natively, one-click access to earlier messages, read-only
-searches, retry, account isolation, theme exit and narrow layout. It does not
+searches, retry, account isolation, theme exit, narrow layout, one card border,
+native Close placement, and conceal/reveal during delayed searches. It does not
 use an authenticated mailbox.

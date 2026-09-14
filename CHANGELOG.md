@@ -1,5 +1,19 @@
 # Releases
 
+## 1.7.21, 2026-09-14
+
+The reader stack now shows one border per folded message. On desktop, the
+native Close button sits beside the previous/next arrows; the redundant Close
+inside the expanded subject is hidden. Mobile retains its existing header Back
+action and all message commands. During a new conversation lookup, the reader
+waits to reveal the expanded message until the read-only search and native
+message load finish, preventing cards from visibly pushing an already open
+message downward. Unchanged background refreshes leave the reader in place.
+
+The owner confirmed that the 1.7.20 stack appeared in Mail and supplied the
+layout feedback. Eighteen fictional browser checks covered the new states,
+alongside existing reader and release checks. No mailbox data was modified.
+
 ## 1.7.20, 2026-09-14
 
 In Conversations mode, opening a received message now assembles its native
