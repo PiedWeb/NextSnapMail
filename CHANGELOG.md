@@ -1,5 +1,18 @@
 # Releases
 
+## 1.7.9, 2026-09-14
+
+The Conversations button now reads SnappyMail's actual `useThreads` setting.
+Previously it read the differently cased `UseThreads` key, so it displayed an
+inactive state even when conversations were enabled. The corrected pressed state
+drives the visible highlight introduced in 1.7.7, including after page reload.
+The native grouping setting and message queries remain unchanged.
+
+Validation: 16 fictional browser checks for both setting values, click targets,
+desktop/mobile styling and dark mode; syntax, release and installation checks.
+The authenticated production browser showed the active state after targeted
+LiteSpeed OPcache invalidation. See `docs/deployments/1.7.9.md`.
+
 ## 1.7.8, 2026-09-14
 
 Newly sent replies are copied into the folder of the message being answered, so

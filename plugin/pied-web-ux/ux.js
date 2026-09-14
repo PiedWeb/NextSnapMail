@@ -79,7 +79,7 @@
             const current = () => {
                 const general = document.getElementById('V-Settings-General');
                 return general && ko.dataFor(general)?.useThreads
-                    ? !!ko.dataFor(general).useThreads() : !!window.rl.settings.get('UseThreads');
+                    ? !!ko.dataFor(general).useThreads() : !!window.rl.settings.get('useThreads');
             };
             const update = () => {
                 button.textContent = t('Conversations', 'Conversations');

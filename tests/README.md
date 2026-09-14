@@ -47,6 +47,7 @@ dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
 dev-browser --timeout 40 < tests/browser/test-list-metadata.js
 dev-browser --timeout 25 < tests/browser/test-list-metadata-fallback.js
+dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
@@ -71,3 +72,6 @@ semantics, unread updates, language/theme restoration and responsive geometry.
 The metadata fallback fixture loads the theme with no plugin or pw-theme class, then loads
 the metadata script after the DOM exists without a view-model event. It checks base CSS,
 followed rows, late binding, live counts and native stylesheet replacement.
+
+`test-conversation-toggle.js` checks the actual bootstrap key, pressed styling and
+opposite setting request in desktop/mobile and light/dark fictional list fixtures.
