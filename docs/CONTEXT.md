@@ -59,6 +59,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Since 1.7.22, take the conversation heading from the earliest chronological
   message and keep the native open-message subject at sender-line size. Hide
   the heading during initial lookup to avoid showing a transient later subject.
+- Since 1.7.23, folded cards show a one-line plain-text body excerpt instead of
+  the repeated subject. Fetch missing excerpts only for visible cards with the
+  native read-only Message endpoint, at most two requests at once, and clear
+  the short preview cache when accounts change. Desktop-only CSS refines the
+  header, actions, calendar import, file tiles and conversation count; the
+  native resizers retain variable widths and the mobile layout stays intact.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

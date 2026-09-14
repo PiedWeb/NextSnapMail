@@ -40,6 +40,36 @@
 
         let generation = 0, timer, disposed = false, context = null, entries = [];
         let loading = false, error = false, silentRefresh = false;
+        let previewAccount = '', previewObserver, previewActive = 0;
+        const previews = new Map();
+        const previewQueue = [];
+        const previewText = raw => {
+            let value = String(ko.unwrap(raw.plain) || '').trim();
+            if (!value && raw.html) {
+                const doc = new DOMParser().parseFromString(String(ko.unwrap(raw.html) || ''), 'text/html');
+                doc.querySelectorAll('script,style,template,svg').forEach(node => node.remove());
+                doc.querySelectorAll('br,p,div,li,tr,blockquote').forEach(node => node.before(' '));
+                value = doc.body.textContent || '';
+            }
+            return value.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0,180);
+        };
+        const pumpPreviews = () => {
+            while (previewActive < 2 && previewQueue.length) {
+                const {entry,owner,resolve} = previewQueue.shift();
+                if (disposed || owner !== account()) { resolve(''); continue; }
+                ++previewActive;
+                void rl.app.Remote.post('Message', null,
+                    {folder:entry.raw.folder, uid:Number(entry.raw.uid)}, 60000)
+                    .then(response => previewText(response?.Result || {})).catch(() => '')
+                    .then(value => { resolve(value); --previewActive; pumpPreviews(); });
+            }
+        };
+        const fetchPreview = entry => {
+            if (previews.has(entry.key)) return previews.get(entry.key);
+            const request = new Promise(resolve => previewQueue.push({entry,owner:account(),resolve}));
+            previews.set(entry.key, request); pumpPreviews();
+            return request;
+        };
         const account = () => String(rl.settings.get('accountHash') || '');
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
         const current = () => vm.message?.();
@@ -80,7 +110,13 @@
                 date.textContent = value.toLocaleString(document.documentElement.lang || 'fr', {dateStyle:'medium',timeStyle:'short'});
             }
             const summary = document.createElement('span'); summary.className = 'pw-conversation-card-summary';
-            summary.textContent = raw.subject || t('(Sans objet)', '(No subject)');
+            const knownPreview = previewText(raw);
+            summary.textContent = knownPreview;
+            summary.hidden = !knownPreview;
+            if (!knownPreview && previewObserver) {
+                button.dataset.pwPreviewKey = entry.key;
+                previewObserver.observe(button);
+            }
             button.append(sender,recipient,date,summary);
             button.addEventListener('click', () => {
                 if (context && active()) showMessage(entry,entry.key === entries.at(-1)?.key);
@@ -89,6 +125,22 @@
         }
 
         function render() {
+            previewObserver?.disconnect();
+            if (previewAccount !== account()) { previews.clear(); previewAccount = account(); }
+            previewObserver = new IntersectionObserver(records => records.forEach(record => {
+                if (!record.isIntersecting) return;
+                const button = record.target, key = button.dataset.pwPreviewKey;
+                previewObserver.unobserve(button);
+                const entry = entries.find(candidate => candidate.key === key);
+                if (!entry || !context) return;
+                const owner = account();
+                void fetchPreview(entry).then(value => {
+                    if (!disposed && account() === owner && button.isConnected && value) {
+                        const summary = button.querySelector('.pw-conversation-card-summary');
+                        if (summary) { summary.textContent = value; summary.hidden = false; }
+                    }
+                });
+            }), {root:dom.querySelector('.messageView'), rootMargin:'160px'});
             const index = entries.findIndex(entry => entry.key === currentKey());
             const visible = active() && !!context && index >= 0
                 && (entries.length > 1 || loading && !silentRefresh || error);
@@ -245,6 +297,7 @@
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();
+            previewObserver?.disconnect(); previews.clear();
             subscriptions.forEach(subscription => subscription.dispose());
             document.removeEventListener('visibilitychange',wake); before.remove(); after.remove();
         });

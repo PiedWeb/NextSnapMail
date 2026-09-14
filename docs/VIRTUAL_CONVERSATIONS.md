@@ -32,6 +32,13 @@ The native Close control is beside the previous/next arrows on desktop; mobile
 uses its existing header Back control. Folded cards have one border.
 Version 1.7.22 uses the earliest message's subject as the conversation heading.
 The open message still shows its own subject at the size of its sender line.
+Since 1.7.23, folded cards show the beginning of their body as plain text,
+truncated to one visual line. The excerpt uses the already loaded plain part
+when available; otherwise, visible cards fetch the native `Message` response
+through `BODY.PEEK`, at most two at a time. HTML is parsed inertly and inserted
+only with `textContent`. The short excerpt cache is cleared on account changes.
+No preview appears if a body cannot be read; the sender, recipient and date
+remain available.
 
 No mailbox write, migration, copy or separate message store is involved.
 The lookup needs a configured Sent folder and matching Message-ID headers.

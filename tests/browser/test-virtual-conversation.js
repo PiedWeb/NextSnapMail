@@ -20,6 +20,8 @@ await p.evaluate(()=>{
         raw('Sent',31,'<sent-one@example.test>','<root@example.test>','<root@example.test>','<img src=x onerror=alert(1)>',1789000100,'Première réponse envoyée','Alex'),
         raw('Sent',32,'<sent-two@example.test>','<sent-one@example.test>','<root@example.test> <sent-one@example.test>','Re: Projet Alpha',1789000300,'Dernière réponse envoyée','Alex')
     ];
+    sentMatches[0].plain='';
+    sentMatches[0].html='<p>Première réponse <strong>envoyée</strong></p><script>indésirable()</script>';
     const collection=NativeDraftCollection.reviveFromJson([sourceRaw]);collection.folder='INBOX';
     collection[0].threads([11,12]);listVM.messageList(collection);
     readerVM.message(collection[0]);readerVM.messageLoadingThrottle=ko.observable(false);
@@ -31,6 +33,10 @@ await p.evaluate(()=>{
     }}};
     rl.app.Remote.post=async(action,trigger,params)=>{
         threadRequests.push({action,folder:params.folder,uid:params.uid,search:params.search,useThreads:params.useThreads,account:threadAccount});
+        if(action==='Message') {
+            const message=[sourceRaw,receivedRaw,...sentMatches].find(item=>item.folder===params.folder&&item.uid===params.uid);
+            return {Result:structuredClone(message||{})};
+        }
         if(holdThreadSearch)await new Promise(resolve=>window.releaseThreadSearch=resolve);
         if(failThreadSearch)throw new Error('fictional search failure');
         const rows=params.folder==='Sent'?sentMatches:[sourceRaw,receivedRaw,...(window.thirdReceived?[thirdReceived]:[])];
@@ -77,13 +83,16 @@ check('A folded message has one border, and native Close sits beside the toolbar
         &&getComputedStyle(subjectClose).display==='none';
 }));
 check('The stack includes both received messages and historical Sent replies without making copies',await p.evaluate(()=>
-    threadRequests.every(request=>request.action==='MessageList')
+    threadRequests.every(request=>['MessageList','Message'].includes(request.action))
     &&threadRequests.some(request=>request.folder==='INBOX'&&request.useThreads===1)
     &&threadRequests.some(request=>request.folder==='Sent'&&request.useThreads===0)
     &&nativeOpens.length===1));
-check('Untrusted subject stays text in a folded card',await p.evaluate(()=>
-    !document.querySelector('.pw-conversation-card img')
-    &&[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent.includes('<img'))));
+await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Première réponse envoyée'));
+check('Folded cards show one-line plain-text body previews, never the repeated subject or active HTML',await p.evaluate(()=>
+    !document.querySelector('.pw-conversation-card img, .pw-conversation-card script')
+    &&[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Première réponse envoyée')
+    &&[...document.querySelectorAll('.pw-conversation-card-summary')].every(node=>!node.textContent.includes('Projet Alpha'))
+    &&getComputedStyle(document.querySelector('.pw-conversation-card-summary')).whiteSpace==='nowrap'));
 await p.locator('.pw-conversation-card-toggle').nth(2).click();
 await p.waitForFunction(()=>readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===12
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===2

@@ -1,6 +1,6 @@
 /* First Pied Web Confort proposal. Keep every rule outside the mobile layout. */
 @media (min-width: 1200px) {
-  html:not(.rl-left-panel-disabled) #rl-app #rl-left { width: 248px; min-width: 248px; }
+  html:not(.rl-left-panel-disabled) #rl-app #rl-left { width: 248px; min-width: 200px; max-width: 360px; }
   html.rl-left-panel-disabled #rl-app #rl-left { width: 72px !important; min-width: 72px; max-width: 72px; }
   #rl-app .b-folders .b-content { padding-inline: 14px; }
   #rl-app .b-folders li a.selectable {
@@ -13,8 +13,8 @@
 
   html.sm-msgView-side #rl-app #V-MailMessageList .messageList {
     width: 36vw;
-    min-width: clamp(420px, 36vw, 540px);
-    max-width: 540px;
+    min-width: 320px;
+    max-width: min(680px, calc(100vw - 700px));
   }
   #rl-app #V-MailMessageList .messageListItem {
     min-height: 68px;

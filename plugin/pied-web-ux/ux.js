@@ -141,7 +141,18 @@
             const header = dom.querySelector('.messageItemHeader');
             // The native header uses `if: message` and replaces its children on
             // message changes. Keep these controls outside that managed subtree.
-            if (header) { header.after(extras); bind(extras, vm); }
+            if (header) {
+                header.after(extras);
+                bind(extras, vm);
+                const positionExtras = () => {
+                    const destination = active() && matchMedia('(min-width:800px)').matches
+                        ? dom.querySelector('#messageItem > .messageItemHeader') || header : header;
+                    if (extras.previousElementSibling !== destination) destination.after(extras);
+                };
+                themeEffects.push(positionExtras);
+                addEventListener('resize', positionExtras);
+                positionExtras();
+            }
             dom.classList.add('pw-enhanced');
         }
     });

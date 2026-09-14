@@ -1,5 +1,19 @@
 # Releases
 
+## 1.7.23, 2026-09-14
+
+Desktop Mail now uses a tighter, more consistent reader header, a clear divider
+before Reply/Forward, compact calendar import and file attachments, and a
+quieter back-to-list control. Conversation counts move to the far right above
+the attachment indicator; the broken native text-file glyph is replaced by a
+consistent paperclip. The Conversations toggle is optically centered. The
+desktop pane widths again accept SnappyMail's native drag-resizer changes.
+Folded conversation cards show a one-line plain-text excerpt instead of
+repeating the subject. Visible excerpts are fetched through the native
+read-only `Message` endpoint, at most two at a time; the underlying IMAP fetch
+uses `BODY.PEEK` and does not mark mail read. The established mobile CSS and
+calendar button position remain unchanged.
+
 ## 1.7.22, 2026-09-14
 
 The conversation heading now shows the earliest message's subject instead of
