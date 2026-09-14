@@ -55,6 +55,13 @@ check('The newest Sent message opens in the native reader while three older mess
     &&document.querySelector('#messageItem > .bodyText').textContent==='Dernière réponse envoyée'
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
+check('The conversation heading uses the earliest message subject, and the open subject matches the sender line size',await p.evaluate(()=>{
+    const heading=document.querySelector('.pw-conversation-before h2');
+    const subject=document.querySelector('.b-message > .messageItemHeader .subjectParent > .subject');
+    const sender=document.querySelector('.pw-sender-name');
+    return heading.textContent==='Projet Alpha'&&!heading.hidden&&subject&&sender
+        &&getComputedStyle(subject).fontSize===getComputedStyle(sender).fontSize;
+}));
 check('A reader built before the plugin script is mounted from its native Knockout view model',await p.evaluate(()=>
     readerVM.pwConversationThread===true&&!!document.querySelector('.pw-conversation-before')));
 check('A folded message has one border, and native Close sits beside the toolbar arrows',await p.evaluate(()=>{
@@ -83,6 +90,7 @@ await p.waitForFunction(()=>readerVM.message()?.folder==='INBOX'&&readerVM.messa
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===1);
 check('An older received message opens with its native body and actions',await p.evaluate(()=>
     document.querySelector('#messageItem > .bodyText').textContent==='Réponse reçue'
+    &&document.querySelector('.pw-conversation-before h2').textContent==='Projet Alpha'
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===2
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===1));
 await p.locator('.pw-conversation-before > button').first().click();
@@ -101,6 +109,7 @@ await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-before .
     &&readerVM.message()?.uid===13);
 check('When the latest message is received it stays expanded, with older Sent and received messages folded',await p.evaluate(()=>
     readerVM.message().folder==='INBOX'&&readerVM.message().uid===13
+    &&document.querySelector('.pw-conversation-before h2').textContent==='Projet Alpha'
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
 await p.setViewportSize({width:390,height:850});
@@ -161,6 +170,7 @@ await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.messag
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===1);
 check('A single received message and its older Sent reply also form a native two-message stack',await p.evaluate(()=>
     document.querySelector('#messageItem > .bodyText').textContent==='Réponse envoyée seule'
+    &&document.querySelector('.pw-conversation-before h2').textContent==='Un seul message reçu'
     &&threadRequests.at(-1).account==='fixture-C'));
 await p.evaluate(()=>{
     holdThreadSearch=true;releaseThreadSearch=null;
@@ -171,6 +181,7 @@ await p.evaluate(()=>{
 await p.waitForFunction(()=>!!window.releaseThreadSearch);
 check('The old native reader is concealed while a new conversation lookup is pending',await p.evaluate(()=>
     document.querySelector('.b-message').classList.contains('pw-conversation-pending')
+    &&document.querySelector('.pw-conversation-before h2').hidden
     &&getComputedStyle(document.querySelector('.b-message > .messageItemHeader')).display==='none'
     &&getComputedStyle(document.querySelector('#messageItem')).display==='none'
     &&document.querySelector('.pw-conversation-before > p').textContent.includes('Recherche')));

@@ -56,6 +56,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   on desktop, with the mobile header Back action serving the same purpose. Hide
   the expanded message until its first cross-folder lookup and native load
   settle so newly found folded cards do not shift visible content.
+- Since 1.7.22, take the conversation heading from the earliest chronological
+  message and keep the native open-message subject at sender-line size. Hide
+  the heading during initial lookup to avoid showing a transient later subject.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

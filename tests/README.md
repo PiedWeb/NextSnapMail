@@ -83,5 +83,6 @@ opposite setting request in desktop/mobile and light/dark fictional list fixture
 received and Sent messages. It verifies late mounting, the newest message from
 either folder opening natively, one-click access to earlier messages, read-only
 searches, retry, account isolation, theme exit, narrow layout, one card border,
-native Close placement, and conceal/reveal during delayed searches. It does not
+native Close placement, the earliest-subject heading, open-subject typography,
+and conceal/reveal during delayed searches. It does not
 use an authenticated mailbox.

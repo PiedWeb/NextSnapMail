@@ -11,6 +11,9 @@
 #rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent > .close {
  display:none!important;
 }
+#rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent {
+ font-size:14px; line-height:1.4; letter-spacing:0;
+}
 #rl-app #V-MailMessageView .b-message.pw-conversation-pending > .messageItemHeader,
 #rl-app #V-MailMessageView .b-message.pw-conversation-pending > #messageItem {
  display:none!important;
@@ -22,10 +25,11 @@
 #rl-app #V-MailMessageView .pw-conversation-before { margin-bottom:4px; }
 #rl-app #V-MailMessageView .pw-conversation-before[hidden],
 #rl-app #V-MailMessageView .pw-conversation-after[hidden],
+#rl-app #V-MailMessageView .pw-conversation-before > h2[hidden],
 #rl-app #V-MailMessageView .pw-conversation-before > button[hidden] { display:none; }
 #rl-app #V-MailMessageView .pw-conversation-before h2 {
  margin:0 0 8px; padding:12px 8px; border-top:1px solid var(--pw-line);
- color:var(--pw-muted); font:600 12px/1.5 var(--pw-font);
+ color:var(--nc-color-main-text); font:600 20px/1.35 var(--pw-font);
 }
 #rl-app #V-MailMessageView .pw-conversation-before > button {
  margin:0 8px 12px; padding:5px 8px; min-height:36px;

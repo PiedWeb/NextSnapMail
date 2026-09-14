@@ -30,6 +30,8 @@ opened conversation is being assembled. The reader and folded cards appear
 together after native loading, avoiding a visible jump when Sent results arrive.
 The native Close control is beside the previous/next arrows on desktop; mobile
 uses its existing header Back control. Folded cards have one border.
+Version 1.7.22 uses the earliest message's subject as the conversation heading.
+The open message still shows its own subject at the size of its sender line.
 
 No mailbox write, migration, copy or separate message store is involved.
 The lookup needs a configured Sent folder and matching Message-ID headers.

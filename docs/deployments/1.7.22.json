@@ -1,0 +1,382 @@
+{
+  "status": {
+    "edition": "",
+    "extendedSupport": false,
+    "installed": true,
+    "maintenance": false,
+    "needsDbUpgrade": false,
+    "productname": "Nextcloud",
+    "version": "34.0.4.1",
+    "versionstring": "34.0.4"
+  },
+  "apps": {
+    "disabled": {
+      "admin_audit": "1.24.0",
+      "app_api": "34.0.0 (installed 32.0.0)",
+      "bruteforcesettings": "7.0.0 (installed 2.4.0)",
+      "circles": "34.0.0 (installed 0.21.4)",
+      "encryption": "2.22.0",
+      "firstrunwizard": "7.0.0-dev.0 (installed 2.10.0)",
+      "mail": "5.11.0 (installed 5.11.0)",
+      "photos": "7.0.0 (installed 7.0.0)",
+      "suspicious_login": "12.0.0-dev.0",
+      "twofactor_nextcloud_notification": "8.0.0",
+      "user_ldap": "1.25.0",
+      "weather_status": "1.14.0 (installed 1.5.0)"
+    },
+    "enabled": {
+      "activity": "7.0.0",
+      "appstore": "1.0.0",
+      "bookmarks": "16.2.6",
+      "calendar": "6.5.4",
+      "cloud_federation_api": "1.18.0",
+      "comments": "1.24.0",
+      "contacts": "8.8.1",
+      "contactsinteraction": "1.15.0",
+      "dashboard": "7.14.0",
+      "dav": "1.40.0",
+      "eurooffice": "11.0.4",
+      "federatedfilesharing": "1.24.0",
+      "federation": "1.24.0",
+      "files": "2.6.0",
+      "files_downloadlimit": "5.2.0",
+      "files_external": "1.26.0",
+      "files_lock": "34.0.1",
+      "files_pdfviewer": "7.0.0",
+      "files_reminders": "1.7.0",
+      "files_sharing": "1.26.0",
+      "files_trashbin": "1.24.0",
+      "files_versions": "1.27.0",
+      "fileslibreofficeedit": "2.0.1",
+      "forms": "5.3.6",
+      "gpxpod": "8.3.1",
+      "impersonate": "5.0.0",
+      "logreader": "7.0.0",
+      "lookup_server_connector": "1.22.0",
+      "memories": "8.1.0",
+      "nextcloud_announcements": "6.0.0",
+      "nextsnapmail": "0.1.11",
+      "notes": "6.0.2",
+      "notifications": "7.0.0-dev.1",
+      "oauth2": "1.22.0",
+      "office": "1.0.0",
+      "password_policy": "6.0.0-dev.0",
+      "passwords": "2026.7.20",
+      "piedwebcalendar": "1.0.1",
+      "piedweboffice": "1.0.3",
+      "polls": "9.2.1",
+      "previewgenerator": "5.14.0",
+      "privacy": "6.0.0-dev.1",
+      "profile": "1.3.0",
+      "provisioning_api": "1.24.0",
+      "recommendations": "7.0.0",
+      "registration": "3.1.0",
+      "related_resources": "5.0.0-dev.0",
+      "serverinfo": "6.0.0",
+      "settings": "1.17.0",
+      "sharebymail": "1.24.0",
+      "support": "6.0.0",
+      "survey_client": "6.0.0-dev.0",
+      "systemtags": "1.24.0",
+      "text": "8.0.0",
+      "theming": "2.9.0",
+      "twofactor_backupcodes": "1.23.0",
+      "twofactor_totp": "16.0.0",
+      "updatenotification": "1.24.0",
+      "user_status": "1.14.0",
+      "viewer": "7.0.0-dev.0",
+      "webhook_listeners": "1.6.0",
+      "workflowengine": "2.16.0"
+    }
+  },
+  "file_checks": {
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/AttachmentImage.php": {
+      "expected": "f09aef246ff3b3757e68106111dc299146b503748670bb9d97cd1e530ece4ca2",
+      "actual": "f09aef246ff3b3757e68106111dc299146b503748670bb9d97cd1e530ece4ca2",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/FilteredSelection.php": {
+      "expected": "67daf171ac6ded5b0fd417d29a979b2b76c63c371b630f970740e0fa6d863d80",
+      "actual": "67daf171ac6ded5b0fd417d29a979b2b76c63c371b630f970740e0fa6d863d80",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/UnreadDrafts.php": {
+      "expected": "01ed714ed20bfa81d05f1632dfa77c3e80f33e6fd42b76df75141db7cb72ab55",
+      "actual": "01ed714ed20bfa81d05f1632dfa77c3e80f33e6fd42b76df75141db7cb72ab55",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/app-shell.js": {
+      "expected": "1b43b9e508e51920ec4faceff3db8e4c5ed55a1137a2b6adf96b0a93e490b253",
+      "actual": "1b43b9e508e51920ec4faceff3db8e4c5ed55a1137a2b6adf96b0a93e490b253",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/attachment-images.js": {
+      "expected": "f9c820b36198ede4364baeaa2a3cf546cfbb062e237b010e0528abc922c5d1ff",
+      "actual": "f9c820b36198ede4364baeaa2a3cf546cfbb062e237b010e0528abc922c5d1ff",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/background-send.js": {
+      "expected": "1bb2edd1d3747c6cec7f53d24fc3f0a7b20485bb6c5920c66aea46a819e01fd9",
+      "actual": "1bb2edd1d3747c6cec7f53d24fc3f0a7b20485bb6c5920c66aea46a819e01fd9",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/composer-icons.js": {
+      "expected": "58c8238f6eb952eb88ac0d90a082002375ba9052b2fe7586d4f2a18a83509a33",
+      "actual": "58c8238f6eb952eb88ac0d90a082002375ba9052b2fe7586d4f2a18a83509a33",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/composer-icons.json": {
+      "expected": "4b07c7ad1231b5bc3596146e9a0c37d4d860b0556e8d80fa64913c989b30af51",
+      "actual": "4b07c7ad1231b5bc3596146e9a0c37d4d860b0556e8d80fa64913c989b30af51",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/composer-images.js": {
+      "expected": "55e059249728bcdf62057377da79a9caf7f3d7183850ccfa80bcb06678874861",
+      "actual": "55e059249728bcdf62057377da79a9caf7f3d7183850ccfa80bcb06678874861",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/composer-toolbar.js": {
+      "expected": "2279e9c2e6acf97bc985fd0456b09b501919a94f050ae0909ca97cfed64ed9db",
+      "actual": "2279e9c2e6acf97bc985fd0456b09b501919a94f050ae0909ca97cfed64ed9db",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/conversation-thread.js": {
+      "expected": "2f960c5a62fe1ced3335d903faff8e5dad7febfcaf68a8463679eb6fdaf6a176",
+      "actual": "2f960c5a62fe1ced3335d903faff8e5dad7febfcaf68a8463679eb6fdaf6a176",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/filtered-selection.js": {
+      "expected": "ac3b4e42136985b4846c755003ec8ce5d22428f7c2c76bc0b0c447158abcdb14",
+      "actual": "ac3b4e42136985b4846c755003ec8ce5d22428f7c2c76bc0b0c447158abcdb14",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/image-compression-license.txt": {
+      "expected": "6aeb9cd1549315900b91eea89819e509818c733ea3040d59d67041c168703694",
+      "actual": "6aeb9cd1549315900b91eea89819e509818c733ea3040d59d67041c168703694",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/image-compression-source.json": {
+      "expected": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
+      "actual": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/image-tools.js": {
+      "expected": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
+      "actual": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/image-vendor.js": {
+      "expected": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
+      "actual": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/index.php": {
+      "expected": "e7d595a5ec19edb8672aae3e60968140da08380f67e87df617a68c1f0faca9e6",
+      "actual": "e7d595a5ec19edb8672aae3e60968140da08380f67e87df617a68c1f0faca9e6",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/list-interactions.js": {
+      "expected": "d0c6981b421ff99961f0edf229a4eb170921d0ef964b57da9171aca5e1919a00",
+      "actual": "d0c6981b421ff99961f0edf229a4eb170921d0ef964b57da9171aca5e1919a00",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/list-metadata.js": {
+      "expected": "8d62f93e83fa8cc83778c846718658c5bd1952ee3ed599a4b9f79650935203c9",
+      "actual": "8d62f93e83fa8cc83778c846718658c5bd1952ee3ed599a4b9f79650935203c9",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/lucide-license.txt": {
+      "expected": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+      "actual": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/lucide-settings.svg": {
+      "expected": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
+      "actual": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/lucide-source.json": {
+      "expected": "4086a72f095493c1ce45228883fa7c2c247372cc1f336823f0b88ea054385fd2",
+      "actual": "4086a72f095493c1ce45228883fa7c2c247372cc1f336823f0b88ea054385fd2",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/markdown-dependencies.json": {
+      "expected": "b1c62316047e23d4b3e9505d49c1b5624c551344e9ccfce99863f461a0260a2e",
+      "actual": "b1c62316047e23d4b3e9505d49c1b5624c551344e9ccfce99863f461a0260a2e",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/markdown-licenses.txt": {
+      "expected": "95d9c100bec971b24af20baf84129557c829580990ed25fd2c827ee761f6ebc9",
+      "actual": "95d9c100bec971b24af20baf84129557c829580990ed25fd2c827ee761f6ebc9",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/markdown-vendors.js": {
+      "expected": "4a82cbc4ee4981995cd46bda7c607fe35a003ff011488c75487a8d9749a5a2dc",
+      "actual": "4a82cbc4ee4981995cd46bda7c607fe35a003ff011488c75487a8d9749a5a2dc",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/markdown.js": {
+      "expected": "b3fda0c995bab6cfba93386d1de80815b45de4a3147af2712f29b43c2769cbca",
+      "actual": "b3fda0c995bab6cfba93386d1de80815b45de4a3147af2712f29b43c2769cbca",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/message-flag.js": {
+      "expected": "3101a2ff0861644e6d86c68a796f2e9e3b37cd5f1d60d6ea3bfcbc194d09aa33",
+      "actual": "3101a2ff0861644e6d86c68a796f2e9e3b37cd5f1d60d6ea3bfcbc194d09aa33",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/quote-readability.js": {
+      "expected": "38df449da67cc3bd2b15545d50d23620ab794c60071eed4a407d459dde2a746c",
+      "actual": "38df449da67cc3bd2b15545d50d23620ab794c60071eed4a407d459dde2a746c",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/send-delay.js": {
+      "expected": "827eeff6bd93ed7d058cf3120b158083ae7de1a0a7c809b203c4cecbf0ba6452",
+      "actual": "827eeff6bd93ed7d058cf3120b158083ae7de1a0a7c809b203c4cecbf0ba6452",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/studio.js": {
+      "expected": "b2f301d8d921909fe8a7bc034ea50a30ecc49f6eef2a0946c920b79cd7ea2d4e",
+      "actual": "b2f301d8d921909fe8a7bc034ea50a30ecc49f6eef2a0946c920b79cd7ea2d4e",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/unread-drafts.js": {
+      "expected": "e848d0a055c17a9cd039fd518c9b78ae7fb786001356d2cd53dc6641fab55181",
+      "actual": "e848d0a055c17a9cd039fd518c9b78ae7fb786001356d2cd53dc6641fab55181",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/ux.css": {
+      "expected": "22089cbabb7b26570273f27a65fa26f1b16870e43198be744c346c0751f4be76",
+      "actual": "22089cbabb7b26570273f27a65fa26f1b16870e43198be744c346c0751f4be76",
+      "matches": true
+    },
+    "data:appdata_nextsnapmail/_data_/_default_/plugins/pied-web-ux/ux.js": {
+      "expected": "abb7cf0c9e0d4456115206aa9c094ce99c95149dde72b5c4ce0a455d653a2eca",
+      "actual": "abb7cf0c9e0d4456115206aa9c094ce99c95149dde72b5c4ce0a455d653a2eca",
+      "matches": true
+    },
+    "root:themes/PiedWeb/snappymail/preview.png": {
+      "expected": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
+      "actual": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
+      "matches": true
+    },
+    "root:themes/PiedWeb/snappymail/style.css": {
+      "expected": "80bb4820574e1403bda3d087f95ebb1d50f024d7da055c293008ef2b1555b885",
+      "actual": "80bb4820574e1403bda3d087f95ebb1d50f024d7da055c293008ef2b1555b885",
+      "matches": true
+    },
+    "root:apps/nextsnapmail/app/snappymail/v/2.38.2/app/libraries/RainLoop/Actions/Accounts.php": {
+      "expected": "624273167508e328c08d938b53fa28842093dccbb0607c0bb99f9c1fa3aef696",
+      "actual": "624273167508e328c08d938b53fa28842093dccbb0607c0bb99f9c1fa3aef696",
+      "matches": true
+    },
+    "root:apps/nextsnapmail/app/snappymail/v/2.38.2/static/js/app.js": {
+      "expected": "547b570b16b22ed90c5589ac52945e5676db29fe85149031e5677d8d4ea87f7c",
+      "actual": "547b570b16b22ed90c5589ac52945e5676db29fe85149031e5677d8d4ea87f7c",
+      "matches": true
+    },
+    "root:apps/nextsnapmail/app/snappymail/v/2.38.2/static/js/min/app.min.js": {
+      "expected": "73bdb933df06ae0300e068ea6ff293abb2aa7550d675c5e3db6e27af063226e2",
+      "actual": "73bdb933df06ae0300e068ea6ff293abb2aa7550d675c5e3db6e27af063226e2",
+      "matches": true
+    },
+    "root:apps/nextsnapmail/app/snappymail/v/2.38.2/static/js/min/app.min.js.gz": {
+      "expected": "863efd83c8c2217b6650d9c969df3091dd651f97afb6024f4c7cd45124dcbe64",
+      "actual": "863efd83c8c2217b6650d9c969df3091dd651f97afb6024f4c7cd45124dcbe64",
+      "matches": true
+    },
+    "root:apps/nextsnapmail/app/snappymail/v/2.38.2/static/js/min/app.min.js.br": {
+      "expected": "5e72ce7c91f5e338f7e6de1b8ab2f4bc1df3d03ff5290ae8eff9f140d35812aa",
+      "actual": "5e72ce7c91f5e338f7e6de1b8ab2f4bc1df3d03ff5290ae8eff9f140d35812aa",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/LICENSE": {
+      "expected": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
+      "actual": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/appinfo/info.xml": {
+      "expected": "dbf1356e1deebd79647a0ba73016c65ae1fa554448ff7858c12831c4cb41ab2f",
+      "actual": "dbf1356e1deebd79647a0ba73016c65ae1fa554448ff7858c12831c4cb41ab2f",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/css/workspace.css": {
+      "expected": "2c8d705f506683a2bb52c5a53b088277f80dfc0b9d3c9355b0e00fe25f39fa8b",
+      "actual": "2c8d705f506683a2bb52c5a53b088277f80dfc0b9d3c9355b0e00fe25f39fa8b",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/js/workspace.js": {
+      "expected": "58000d75107ac3e3f54ffab62be871afbe961d050f1f79959d9bca12597e4791",
+      "actual": "58000d75107ac3e3f54ffab62be871afbe961d050f1f79959d9bca12597e4791",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/lib/AppInfo/Application.php": {
+      "expected": "87e7340484a6864433be15da1fcd832788a2bc2e289364b02530fe9316f671a5",
+      "actual": "87e7340484a6864433be15da1fcd832788a2bc2e289364b02530fe9316f671a5",
+      "matches": true
+    },
+    "root:apps/piedwebcalendar/lib/Listeners/WorkspaceListener.php": {
+      "expected": "8d239e4c9de597875f8122f1cf21ca7b9d3745cf4144e8d39537d36716a54f66",
+      "actual": "8d239e4c9de597875f8122f1cf21ca7b9d3745cf4144e8d39537d36716a54f66",
+      "matches": true
+    },
+    "root:apps/piedweboffice/LICENSE": {
+      "expected": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
+      "actual": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
+      "matches": true
+    },
+    "root:apps/piedweboffice/appinfo/info.xml": {
+      "expected": "8ea9aa038ab52755b8d419d3a2d899b55368b94e44a958c92a73692fb2474244",
+      "actual": "8ea9aa038ab52755b8d419d3a2d899b55368b94e44a958c92a73692fb2474244",
+      "matches": true
+    },
+    "root:apps/piedweboffice/css/workspace.css": {
+      "expected": "723870c715d1f39d6bf35f05532339f92b8edbc59a96ed054aca21980a96dd2f",
+      "actual": "723870c715d1f39d6bf35f05532339f92b8edbc59a96ed054aca21980a96dd2f",
+      "matches": true
+    },
+    "root:apps/piedweboffice/js/workspace.js": {
+      "expected": "039a24c960fd70450d023daecca8273172ad961ed6716799f5c4bc5cd401bfbd",
+      "actual": "039a24c960fd70450d023daecca8273172ad961ed6716799f5c4bc5cd401bfbd",
+      "matches": true
+    },
+    "root:apps/piedweboffice/lib/AppInfo/Application.php": {
+      "expected": "8bc13a47fb35d0251e4c645df279133294417ab5fd67bbbf04238c2ac94fea10",
+      "actual": "8bc13a47fb35d0251e4c645df279133294417ab5fd67bbbf04238c2ac94fea10",
+      "matches": true
+    },
+    "root:apps/piedweboffice/lib/Listeners/WorkspaceListener.php": {
+      "expected": "74ff6f5bf23119652402b58d4068949796afb91cd758e1991f46b821309a8c8d",
+      "actual": "74ff6f5bf23119652402b58d4068949796afb91cd758e1991f46b821309a8c8d",
+      "matches": true
+    }
+  },
+  "calendar": {
+    "calendar-defaultVendors-src_views_Calendar_vue-src_models_attendee_js.js": {
+      "original_occurrences": 0,
+      "patched_occurrences": 1,
+      "sha256": "a5d1908d284e7356b9a0d8788becd4d883a0b2f81b6f0d965421655fe22abaf1",
+      "state": "patched"
+    },
+    "calendar-main.js": {
+      "original_occurrences": 0,
+      "patched_occurrences": 1,
+      "sha256": "86724f9a849d2bad3232ecfe8ff15bc5f95e44f10a2bdc4155450d11dce51df3",
+      "state": "patched"
+    }
+  },
+  "htaccess": {
+    "hsts_header_count": 1,
+    "hsts_preload": true,
+    "rewrite_options": true,
+    "sha256": "dce39b89a193f996b2ebc72103c587932acd07e051f069869c01af094f2459f9",
+    "webdav_noabort_noconntimeout": true
+  },
+  "summary": {
+    "matching_files": 52,
+    "checked_files": 52,
+    "calendar_description": "patched",
+    "htaccess_expected": true,
+    "mismatches": []
+  }
+}

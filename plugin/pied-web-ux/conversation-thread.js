@@ -94,7 +94,8 @@
                 && (entries.length > 1 || loading && !silentRefresh || error);
             before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
             host.classList.toggle('pw-conversation-active', visible);
-            title.textContent = t('Conversation', 'Conversation');
+            title.textContent = entries[0]?.raw.subject || t('(Sans objet)', '(No subject)');
+            title.hidden = loading && !silentRefresh;
             latestButton.textContent = t('Afficher le dernier message', 'Show latest message');
             latestButton.hidden = !visible || index === entries.length - 1;
             status.textContent = loading && !silentRefresh ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')

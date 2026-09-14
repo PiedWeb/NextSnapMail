@@ -1,5 +1,13 @@
 # Releases
 
+## 1.7.22, 2026-09-14
+
+The conversation heading now shows the earliest message's subject instead of
+the generic “Conversation” label. It stays stable while switching between
+folded messages. The expanded message keeps its own subject below the stack,
+at the same 14 px size as the sender line. The heading stays hidden during the
+initial read-only lookup so it does not briefly show a later subject.
+
 ## 1.7.21, 2026-09-14
 
 The reader stack now shows one border per folded message. On desktop, the
