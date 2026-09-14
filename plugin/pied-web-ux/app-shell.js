@@ -56,7 +56,7 @@ body.pw-mail-shell #header .app-menu__waffle svg {width:22px;height:22px;}
     addEventListener('rl-view-model',schedule);
     const dark = matchMedia('(prefers-color-scheme:dark)'); dark.addEventListener('change',schedule);
     addEventListener('pagehide',()=>{
-        observer.disconnect(); cancelAnimationFrame(frame); dark.removeEventListener('change',schedule);
+        observer.disconnect(); cancelAnimationFrame(frame); frame=0; dark.removeEventListener('change',schedule);
         host.body.classList.remove('pw-mail-shell'); style.remove();
         ['--pw-shell-ink','--pw-shell-hover','--pw-shell-focus'].forEach(key=>header.style.removeProperty(key));
     });

@@ -49,6 +49,7 @@ dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
 dev-browser --timeout 40 < tests/browser/test-list-metadata.js
 dev-browser --timeout 25 < tests/browser/test-list-metadata-fallback.js
 dev-browser --timeout 45 < tests/browser/test-desktop-scan.js
+dev-browser --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
 ```
 

@@ -9,18 +9,23 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Pied Web branding, neutral surfaces and teal selection/primary actions; local licensed fonts/icons.
 - Since 1.7.3 mail fills the Nextcloud window. Preserve the native app grid at top left;
   hide surrounding Nextcloud chrome only with Pied Web, restore it on exit. Mobile search
-  expands below the single header. Checked message rows have a stronger teal surface and
-  centered checkboxes. See MAIL_SHELL.md for native launcher ownership and fallbacks.
+  expands below the single header. Checked message rows have a stronger teal surface.
+  See MAIL_SHELL.md for native launcher ownership and fallbacks.
 - Since 1.7.12 the first Confort proposal applies only from 1200 px: wider navigation/list,
   40 px folder rows and roomier message reading. The established mobile layout is deliberately
   unchanged; compare fictional 390 px screenshots when adjusting desktop CSS again.
 - Since 1.7.13 the desktop minimum width applies only while folders are expanded. A collapsed
-  rail is 72 px; row checkboxes align with Select all and faint dividers separate messages.
-- Since 1.7.14 a desktop-only read-status dot precedes each checkbox and calls the native
+  rail is 72 px and faint dividers separate messages.
+- Since 1.7.14 a desktop-only read-status dot sits at the start of each row and calls the native
   seen/unseen action for a message in the active list. Attachment indicators sit in a fixed
   right-hand column. Unstarred desktop stars appear on hover/focus; starred ones remain
   visible. Mobile keeps its visible star and unchanged row geometry; SnappyMail's native
   row double-tap already has another meaning.
+- Since 1.7.15 visible checkboxes are hidden only when the selection script has mounted.
+  Ctrl/Command+click enters native checked selection on desktop; a 550 ms long touch does
+  so on mobile. Further row taps toggle checked state. A count, Done button and Escape exit
+  keep the mode explicit. Scroll movement cancels long touch, and swipe deletion is disabled
+  while selection is active. Native checkboxes remain the fallback if the script is absent.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars use an

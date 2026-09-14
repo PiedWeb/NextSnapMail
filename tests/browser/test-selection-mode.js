@@ -1,0 +1,67 @@
+const p=await browser.getPage('nextsnapmail-selection-mode');p.setDefaultTimeout(6000);
+await p.setViewportSize({width:1440,height:900});await p.emulateMedia({colorScheme:'light'});
+await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&listOnly=1');
+await p.waitForFunction(()=>document.querySelector('#V-MailMessageList')?.dataset.pwSelectionVersion==='1.7.15');
+await p.evaluate(()=>{window.fixtureRowOpens=[];demoRows.forEach((row,i)=>row.addEventListener('click',()=>fixtureRowOpens.push(i+1)));});
+const results=[];const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
+check('No checkbox or selection banner appears at rest',await p.evaluate(()=>{
+ const list=document.querySelector('#V-MailMessageList');
+ return !list.classList.contains('pw-selection-mode')&&list.querySelector('.pw-selection-bar').hidden
+   &&[...list.querySelectorAll('.messageCheckbox,.checkboxCheckAll')].every(x=>getComputedStyle(x).display==='none');
+}));
+await p.locator('.messageListItem .senderParent').nth(2).click();
+check('Ordinary click keeps the native open behavior',await p.evaluate(()=>fixtureRowOpens.join(',')==='3'&&demoMessages.every(m=>!m.checked())));
+await p.evaluate(()=>demoRows[0].querySelector('.senderParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
+check('Ctrl-click enters selection without opening a message',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages.filter(m=>m.checked()).length===1&&document.querySelector('.pw-selection-count').textContent==='1 message sélectionné'&&fixtureRowOpens.join(',')==='3'));
+await p.locator('.messageListItem .senderParent').nth(1).click();
+check('Further plain clicks add messages to the selection',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages[1].checked()&&document.querySelector('.pw-selection-count').textContent==='2 messages sélectionnés'&&fixtureRowOpens.join(',')==='3'));
+await p.locator('.messageListItem .senderParent').first().click();
+check('Tapping a selected row removes only that message',await p.evaluate(()=>!demoMessages[0].checked()&&demoMessages[1].checked()&&fixtureRowOpens.join(',')==='3'));
+await p.locator('.pw-read-toggle').first().click();
+check('The read-status dot remains independent in selection mode',await p.evaluate(()=>fixtureSeenActions.length===1&&demoMessages[1].checked()&&!demoMessages[0].checked()));
+await p.locator('.pw-selection-finish').click();
+check('Done clears checked state and returns to normal mode',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));
+await p.evaluate(()=>demoRows[0].querySelector('.subjectParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
+await p.locator('.messageListItem .subjectParent').nth(1).click();
+await p.evaluate(()=>listVM.deleteCommand());
+check('Existing grouped actions still receive exactly the selected messages',await p.evaluate(()=>fixtureMoves.length===1&&fixtureMoves[0].uids.join(',')==='1,2'));
+await p.evaluate(()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
+check('Escape leaves selection mode',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));
+await p.setViewportSize({width:390,height:844});
+await p.waitForFunction(()=>document.documentElement.classList.contains('rl-mobile'));
+check('Mobile has no checkbox or separate selection menu entry',await p.evaluate(()=>[...document.querySelectorAll('.messageCheckbox,.checkboxCheckAll,.pw-mobile-select')].every(x=>getComputedStyle(x).display==='none')));
+await p.locator('.messageListItem .subjectParent').nth(3).click();
+check('Short mobile tap still opens the message',await p.evaluate(()=>fixtureRowOpens.at(-1)===4&&demoMessages.every(m=>!m.checked())));
+await p.evaluate(async()=>{
+ const row=demoRows[0],part=row.querySelector('.senderParent'),r=part.getBoundingClientRect(),x=r.x+10,y=r.y+10;
+ part.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:71,clientX:x,clientY:y}));
+ await new Promise(resolve=>setTimeout(resolve,640));
+ part.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:71,clientX:x,clientY:y}));
+ part.click();
+});
+check('Long touch enters selection and suppresses the following click',await p.evaluate(()=>demoMessages[0].checked()&&document.querySelector('#V-MailMessageList').classList.contains('pw-selection-mode')&&fixtureRowOpens.at(-1)===4));
+await p.locator('.messageListItem .subjectParent').nth(1).click();
+check('Later mobile taps add to selection',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages[1].checked()&&fixtureRowOpens.at(-1)===4));
+check('Mobile exit control meets the touch target size',await p.evaluate(()=>{const r=document.querySelector('.pw-selection-finish').getBoundingClientRect();return r.height>=44&&r.width>=44&&document.documentElement.scrollWidth<=innerWidth;}));
+await p.locator('.pw-selection-finish').click();
+await p.evaluate(async()=>{
+ const row=demoRows[4],part=row.querySelector('.senderParent'),r=part.getBoundingClientRect(),x=r.x+10,y=r.y+10;
+ part.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:73,clientX:x,clientY:y}));
+ await new Promise(resolve=>setTimeout(resolve,1100));
+ part.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:73,clientX:x,clientY:y}));
+ part.click();
+});
+check('A long hold still suppresses its release click',await p.evaluate(()=>demoMessages[4].checked()&&fixtureRowOpens.at(-1)===4));
+await p.locator('.pw-selection-finish').click();
+await p.evaluate(async()=>{
+ const row=demoRows[2],part=row.querySelector('.senderParent'),r=part.getBoundingClientRect(),x=r.x+10,y=r.y+10;
+ part.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:72,clientX:x,clientY:y}));
+ part.dispatchEvent(new PointerEvent('pointermove',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:72,clientX:x,clientY:y+14}));
+ await new Promise(resolve=>setTimeout(resolve,640));
+});
+check('Scrolling cancels the long-touch timer',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));
+await p.setViewportSize({width:1440,height:900});
+await p.evaluate(()=>document.querySelector('#V-MailMessageList').removeAttribute('data-pw-selection-version'));
+check('Missing selection script marker restores native desktop checkboxes',await p.evaluate(()=>getComputedStyle(demoRows[0].querySelector('.messageCheckbox')).display!=='none'&&getComputedStyle(document.querySelector('.checkboxCheckAll')).display!=='none'));
+check('No runtime errors',await p.evaluate(()=>fixtureErrors.length===0));
+console.log(JSON.stringify({passed:results.length,results},null,2));

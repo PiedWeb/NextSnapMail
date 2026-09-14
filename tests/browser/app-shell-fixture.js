@@ -9,5 +9,5 @@ if (new URLSearchParams(location.search).has('shell')) {
     content.before(header);
     const style=document.createElement('style');style.textContent='body{--header-height:48px}#header{height:48px;display:flex;justify-content:space-between;background:teal}#header .header-start{display:flex}.app-menu{display:flex}.app-menu__waffle{width:44px;height:44px}#content.app-nextsnapmail{margin-top:0;height:calc(100dvh - 48px)}#content.app-nextsnapmail #rl-app{position:relative;inset:auto;height:100%;width:100%}html.rl-mobile.pw-mail-shell #rl-left{top:0}';document.head.append(style);
     }
-    const script=document.createElement('script');script.src='/.local-work/pied-web-ux/app-shell.js?fixture=173c';document.head.append(script);
+    const script=document.createElement('script');script.src='/.local-work/pied-web-ux/app-shell.js?fixture=175a';document.head.append(script);
 }

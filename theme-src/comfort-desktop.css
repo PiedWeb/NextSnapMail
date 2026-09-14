@@ -23,7 +23,6 @@
     margin-inline: 8px;
     border-bottom: 1px solid color-mix(in oklch, var(--pw-line) 70%, var(--pw-paper)) !important;
   }
-  #rl-app #V-MailMessageList .messageListItem .messageCheckbox { flex: 0 0 34px; }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle {
     display:flex; align-items:center; justify-content:center; align-self:center;
     flex:0 0 24px; width:24px; height:32px; margin:0 4px 0 0; padding:0;

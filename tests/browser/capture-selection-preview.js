@@ -1,0 +1,22 @@
+const p=await browser.getPage('nextsnapmail-selection-preview');
+p.setDefaultTimeout(6000);
+await p.setViewportSize({width:1440,height:900});
+await p.emulateMedia({colorScheme:'light'});
+await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&listOnly=1');
+await p.waitForFunction(()=>document.querySelector('#V-MailMessageList')?.dataset.pwSelectionVersion==='1.7.15');
+console.log(await saveScreenshot(await p.screenshot(),'pw-1715-desktop.png'));
+await p.evaluate(()=>demoRows[0].querySelector('.senderParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
+await p.locator('.messageListItem .senderParent').nth(1).click();
+console.log(await saveScreenshot(await p.screenshot(),'pw-1715-desktop-selection.png'));
+await p.locator('.pw-selection-finish').click();
+await p.setViewportSize({width:390,height:844});
+await p.waitForFunction(()=>document.documentElement.classList.contains('rl-mobile'));
+console.log(await saveScreenshot(await p.screenshot(),'pw-1715-mobile.png'));
+await p.evaluate(async()=>{
+ const part=demoRows[0].querySelector('.senderParent'),r=part.getBoundingClientRect(),x=r.x+10,y=r.y+10;
+ part.dispatchEvent(new PointerEvent('pointerdown',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:81,clientX:x,clientY:y}));
+ await new Promise(resolve=>setTimeout(resolve,640));
+ part.dispatchEvent(new PointerEvent('pointerup',{bubbles:true,pointerType:'touch',isPrimary:true,pointerId:81,clientX:x,clientY:y}));
+});
+console.log(await saveScreenshot(await p.screenshot(),'pw-1715-mobile-selection.png'));
+console.log('Captured fictional 1.7.15 desktop and mobile previews.');

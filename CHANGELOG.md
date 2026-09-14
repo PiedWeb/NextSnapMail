@@ -1,5 +1,13 @@
 # Releases
 
+## 1.7.15, 2026-09-14
+
+Visible list checkboxes and the mobile selection-menu entry are removed when the Pied Web selection script is active. Ctrl+click (or Command+click) on a desktop message starts native multi-selection; a 550 ms long touch starts it on mobile. Further plain clicks/taps toggle messages without opening them. A count and Done button appear while selecting, and Escape exits on desktop. Native grouped commands still receive the checked messages. Scroll movement cancels the long-touch timer, and swipe deletion remains available outside selection mode. If the script is unavailable, native checkboxes stay visible as a fallback.
+
+The Nextcloud shell now resets a pending animation-frame handle during page hide so its integration reliably returns from browser history.
+
+Fictional browser checks covered click and touch entry, selected action targets, exit behavior, normal opening, scroll cancellation, mobile geometry and dark mode. The resting 390 px mobile capture is pixel-identical to 1.7.14. No production message state was changed during fixture validation.
+
 ## 1.7.14, 2026-09-14
 
 Desktop message rows now show a small amber dot for unread mail and a pale gray dot for read mail. Clicking or pressing Space on the dot uses SnappyMail's native seen/unseen action without selecting or opening the row. The checkbox remains a separate, centered control. Unstarred messages reveal their star on hover or keyboard focus; starred messages remain visible. Attachment indicators occupy a fixed column at the right of each row, freeing the subject line for scanning. These layout rules start at 1200 px. Mobile keeps its existing visible star and tap target because SnappyMail already uses row double-tap/double-click for another action.

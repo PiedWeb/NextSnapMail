@@ -16,9 +16,9 @@ check('The attachment occupies a dedicated column after the star',await p.evalua
  const row=demoRows[0],content=row.lastElementChild,star=row.querySelector('.flagParent').getBoundingClientRect(),attachment=row.querySelector('.attachmentParent').getBoundingClientRect(),subject=row.querySelector('.subjectParent').getBoundingClientRect();
  return getComputedStyle(content).display==='grid'&&attachment.left>=star.right&&attachment.left>=subject.right&&attachment.width>=24;
 }));
-check('Read dot and checkbox have distinct, aligned targets',await p.evaluate(()=>{
- const row=demoRows[0],dot=row.querySelector('.pw-read-toggle').getBoundingClientRect(),box=row.querySelector('.messageCheckbox').getBoundingClientRect();
- return dot.right<=box.left&&Math.abs(dot.y+dot.height/2-(box.y+box.height/2))<8;
+check('Read dot remains the left-most visible action',await p.evaluate(()=>{
+ const row=demoRows[0],dot=row.querySelector('.pw-read-toggle').getBoundingClientRect(),sender=row.querySelector('.senderParent').getBoundingClientRect();
+ return getComputedStyle(row.querySelector('.messageCheckbox')).display==='none'&&dot.right<=sender.left;
 }));
 await p.locator('.messageListItem .pw-read-toggle').first().click();
 await p.waitForFunction(()=>demoRows[0].querySelector('.pw-read-toggle').dataset.unread==='0');
