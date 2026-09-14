@@ -1,0 +1,36 @@
+/* First Pied Web Confort proposal. Keep every rule outside the mobile layout. */
+@media (min-width: 1200px) {
+  #rl-app #rl-left { width: 248px; min-width: 248px; }
+  #rl-app .b-folders .b-content { padding-inline: 14px; }
+  #rl-app .b-folders li a.selectable {
+    height: 40px;
+    line-height: 40px !important;
+    margin-block: 1px;
+    padding-inline: 12px 44px;
+  }
+  #rl-app .pw-folder-section { padding-block: 24px 8px; }
+
+  html.sm-msgView-side #rl-app #V-MailMessageList .messageList {
+    width: 36vw;
+    min-width: clamp(420px, 36vw, 540px);
+    max-width: 540px;
+  }
+  #rl-app #V-MailMessageList .messageListItem {
+    min-height: 68px;
+    padding: 12px 20px;
+    margin-inline: 8px;
+  }
+  #rl-app #V-MailMessageList .messageListItem .senderParent {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  #rl-app #V-MailMessageList .messageListItem .subjectParent { line-height: 1.5; }
+  #rl-app #V-MailMessageList .messageListItem time { font-size: 12px; }
+  #rl-app .pw-day-label,
+  #rl-app .messageList .groupLabel { padding-block: 18px 8px; }
+
+  #rl-app .messageView .messageItemHeader { padding-inline: 36px; }
+  #rl-app #messageItem > .messageItemHeader { padding-inline-start: 36px; }
+  #rl-app .bodyText { max-width: 640px; padding: 30px 36px 8px; line-height: 1.6; }
+  #rl-app .pw-reading-actions { padding-inline: 36px; }
+}

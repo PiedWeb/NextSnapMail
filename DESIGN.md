@@ -4,6 +4,10 @@
 
 Pied Web uses quiet neutral surfaces, teal primary actions and selection, and readable native/system typography. Mail-specific tokens and components remain in theme-src/. Nextcloud integrations inherit the instance's native foreground, background, hover and focus tokens rather than imposing a second palette.
 
+## Mail desktop comfort
+
+At widths of 1200 px and above, give folder labels 248 px of navigation space and 40 px rows. The message list uses 36vw, bounded by 420 and 540 px, with approximately 68 px row targets and 14 px sender text. Reading uses a 36 px gutter and a 640 px maximum body box. These rules live in `theme-src/comfort-desktop.css` and load after the established theme; phone and medium-width layouts keep their existing geometry. Keep native selection, unread, followed and keyboard states distinct.
+
 ## Scene and theme
 
 Robin moves between mail and planning during ordinary desktop work and phone use; preserve the user's current Nextcloud light/dark setting so each app feels like the same workspace.

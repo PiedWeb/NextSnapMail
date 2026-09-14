@@ -1,5 +1,11 @@
 # Releases
 
+## 1.7.12, 2026-09-14
+
+First Pied Web Confort proposal for desktop widths of at least 1200 px: a wider folder pane and message list, 40 px folder rows, more breathing room in the message list and reading pane, and slightly larger sender text. The existing mobile and medium-width layout keeps its previous geometry. The plugin version gives SnappyMail's compiled CSS a fresh cache key; the 1.7.10 virtual Sent conversation behavior remains intact.
+
+Fictional browser previews at 1200/1440 px in light and dark mode showed no horizontal overflow. A 390 px screenshot before and after the theme change was pixel-identical; 320 px had no horizontal overflow. See `docs/previews/1.7.12/` and the deployment record.
+
 ## 1.7.10, 2026-09-14
 
 The open conversation now searches the configured Sent folder for replies by

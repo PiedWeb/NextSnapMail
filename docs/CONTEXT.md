@@ -11,6 +11,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   hide surrounding Nextcloud chrome only with Pied Web, restore it on exit. Mobile search
   expands below the single header. Checked message rows have a stronger teal surface and
   centered checkboxes. See MAIL_SHELL.md for native launcher ownership and fallbacks.
+- Since 1.7.12 the first Confort proposal applies only from 1200 px: wider navigation/list,
+  40 px folder rows and roomier message reading. The established mobile layout is deliberately
+  unchanged; compare fictional 390 px screenshots when adjusting desktop CSS again.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars stay visible,

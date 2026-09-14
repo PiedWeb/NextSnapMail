@@ -4337,3 +4337,39 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
 #rl-app .b-folders .b-folders-system a[data-icon="🗑"] { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h18%20M9%206V3h6v3%20M5%206l1%2015h12l1-15%20M10%2010v7%20M14%2010v7%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app .b-folders .b-folders-system a[data-icon="🗄"] { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Crect%20x%3D%223%22%20y%3D%223%22%20width%3D%2218%22%20height%3D%225%22%20rx%3D%221%22%2F%3E%3Cpath%20d%3D%22M5%208v13h14V8%20M10%2012h4%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app .b-folders .b-folders-user a:not(.system) { --mail-folder-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22currentColor%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h6l2%203h10v12H3Z%22%2F%3E%3C%2Fsvg%3E"); }
+/* First Pied Web Confort proposal. Keep every rule outside the mobile layout. */
+@media (min-width: 1200px) {
+  #rl-app #rl-left { width: 248px; min-width: 248px; }
+  #rl-app .b-folders .b-content { padding-inline: 14px; }
+  #rl-app .b-folders li a.selectable {
+    height: 40px;
+    line-height: 40px !important;
+    margin-block: 1px;
+    padding-inline: 12px 44px;
+  }
+  #rl-app .pw-folder-section { padding-block: 24px 8px; }
+
+  html.sm-msgView-side #rl-app #V-MailMessageList .messageList {
+    width: 36vw;
+    min-width: clamp(420px, 36vw, 540px);
+    max-width: 540px;
+  }
+  #rl-app #V-MailMessageList .messageListItem {
+    min-height: 68px;
+    padding: 12px 20px;
+    margin-inline: 8px;
+  }
+  #rl-app #V-MailMessageList .messageListItem .senderParent {
+    font-size: 14px;
+    line-height: 1.4;
+  }
+  #rl-app #V-MailMessageList .messageListItem .subjectParent { line-height: 1.5; }
+  #rl-app #V-MailMessageList .messageListItem time { font-size: 12px; }
+  #rl-app .pw-day-label,
+  #rl-app .messageList .groupLabel { padding-block: 18px 8px; }
+
+  #rl-app .messageView .messageItemHeader { padding-inline: 36px; }
+  #rl-app #messageItem > .messageItemHeader { padding-inline-start: 36px; }
+  #rl-app .bodyText { max-width: 640px; padding: 30px 36px 8px; line-height: 1.6; }
+  #rl-app .pw-reading-actions { padding-inline: 36px; }
+}
