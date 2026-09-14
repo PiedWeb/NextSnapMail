@@ -19,7 +19,11 @@ check('The original menu opens under the new icon',await page.evaluate(()=>{
  const rect=menu.getBoundingClientRect();
  return group.classList.contains('show') && rect.width>0 && rect.height>0;
 }));
-await page.locator('.pw-reader-tags .dropdown-menu a').click();
+check('Label entries match the other menus rather than the message title',await page.evaluate(()=>{
+ const item=document.querySelector('.pw-reader-tags .dropdown-menu a'),style=getComputedStyle(item);
+ return style.fontSize==='15px' && Number(style.fontWeight)===400;
+}));
+await page.locator('.pw-reader-tags .dropdown-menu a').first().click();
 check('The bound label action still responds',await page.evaluate(()=>fixtureLabelActions.length===1 && fixtureLabelActions[0]==='Projet'));
 await page.locator('#tags-dropdown-id').press('Space');
 check('Space opens the icon menu',await page.evaluate(()=>document.querySelector('.pw-reader-tags').classList.contains('show')));

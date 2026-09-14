@@ -1,5 +1,9 @@
 # Releases
 
+## 1.7.19, 2026-09-14
+
+Fix the reader label dropdown's oversized, bold text after moving it beside the message controls. Its entries now use the same 15 px regular typography as the other Mail menus. The icon placement, native label actions and mobile target are unchanged. A fictional browser check now asserts the open menu typography.
+
 ## 1.7.18, 2026-09-14
 
 The message reader now places SnappyMail's native Étiquettes icon between the message information control and the star. The separate label row disappears, including its assigned-label text; the native dropdown still handles label actions. The icon has a French/English accessible name and a 44 px target on desktop and mobile. Leaving Pied Web restores the original row. Fictional reader checks covered click, keyboard, mobile, dark mode, theme exit and native row rebuilding; no real label was changed during validation.
