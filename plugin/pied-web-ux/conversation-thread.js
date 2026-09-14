@@ -1,149 +1,249 @@
-/* A read-only Sent view inside the native, folder-scoped conversation list. */
+/* One chronological reader stack for the current folder's thread and Sent replies. */
 (() => {
     'use strict';
     const t = (fr, en) => (document.documentElement.lang || 'fr').startsWith('fr') ? fr : en;
     const ids = value => String(value || '').match(/<[^<>\s]{1,255}>/g) || [];
-    const key = value => String(value || '').toLowerCase();
-    const active = () => document.documentElement.classList.contains('pw-theme');
+    const normalize = value => String(value || '').toLowerCase();
+    const itemKey = item => item?.folder && Number(item.uid) > 0 ? item.folder + '\u0000' + item.uid : '';
+    const active = () => document.documentElement.classList.contains('pw-theme') && !!rl.settings.get('useThreads');
+    const addresses = value => {
+        const entries = value?.['@Collection'] || value || [];
+        return Array.isArray(entries) ? entries.map(address => address.name || address.email).filter(Boolean).join(', ') : '';
+    };
+    const plain = message => ({
+        folder: message.folder, uid: message.uid, messageId: message.messageId,
+        inReplyTo: message.inReplyTo, references: message.references,
+        subject: ko.unwrap(message.subject), dateTimestamp: ko.unwrap(message.dateTimestamp),
+        from: message.from, to: message.to
+    });
+    let listVM, bootstrapObserver;
 
-    addEventListener('rl-view-model', ({detail:vm}) => {
-        if (vm.viewModelTemplateID !== 'MailMessageList' || vm.pwConversationThread) return;
-        const list = vm.messageList, dom = vm.viewModelDom;
-        const content = dom?.querySelector('.messageList > .b-content');
-        if (!content) return;
+    function mount(vm) {
+        if (vm.viewModelTemplateID !== 'MailMessageView' || vm.pwConversationThread) return;
+        const dom = vm.viewModelDom, host = dom?.querySelector('.messageView .b-message');
+        const item = host?.querySelector('#messageItem');
+        const header = host?.querySelector(':scope > .messageItemHeader');
+        if (!host || !item || !header || !vm.message?.subscribe) return;
         vm.pwConversationThread = true;
+        bootstrapObserver?.disconnect();
 
-        const section = document.createElement('section');
-        section.className = 'pw-conversation-sent'; section.hidden = true;
-        const heading = document.createElement('h2');
-        const rows = document.createElement('div'); rows.className = 'pw-conversation-sent-rows';
+        const before = document.createElement('section'); before.className = 'pw-conversation-before'; before.hidden = true;
+        const title = document.createElement('h2');
+        const latestButton = document.createElement('button'); latestButton.type = 'button'; latestButton.hidden = true;
+        const beforeCards = document.createElement('div'); beforeCards.className = 'pw-conversation-cards';
         const status = document.createElement('p'); status.setAttribute('role', 'status');
         const retry = document.createElement('button'); retry.type = 'button'; retry.hidden = true;
-        section.append(heading,rows,status,retry); content.append(section);
+        before.append(title,latestButton,beforeCards,status,retry); header.before(before);
+        const after = document.createElement('section'); after.className = 'pw-conversation-after'; after.hidden = true;
+        const afterCards = document.createElement('div'); afterCards.className = 'pw-conversation-cards';
+        after.append(afterCards); item.after(after);
 
-        let generation = 0, timer, disposed = false, loading = false, error = false;
-        let entries = [], sent = '', anchor = '', CollectionModel;
+        let generation = 0, timer, disposed = false, context = null, entries = [];
+        let loading = false, error = false;
+        const account = () => String(rl.settings.get('accountHash') || '');
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
-        const source = () => String(list()?.folder || '');
-        const eligible = () => active() && !!list.threadUid?.() && !list.loading?.()
-            && !!source() && !!sentFolder() && source() !== sentFolder() && !!list()?.length;
-        const rootId = () => {
-            const messages = [...(list() || [])].filter(message => ids(message.messageId).length);
-            const present = new Set(messages.map(message => key(ids(message.messageId)[0])));
-            const roots = messages.filter(message => !ids(message.inReplyTo).some(id => present.has(key(id))));
-            return ids((roots.length ? roots : messages).sort((a,b) =>
-                Number(a.dateTimestamp?.() || 0) - Number(b.dateTimestamp?.() || 0))[0]?.messageId)[0] || '';
-        };
-        const currentScope = () => JSON.stringify([
-            rl.settings.get('accountHash'), source(), list.threadUid?.(), sentFolder(), rootId()
-        ]);
-        const valid = (version, snapshot) => !disposed && version === generation
-            && snapshot === currentScope() && eligible();
-        const place = () => [...content.querySelectorAll('.messageListPlace')].at(-1)?.after(section);
+        const current = () => vm.message?.();
+        const currentKey = () => itemKey(current());
+        const valid = (version, ctx) => !disposed && version === generation && context === ctx
+            && account() === ctx.account && active() && !!currentKey()
+            && (currentKey() === ctx.originKey || entries.some(entry => entry.key === currentKey()));
 
-        function render() {
-            place();
-            heading.textContent = t('Réponses envoyées dans cette conversation', 'Sent replies in this conversation');
-            retry.textContent = t('Réessayer', 'Try again');
-            const visible = eligible() && !!anchor && (loading || error || entries.length);
-            section.hidden = !visible;
-            status.textContent = loading ? t('Recherche dans Envoyés…', 'Searching Sent…')
-                : error ? t('Réponses envoyées indisponibles.', 'Sent replies unavailable.') : '';
-            const focused = section.contains(document.activeElement) ? document.activeElement.dataset.uid : null;
-            retry.hidden = !error; rows.replaceChildren();
-            if (!visible || error) return;
-            entries.forEach(item => {
-                const button = document.createElement('button'); button.type = 'button';
-                button.className = 'pw-conversation-sent-row'; button.dataset.uid = String(item.uid);
-                const label = document.createElement('span'); label.className = 'pw-conversation-sent-label';
-                label.textContent = t('Envoyé', 'Sent');
-                const subject = document.createElement('span'); subject.className = 'pw-conversation-sent-subject';
-                subject.textContent = item.subject || t('(Sans objet)', '(No subject)');
-                const recipient = document.createElement('span'); recipient.className = 'pw-conversation-sent-recipient';
-                const addresses = item.to?.['@Collection'] || item.to || [];
-                const to = Array.isArray(addresses) ? addresses : [];
-                recipient.textContent = t('À : ', 'To: ') + to.map(address => address.name || address.email).filter(Boolean).join(', ');
-                const date = document.createElement('time');
-                const stamp = Number(item.dateTimestamp);
-                if (stamp > 0 && Number.isFinite(stamp) && Number.isFinite(new Date(stamp * 1000).getTime())) {
-                    const value = new Date(stamp * 1000);
-                    date.dateTime = value.toISOString();
-                    date.textContent = value.toLocaleDateString(document.documentElement.lang || 'fr', {day:'numeric',month:'short'});
-                    date.title = value.toLocaleString();
-                }
-                button.setAttribute('aria-label', [label.textContent, recipient.textContent, subject.textContent].filter(Boolean).join(' — '));
-                button.append(label,recipient,subject,date);
-                button.addEventListener('click', event => {
-                    event.stopPropagation();
-                    if (!eligible() || !CollectionModel || !vm.selector?.oCallbacks?.ItemSelect) return;
-                    const message = CollectionModel.reviveFromJson([item])[0];
-                    if (!message || message.folder !== sent || Number(message.uid) !== Number(item.uid)) return;
-                    vm.selector.unselect();
-                    vm.selector.oCallbacks.ItemSelect(message); // Native reader fetch, flags and actions use Sent/UID.
-                    rows.querySelectorAll('button').forEach(row => row.removeAttribute('aria-current'));
-                    button.setAttribute('aria-current', 'true');
-                });
-                rows.append(button);
-            });
-            if (focused) [...rows.querySelectorAll('button')].find(button => button.dataset.uid === focused)?.focus();
+        function showMessage(entry, followLatest = false) {
+            const callback = listVM?.selector?.oCallbacks?.ItemSelect;
+            const CollectionModel = rl.app.messageList?.()?.constructor;
+            const model = entry.model || CollectionModel?.reviveFromJson?.([entry.raw])?.[0];
+            if (typeof callback !== 'function' || !model || itemKey(model) !== entry.key) {
+                error = true; render(); return;
+            }
+            context.followLatest = followLatest;
+            callback(model); // Native reader fetch, attachments and actions use this message's real folder/UID.
         }
 
-        async function search(field, id, version, snapshot) {
-            const found = [], query = new URLSearchParams({header:field + ' ' + id}).toString();
+        function card(entry) {
+            const raw = entry.raw, article = document.createElement('article');
+            article.className = 'pw-conversation-card';
+            const button = document.createElement('button'); button.type = 'button';
+            button.className = 'pw-conversation-card-toggle';
+            button.setAttribute('aria-expanded', 'false');
+            const sender = document.createElement('strong');
+            sender.textContent = addresses(raw.from) || t('Message', 'Message');
+            const recipient = document.createElement('span'); recipient.className = 'pw-conversation-card-recipient';
+            recipient.textContent = t('À : ', 'To: ') + addresses(raw.to);
+            const date = document.createElement('time'), stamp = Number(raw.dateTimestamp);
+            if (stamp > 0 && Number.isFinite(stamp) && Number.isFinite(new Date(stamp * 1000).getTime())) {
+                const value = new Date(stamp * 1000);
+                date.dateTime = value.toISOString();
+                date.textContent = value.toLocaleString(document.documentElement.lang || 'fr', {dateStyle:'medium',timeStyle:'short'});
+            }
+            const summary = document.createElement('span'); summary.className = 'pw-conversation-card-summary';
+            summary.textContent = raw.subject || t('(Sans objet)', '(No subject)');
+            button.append(sender,recipient,date,summary);
+            button.addEventListener('click', () => {
+                if (context && active()) showMessage(entry,entry.key === entries.at(-1)?.key);
+            });
+            article.append(button); return article;
+        }
+
+        function render() {
+            const index = entries.findIndex(entry => entry.key === currentKey());
+            const visible = active() && !!context && index >= 0 && (entries.length > 1 || loading || error);
+            before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
+            host.classList.toggle('pw-conversation-active', visible);
+            title.textContent = t('Conversation', 'Conversation');
+            latestButton.textContent = t('Afficher le dernier message', 'Show latest message');
+            latestButton.hidden = !visible || index === entries.length - 1;
+            status.textContent = loading ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')
+                : error ? t('Conversation incomplète.', 'Conversation incomplete.') : '';
+            retry.textContent = t('Réessayer', 'Try again'); retry.hidden = !error;
+            beforeCards.replaceChildren(); afterCards.replaceChildren();
+            if (!visible) return;
+            entries.forEach((entry, position) => {
+                if (position < index) beforeCards.append(card(entry));
+                else if (position > index) afterCards.append(card(entry));
+            });
+        }
+
+        async function search(folder, params, version, ctx) {
+            const found = [];
             for (let offset = 0; offset < 200; offset += 50) {
                 const response = await rl.app.Remote.post('MessageList', null,
-                    {folder:sent,offset,limit:50,sort:'REVERSE DATE',search:query,useThreads:0}, 60000);
-                if (!valid(version,snapshot)) return [];
+                    {folder, offset, limit:50, sort:'REVERSE DATE', ...params}, 60000);
+                if (!valid(version,ctx)) return [];
                 const result = response?.Result, page = result?.['@Collection'];
-                if (!Array.isArray(page) || result.folder?.name !== sent || Number(result.offset) !== offset) throw new Error('response');
+                if (!Array.isArray(page) || result.folder?.name !== folder || Number(result.offset) !== offset)
+                    throw new Error('message list');
                 found.push(...page);
                 if (page.length < 50 || offset + 50 >= Number(result.totalEmails || 0)) break;
             }
             return found;
         }
 
-        async function refresh() {
-            if (!eligible() || disposed || document.hidden) { ++generation; entries = []; anchor = ''; loading = false; error = false; render(); return; }
-            const id = rootId(); if (!id) { ++generation; entries = []; anchor = ''; render(); return; }
-            const version = ++generation, snapshot = currentScope();
-            const collection = list()?.constructor;
-            if (typeof collection?.reviveFromJson !== 'function') { entries = []; error = true; render(); return; }
-            CollectionModel = collection; sent = sentFolder(); anchor = id;
-            entries = []; loading = true; error = false; render();
-            try {
-                const references = await search('References', id, version, snapshot);
-                if (!valid(version,snapshot)) return;
-                const direct = await search('In-Reply-To', id, version, snapshot);
-                if (!valid(version,snapshot)) return;
-                const existing = new Set(list().map(message => key(ids(message.messageId)[0])));
-                const seen = new Set();
-                entries = [...references,...direct].filter(item => {
-                    const uid = Number(item?.uid), ownId = key(ids(item?.messageId)[0]);
-                    if (item?.folder !== sent || !Number.isInteger(uid) || uid < 1 || seen.has(uid)
-                        || (ownId && existing.has(ownId))
-                        || ![...ids(item.references),...ids(item.inReplyTo)].some(value => key(value) === key(id))) return false;
-                    seen.add(uid); return true;
-                }).sort((a,b) => Number(a.dateTimestamp || 0) - Number(b.dateTimestamp || 0));
-            } catch {
-                if (valid(version,snapshot)) error = true;
-            } finally {
-                if (version === generation) { loading = false; render(); }
+        async function collectFolder(ctx, version) {
+            const list = rl.app.messageList?.();
+            if (list?.folder === ctx.folder && rl.app.messageList.threadUid?.()
+                && [...list].some(message => itemKey(message) === ctx.originKey)) {
+                return [...list].map(message => ({raw:plain(message),model:message}));
             }
+            if (!ctx.threadUid) return [];
+            const rows = await search(ctx.folder, {search:'',useThreads:1,
+                threadUid:ctx.threadUid,threadAlgorithm:rl.settings.get('threadAlgorithm') || ''}, version,ctx);
+            return rows.filter(row => row.folder === ctx.folder).map(raw => ({raw}));
         }
-        const schedule = () => { clearTimeout(timer); timer = setTimeout(() => void refresh(), 160); };
-        retry.addEventListener('click', schedule);
-        const subscriptions = [list,list.loading,list.threadUid].filter(value => value?.subscribe)
+
+        async function collectSent(ctx, folderRows, version) {
+            const sent = ctx.sent; if (!sent) return [];
+            const anchors = new Map();
+            [ctx.origin,...folderRows.map(row => row.raw)].forEach(row => {
+                ids(row.messageId).forEach(id => anchors.set(normalize(id),id));
+            });
+            const root = ids(ctx.origin.references)[0] || ids(ctx.origin.inReplyTo)[0]
+                || ids(ctx.origin.messageId)[0];
+            if (root) anchors.set(normalize(root),root);
+            const found = new Map(), queue = [...anchors.values()], scanned = new Set();
+            if (root) {
+                const query = new URLSearchParams({header:'References ' + root}).toString();
+                for (const raw of await search(sent,{search:query,useThreads:0},version,ctx)) {
+                    if (raw.folder === sent && ids(raw.references).some(id => normalize(id) === normalize(root))) {
+                        found.set(itemKey(raw),raw);
+                        ids(raw.messageId).forEach(id => queue.push(id));
+                    }
+                }
+            }
+            while (queue.length && scanned.size < 20 && valid(version,ctx)) {
+                const id = queue.shift(), normalized = normalize(id);
+                if (scanned.has(normalized)) continue;
+                scanned.add(normalized);
+                const query = new URLSearchParams({header:'In-Reply-To ' + id}).toString();
+                for (const raw of await search(sent,{search:query,useThreads:0},version,ctx)) {
+                    if (raw.folder === sent && ids(raw.inReplyTo).some(value => normalize(value) === normalized)) {
+                        found.set(itemKey(raw),raw);
+                        ids(raw.messageId).forEach(value => queue.push(value));
+                    }
+                }
+            }
+            return [...found.values()].map(raw => ({raw}));
+        }
+
+        async function scan(ctx) {
+            const version = ++generation, selectedBefore = currentKey();
+            loading = true; error = false; render();
+            let folderRows = [], sentRows = [];
+            try { folderRows = await collectFolder(ctx,version); }
+            catch { if (valid(version,ctx)) error = true; }
+            if (!valid(version,ctx)) return;
+            try { sentRows = await collectSent(ctx,folderRows,version); }
+            catch { if (valid(version,ctx)) error = true; }
+            if (!valid(version,ctx)) return;
+            const combined = new Map();
+            for (const row of [{raw:ctx.origin,model:ctx.originModel},...folderRows,...sentRows]) {
+                const key = itemKey(row.raw);
+                if (key && (!combined.has(key) || row.model)) combined.set(key,{...row,key});
+            }
+            entries = [...combined.values()].sort((a,b) =>
+                Number(a.raw.dateTimestamp || 0) - Number(b.raw.dateTimestamp || 0)
+                || a.key.localeCompare(b.key));
+            loading = false; render();
+            const latest = entries.at(-1);
+            if (ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key)
+                showMessage(latest,true);
+        }
+
+        function reset() {
+            ++generation; context = null; entries = []; loading = error = false; render();
+        }
+        function update() {
+            if (disposed || !currentKey()) { reset(); return; }
+            if (!active() || document.hidden) {
+                ++generation; loading = false;
+                if (context) context.needsRefresh = true;
+                render(); return;
+            }
+            if (context && account() === context.account && entries.some(entry => entry.key === currentKey())) {
+                if (context.needsRefresh) { context.needsRefresh = false; void scan(context); }
+                else render();
+                return;
+            }
+            if (vm.messageLoadingThrottle?.()) return;
+            const source = current(), origin = plain(source);
+            const threads = source.threads?.() || [];
+            context = {account:account(), folder:source.folder, sent:sentFolder(), origin,
+                originModel:source,originKey:itemKey(source),threadUid:threads.length > 1
+                    ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:true};
+            entries = [{raw:origin,model:source,key:context.originKey}];
+            void scan(context);
+        }
+        const schedule = () => { clearTimeout(timer); timer = setTimeout(update,160); };
+        latestButton.addEventListener('click', () => { const latest = entries.at(-1); if (latest) showMessage(latest,true); });
+        retry.addEventListener('click', () => { if (context) void scan(context); });
+        const subscriptions = [vm.message,vm.messageLoadingThrottle].filter(value => value?.subscribe)
             .map(value => value.subscribe(schedule));
         const theme = new MutationObserver(schedule);
         theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const wake = () => { if (!document.hidden) schedule(); };
         document.addEventListener('visibilitychange',wake);
-        const poll = setInterval(() => { if (eligible() && !loading) schedule(); },60000);
+        const poll = setInterval(() => { if (context && active() && !loading) void scan(context); },60000);
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
-            disposed = true; ++generation; clearTimeout(timer); clearInterval(poll); theme.disconnect();
+            disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();
             subscriptions.forEach(subscription => subscription.dispose());
-            document.removeEventListener('visibilitychange',wake); section.remove();
+            document.removeEventListener('visibilitychange',wake); before.remove(); after.remove();
         });
+    }
+
+    function bootstrap() {
+        if (typeof ko === 'undefined') return;
+        const list = document.getElementById('V-MailMessageList');
+        const reader = document.getElementById('V-MailMessageView');
+        const candidateList = list && ko.dataFor(list);
+        if (candidateList?.viewModelTemplateID === 'MailMessageList') listVM = candidateList;
+        const candidateReader = reader && ko.dataFor(reader);
+        if (candidateReader?.viewModelTemplateID === 'MailMessageView') mount(candidateReader);
+    }
+    addEventListener('rl-view-model', ({detail:vm}) => {
+        if (vm.viewModelTemplateID === 'MailMessageList') listVM = vm;
+        else if (vm.viewModelTemplateID === 'MailMessageView') mount(vm);
     });
+    bootstrapObserver = new MutationObserver(bootstrap);
+    bootstrapObserver.observe(document.documentElement,{childList:true,subtree:true});
+    queueMicrotask(bootstrap);
 })();

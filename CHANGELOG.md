@@ -1,5 +1,24 @@
 # Releases
 
+## 1.7.20, 2026-09-14
+
+In Conversations mode, opening a received message now assembles its native
+folder thread with historical replies from Sent. The newest message, whether
+received or sent, opens in SnappyMail's native reader; the others are folded
+cards one click away. The earlier list-only panel required a selected native
+thread and did not appear in an ordinary opened Inbox message. Read-only
+header searches find Sent replies, and native opening keeps attachments and
+message actions tied to the displayed folder/UID. No mailbox copy or move is
+needed. Search failures offer Retry, and account changes discard stale
+results. The reader also mounts when its DOM appears after the plugin event.
+The 1.7.19 reader label-menu typography is retained.
+
+Fourteen fictional browser checks covered reader placement, native opening,
+read-only requests, retries, account changes, theme exit and narrow screens.
+The native header parser and reproducible theme/build checks passed. The owner
+confirmed the interim 1.7.19 Web runtime but reported that its conversation
+module had not mounted; the 1.7.20 reader result remains to be checked.
+
 ## 1.7.19, 2026-09-14
 
 Fix the reader label dropdown's oversized, bold text after moving it beside the message controls. Its entries now use the same 15 px regular typography as the other Mail menus. The icon placement, native label actions and mobile target are unchanged. A fictional browser check now asserts the open menu typography.

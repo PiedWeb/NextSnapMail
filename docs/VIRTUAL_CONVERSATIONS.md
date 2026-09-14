@@ -1,32 +1,33 @@
-# Sent replies in conversations
+# One reader stack across Inbox and Sent
 
-SnappyMail 2.38.2 asks IMAP to build a thread in one selected folder. A reply
-stored in Sent is therefore absent from an Inbox thread even though its
-`References` or `In-Reply-To` header points to an Inbox message. Pied Web 1.7.10
-adds a read-only Sent section below the native messages of an opened thread.
-The section searches the current account's configured Sent folder for the root
-message ID, retrieves up to 200 matches per header query, checks exact ID
-tokens, removes duplicate UIDs and hides any message ID already present in the
-native thread. Results are sorted by date. There is no background mailbox
-scan, migration or second stored copy.
+SnappyMail 2.38.2 groups IMAP threads within one folder. A reply kept in Sent is
+therefore absent from the Inbox thread even if its `References` or
+`In-Reply-To` header points to a received message. The 1.7.10 extension put a
+read-only Sent list in the message **list** and required the native thread to
+be selected. It did not appear when a normal Inbox row was opened. Version
+1.7.20 attaches to `MailMessageView`, including when that view's DOM is built
+before the plugin script runs.
 
-Selecting a virtual row constructs the native SnappyMail MessageModel with its
-actual Sent folder and UID, then calls the reader's native selection callback.
-The reader fetches the body and uses its regular reply, flag, move and delete
-commands. Virtual rows themselves have no checkbox, drag action or bulk
-selection; native list operations stay scoped to the current folder. Queries
-are discarded when the account or thread changes, and failures show Retry.
-French and English labels, focus styling, dark colors and narrow layouts are
-provided by the theme. The section disappears when leaving Pied Web.
+With Pied Web and Conversations mode active, opening a received message gathers
+all messages in its native folder thread and searches the account's configured
+Sent folder for replies. The folder thread uses SnappyMail's native read-only
+`MessageList` query. Sent discovery searches `References` and `In-Reply-To`
+headers, checks exact Message-ID tokens, follows reply chains, deduplicates
+folder/UID pairs, and sorts the combined set by date. Each search is limited to
+200 results, and following a Sent chain stops after 20 IDs.
 
-The lookup needs a configured Sent folder and a Message-ID on the visible
-thread root. It also depends on replies carrying a matching `References` or
-`In-Reply-To` header. Custom per-identity Sent folders are not searched unless
-they are the configured account Sent folder. A thread with more than 200 matches
-per header query is truncated. SnappyMail's native conversation badge still
-counts only the original folder; the virtual section does not alter IMAP counts.
+The newest message, received or sent, opens in SnappyMail's **native reader**.
+Earlier messages appear as folded cards above it; clicking one opens that
+message natively and places the remaining cards around it. A button returns
+to the newest message. Native body, attachment, image, reply, flag and other
+message actions therefore belong to whichever message is open. The current
+folder's message list is not copied or altered. Searches are retried after a
+failure, and a 60-second refresh can pick up a new reply while the reader stays
+open. Account changes discard stale searches.
 
-Versions 1.7.8 and 1.7.9 appended a second copy of new replies to the original
-folder. Version 1.7.10 removes that send hook. Existing copies are not deleted;
-the virtual section filters them by Message-ID to avoid displaying the same
-reply twice in the open conversation.
+No mailbox write, migration, copy or separate message store is involved.
+The lookup needs a configured Sent folder and matching Message-ID headers.
+Additional Sent folders configured per identity are not searched unless they
+are the account's configured Sent folder. Messages in other received folders
+are not included. The native conversation count remains folder-scoped.
+Existing duplicate copies made by 1.7.8–1.7.9 remain untouched.
