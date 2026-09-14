@@ -11,7 +11,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Clear folder hierarchy, quieter secondary counters and a compact icon sidebar.
 - Mobile account identity, usable account menus, consistent icons and message actions.
 - Reply, Reply all, Mark unread, visible Unsubscribe and Messages/Conversations switching.
-- Sent replies also appear in their original conversation while staying in Sent.
+- Conversations show matching Sent replies, including older ones, without storing extra copies.
 - Selection of all filtered results across pages, with explicit deletion confirmation.
 - Swipe to delete and Delete-key handling for selected list messages.
 - Readable interleaved quotations and native message flag controls.
@@ -34,7 +34,7 @@ This does **not** implement scheduled delivery, a unified inbox or a new vacatio
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.7.9**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.7.10**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

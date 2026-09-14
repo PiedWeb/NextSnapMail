@@ -17,7 +17,7 @@ Use a separate source checkout of the NextSnapMail revision recorded in `release
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation-reply.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
@@ -42,6 +42,7 @@ dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser --timeout 30 < tests/browser/test-reader-copy-md.js
+dev-browser --timeout 60 < tests/browser/test-virtual-conversation.js
 dev-browser --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser --timeout 60 < tests/browser/test-unread-drafts.js

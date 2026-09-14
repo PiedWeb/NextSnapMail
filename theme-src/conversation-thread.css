@@ -1,0 +1,42 @@
+/* Read-only Sent matches live inside the open conversation, outside native UID selection. */
+#rl-app #V-MailMessageList .pw-conversation-sent { border-top:1px solid var(--pw-line); }
+#rl-app #V-MailMessageList .pw-conversation-sent h2 {
+ margin:0; padding:10px 16px 8px; background:var(--pw-rail); color:var(--pw-muted);
+ font:600 11px/1.4 var(--pw-font); letter-spacing:.02em;
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-row {
+ display:grid; grid-template-columns:auto minmax(0,1fr) auto;
+ grid-template-areas:'label recipient date' 'label subject date'; gap:2px 10px;
+ align-items:center; width:100%; min-height:64px; padding:10px 16px;
+ border:0; border-bottom:1px solid var(--pw-line); border-radius:0;
+ background:color-mix(in oklch,var(--nc-color-primary-element) 5%,var(--pw-paper));
+ color:var(--nc-color-main-text); text-align:start; cursor:pointer; font-family:var(--pw-font);
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-row:is(:hover,[aria-current="true"]) { background:var(--pw-selected); }
+#rl-app #V-MailMessageList .pw-conversation-sent-row:focus-visible {
+ outline:2px solid var(--nc-color-primary-element); outline-offset:-3px;
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-label {
+ grid-area:label; align-self:center; border:1px solid color-mix(in oklch,var(--nc-color-primary-element) 35%,var(--pw-line));
+ border-radius:999px; padding:3px 7px; color:var(--nc-color-primary-element); font-size:10px; font-weight:600;
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-recipient {
+ grid-area:recipient; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; color:var(--pw-muted);
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-subject {
+ grid-area:subject; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:14px;
+}
+#rl-app #V-MailMessageList .pw-conversation-sent-row time { grid-area:date; font-size:11px; color:var(--pw-muted); }
+#rl-app #V-MailMessageList .pw-conversation-sent > p { margin:0; padding:10px 16px; color:var(--pw-muted); font-size:12px; }
+#rl-app #V-MailMessageList .pw-conversation-sent > p:empty { display:none; }
+#rl-app #V-MailMessageList .pw-conversation-sent > button:not(.pw-conversation-sent-row) {
+ margin:0 16px 12px; min-height:36px; border:1px solid var(--pw-line); border-radius:6px;
+ padding:6px 10px; background:var(--pw-paper); color:var(--nc-color-main-text);
+}
+#rl-app #V-MailMessageList .pw-conversation-sent > button:not(.pw-conversation-sent-row):focus-visible {
+ outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+}
+@media(max-width:360px) {
+ #rl-app #V-MailMessageList .pw-conversation-sent-row { grid-template-columns:auto minmax(0,1fr); grid-template-areas:'label recipient' 'subject subject' 'date date'; }
+ #rl-app #V-MailMessageList .pw-conversation-sent-row time { justify-self:end; }
+}

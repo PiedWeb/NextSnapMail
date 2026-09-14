@@ -1,5 +1,22 @@
 # Releases
 
+## 1.7.10, 2026-09-14
+
+The open conversation now searches the configured Sent folder for replies by
+`References` and `In-Reply-To`, showing matches in a clearly marked read-only
+part of the stack. Matches open through the native reader with their real Sent
+folder and UID. This works for older replies without migrating mail. The 1.7.8
+send hook that added another copy to the original folder has been removed, so
+future replies are stored only according to SnappyMail's normal Sent setting.
+Copies already created by 1.7.8 or 1.7.9 remain untouched and are deduplicated
+in this view by Message-ID. The query is scoped to the active account's Sent
+folder and runs only for an opened thread. See `docs/VIRTUAL_CONVERSATIONS.md`
+for matching and limits.
+
+Validation: native 2.38.2 header-search parser, eleven fictional browser
+scenarios including historical replies, native reader opening, account races,
+retry and mobile layout; release checks. No real mail was sent or moved.
+
 ## 1.7.9, 2026-09-14
 
 The Conversations button now reads SnappyMail's actual `useThreads` setting.

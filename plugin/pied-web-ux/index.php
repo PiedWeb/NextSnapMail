@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.7.9',
+        VERSION = '1.7.10',
         RELEASE = '2026-09-14',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -12,7 +12,6 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 
     public function Init(): void
     {
-        $this->addHook('filter.send-message-stream', 'CopyConversationReply');
         $this->addCss('ux.css');
         $this->addJs('send-delay.js');
         $this->addJs('background-send.js');
@@ -32,16 +31,11 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('attachment-images.js');
         $this->addJs('unread-drafts.js');
         $this->addJs('list-metadata.js');
+        $this->addJs('conversation-thread.js');
         $this->addJs('app-shell.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
-    }
-
-    public function CopyConversationReply($account, $stream, int $size): void
-    {
-        require_once __DIR__ . '/ConversationReply.php';
-        PiedWebConversationReply::copy(\RainLoop\Api::Actions(), $stream, $size);
     }
 
     public function UnreadDrafts(): array

@@ -18,5 +18,5 @@ for kind, path in paths.items():
     selector = '#rl-app .b-folders .b-folders-user a:not(.system)' if kind == 'folder' else '#rl-app .b-folders .b-folders-system a[data-icon="' + kind + '"]'
     icons.append(selector + ' { --mail-folder-icon: url("data:image/svg+xml,' + quote(svg, safe='') + '"); }')
 base = (theme / 'nextcloud-v25.css').read_text()
-(root / 'theme/PiedWeb/snappymail/style.css').write_text((theme / 'font-face.css').read_text() + base + '\n' + (theme / 'overrides.css').read_text() + '\n' + (theme / 'studio.css').read_text() + '\n' + (theme / 'list-metadata.css').read_text() + '\n' + (theme / 'app-shell.css').read_text() + '\n' + '\n'.join(icons) + '\n')
+(root / 'theme/PiedWeb/snappymail/style.css').write_text((theme / 'font-face.css').read_text() + base + '\n' + (theme / 'overrides.css').read_text() + '\n' + (theme / 'studio.css').read_text() + '\n' + (theme / 'list-metadata.css').read_text() + '\n' + (theme / 'conversation-thread.css').read_text() + '\n' + (theme / 'app-shell.css').read_text() + '\n' + '\n'.join(icons) + '\n')
 print('Built Pied Web theme with seven monochrome SVG folder icons.')

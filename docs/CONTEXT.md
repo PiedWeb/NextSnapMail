@@ -22,11 +22,13 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   color tied to the button state, including mobile and dark mode. SnappyMail's
   bootstrap setting is `useThreads` (lowercase `u`); the saved server setting is
   `UseThreads`. The button must read the bootstrap spelling to show the real mode.
-- Sent replies are copied into the replied-to folder after SMTP submission and before
-  the normal Sent append, because native IMAP threads are scoped to one folder.
-  The same prepared stream (including Bcc handling) is rewound for both appends.
-  Skip forwards and same-folder saves; never let a failed conversation append
-  prevent the native Sent copy. Existing sent mail is not backfilled.
+- Native IMAP threads are folder-scoped. In an opened thread, the Pied Web view
+  performs read-only header searches in the active account's Sent folder and
+  displays matching replies outside native UID selection. It revives a matched
+  message with its real Sent folder/UID before calling the native reader action.
+  Since 1.7.10 the send hook no longer creates conversation copies. Existing
+  copies from 1.7.8/1.7.9 are not deleted and are hidden as duplicates in the
+  virtual Sent section. See `VIRTUAL_CONVERSATIONS.md`.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
