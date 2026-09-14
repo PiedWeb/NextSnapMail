@@ -1,5 +1,11 @@
 # Releases
 
+## 1.7.13, 2026-09-14
+
+Desktop Confort refinement: restore the native 72 px icon rail when folders are collapsed, add a faint divider between message rows, and align each row checkbox with Select all while keeping its vertical center level with the star. These rules still begin at 1200 px; the 390 px fictional screenshot is pixel-identical to 1.7.12. The plugin version changes to give the compiled stylesheet a fresh cache key.
+
+The collapsed width, checkbox alignment, divider, mobile geometry, dark selection states and shell restoration passed the fictional browser checks. See `docs/previews/1.7.13/` and the deployment record.
+
 ## 1.7.12, 2026-09-14
 
 First Pied Web Confort proposal for desktop widths of at least 1200 px: a wider folder pane and message list, 40 px folder rows, more breathing room in the message list and reading pane, and slightly larger sender text. The existing mobile and medium-width layout keeps its previous geometry. The plugin version gives SnappyMail's compiled CSS a fresh cache key; the 1.7.10 virtual Sent conversation behavior remains intact.

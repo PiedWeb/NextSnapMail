@@ -7,6 +7,8 @@ check('Mail fills the viewport without the wrapper',await p.evaluate(()=>{const 
 check('Native app launcher stays in its original header and has a 44px target',await p.evaluate(()=>{const e=document.querySelector('#header .app-menu__waffle'),r=e.getBoundingClientRect();return r.y>=0&&r.width>43.9&&r.height>43.9&&getComputedStyle(document.querySelector('#header .header-end')).display==='none';}));
 const centers=()=>p.evaluate(()=>[...document.querySelectorAll('.messageListItem')].filter(r=>r.offsetWidth).every(r=>{const c=r.querySelector('.checkboxMessage').getBoundingClientRect(),s=r.querySelector('.flagParent').getBoundingClientRect();return Math.abs(c.y+c.height/2-s.y-s.height/2)<1;}));
 check('Desktop checkboxes and stars share their vertical center',await centers());
+check('Desktop row checkboxes line up with select all',await p.evaluate(()=>{const header=document.querySelector('#V-MailMessageList .checkboxCheckAll').getBoundingClientRect(),row=document.querySelector('.messageListItem .checkboxMessage').getBoundingClientRect();return Math.abs(header.x-row.x)<1;}));
+check('Desktop messages have a subtle divider',await p.evaluate(()=>getComputedStyle(document.querySelector('.messageListItem')).borderBottomWidth==='1px'));
 await p.evaluate(()=>{demoRows[0].classList.add('checked');demoRows[1].classList.add('selected');});
 check('Checked, current and neutral rows have distinct surfaces',await p.evaluate(()=>new Set([0,1,2].map(i=>getComputedStyle(demoRows[i]).backgroundColor)).size===3));
 await p.screenshot({path:'shell-173-desktop.png'});
@@ -33,6 +35,7 @@ await p.waitForFunction(()=>document.body.classList.contains('pw-mail-shell'));
 check('Returning to Pied Web hides the wrapper again',await p.evaluate(()=>document.querySelector('#content').getBoundingClientRect().y===0));
 await p.setViewportSize({width:1200,height:800});await p.evaluate(()=>document.documentElement.classList.add('rl-left-panel-disabled'));await p.evaluate(()=>dispatchEvent(new Event('resize')));
 check('Compact sidebar keeps a clear launcher slot',await p.evaluate(()=>document.querySelector('.buttonCompose').getBoundingClientRect().y>=55.9));
+check('Compact sidebar returns to its 72px icon rail',await p.evaluate(()=>{const rail=document.querySelector('#rl-left').getBoundingClientRect(),list=document.querySelector('.messageList').getBoundingClientRect();return Math.abs(rail.width-72)<1&&list.x>=rail.right-1&&document.documentElement.scrollWidth<=innerWidth;}));
 await p.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));
 check('Page hide restores the host before leaving',await p.evaluate(()=>!document.body.classList.contains('pw-mail-shell')));
 await p.evaluate(()=>dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true})));await p.waitForFunction(()=>document.body.classList.contains('pw-mail-shell'));

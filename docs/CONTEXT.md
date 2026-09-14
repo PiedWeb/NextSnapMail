@@ -14,6 +14,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Since 1.7.12 the first Confort proposal applies only from 1200 px: wider navigation/list,
   40 px folder rows and roomier message reading. The established mobile layout is deliberately
   unchanged; compare fictional 390 px screenshots when adjusting desktop CSS again.
+- Since 1.7.13 the desktop minimum width applies only while folders are expanded. A collapsed
+  rail is 72 px; row checkboxes align with Select all and faint dividers separate messages.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars stay visible,

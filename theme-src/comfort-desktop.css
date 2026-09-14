@@ -1,6 +1,7 @@
 /* First Pied Web Confort proposal. Keep every rule outside the mobile layout. */
 @media (min-width: 1200px) {
-  #rl-app #rl-left { width: 248px; min-width: 248px; }
+  html:not(.rl-left-panel-disabled) #rl-app #rl-left { width: 248px; min-width: 248px; }
+  html.rl-left-panel-disabled #rl-app #rl-left { width: 72px !important; min-width: 72px; max-width: 72px; }
   #rl-app .b-folders .b-content { padding-inline: 14px; }
   #rl-app .b-folders li a.selectable {
     height: 40px;
@@ -18,8 +19,11 @@
   #rl-app #V-MailMessageList .messageListItem {
     min-height: 68px;
     padding: 12px 20px;
+    padding-inline-start: 8px;
     margin-inline: 8px;
+    border-bottom: 1px solid color-mix(in oklch, var(--pw-line) 70%, var(--pw-paper)) !important;
   }
+  #rl-app #V-MailMessageList .messageListItem .messageCheckbox { flex: 0 0 34px; }
   #rl-app #V-MailMessageList .messageListItem .senderParent {
     font-size: 14px;
     line-height: 1.4;
