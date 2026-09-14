@@ -30,6 +30,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   still mark the timeline and the opened message retains its full date. The row border
   directly before a day heading is transparent to avoid a double separator. Mobile
   date and divider styling remains unchanged.
+- Since 1.7.17 desktop day headings add a short leading rule without moving the date
+  label, balancing the existing trailing rule; the mobile headings stay unchanged.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars use an

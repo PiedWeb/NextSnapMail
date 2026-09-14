@@ -1,5 +1,9 @@
 # Releases
 
+## 1.7.17, 2026-09-14
+
+Desktop day headings now have a short line before the label and the existing long line after it, forming a single balanced separator (`— Hier ———`). The label stays at its prior horizontal position. Mobile headings remain unchanged.
+
 ## 1.7.16, 2026-09-14
 
 Desktop message rows no longer show their relative time; the day headings still mark the timeline, and the full date remains available in the opened message. The star and attachment columns stay at the right of the row. At a day boundary, the preceding row's bottom border becomes transparent so the heading has one separator instead of two. Both changes start at 1200 px; mobile retains its existing dates and dividers.

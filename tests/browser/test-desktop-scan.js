@@ -28,6 +28,12 @@ check('A day heading replaces the preceding row divider',await p.evaluate(()=>{
  const normal=getComputedStyle(demoRows[1]).borderBottomColor;
  return /^(transparent|rgba\([^)]*,\s*0\))$/.test(color)&&normal!==color;
 }));
+check('Desktop day headings have a short leading rule and a long trailing rule',await p.evaluate(()=>{
+ const label=document.querySelector('.pw-day-label');
+ const before=getComputedStyle(label,'::before'),after=getComputedStyle(label,'::after');
+ return getComputedStyle(label).paddingInlineStart==='16px'&&before.content!=='none'
+   &&before.width==='20px'&&after.content!=='none'&&after.flexGrow==='1';
+}));
 check('Read dot remains the left-most visible action',await p.evaluate(()=>{
  const row=demoRows[0],dot=row.querySelector('.pw-read-toggle').getBoundingClientRect(),sender=row.querySelector('.senderParent').getBoundingClientRect();
  return getComputedStyle(row.querySelector('.messageCheckbox')).display==='none'&&dot.right<=sender.left;
@@ -52,5 +58,8 @@ check('Mobile row times and dividers remain visible',await p.evaluate(()=>{
  return [...document.querySelectorAll('.messageListItem time')].every(el=>getComputedStyle(el).display!=='none')
    &&!!boundary&&!/^(transparent|rgba\([^)]*,\s*0\))$/.test(getComputedStyle(boundary).borderBottomColor);
 }));
+check('Mobile day headings do not gain the desktop leading rule',await p.evaluate(()=>
+ getComputedStyle(document.querySelector('.pw-day-label'),'::before').content==='none'
+));
 check('No runtime errors',await p.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:results.length,results},null,2));
