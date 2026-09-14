@@ -1,5 +1,5 @@
 {
-  "version": "1.7.15",
+  "version": "1.7.16",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.11",
@@ -22,7 +22,7 @@
     "plugin/pied-web-ux/image-compression-source.json": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
-    "plugin/pied-web-ux/index.php": "d70dd7685cf6f3080f977592cc7419768b6214d7999266d085a148e4cc586cdf",
+    "plugin/pied-web-ux/index.php": "c620f1e34ef3ffdc7f3518a7eaeebc829c1c4e5f906c202c944ed15c00733e66",
     "plugin/pied-web-ux/list-interactions.js": "d0c6981b421ff99961f0edf229a4eb170921d0ef964b57da9171aca5e1919a00",
     "plugin/pied-web-ux/list-metadata.js": "8d62f93e83fa8cc83778c846718658c5bd1952ee3ed599a4b9f79650935203c9",
     "plugin/pied-web-ux/lucide-license.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
@@ -40,7 +40,7 @@
     "plugin/pied-web-ux/ux.css": "22089cbabb7b26570273f27a65fa26f1b16870e43198be744c346c0751f4be76",
     "plugin/pied-web-ux/ux.js": "abb7cf0c9e0d4456115206aa9c094ce99c95149dde72b5c4ce0a455d653a2eca",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
-    "theme/PiedWeb/snappymail/style.css": "2352aa8a3da3c6c7503d49b4c222e2c48373191dd52c51062f44881f4f1ece16"
+    "theme/PiedWeb/snappymail/style.css": "4d621559b43d69c04bee556e1b0de2cc76a8ace6f1fe45fe2f856e6ce4538e6a"
   },
   "core_patch": {
     "pull_request": "https://github.com/oe79/NextSnapMail/pull/41",

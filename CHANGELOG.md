@@ -1,5 +1,9 @@
 # Releases
 
+## 1.7.16, 2026-09-14
+
+Desktop message rows no longer show their relative time; the day headings still mark the timeline, and the full date remains available in the opened message. The star and attachment columns stay at the right of the row. At a day boundary, the preceding row's bottom border becomes transparent so the heading has one separator instead of two. Both changes start at 1200 px; mobile retains its existing dates and dividers.
+
 ## 1.7.15, 2026-09-14
 
 Visible list checkboxes and the mobile selection-menu entry are removed when the Pied Web selection script is active. Ctrl+click (or Command+click) on a desktop message starts native multi-selection; a 550 ms long touch starts it on mobile. Further plain clicks/taps toggle messages without opening them. A count and Done button appear while selecting, and Escape exits on desktop. Native grouped commands still receive the checked messages. Scroll movement cancels the long-touch timer, and swipe deletion remains available outside selection mode. If the script is unavailable, native checkboxes stay visible as a fallback.

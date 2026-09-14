@@ -26,6 +26,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   so on mobile. Further row taps toggle checked state. A count, Done button and Escape exit
   keep the mode explicit. Scroll movement cancels long touch, and swipe deletion is disabled
   while selection is active. Native checkboxes remain the fallback if the script is absent.
+- Since 1.7.16 desktop rows at 1200 px and wider hide relative times; day headings
+  still mark the timeline and the opened message retains its full date. The row border
+  directly before a day heading is transparent to avoid a double separator. Mobile
+  date and divider styling remains unchanged.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
 - Conversation totals and unread counts are visually distinct; list stars use an
