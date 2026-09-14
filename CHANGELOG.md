@@ -1,5 +1,15 @@
 # Releases
 
+## 1.7.7, 2026-09-14
+
+The Conversations toggle now has a clearly visible pressed state in desktop and
+mobile toolbars. Its icon follows the button color, and the selected background
+and outline remain legible in light and dark mode. The underlying grouping
+setting, reload behavior and accessible pressed state are unchanged.
+
+Validation: fictional browser fixture at desktop and mobile widths, both color
+schemes; reproducible theme build and release checks.
+
 ## 1.7.6, 2026-09-13
 
 The reader's Copy as Markdown button now confirms a completed copy with a brief

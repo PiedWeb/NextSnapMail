@@ -17,6 +17,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   use an outlined/filled pair, and preserve native folder/selection commands.
   Since 1.7.2 followed messages use an amber star and row tint. Metadata CSS belongs to the
   theme and works before plugin initialization; theme changes and late DOM mounting are tested.
+- The Conversations toggle uses its existing `aria-pressed` state for a visible teal
+  icon, background and full outline in every list toolbar layout. Keep the icon
+  color tied to the button state, including mobile and dark mode.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

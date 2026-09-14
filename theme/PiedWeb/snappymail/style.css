@@ -3903,7 +3903,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 /* Iteration 20: remove inherited control collisions and align pane boundaries. */
 #rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { min-height:56px!important; height:56px; margin:0!important; padding-block:0!important; align-items:center; border-bottom:1px solid var(--pw-line); }
 #rl-app #V-MailMessageList > .btn-toolbar [data-pw-icon].btn,#rl-app #V-MailMessageList > .btn-toolbar .pw-threads { background:transparent!important; }
-#rl-app #V-MailMessageList > .btn-toolbar .pw-threads[aria-pressed="true"] { background:var(--pw-selected)!important; }
+#rl-app #V-MailMessageList > .btn-toolbar .pw-threads[aria-pressed="true"] { background:color-mix(in oklch,var(--nc-color-primary-element) 20%,var(--pw-paper))!important; }
 #rl-app .pw-desktop-identity { min-height:56px; box-sizing:border-box; border-bottom:1px solid var(--pw-line); }
 #rl-app .b-folders .b-toolbar { padding-block:12px; }
 @media(max-width:799px){
@@ -4097,6 +4097,22 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
  #rl-app .b-folders .b-folders-system a.selected[data-unread]::after,
  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-reply,
  #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] {
+  color:color-mix(in oklch,var(--nc-color-primary-element) 65%,var(--nc-color-main-text));
+ }
+}
+
+/* The conversation icon uses the button's pressed-state ink in every toolbar layout. */
+#rl-app #V-MailMessageList button.pw-threads::before,
+#rl-app #rl-right > .pw-mobile-header button.pw-threads::before { background:currentColor; }
+#rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"],
+#rl-app #rl-right > .pw-mobile-header button.pw-threads[aria-pressed="true"] {
+ color:var(--nc-color-primary-element);
+ background:color-mix(in oklch,var(--nc-color-primary-element) 20%,var(--pw-paper))!important;
+ box-shadow:inset 0 0 0 1px color-mix(in oklch,var(--nc-color-primary-element) 45%,transparent);
+}
+@media(prefers-color-scheme:dark){
+ #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"],
+ #rl-app #rl-right > .pw-mobile-header button.pw-threads[aria-pressed="true"] {
   color:color-mix(in oklch,var(--nc-color-primary-element) 65%,var(--nc-color-main-text));
  }
 }
