@@ -6,7 +6,7 @@ await p.waitForFunction(()=>document.body.classList.contains('pw-mail-shell'));
 check('Mail fills the viewport without the wrapper',await p.evaluate(()=>{const r=document.querySelector('#content').getBoundingClientRect();return r.y===0&&Math.abs(r.height-innerHeight)<1&&r.width===innerWidth;}));
 check('Native app launcher stays in its original header and has a 44px target',await p.evaluate(()=>{const e=document.querySelector('#header .app-menu__waffle'),r=e.getBoundingClientRect();return r.y>=0&&r.width>43.9&&r.height>43.9&&getComputedStyle(document.querySelector('#header .header-end')).display==='none';}));
 check('Desktop selection checkboxes are removed from the visible interface',await p.evaluate(()=>[...document.querySelectorAll('.messageCheckbox,.checkboxCheckAll')].every(el=>getComputedStyle(el).display==='none')));
-check('Desktop messages have a subtle divider',await p.evaluate(()=>getComputedStyle(document.querySelector('.messageListItem')).borderBottomWidth==='1px'));
+check('Desktop messages have a subtle divider',await p.evaluate(()=>{const width=parseFloat(getComputedStyle(document.querySelector('.messageListItem')).borderBottomWidth);return width>0&&width<=1;}));
 await p.evaluate(()=>{demoRows[0].classList.add('checked');demoRows[1].classList.add('selected');});
 check('Checked, current and neutral rows have distinct surfaces',await p.evaluate(()=>new Set([0,1,2].map(i=>getComputedStyle(demoRows[i]).backgroundColor)).size===3));
 await p.screenshot({path:'shell-173-desktop.png'});

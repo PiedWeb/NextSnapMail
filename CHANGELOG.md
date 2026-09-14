@@ -1,5 +1,9 @@
 # Releases
 
+## 1.7.18, 2026-09-14
+
+The message reader now places SnappyMail's native Étiquettes icon between the message information control and the star. The separate label row disappears, including its assigned-label text; the native dropdown still handles label actions. The icon has a French/English accessible name and a 44 px target on desktop and mobile. Leaving Pied Web restores the original row. Fictional reader checks covered click, keyboard, mobile, dark mode, theme exit and native row rebuilding; no real label was changed during validation.
+
 ## 1.7.17, 2026-09-14
 
 Desktop day headings now have a short line before the label and the existing long line after it, forming a single balanced separator (`— Hier ———`). The label stays at its prior horizontal position. Mobile headings remain unchanged.

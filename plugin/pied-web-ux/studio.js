@@ -95,6 +95,44 @@
             };
             if (nativeHeader) new MutationObserver(formatSender).observe(nativeHeader,{childList:true,subtree:true});
             formatSender();
+            // Keep SnappyMail's bound label menu, but place its trigger with the
+            // other reader details. The source marker lets theme exit restore it.
+            let tagGroup, tagMarker, tagRow;
+            const syncTags=()=>{
+                const row=dom.querySelector('#messageItem > .messageItemHeader .messageTags');
+                const nativeGroup=row?.querySelector(':scope > .btn-group');
+                if (tagGroup && (!tagMarker?.isConnected || nativeGroup && nativeGroup!==tagGroup)) {
+                    ko.cleanNode?.(tagGroup); tagGroup.remove();
+                    tagRow?.classList.remove('pw-tags-in-header');
+                    tagMarker?.remove();
+                    tagGroup=tagMarker=tagRow=null;
+                }
+                if (nativeGroup && !tagGroup) {
+                    tagGroup=nativeGroup; tagRow=row;
+                    tagMarker=document.createComment('Native message tags action');
+                    tagGroup.before(tagMarker);
+                    tagGroup.classList.add('pw-reader-tags');
+                    const trigger=tagGroup.querySelector('#tags-dropdown-id');
+                    keyboardButton(trigger);
+                    const label=fr() ? 'Étiquettes du message' : 'Message labels';
+                    trigger?.setAttribute('aria-label',label);
+                    trigger?.setAttribute('title',label);
+                    trigger?.setAttribute('aria-haspopup','menu');
+                }
+                if (!tagGroup) return;
+                const details=nativeHeader?.querySelector('.pw-message-details');
+                const star=details?.querySelector('.flagParent');
+                if (document.documentElement.classList.contains('pw-theme') && star) {
+                    if (tagGroup.parentNode!==details || tagGroup.nextElementSibling!==star) details.insertBefore(tagGroup,star);
+                    tagRow.classList.add('pw-tags-in-header');
+                } else {
+                    if (tagGroup.previousSibling!==tagMarker) tagMarker.after(tagGroup);
+                    tagRow.classList.remove('pw-tags-in-header');
+                }
+            };
+            new MutationObserver(syncTags).observe(dom,{childList:true,subtree:true});
+            new MutationObserver(syncTags).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+            syncTags();
             const toolbar = dom.querySelector('.top-toolbar');
             const reply = toolbar?.querySelector('.pw-message-actions');
             if (reply) toolbar.prepend(reply);

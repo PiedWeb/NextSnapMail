@@ -864,3 +864,25 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 @media(pointer:coarse) {
  #rl-app #V-SystemDropDown .dropdown-menu a { min-height:44px; }
 }
+
+/* Keep the native label menu beside message info and follow controls. */
+html.pw-theme #rl-app #V-MailMessageView .messageTags.pw-tags-in-header { display:none!important; }
+html.pw-theme #rl-app #V-MailMessageView .informationShort:has(.pw-reader-tags) { overflow:visible; }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags {
+ display:flex!important; align-items:center; justify-content:center; order:2;
+ position:relative; flex:0 0 44px; width:44px; height:44px; margin:0;
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id {
+ display:flex; align-items:center; justify-content:center;
+ box-sizing:border-box; width:44px; min-width:44px; height:44px; min-height:44px;
+ padding:0; border:0; border-radius:6px; background:transparent;
+ color:var(--pw-muted); font-size:0; line-height:1;
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id::before {
+ content:''; display:block; width:18px; height:18px; background:currentColor;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13.5 12.5 21 3 11.5V3h8.5L21 12.5a1.4 1.4 0 0 1-1 1Z'/%3E%3Ccircle cx='7.5' cy='7.5' r='1'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id::after { display:none; }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:hover,
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags.show > #tags-dropdown-id { color:var(--nc-color-main-text); background:var(--pw-rail); }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }

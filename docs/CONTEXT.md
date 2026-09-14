@@ -53,6 +53,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
+- Since 1.7.18 the reader's native label dropdown is icon-only beside message info and the star. Its bound menu node is moved with a restoration marker; the separate label row is hidden only while the move succeeds. Rebuilt native rows discard stale controls, and theme exit restores the original placement.
 - Contacts navigates to Nextcloud Contacts. The redundant Calendar shortcut was removed;
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.
