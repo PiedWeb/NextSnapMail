@@ -198,6 +198,7 @@ trait User
 		$this->setSettingsFromParams($oSettings, 'MessageReadDelay', 'int');
 		$this->setSettingsFromParams($oSettings, 'MsgDefaultAction', 'int');
 		$this->setSettingsFromParams($oSettings, 'showNextMessage', 'bool');
+		$this->setSettingsFromParams($oSettings, 'ShowUnreadCount', 'bool');
 		$this->setSettingsFromParams($oSettings, 'markdown', 'bool');
 
 		$this->setSettingsFromParams($oSettings, 'Resizer4Width', 'int');
@@ -210,7 +211,6 @@ trait User
 		$this->setSettingsFromParams($oSettingsLocal, 'HideUnsubscribed', 'bool');
 		$this->setSettingsFromParams($oSettingsLocal, 'HideDeleted', 'bool');
 		$this->setSettingsFromParams($oSettingsLocal, 'UnhideKolabFolders', 'bool');
-		$this->setSettingsFromParams($oSettingsLocal, 'ShowUnreadCount', 'bool');
 		$this->setSettingsFromParams($oSettingsLocal, 'CheckMailInterval', 'int');
 
 		return $this->DefaultResponse($oSettings->save() && $oSettingsLocal->save());

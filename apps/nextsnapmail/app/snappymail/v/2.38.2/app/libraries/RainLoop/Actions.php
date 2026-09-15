@@ -689,6 +689,8 @@ class Actions
 					$aResult['MaxBlockquotesLevel'] = (int)$oSettings->GetConf('MaxBlockquotesLevel', $aResult['MaxBlockquotesLevel']);
 					$aResult['simpleAttachmentsList'] = (bool)$oSettings->GetConf('simpleAttachmentsList', $aResult['simpleAttachmentsList']);
 					$aResult['listGrouped'] = (bool)$oSettings->GetConf('listGrouped', $aResult['listGrouped']);
+					// Shared by the main account and all its additional accounts
+					$aResult['ShowUnreadCount'] = (bool)$oSettings->GetConf('ShowUnreadCount', $aResult['ShowUnreadCount']);
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
 					$aResult['MessagesPerPage'] = \max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']));
 					$aResult['messageNewWindow'] = (bool)$oSettings->GetConf('messageNewWindow', $aResult['messageNewWindow']);

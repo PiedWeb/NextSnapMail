@@ -222,7 +222,7 @@ trait Accounts
 			'threadAlgorithm' => '',
 			'ReplySameFolder' => (bool) $oConfig->Get('defaults', 'mail_reply_same_folder', false),
 			'HideDeleted' => true,
-			'ShowUnreadCount' => false,
+			'ShowUnreadCount' => true,
 			'UnhideKolabFolders' => false,
 			'CheckMailInterval' => \max(15, $minRefreshInterval)
 		];
@@ -238,7 +238,6 @@ trait Accounts
 			$aResult['threadAlgorithm'] = (string) $oSettingsLocal->GetConf('threadAlgorithm', $aResult['threadAlgorithm']);
 			$aResult['ReplySameFolder'] = (bool) $oSettingsLocal->GetConf('ReplySameFolder', $aResult['ReplySameFolder']);
 			$aResult['HideDeleted'] = (bool)$oSettingsLocal->GetConf('HideDeleted', $aResult['HideDeleted']);
-			$aResult['ShowUnreadCount'] = (bool)$oSettingsLocal->GetConf('ShowUnreadCount', $aResult['ShowUnreadCount']);
 			$aResult['UnhideKolabFolders'] = (bool)$oSettingsLocal->GetConf('UnhideKolabFolders', $aResult['UnhideKolabFolders']);
 			$aResult['CheckMailInterval'] = \max((int) $oSettingsLocal->GetConf('CheckMailInterval', $aResult['CheckMailInterval']), $minRefreshInterval);
 /*
