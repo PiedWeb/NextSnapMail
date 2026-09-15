@@ -297,10 +297,21 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:focus-visible {
     outline:2px solid var(--nc-color-primary-element); outline-offset:1px;
 }
+/* The editing-mode menu is the last system control in a redrawn toolbar: give it
+   the theme's own chevron instead of the platform one. The element stays a
+   native select, so the keyboard and the option list are unchanged. */
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {
-    display:block; width:126px; min-width:0; padding:5px 8px 5px 9px;
-    border:1px solid var(--nc-color-border)!important; background-color:transparent;
-    appearance:auto;
+    display:block; width:126px; min-width:0; padding:5px 26px 5px 9px;
+    border:1px solid var(--pw-grey-300)!important; border-radius:var(--pw-radius-md);
+    background-color:transparent; color:var(--pw-grey-800);
+    appearance:none;
+    background-image:var(--pw-chevron-down);
+    background-repeat:no-repeat;
+    background-position:right 8px center;
+    background-size:14px 14px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn:dir(rtl) {
+    padding:5px 9px 5px 26px; background-position:left 8px center;
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select[data-action="fontSize"] { width:110px; }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select[data-action="plain"] { width:105px; }

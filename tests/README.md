@@ -55,6 +55,7 @@ dev-browser --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser --timeout 45 < tests/browser/test-composer-actions.js
 dev-browser --timeout 45 < tests/browser/test-elevation.js
 dev-browser --timeout 45 < tests/browser/test-empty-state.js
+dev-browser --timeout 50 < tests/browser/test-native-controls.js
 dev-browser --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
 dev-browser --timeout 45 < tests/browser/test-left-panel-state.js

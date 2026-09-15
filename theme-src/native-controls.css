@@ -1,0 +1,57 @@
+/* Native controls left raw in a redrawn interface.
+ *
+ * Three engine defaults still spoke their own language in the middle of a
+ * Lucide icon set: the account switcher ended in the text glyph "▼", the
+ * attachment section used the browser's own disclosure triangle, and the
+ * composer's editing-mode menu was an unstyled system select. Each is brought
+ * onto the one control language the rest of the theme already uses. Markup,
+ * commands and keyboard behaviour are untouched.
+ */
+#rl-app {
+  --pw-chevron-down: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* The account switcher. */
+#rl-app #top-system-dropdown-id::after {
+  content: '';
+  display: block;
+  flex: 0 0 14px;
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: var(--pw-chevron-down) center/contain no-repeat;
+  font-size: 0;
+}
+
+/* The attachment section. */
+#rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary {
+  display: flex;
+  align-items: center;
+  gap: var(--pw-space-2);
+  list-style: none;
+}
+#rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary::-webkit-details-marker {
+  display: none;
+}
+#rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary::marker {
+  content: '';
+}
+#rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary::before {
+  content: '';
+  display: block;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  background: currentColor;
+  mask: var(--pw-chevron-down) center/contain no-repeat;
+  transform: rotate(-90deg);
+  transition: transform .12s ease;
+}
+#rl-app #V-MailMessageView #messageItem .attachmentsPlace[open] > summary::before {
+  transform: rotate(0deg);
+}
+@media (prefers-reduced-motion: reduce) {
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary::before {
+    transition: none;
+  }
+}

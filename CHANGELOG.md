@@ -1,5 +1,26 @@
 # Releases
 
+## 1.7.47, 2026-09-16
+
+Three engine defaults still spoke their own language in the middle of a Lucide
+icon set. The account switcher ended in the text glyph "▼" inherited from the
+application stylesheet, the attachment section used the browser's own disclosure
+triangle, and the composer's editing-mode menu was an unstyled system select
+sitting between fully redrawn buttons.
+
+All three now use the theme's chevron: a masked 14 px glyph after the account
+name, a 16 px glyph before "Pièces jointes" that points sideways when the
+section is closed and turns down when it opens, and a 14 px glyph at the end of
+the mode menu, which also picks up the theme's border colour and radius.
+
+The menu stays a native `select` with its native options, keyboard behaviour and
+right-to-left placement; the attachment section stays a native `details`. No
+markup or command changed. The rotation honours reduced-motion.
+
+New: `theme-src/native-controls.css` and `tests/browser/test-native-controls.js`,
+six cases covering each glyph, the open and closed states, and the select still
+being a working native control.
+
 ## 1.7.46, 2026-09-16
 
 Empty states exist. An empty folder, an emptied trash and a search with no
