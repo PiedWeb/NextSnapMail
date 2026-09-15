@@ -1,5 +1,24 @@
 # Releases
 
+## 1.7.39, 2026-09-16
+
+A followed message no longer shouts louder than the message being read. The
+star painted the whole row amber, so in a list where selection is a pale teal
+tint, the user's own bookmark was the most prominent surface on screen — and
+the star itself grew from 19 to 22 px and gained a filled chip, so the row
+shifted as it was flagged.
+
+Following is now an accent at the row edge: a 3 px amber bar drawn as a
+positioned pseudo-element, so the row keeps its height, its selection ring and
+its background. The filled amber star and its chip stay. The star glyph keeps
+one size in both states. The open message and the checked messages are again
+the only full tints in the list.
+
+`--pw-follow-surface` is removed; it had no other use. Two fixture cases were
+added: a followed row shares its background with an ordinary row while carrying
+a 3 px accent an ordinary row does not have, and the star reports the same glyph
+box whether or not the message is followed.
+
 ## 1.7.38, 2026-09-16
 
 The desktop list gets its hour back. Above 1200 px `time` was hidden outright

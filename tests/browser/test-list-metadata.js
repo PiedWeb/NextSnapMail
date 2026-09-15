@@ -25,6 +25,23 @@ await p.evaluate(async()=>{
 await p.waitForSelector('.threads-len[data-pw-total]');
 const results=[];const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
 check('Native count text is preserved; accessible label explains total and unread',await p.evaluate(()=>{const b=document.querySelector('.threads-len');return b.textContent==='13/4'&&b.dataset.pwTotal==='13'&&b.dataset.pwUnread==='4 non lus'&&b.getAttribute('aria-label').includes('13 messages, dont 4 non lus');}));
+check('A followed row carries an edge accent, not a full surface, and never outshines the open message',await p.evaluate(()=>{
+ const rows=document.querySelectorAll('.messageListItem');
+ const flagged=rows[1],plain=rows[2],open=rows[0];
+ const accent=getComputedStyle(flagged,'::before');
+ const clear=c=>c==='rgba(0, 0, 0, 0)'||c==='transparent';
+ return getComputedStyle(flagged).backgroundColor===getComputedStyle(plain).backgroundColor
+  &&clear(getComputedStyle(flagged).backgroundColor)
+  &&open.classList.contains('selected')&&!clear(getComputedStyle(open).backgroundColor)
+  &&accent.content==='""'&&accent.position==='absolute'&&parseFloat(accent.width)===3
+  &&!clear(accent.backgroundColor)&&getComputedStyle(plain,'::before').content==='none';
+}));
+check('The star keeps one glyph size whether or not the message is followed',await p.evaluate(()=>{
+ const rows=document.querySelectorAll('.messageListItem');
+ const a=getComputedStyle(rows[0].querySelector('.flagParent'),'::after');
+ const b=getComputedStyle(rows[1].querySelector('.flagParent'),'::after');
+ return a.width===b.width&&a.height===b.height&&parseFloat(a.width)===19;
+}));
 check('Desktop keeps the flagged star visible and reserves the unflagged hit area',await p.evaluate(()=>{const rows=document.querySelectorAll('.messageListItem'),plain=rows[0].querySelector('.flagParent'),flagged=rows[1].querySelector('.flagParent');return getComputedStyle(plain).opacity==='0'&&getComputedStyle(flagged).opacity==='1'&&plain.getBoundingClientRect().width>=31.9;}));
 await p.locator('.messageListItem').first().hover();
 await p.waitForFunction(()=>getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1');
