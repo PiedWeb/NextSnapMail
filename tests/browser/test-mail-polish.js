@@ -17,11 +17,13 @@ await list.evaluate(()=>{
     document.querySelector('.messageList .b-content').prepend(back);
 });
 await list.waitForSelector('.threads-len[data-pw-total]');
-check('The conversation count sits above the dedicated attachment column, with centered digits',await list.evaluate(()=>{
+check('The conversation count sits on the sender line, before the hour, with centered digits',await list.evaluate(()=>{
     const row=document.querySelector('.messageListItem'),count=row.querySelector('.threads-len');
-    const attachment=row.querySelector('.attachmentParent');
-    const a=count.getBoundingClientRect(),b=attachment.getBoundingClientRect(),style=getComputedStyle(count);
-    return a.top<b.top && Math.abs(a.right-b.right)<2 && style.alignItems==='center'
+    const attachment=row.querySelector('.attachmentParent'),time=row.querySelector('time');
+    const a=count.getBoundingClientRect(),b=attachment.getBoundingClientRect();
+    const c=time.getBoundingClientRect(),style=getComputedStyle(count);
+    return a.top<b.top && a.right<=c.left+1 && Math.abs(a.top-c.top)<12
+        && Math.abs(c.right-b.right)<2 && style.alignItems==='center'
         && style.justifyContent==='center' && count.dataset.pwTotal==='14';
 }));
 check('A text attachment uses the same quiet paperclip glyph as other attachments',await list.evaluate(()=>{

@@ -44,7 +44,6 @@
     line-height: 1.4;
   }
   #rl-app #V-MailMessageList .messageListItem .subjectParent { line-height: 1.5; }
-  #rl-app #V-MailMessageList .messageListItem time { display:none; }
   html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
     grid-template-columns:minmax(0,1fr) auto 32px 24px;
   }

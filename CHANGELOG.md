@@ -1,5 +1,28 @@
 # Releases
 
+## 1.7.38, 2026-09-16
+
+The desktop list gets its hour back. Above 1200 px `time` was hidden outright
+and the day headings were left to carry the date, so fifteen messages under
+"Aujourd'hui" gave no clue which arrived at 9 h and which at 17 h — while the
+phone layout had kept the hour all along.
+
+The hour returns as tertiary data rather than as another competing signal: 12 px,
+the 600 step of the grey ramp, tabular figures so the column stays flush, right
+aligned above the star and attachment columns. The desktop row grid grows from
+three to four columns, the sender keeps the first, the conversation pill moves to
+the second, and the subject spans the first two.
+
+The stale grid in `comfort-desktop.css` was not edited: `mail-polish.css` loads
+later with the same selectors and has owned the desktop row geometry since
+1.7.23, so the earlier block never applied. The blanket `display:none` moved out
+of `comfort-desktop.css` so that one file owns the column.
+
+Two fixtures asserted the old contract and now assert the new one: the
+conversation count sits on the sender line before the hour, and desktop rows
+carry a quiet right-aligned hour whose right edges all line up. Phone and
+medium-width layouts are untouched.
+
 ## 1.7.37, 2026-09-16
 
 One colour now means one thing. Above 1200 px the desktop list painted its
