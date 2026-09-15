@@ -1,5 +1,25 @@
 # Releases
 
+## 1.7.45, 2026-09-16
+
+The phone row carried seven marks — sender, attachment glyph, conversation
+pill, unread sub-count, unread dot, hour, star — for two questions: from whom,
+and when. Nothing is removed, because on a phone each of them is reachable only
+by touch; they are put back in their place instead.
+
+The attachment glyph and the resting star drop to the 400 step of the grey
+ramp, the conversation pill sits on the 100 step with 700 ink and loses the
+divider inside it, and the unread dot gives way on rows where the pill already
+spells the count out — a row with "4 non lus" no longer also carries a dot,
+while a row with no conversation keeps one. The sender, the subject and the hour
+keep full contrast and the bold subject still marks unread on its own, so the
+state never depends on colour alone.
+
+A followed star keeps its amber and its chip. Touch targets, the grid, the
+narrow-phone layout below 360 px and every command are unchanged.
+`test-list-metadata.js` gains a case measuring the glyph and star luminance
+against the sender in sRGB and checking both dot outcomes.
+
 ## 1.7.44, 2026-09-16
 
 The reader toolbar reads as groups instead of a wall. Eight icon buttons carried

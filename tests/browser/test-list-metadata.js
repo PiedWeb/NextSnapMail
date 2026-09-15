@@ -68,6 +68,22 @@ for(const [width,dark] of [[390,false],[320,false],[390,true]]){
  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:dark?'dark':'light'});
  await p.evaluate(dark=>{document.documentElement.dataset.themes=dark?'dark':'light';document.getElementById('V-MailMessageView').hidden=true;document.getElementById('rl-right').classList.remove('message-selected');},dark);
  check('Mobile geometry '+width+(dark?' dark':''),await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&[...document.querySelectorAll('.messageListItem .flagParent')].every(b=>{const r=b.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9&&r.right<=innerWidth;})));
+ if(width===390&&!dark)check('Phone metadata steps behind the sender, and the unread dot yields to the spelled-out count',await p.evaluate(()=>{
+  const ctx=document.createElement('canvas').getContext('2d',{willReadFrequently:true});
+  const lum=c=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=c;ctx.fillRect(0,0,1,1);
+   const [r,g,b]=ctx.getImageData(0,0,1,1).data;
+   const f=v=>{v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);};
+   return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);};
+  const rows=[...document.querySelectorAll('.messageListItem')];
+  const sender=lum(getComputedStyle(rows[0].querySelector('.senderParent')).color);
+  const clip=lum(getComputedStyle(rows[0].querySelector('.attachmentParent')).color);
+  const plainStar=lum(getComputedStyle(rows[2].querySelector('.flagParent')).color);
+  const withCount=rows.find(r=>r.classList.contains('unseen')&&r.querySelector('.threads-len[data-pw-unread]:not([data-pw-unread=""])'));
+  const withoutPill=rows.find(r=>r.classList.contains('unseen')&&!r.querySelector('.threads-len'));
+  if(!withCount||!withoutPill)return false;
+  const dot=el=>getComputedStyle(el.querySelector('time'),'::before').display;
+  return clip>sender&&plainStar>sender&&dot(withCount)==='none'&&dot(withoutPill)!=='none';
+ }));
  if(width===320)check('Narrow phones keep the sender above conversation metadata',await p.evaluate(()=>{const row=document.querySelector('.messageListItem');return row.querySelector('.senderParent').getBoundingClientRect().width>=100&&row.querySelector('.threads-len').getBoundingClientRect().top>=row.querySelector('.subjectParent').getBoundingClientRect().bottom;}));
  await p.screenshot({path:'list-metadata-'+(dark?'dark':width===320?'320':'mobile')+'.png'});
 }

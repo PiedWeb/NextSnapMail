@@ -88,3 +88,31 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
     color:color-mix(in oklch,var(--nc-color-primary-element) 70%,var(--nc-color-main-text));
 }
+
+/* Phone rows: four signals, not seven.
+ *
+ * A row carried the sender, an attachment glyph, a conversation pill, an unread
+ * sub-count, an unread dot, the hour and a star — seven marks for two questions
+ * (from whom, when). Nothing is removed, because every one of them is reachable
+ * by touch and only by touch; they are put back in their place instead. The
+ * sender, the subject and the hour keep full contrast, the rest steps back, and
+ * the unread dot gives way when the pill already spells the count out.
+ */
+@media(max-width:799px) {
+    #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-grey-400);}
+    #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
+        color:var(--pw-grey-400);
+    }
+    #rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent {
+        color:var(--pw-flag);
+    }
+    #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
+        background:var(--pw-grey-100);color:var(--pw-grey-700);
+    }
+    #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
+        border-inline-start:0;
+    }
+    #rl-app #rl-right #V-MailMessageList .messageListItem.unseen:has(.threads-len[data-pw-unread]:not([data-pw-unread=""])) time::before {
+        display:none;
+    }
+}
