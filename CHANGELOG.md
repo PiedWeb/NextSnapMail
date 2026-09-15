@@ -1,5 +1,25 @@
 # Releases
 
+## 1.7.35, 2026-09-16
+
+Housekeeping with no visual change. `theme-src/studio.css` had grown as an
+append-only log of thirty iterations, so a property was often declared five to
+fourteen times for the same selector and only the last declaration could ever
+apply. `#rl-app .messageListItem` declared `min-height` fourteen times; the
+reader subject size was declared seven times. Nobody could read the effective
+value without replaying the cascade.
+
+293 declarations that a later, identical selector in the same media context
+already overrode were removed, and 105 rules that held nothing else disappeared
+with them. The file drops from 91 to 78 kB. A declaration was only removed when
+a later one carried at least the same importance, so `!important` ordering is
+preserved.
+
+The rewrite is proved equivalent rather than reviewed by eye: the winning
+declaration for all 2 262 `(media, selector, property)` triples in the bundle is
+byte-identical before and after. The browser fixtures were re-run in full and
+report the same geometry, colours and states.
+
 ## 1.7.34, 2026-09-15
 
 Addresses in the message header are now links. The sender line, the À/Cc recipients under

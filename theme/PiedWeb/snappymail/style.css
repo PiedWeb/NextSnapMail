@@ -3294,67 +3294,58 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 }
 
 /* Pied Web, composition and interaction system. */
-#rl-app {
-  --pw-paper: color-mix(in oklch, var(--nc-color-main-background) 99%, var(--nc-color-primary-element));
-  --pw-rail: color-mix(in oklch, var(--nc-color-main-background) 95%, var(--nc-color-primary-element));
-  --pw-line: color-mix(in oklch, var(--nc-color-main-text) 12%, var(--nc-color-main-background));
-  --pw-muted: color-mix(in oklch, var(--nc-color-main-text) 64%, var(--nc-color-main-background));
-  --pw-selected: color-mix(in oklch, var(--nc-color-primary-element) 10%, var(--nc-color-main-background));
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  color: var(--nc-color-main-text);
-  background: var(--pw-paper);
-}
+#rl-app {--pw-paper: color-mix(in oklch, var(--nc-color-main-background) 99%, var(--nc-color-primary-element));--pw-line: color-mix(in oklch, var(--nc-color-main-text) 12%, var(--nc-color-main-background));color: var(--nc-color-main-text);background: var(--pw-paper);}
 #rl-app :is(input,button,select,textarea), #rl-app .messageListItem { font-family: inherit; }
-#rl-app #rl-left { background: var(--pw-rail); width: 248px; border-inline-end: 1px solid var(--pw-line); box-sizing: border-box; }
+#rl-app #rl-left {background: var(--pw-rail);border-inline-end: 1px solid var(--pw-line);box-sizing: border-box;}
 #rl-app .b-folders { background: transparent; }
 #rl-app .b-folders .b-toolbar { display:flex; gap:8px; padding:20px 16px; min-height:80px; box-sizing:border-box; }
-#rl-app .b-folders .b-toolbar .buttonCompose { display:flex; align-items:center; justify-content:center; gap:10px; flex:1; height:44px; min-height:44px; padding:0 12px; color:var(--nc-color-primary-element-text); background:var(--nc-color-primary-element); border:0!important; border-radius:8px; font:600 14px/1.2 inherit; }
+#rl-app .b-folders .b-toolbar .buttonCompose {display:flex;align-items:center;justify-content:center;gap:10px;flex:1;height:44px;min-height:44px;padding:0 12px;color:var(--nc-color-primary-element-text);background:var(--nc-color-primary-element);border:0!important;font:600 14px/1.2 inherit;}
 #rl-app .b-folders .b-toolbar .buttonContacts { flex:0 0 36px; }
 #rl-app .b-folders .buttonComposeText { white-space:nowrap; }
 #rl-app .b-folders .b-content { padding:8px 12px; }
-#rl-app .b-folders li a.selectable { height:40px; line-height:40px!important; padding-inline:12px 48px; border:0; border-radius:6px; font-size:14px; font-weight:400; margin:2px 0; }
+#rl-app .b-folders li a.selectable {height:40px;line-height:40px!important;padding-inline:12px 48px;border:0;border-radius:6px;font-weight:400;margin:2px 0;}
 #rl-app .b-folders li a.selectable[data-unread] { font-weight:400; }
 #rl-app .b-folders li a.selectable.selected { background:var(--pw-selected); color:var(--nc-color-primary-element); font-weight:600; }
-#rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before { width:19px; height:19px; min-width:19px; margin-inline-end:12px; vertical-align:-4px; }
+#rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before {margin-inline-end:12px;vertical-align:-4px;}
 #rl-app .b-folders .b-folders-system a[data-unread]::after,#rl-app .b-folders .b-folders-user a[data-unread]:not(.system)::after { background:transparent; color:var(--pw-muted); min-width:0; padding:0; font-size:12px; font-weight:500; }
 #rl-app .b-folders .b-folders-system a.selected[data-unread]::after { color:var(--nc-color-primary-element); font-weight:650; }
 #rl-app .b-folders hr { margin:18px 12px; border-color:var(--pw-line); }
 #rl-app #V-MailFolderList .b-footer { display:flex; justify-content:space-between; gap:8px; padding:12px; border-top:1px solid var(--pw-line); }
-#rl-app #V-MailFolderList .b-footer .btn { background:transparent; border:0!important; }
+#rl-app #V-MailFolderList .b-footer .btn {border:0!important;}
 #rl-app #V-MailMessageList { position:relative; }
-#rl-app #V-MailMessageList > .btn-toolbar { padding:0 16px; gap:2px; min-height:44px; border:0; background:transparent; border-radius:0; margin:0; }
+#rl-app #V-MailMessageList > .btn-toolbar {gap:2px;border:0;background:transparent;border-radius:0;margin:0;}
 #rl-app .pw-list-title { margin:0; padding:18px 20px 8px; font-size:19px; font-weight:650; line-height:1.4; letter-spacing:-.35px; }
 #rl-app #V-MailMessageList .pw-threads { min-height:36px; height:36px; padding:0 10px; border:0!important; border-radius:6px; background:var(--pw-rail); font-size:12px; margin-inline-start:auto; }
 #rl-app .messageList,#rl-app .messageView { border:0; border-radius:0; box-shadow:none; background:var(--pw-paper); }
 #rl-app #V-MailMessageList .messageList { margin:0; border-inline-end:1px solid var(--pw-line); }
-#rl-app #V-MailMessageList .messageList .second-toolbar { padding:8px 16px 14px; height:auto; min-height:54px; border-bottom:1px solid var(--pw-line); gap:8px; }
+#rl-app #V-MailMessageList .messageList .second-toolbar {padding:8px 16px 14px;height:auto;border-bottom:1px solid var(--pw-line);gap:8px;}
 #rl-app .messageList .checkboxCheckAll { margin:0 2px 0 0; flex:0 0 20px; }
 #rl-app .messageList .btn.buttonMoreSearch { width:28px; min-width:28px; margin:0; padding:0; border:0!important; color:var(--pw-muted); font-size:11px; }
 #rl-app .messageList .search-input-wrp { flex:1; min-width:0; }
-#rl-app .messageList .inputSearch { width:100%; height:36px; min-height:36px; padding:0 12px; border:1px solid var(--pw-line); border-radius:7px; background:var(--pw-rail); color:var(--nc-color-main-text); font-size:13px; box-shadow:none; }
+#rl-app .messageList .inputSearch {width:100%;height:36px;min-height:36px;padding:0 12px;border:1px solid var(--pw-line);border-radius:7px;color:var(--nc-color-main-text);font-size:13px;box-shadow:none;}
 #rl-app .messageList .inputSearch:focus { border-color:var(--nc-color-primary-element); outline:2px solid color-mix(in oklch,var(--nc-color-primary-element) 25%,transparent); }
 #rl-app .messageList .b-content { padding:0; }
-#rl-app .messageListItem { margin:0; padding:14px 18px 14px 16px; min-height:74px; box-sizing:border-box; border:0!important; border-bottom:1px solid var(--pw-line)!important; border-radius:0; font-size:14px; background:transparent; }
+#rl-app .messageListItem {margin:0;padding:14px 18px 14px 16px;box-sizing:border-box;border:0!important;font-size:14px;background:transparent;}
 #rl-app .messageListItem.selected,#rl-app .messageListItem.selected:hover { background:var(--pw-selected)!important; }
 #rl-app .messageListItem .messageCheckbox { flex:0 0 26px; margin:0; }
 #rl-app .messageListItem .checkboxMessage { color:var(--pw-muted); font-size:18px; }
-#rl-app .messageListItem .senderParent { font-weight:400; font-size:13px; line-height:1.45; color:var(--pw-muted); }
-#rl-app .messageListItem .subjectParent { font-size:14px; font-weight:400; line-height:1.45; }
-#rl-app .messageListItem.unseen .subjectParent { font-weight:600; }
-#rl-app .messageListItem time { font-family:inherit; font-size:11px; font-variant-numeric:tabular-nums; color:var(--pw-muted); min-width:42px; text-align:end; }
+#rl-app .messageListItem .senderParent {font-weight:400;}
+#rl-app .messageListItem .subjectParent {font-weight:400;}
+
+#rl-app .messageListItem time {font-family:inherit;min-width:42px;text-align:end;}
 #rl-app .messageListItem .flagParent { color:var(--pw-muted); opacity:.4; }
 @media (pointer:fine) { #rl-app .messageListItem:not(:hover):not(:focus-within):not(.msgflag-\5c flagged) .flagParent:not(.flagOn) { opacity:0; } }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding:18px 20px; min-height:80px; gap:4px; box-sizing:border-box; border-bottom:1px solid var(--pw-line); }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { height:34px; width:34px; min-width:34px; }
+
 #rl-app #V-MailMessageView.pw-enhanced > .messageView { margin:0; }
 #rl-app .messageView .messageItemHeader { border:0; border-radius:0; padding:24px 32px 0; }
-#rl-app .messageView .messageItemHeader .subjectParent { font-family:inherit; font-size:22px; font-weight:600; letter-spacing:-.4px; line-height:1.35; gap:10px; align-items:start; }
+#rl-app .messageView .messageItemHeader .subjectParent {font-family:inherit;gap:10px;align-items:start;}
 #rl-app .messageView .messageItemHeader .subject { margin:0; font-size:inherit; }
 #rl-app .messageView .messageItemHeader .infoParent { order:2; font-size:16px; }
 #rl-app .messageView .messageItemHeader .flagParent { order:3; font-size:18px; }
 #rl-app .messageView .messageItemHeader .informationShort { margin:14px 0 0; font-size:13px; line-height:1.5; color:var(--pw-muted); }
 #rl-app .messageView .messageItemHeader .informationShort a { text-decoration:none; }
-#rl-app #messageItem > .messageItemHeader { padding-top:4px; padding-bottom:20px; border-bottom:1px solid var(--pw-line); }
+#rl-app #messageItem > .messageItemHeader {border-bottom:1px solid var(--pw-line);}
 #rl-app #messageItem > .messageItemHeader .informationShort { margin:0; font-size:12px; }
 #rl-app #messageItem > .messageItemHeader .date { float:right; font-size:12px; color:var(--pw-muted); }
 #rl-app #messageItem { height:auto; overflow:visible; flex:1; }
@@ -3366,7 +3357,7 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 #rl-app #V-SystemDropDown.pw-docked-account .btn-toolbar { height:36px; }
 #rl-app [data-pw-icon].btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; min-height:36px; min-width:36px; padding:0; border:0!important; background:transparent; border-radius:6px; font-size:0!important; color:var(--pw-muted); }
 #rl-app [data-pw-icon].btn > :not(.buttonComposeText) { display:none; }
-#rl-app [data-pw-icon].btn::before { content:''; display:block; width:19px; height:19px; background:currentColor; mask:var(--pw-icon) center/contain no-repeat; }
+#rl-app [data-pw-icon].btn::before {content:'';display:block;background:currentColor;mask:var(--pw-icon) center/contain no-repeat;}
 #rl-app [data-pw-icon].btn:hover { background:var(--pw-rail); color:var(--nc-color-main-text); }
 #rl-app [data-pw-icon].btn:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
 #rl-app .b-folders .buttonCompose[data-pw-icon] { color:var(--nc-color-primary-element-text); background:var(--nc-color-primary-element); width:auto; }
@@ -3380,17 +3371,17 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
  html.rl-left-panel-disabled #rl-app .b-folders li a.selectable::after { font-size:10px; }
 }
 @media (max-width:799px) {
- #rl-app #rl-right { padding-top:42px; }
- #rl-app #V-SystemDropDown { top:3px; right:10px; max-width:calc(100% - 20px); }
+ 
+ 
  #rl-app .pw-list-title { padding:10px 16px 6px; font-size:20px; }
- #rl-app #V-MailMessageList > .btn-toolbar { padding:0 12px 4px; min-height:44px; flex-wrap:nowrap; gap:2px; }
+ #rl-app #V-MailMessageList > .btn-toolbar {flex-wrap:nowrap;gap:2px;}
  #rl-app #V-MailMessageList > .btn-toolbar .btn-group { margin:0; flex:0 0 auto; }
  #rl-app #V-MailMessageList .pw-threads { height:40px; min-height:40px; padding:0 8px; font-size:12px; }
  #rl-app [data-pw-icon].btn { width:40px; height:40px; min-width:40px; min-height:40px; }
  #rl-app .messageList .inputSearch { font-size:14px; height:40px; }
- #rl-app .messageListItem { min-height:82px; padding:14px 16px 14px 12px; }
+ 
  #rl-app .messageListItem .senderParent { font-size:13px; }
- #rl-app .messageListItem .subjectParent { font-size:14px; }
+ 
  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding:6px 12px; min-height:48px; }
  #rl-app .messageView .messageItemHeader { padding:24px 20px 0; }
  #rl-app .bodyText { padding:24px 20px; }
@@ -3403,12 +3394,12 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 #rl-app [data-pw-icon="archive"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%208h16v13H4zM3%203h18v5H3zM9%2012h6%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app [data-pw-icon="spam"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m12%203%2010%2018H2zM12%209v5m0%203v.1%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app [data-pw-icon="trash"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h18M9%206V3h6v3M5%206l1%2015h12l1-15M10%2010v7m4-7v7%22%2F%3E%3C%2Fsvg%3E"); }
-#rl-app [data-pw-icon="more"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%206h16M4%2012h16M4%2018h16%22%2F%3E%3C%2Fsvg%3E"); }
+
 #rl-app [data-pw-icon="folder"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h6l2%203h10v12H3z%22%2F%3E%3C%2Fsvg%3E"); }
-#rl-app [data-pw-icon="compose"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205v14M5%2012h14%22%2F%3E%3C%2Fsvg%3E"); }
+
 #rl-app [data-pw-icon="refresh"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%208a8%208%200%201%200%20.3%207M20%203v5h-5%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app [data-pw-icon="sort"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%204v16l-4-4M8%2020l4-4M15%205h6M15%2010h4%22%2F%3E%3C%2Fsvg%3E"); }
-#rl-app [data-pw-icon="reply"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%206%203%2012l6%206M3%2012h11a7%207%200%200%201%207%207%22%2F%3E%3C%2Fsvg%3E"); }
+
 #rl-app [data-pw-icon="reply-all"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%206-5%206%205%206m6-12-5%206%205%206M7%2012h7a7%207%200%200%201%207%207%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app [data-pw-icon="unread"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h18v14H3zM3%206l9%207%209-7%22%2F%3E%3C%2Fsvg%3E"); }
 #rl-app [data-pw-icon="contacts"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%203h15v18H5zM2%207h4M2%2012h4M2%2017h4M9%2017c0-4%207-4%207%200M12.5%206a2.5%202.5%200%201%200%200%205%202.5%202.5%200%200%200%200-5%22%2F%3E%3C%2Fsvg%3E"); }
@@ -3420,26 +3411,24 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 #rl-app #V-MailMessageList > .btn-toolbar { min-height:80px; box-sizing:border-box; padding:16px 18px; align-items:center; flex-wrap:nowrap; }
 #rl-app #V-MailMessageList > .btn-toolbar:not(.hasChecked) .onCheckedShow { display:none!important; }
 #rl-app #V-MailMessageList > .btn-toolbar.hasChecked .pw-list-title { display:none; }
-#rl-app #V-MailMessageList .pw-list-title { font:600 17px/1.3 system-ui; letter-spacing:-.35px; padding:0; margin:0 auto 0 0; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; }
+#rl-app #V-MailMessageList .pw-list-title {font:600 17px/1.3 system-ui;padding:0;margin:0 auto 0 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
 #rl-app #V-MailMessageList .pw-threads { flex:0 0 auto; margin:0; }
 #rl-app #V-MailMessageList > .btn-toolbar > [data-pw-icon].btn { flex:0 0 30px; min-width:30px; width:30px; }
 #rl-app #V-MailMessageList > .btn-toolbar > .btn-group { flex:0 0 auto; margin:0; }
 #rl-app #V-MailMessageList > .btn-toolbar .btn-group [data-pw-icon].btn { min-width:30px; width:30px; }
-#rl-app #V-MailMessageList .messageList .second-toolbar { min-height:54px; padding-block:4px 12px; }
+#rl-app #V-MailMessageList .messageList .second-toolbar {padding-block:4px 12px;}
 #rl-app #V-MailMessageList .messageList .b-content { padding:0; }
-#rl-app .messageListItem { min-height:76px; }
+
 #rl-app .messageListItem.selected { border-color:var(--pw-line)!important; }
-#rl-app .messageListItem .senderParent { color:var(--nc-color-main-text); font-size:13px; }
-#rl-app .messageListItem time { font-size:11px; }
+
 #rl-app #V-MailMessageView [data-pw-icon].btn { border:0!important; background:transparent; border-radius:6px; }
-#rl-app #V-MailMessageView .pw-reply[data-pw-icon] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { margin-inline-start:5px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { padding-inline-start:8px; border-inline-start:1px solid var(--pw-line); }
-#rl-app #V-MailFolderList .b-footer { height:56px; min-height:56px; align-items:center; flex-wrap:nowrap; }
+
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {padding-inline-start:8px;}
+#rl-app #V-MailFolderList .b-footer {align-items:center;flex-wrap:nowrap;}
 #rl-app #V-MailFolderList .b-footer .btn-group { display:flex; margin:0; gap:4px; }
 #rl-app #V-MailFolderList .b-footer .btn { display:inline-flex!important; align-items:center; justify-content:center; width:36px!important; height:36px; padding:0!important; min-width:36px; background:transparent!important; font-size:18px; }
 #rl-app #V-MailFolderList .b-footer .btn::after { display:none; }
-#rl-app .b-folders .b-folders-system a:is([data-icon="⚠"],[data-icon="🗑"])[data-unread]::after { background:transparent; color:var(--pw-muted); font-size:12px; }
+#rl-app .b-folders .b-folders-system a:is([data-icon="⚠"],[data-icon="🗑"])[data-unread]::after {background:transparent;}
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign { inset-inline-start:0; width:10px; font-size:10px; }
 #rl-app *::-webkit-resizer { background:transparent; }
 @media (max-width:799px) {
@@ -3471,50 +3460,48 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 @media(max-width:799px) { #rl-app #V-MailMessageList .pw-list-title { top:-36px; } }
 /* Iteration 4: native mobile composition and a continuous application canvas. */
 #rl-app .pw-mobile-header, #rl-app .pw-mobile-folder-label { display:none; }
-#rl-app #V-MailMessageList button.pw-threads { border:1px solid var(--pw-line)!important; background:var(--pw-paper); padding:0 10px; border-radius:6px; height:32px; min-height:32px; }
+#rl-app #V-MailMessageList button.pw-threads {border-radius:6px;height:32px;min-height:32px;}
 #rl-app #V-MailMessageView .messageItemHeader .date { float:none; display:inline; margin:0; }
 #rl-app #V-MailMessageView #messageItem > .messageItemHeader > div:first-child { display:flex; flex-direction:row-reverse; justify-content:flex-end; align-items:center; gap:16px; flex-wrap:wrap; }
-#rl-app .messageView .messageItemHeader { padding-top:24px; }
-#rl-app #messageItem > .messageItemHeader { padding-top:6px; padding-bottom:20px; }
-#rl-app .bodyText { padding-top:24px; }
+
 #rl-app #V-MailMessageView .top-toolbar .btn[data-pw-icon="close"] { margin-inline-end:8px; }
 #rl-app .messageListItem .messageCheckbox { flex-basis:24px; }
 #rl-app .messageListItem .checkboxMessage, #rl-app .checkboxCheckAll { font-size:0!important; position:relative; }
 #rl-app .messageListItem .checkboxMessage { display:block; width:16px; height:16px; line-height:0; }
-#rl-app .messageListItem .checkboxMessage::before, #rl-app .checkboxCheckAll::before { content:''; display:block; box-sizing:border-box; width:14px; height:14px; border:1px solid color-mix(in oklch,var(--pw-muted) 65%,var(--pw-paper)); border-radius:3px; }
+#rl-app .messageListItem .checkboxMessage::before, #rl-app .checkboxCheckAll::before {content:'';display:block;box-sizing:border-box;border:1px solid color-mix(in oklch,var(--pw-muted) 65%,var(--pw-paper));border-radius:3px;}
 #rl-app .messageListItem.checked .checkboxMessage::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
 #rl-app .messageListItem.checked .checkboxMessage::after { content:''; position:absolute; box-sizing:border-box; left:4px; top:4px; width:8px; height:5px; border:solid var(--nc-color-primary-element-text); border-width:0 0 2px 2px; transform:rotate(-45deg); }
 #rl-app #V-MailMessageList:has(.btn-toolbar.hasChecked) .checkboxCheckAll::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
 #rl-app * { scrollbar-width:thin; scrollbar-color:color-mix(in oklch,var(--pw-muted) 23%,transparent) transparent; }
 @media(max-width:799px) {
  #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) { padding-top:0; flex-direction:column; }
- #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header { display:flex; align-items:center; flex:0 0 68px; gap:8px; padding:0 12px; box-sizing:border-box; background:var(--pw-paper); }
+ #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header {display:flex;align-items:center;flex:0 0 68px;padding:0 12px;box-sizing:border-box;}
  #rl-app .pw-mobile-header > .btn { width:44px; height:44px; min-width:44px; min-height:44px; flex:0 0 44px; }
  #rl-app .pw-mobile-header > .btn[data-pw-icon="compose"] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-radius:8px; }
  #rl-app .pw-mobile-identity { flex:1; min-width:0; }
- #rl-app .pw-mobile-identity #V-SystemDropDown { position:static; max-width:100%; margin:0; padding:0; }
- #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { padding:0; margin:0; height:auto; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { display:flex; align-items:flex-start; justify-content:center; flex-direction:column; gap:2px; height:56px; min-height:56px; padding:0 18px 0 0; font-size:12px; border-radius:0; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown {position:static;margin:0;padding:0;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar {padding:0;margin:0;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {display:flex;align-items:flex-start;flex-direction:column;gap:2px;border-radius:0;}
  #rl-app .pw-mobile-identity #top-system-dropdown-id::after { position:absolute; right:2px; bottom:12px; font-size:10px; }
  #rl-app .pw-mobile-identity #top-system-dropdown-id > i:not(.icon-spinner) { display:none; }
- #rl-app .pw-mobile-identity .pw-mobile-folder-label { display:block; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:600 17px/1.3 system-ui; letter-spacing:-.3px; }
+ #rl-app .pw-mobile-identity .pw-mobile-folder-label {display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:600 17px/1.3 system-ui;}
  #rl-app #V-MailMessageList { height:auto; flex:1 1 auto; min-height:0; }
  #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved:not(.hasChecked), #rl-app #V-MailMessageList .pw-list-title { display:none; }
  #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved.hasChecked { min-height:48px; }
  #rl-app #V-MailMessageList .messageList { min-width:0; }
- #rl-app #V-MailMessageList .messageList .second-toolbar { padding:0 12px 12px; min-height:52px; gap:4px; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar {padding:0 12px 12px;}
  #rl-app #V-MailMessageList .messageList .second-toolbar .btn-group { display:inline-flex; flex:0 0 auto; margin:0; }
  #rl-app #V-MailMessageList .messageList .second-toolbar [data-pw-icon].btn { min-width:30px; width:30px; }
  #rl-app #V-MailMessageList .messageList .second-toolbar .buttonMoreSearch { min-width:24px; width:24px; }
  #rl-app #V-MailMessageList .messageList .second-toolbar .dropdown-menu { left:auto; right:0; max-width:calc(100vw - 24px); }
  #rl-app #V-MailMessageList .messageList .inputSearch { height:36px; min-height:36px; font-size:14px; }
- #rl-app #V-MailMessageList button.pw-threads { font-size:0; min-width:30px; width:30px; height:40px; padding:0; border:0!important; background:transparent; }
+ #rl-app #V-MailMessageList button.pw-threads {min-width:30px;width:30px;height:40px;border:0!important;background:transparent;}
  #rl-app #V-MailMessageList button.pw-threads::before { content:''; display:inline-block; width:18px; height:18px; background:var(--pw-muted); mask:var(--pw-conversations-icon) center/contain no-repeat; }
  #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); }
- #rl-app .messageListItem { min-height:82px; padding:16px 18px; }
- #rl-app .messageListItem .senderParent { font-size:13px; line-height:1.5; }
- #rl-app .messageListItem .subjectParent { font-size:14px; line-height:1.5; }
- #rl-app #V-MailMessageView .top-toolbar [data-pw-icon="close"] { display:none; }
+ 
+ #rl-app .messageListItem .senderParent {line-height:1.5;}
+ 
+ 
  #rl-app .pw-mobile-header > .btn:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
 }
 html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
@@ -3525,24 +3512,23 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
 #rl-app .pw-mobile-header > button.btn[data-pw-icon="compose"] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); }
 #rl-app [data-pw-icon].btn::before { flex:0 0 19px; min-width:19px; }
 /* Iteration 5: account in navigation, deliberate action groups and reading rhythm. */
-#rl-app { --pw-selected:color-mix(in oklch,var(--nc-color-primary-element) 15%,var(--nc-color-main-background)); }
+
 #rl-app [data-pw-icon="more"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='1.6'/%3E%3Ccircle cx='12' cy='12' r='1.6'/%3E%3Ccircle cx='19' cy='12' r='1.6'/%3E%3C/svg%3E"); }
 #rl-app .pw-mobile-refresh { display:none; }
 #rl-app .pw-desktop-identity { display:none; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { padding:0 12px 0 0; border-inline-start:0; border-inline-end:1px solid var(--pw-line); margin-inline-end:8px; gap:2px; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {border-inline-start:0;border-inline-end:1px solid var(--pw-line);}
 #rl-app #V-MailMessageView .pw-reply[data-pw-icon] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-radius:6px; }
 #rl-app #V-MailMessageView .top-toolbar .pw-reader-menu .btn::after { display:none; }
 #rl-app #V-MailMessageView .top-toolbar .pw-reader-menu { position:relative; }
-#rl-app .pw-reading-actions { display:flex; gap:10px; padding:4px 32px 32px; }
+#rl-app .pw-reading-actions {display:flex;padding:4px 32px 32px;}
 #rl-app .pw-reading-actions .btn { min-height:36px; height:36px; padding:0 18px; border:1px solid var(--pw-line)!important; background:var(--pw-paper); border-radius:6px; font:500 13px/1.2 system-ui; }
 #rl-app .pw-reading-actions .pw-reading-reply { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-color:var(--nc-color-primary-element)!important; }
-#rl-app .messageView .messageItemHeader .subjectParent { font-size:24px; line-height:1.35; letter-spacing:-.5px; }
-#rl-app .messageView .messageItemHeader .informationShort { margin-top:16px; }
-#rl-app .messageListItem .subjectParent { font-size:14px; line-height:1.5; }
-#rl-app .messageListItem .senderParent { font-size:12px; line-height:1.6; color:var(--pw-muted); }
-#rl-app .messageListItem { min-height:76px; padding-block:13px; }
+#rl-app .messageView .messageItemHeader .subjectParent {line-height:1.35;}
+
+#rl-app .messageListItem .subjectParent {line-height:1.5;}
+
 @media(min-width:800px) {
- #rl-app #rl-left { width:248px; overflow:visible; }
+ #rl-app #rl-left {overflow:visible;}
  #rl-app .pw-desktop-identity { display:flex; align-items:center; padding:0 16px; flex:0 0 64px; min-width:0; }
  #rl-app .pw-desktop-identity #V-SystemDropDown { max-width:100%; margin:0; width:100%; }
  #rl-app .pw-desktop-identity #V-SystemDropDown .btn-toolbar { margin:0; }
@@ -3550,22 +3536,22 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
  #rl-app .pw-desktop-identity #top-system-dropdown-id > i:not(.icon-spinner) { display:none; }
  #rl-app .pw-desktop-identity #top-system-dropdown-id::after { margin-inline-start:auto; }
  #rl-app .pw-desktop-identity .dropdown-menu { left:0; right:auto; min-width:230px; }
- #rl-app #V-MailFolderList .b-toolbar { min-height:68px; padding:4px 16px 20px; }
+ #rl-app #V-MailFolderList .b-toolbar {padding:4px 16px 20px;}
  #rl-app #V-MailFolderList .b-toolbar .buttonCompose { height:44px; }
- #rl-app #V-MailMessageList > .btn-toolbar, #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { min-height:64px; padding-block:12px; }
+ 
  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline:28px; }
  html.sm-msgView-side #rl-app #V-MailMessageView .top-toolbar [data-pw-icon="close"], #rl-app #V-MailMessageView:has(.pw-reader-menu) .top-toolbar [data-pw-icon="spam"] { display:none; }
- #rl-app #V-MailMessageList .messageList .second-toolbar { min-height:68px; padding-block:4px 20px; }
+ 
  #rl-app .b-folders .b-content { padding-top:0; }
  html.rl-left-panel-disabled #rl-app .pw-desktop-identity { display:none; }
  html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-toolbar { padding-block:16px; min-height:80px; }
 }
 @media(max-width:799px) {
  #rl-app .pw-mobile-refresh { display:list-item; }
- #rl-app #rl-right > .pw-mobile-header { flex-basis:64px!important; }
- #rl-app .messageListItem { min-height:76px; padding-block:13px; }
- #rl-app .messageListItem .senderParent { font-size:12px; }
- #rl-app .messageListItem .subjectParent { font-size:14px; }
+ 
+ 
+ 
+ 
  #rl-app .pw-reading-actions { padding-inline:20px; }
  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { padding-inline-end:4px; margin-inline-end:0; }
 }
@@ -3579,34 +3565,32 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
  html:not(.rl-left-panel-disabled) #rl-app #rl-left, html.sm-msgView-side #rl-app #V-MailMessageList .messageList { resize:none; }
 }
 /* Iteration 6: fewer competing controls, denser rows, clearer reading states. */
-#rl-app { --pw-muted:color-mix(in oklch,var(--nc-color-main-text) 73%,var(--nc-color-main-background)); --pw-selected:color-mix(in oklch,var(--nc-color-primary-element) 10%,var(--nc-color-main-background)); }
+#rl-app {--pw-muted:color-mix(in oklch,var(--nc-color-main-text) 73%,var(--nc-color-main-background));}
 #rl-app #V-MailMessageList .pw-sort-in-menu { display:none!important; }
 #rl-app #V-MailMessageList .second-toolbar .btn-group { display:inline-flex; margin:0; flex:0 0 auto; }
 #rl-app .pw-menu-heading { padding:12px 16px 4px; font:600 11px/1.5 system-ui; text-transform:uppercase; letter-spacing:.05em; color:var(--pw-muted); border-top:1px solid var(--pw-line); }
 #rl-app #V-MailMessageList .second-toolbar .dropdown-menu { max-height:65vh; overflow:auto; right:0; left:auto; }
-#rl-app .messageListItem { min-height:64px; padding-block:8px; }
-#rl-app .messageListItem time { color:var(--pw-muted); opacity:1; }
+#rl-app .messageListItem {padding-block:8px;}
+#rl-app .messageListItem time {opacity:1;}
 #rl-app .messageListItem.unseen time::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--nc-color-primary-element); margin-inline-end:6px; vertical-align:2px; }
-#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { margin-inline-start:auto; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { border-radius:6px; }
+
 @media(min-width:800px) {
  #rl-app #rl-left { width:232px; }
  #rl-app .b-folders li a.selectable { font-size:13px; }
  #rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before { margin-inline-end:10px; }
- html.sm-msgView-side #rl-app #V-MailMessageList .messageList { width:33vw; }
- #rl-app #V-MailMessageList .pw-list-title { font-size:18px; }
- #rl-app #V-MailMessageList > .btn-toolbar { gap:8px; }
+ 
+ 
+ 
 }
 @media(max-width:799px) {
- #rl-app #rl-right > .pw-mobile-header { padding-inline:12px; gap:8px; }
+ 
  #rl-app #rl-right > .pw-mobile-header > button.btn { border:0!important; border-radius:8px; }
  #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="menu"] { margin-inline-start:-6px; }
  #rl-app #V-MailMessageList .messageList .second-toolbar { gap:6px; padding-inline:16px; }
  #rl-app #V-MailMessageList .messageList .second-toolbar .btn-group [data-pw-icon].btn { width:36px; min-width:36px; }
  #rl-app #V-MailMessageList .messageList .inputSearch { background:var(--pw-rail); }
- #rl-app .messageListItem { min-height:68px; padding-block:9px; }
- #rl-app .messageListItem .senderParent { font-size:12px; }
+ 
+ 
  #rl-app .messageListItem .subjectParent { line-height:1.45; }
 }
 /* Iteration 7: aligned navigation bands and integrated search. */
@@ -3619,12 +3603,12 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
 #rl-app #V-MailMessageList button.pw-threads { display:inline-flex; align-items:center; gap:6px; color:var(--pw-muted); border:0!important; padding:0 6px; font-size:12px; background:transparent; }
 #rl-app #V-MailMessageList button.pw-threads::before { content:''; display:block; width:16px; height:16px; background:currentColor; mask:var(--pw-conversations-icon) center/contain no-repeat; }
 #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
-#rl-app .pw-folder-section { color:var(--pw-muted); font:600 11px/1.5 system-ui; letter-spacing:.06em; text-transform:uppercase; padding:24px 8px 6px; margin:0; }
+#rl-app .pw-folder-section {color:var(--pw-muted);font:600 11px/1.5 system-ui;padding:24px 8px 6px;margin:0;}
 #rl-app .b-folders hr { display:none; }
 #rl-app .b-folders .b-folders-user { background:transparent; border:0; }
-#rl-app .messageListItem .senderParent { font-size:13px; color:var(--nc-color-main-text); }
+
 #rl-app .messageListItem { border-bottom-color:color-mix(in oklch,var(--pw-line) 60%,var(--pw-paper))!important; }
-#rl-app .messageListItem time { font-size:11px; }
+
 #rl-app .messageListItem .checkboxMessage::before,#rl-app .checkboxCheckAll::before { width:16px; height:16px; }
 #rl-app .messageView .messageItemHeader .subjectParent .infoParent { color:var(--pw-muted); }
 #rl-app .messageView .messageItemHeader .subjectParent .flagParent { color:var(--pw-muted); }
@@ -3639,9 +3623,9 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
  #rl-app .messageView .messageItemHeader { padding-top:28px; }
 }
 @media(max-width:799px) {
- #rl-app #rl-right > .pw-mobile-header { flex-basis:60px!important; gap:4px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { min-height:52px; height:52px; }
- #rl-app #V-MailMessageList .messageList .second-toolbar { min-height:48px; padding-block:0 8px; }
+ 
+ 
+ #rl-app #V-MailMessageList .messageList .second-toolbar {padding-block:0 8px;}
  #rl-app #V-MailMessageList button.pw-threads { font-size:0; padding:0; justify-content:center; }
  #rl-app .messageListItem .senderParent { font-size:13px; }
  #rl-app .messageListItem .subjectParent { padding-inline-end:0; }
@@ -3655,124 +3639,115 @@ html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
 /* Iteration 8: remove legacy sizing artifacts; finish the native controls. */
 #rl-app #V-MailMessageList .messageList .second-toolbar { box-sizing:border-box; min-height:52px; }
 #rl-app .messageListItem :is(.flagParent,.attachmentParent,.threads-len) { height:20px; min-height:0; line-height:20px; font-size:15px; }
-#rl-app .messageListItem { min-height:64px; }
-#rl-app .messageView .messageItemHeader .subjectParent { font-size:22px; }
+
 #rl-app .messageView .messageItemHeader .informationShort .from { color:var(--nc-color-main-text); font-size:14px; font-weight:600; }
 #rl-app .messageView .messageItemHeader .informationShort .from a { color:var(--pw-muted); font-size:12px; font-weight:400; }
-#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) { font-size:0; width:28px; height:28px; flex:0 0 28px; display:flex; justify-content:center; align-items:center; }
-#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent)::before { content:''; display:block; width:18px; height:18px; background:currentColor; mask:var(--pw-info-icon) center/contain no-repeat; }
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) {font-size:0;flex:0 0 28px;display:flex;justify-content:center;align-items:center;}
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent)::before {content:'';display:block;background:currentColor;mask:var(--pw-info-icon) center/contain no-repeat;}
 #rl-app #V-MailMessageView .messageItemHeader .flagParent::before { mask-image:var(--pw-star-icon); }
 #rl-app #V-MailMessageView .messageItemHeader .flagParent.flagOn { color:var(--nc-color-primary-element); }
-#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-radius:6px; }
+#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] {border-radius:6px;}
 #rl-app #V-MailFolderList .b-footer .btn:is(.icon-folder-add,[data-i18n="[title]SETTINGS_LABELS/FOLDERS"],.toggleLeft) { font-size:0; }
 #rl-app #V-MailFolderList .b-footer .btn:is(.icon-folder-add,[data-i18n="[title]SETTINGS_LABELS/FOLDERS"])::before { content:''; width:20px; height:20px; background:currentColor; mask:var(--pw-add-folder-icon) center/contain no-repeat; }
 #rl-app #V-MailFolderList .b-footer .btn[data-i18n="[title]SETTINGS_LABELS/FOLDERS"]::before { mask-image:var(--pw-settings-icon); }
 #rl-app .buttonMoreSearch[data-pw-icon="filter"] { color:var(--pw-muted); opacity:1; }
 @media(max-width:799px) {
- #rl-app #rl-right > .pw-mobile-header { flex-basis:56px!important; }
+ 
  #rl-app #V-MailMessageList .messageList .second-toolbar { min-height:44px; }
- #rl-app .messageListItem { min-height:64px; padding-block:10px; }
+ 
  #rl-app .pw-mobile-identity #top-system-dropdown-id::after { display:none; }
  #rl-app .pw-mobile-identity .pw-account-label::after { content:'⌄'; flex:0 0 12px; margin-inline-start:6px; text-align:center; line-height:1; font-size:13px; }
  #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { padding-right:0; }
 }
 /* Iteration 9: mobile inbox first; richer sender identity in the reading pane. */
-#rl-app { --pw-selected:color-mix(in oklch,var(--nc-color-primary-element) 16%,var(--nc-color-main-background)); }
+
 #rl-app .pw-from { display:flex; flex-wrap:wrap; gap:12px; }
 #rl-app .pw-native-from { display:none; }
 #rl-app .pw-sender { display:inline-flex; align-items:center; gap:10px; }
-#rl-app .pw-sender-initial { display:flex; align-items:center; justify-content:center; width:34px; height:34px; flex:0 0 34px; border-radius:50%; background:var(--pw-rail); border:1px solid var(--pw-line); color:var(--pw-muted); font:500 14px/1 system-ui; }
+#rl-app .pw-sender-initial {align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;color:var(--pw-muted);font:500 14px/1 system-ui;}
 #rl-app .pw-sender-name { display:block; color:var(--nc-color-main-text); font:600 14px/1.4 system-ui; }
-#rl-app .pw-sender-address { display:block; font:12px/1.4 system-ui; color:var(--pw-muted); }
-#rl-app .bodyText { max-width:640px; width:100%; }
-#rl-app .messageView .messageItemHeader { padding-top:24px; }
-#rl-app .messageView .messageItemHeader .informationShort { margin-top:12px; }
-#rl-app #messageItem > .messageItemHeader { padding-top:8px; padding-bottom:16px; }
+#rl-app .pw-sender-address {font:12px/1.4 system-ui;color:var(--pw-muted);}
+#rl-app .bodyText {width:100%;}
+
 #rl-app #messageItem > .messageItemHeader > div:first-child { gap:12px; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { border-radius:6px!important; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { gap:6px; }
+
 #rl-app [data-pw-icon="search"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m16 16 5 5'/%3E%3C/svg%3E"); }
 html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem :is(.flagParent,.attachmentParent,.threads-len) { height:20px; min-height:0; line-height:20px; font-size:15px; }
 @media(max-width:799px) {
  #rl-app #V-MailMessageList:not(.pw-search-open):not(.pw-search-active):not(:has(> .btn-toolbar.hasChecked)) .messageList > .second-toolbar { display:none; }
- #rl-app #rl-right > .pw-mobile-header { padding-inline:12px; gap:4px; border-bottom:1px solid var(--pw-line); }
+ #rl-app #rl-right > .pw-mobile-header {border-bottom:1px solid var(--pw-line);}
  #rl-app #rl-right > .pw-mobile-header > button.btn { width:32px; min-width:32px; height:44px; flex:0 0 32px; }
  #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="compose"] { width:40px; min-width:40px; flex-basis:40px; height:40px; min-height:40px; }
  #rl-app #rl-right > .pw-mobile-header > button.pw-threads { padding:0; font-size:0; background:transparent; }
  #rl-app .pw-mobile-header > button.pw-threads::before { content:''; display:block; width:18px; height:18px; background:var(--pw-muted); mask:var(--pw-conversations-icon) center/contain no-repeat; }
  #rl-app .pw-mobile-header > button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
  #rl-app #rl-right.message-selected > .pw-mobile-header :is(.pw-search-toggle,.pw-threads) { display:none; }
- #rl-app .pw-mobile-identity .pw-mobile-folder-label { font-size:16px; letter-spacing:-.2px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { font-size:11px; }
+ 
+ 
  #rl-app .pw-mobile-header .pw-account-label::after { flex-basis:8px; margin-inline-start:3px; }
 }
 /* Iteration 10: native date groups create a scanning rhythm. */
-#rl-app .pw-day-label, #rl-app .messageList .groupLabel { padding:9px 18px 7px; min-height:32px; box-sizing:border-box; color:var(--pw-muted); background:var(--pw-paper); font:600 11px/1.4 system-ui; text-transform:uppercase; letter-spacing:.06em; border-bottom:1px solid var(--pw-line); }
-#rl-app .messageListItem .senderParent { line-height:1.4; }
-#rl-app .messageListItem .subjectParent { font-size:14px; }
-#rl-app .messageListItem.unseen .subjectParent { font-weight:650; }
+#rl-app .pw-day-label, #rl-app .messageList .groupLabel {padding:9px 18px 7px;box-sizing:border-box;color:var(--pw-muted);font:600 11px/1.4 system-ui;border-bottom:1px solid var(--pw-line);}
+
 #rl-app .messageListItem time { font-weight:400; }
-#rl-app .messageView .messageItemHeader .subjectParent { font-size:23px; font-weight:600; }
-#rl-app .messageView .messageItemHeader .informationShort { margin-top:12px; }
-#rl-app .bodyText { max-width:608px; }
+
 #rl-app .b-folders .b-toolbar .buttonCompose { border-radius:6px; }
 #rl-app .b-folders li a.selectable.selected { border-radius:5px; }
 @media(max-width:799px) {
  #rl-app #rl-right > .pw-mobile-header > button.pw-threads { display:flex; align-items:center; justify-content:center; }
  #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="compose"] { border-radius:6px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { font-size:12px; }
- #rl-app .pw-mobile-identity .pw-mobile-folder-label { font-size:16px; }
+ 
+ 
  #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline:18px; background:var(--pw-rail); }
 }
 /* Iteration 11: one self-hosted type system, clearer content hierarchy. */
 #rl-app { --pw-font:'Pied Web UI',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; font-family:var(--pw-font); }
 #rl-app :is(.b-folders,.messageList,.messageView,.messageListItem,.pw-list-title,.pw-mobile-folder-label,.pw-day-label,.pw-folder-section,.pw-sender-name,.pw-sender-address,.pw-account-label) { font-family:var(--pw-font)!important; }
 #rl-app .messageListItem :is(.senderParent,.subjectParent,time),#rl-app .messageView .messageItemHeader :is(.subjectParent,.subject,.informationShort,.date),#rl-app button.pw-threads,#rl-app .pw-reading-actions button.btn,#rl-app .buttonComposeText { font-family:var(--pw-font)!important; }
-#rl-app .messageListItem .senderParent { font-size:13px; line-height:1.35; }
-#rl-app .messageListItem .subjectParent { font-size:14px; }
-#rl-app .messageListItem.unseen .subjectParent { font-weight:620; }
+#rl-app .messageListItem .senderParent {line-height:1.35;}
+
 #rl-app .messageListItem:not(.unseen) .subjectParent { color:color-mix(in oklch,var(--nc-color-main-text) 84%,var(--pw-paper)); }
-#rl-app .messageListItem time { font-size:11px; font-variant-numeric:tabular-nums; }
-#rl-app .messageView .messageItemHeader .subjectParent { font-size:24px; font-weight:620; letter-spacing:-.6px; }
+#rl-app .messageListItem time {font-variant-numeric:tabular-nums;}
+
 #rl-app #V-MailMessageList .pw-list-title { font-size:20px; font-weight:650; letter-spacing:-.55px; }
 #rl-app .pw-folder-section,#rl-app .pw-day-label,#rl-app .messageList .groupLabel { font-size:11px; font-weight:600; letter-spacing:.055em; }
 #rl-app #V-MailFolderList .buttonComposeText { font-size:13px; font-weight:600; }
-#rl-app .b-folders li a.selectable { font-size:13px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { width:36px; height:36px; min-width:36px; }
+
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn {width:36px;min-width:36px;}
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions { gap:4px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { margin-inline-start:8px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { margin-inline-start:auto; }
+
 @media(max-width:799px){
  #rl-app .pw-mobile-identity .pw-mobile-folder-label { font-size:17px; font-weight:650; letter-spacing:-.4px; }
  #rl-app .messageListItem { padding-block:10px; }
  #rl-app .messageListItem .subjectParent { font-size:14px; }
 }
 /* Iteration 12: calmer surfaces and a folder-led mobile header. */
-#rl-app { --pw-rail:color-mix(in oklch,var(--nc-color-main-background) 92%,var(--nc-color-main-text)); }
-#rl-app .pw-day-label,#rl-app .messageList .groupLabel { font-size:12px; font-weight:550; letter-spacing:0; text-transform:none; border:0; padding-block:18px 8px; min-height:38px; background:var(--pw-paper); }
+
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {letter-spacing:0;text-transform:none;border:0;background:var(--pw-paper);}
 #rl-app .pw-day-label::first-letter,#rl-app .messageList .groupLabel::first-letter { text-transform:uppercase; }
 #rl-app .pw-day-label:first-child { padding-top:12px; min-height:32px; }
 #rl-app .messageListItem { border-bottom:0!important; }
 html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { grid-template-rows:20px auto; align-content:center; row-gap:2px; }
-#rl-app #messageItem > .messageItemHeader { padding-inline-start:76px; }
+
 #rl-app .pw-sender-initial { border:0; background:var(--pw-rail); }
 #rl-app .messageList .inputSearch { background:var(--pw-paper); }
-#rl-app [data-pw-icon="reply"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M10 4 2 11l8 7v-5c6 0 9 2 12 6-1-9-6-13-12-13Z'/%3E%3C/svg%3E"); }
+
 @media(max-width:799px) {
  #rl-app #rl-right:not(.message-selected) > .pw-mobile-header > .btn:first-child { display:none; }
- #rl-app #rl-right > .pw-mobile-header { padding-inline:16px 12px; }
- #rl-app .pw-mobile-identity { display:flex; flex-direction:column; justify-content:center; }
- #rl-app .pw-mobile-identity button.pw-mobile-folder-label { display:flex; align-items:center; justify-content:flex-start; gap:6px; width:auto; height:25px; min-height:25px; margin:0; padding:0; border:0!important; border-radius:0; font:650 17px/1.4 var(--pw-font); letter-spacing:-.4px; color:var(--nc-color-main-text); background:transparent; }
+ 
+ #rl-app .pw-mobile-identity {display:flex;}
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label {display:flex;align-items:center;justify-content:flex-start;gap:6px;width:auto;margin:0;padding:0;border:0!important;border-radius:0;font:650 17px/1.4 var(--pw-font);letter-spacing:-.4px;color:var(--nc-color-main-text);background:transparent;}
  #rl-app .pw-mobile-identity button.pw-mobile-folder-label::after { content:'⌄'; font:400 13px/1 var(--pw-font); color:var(--pw-muted); }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { height:22px; min-height:22px; padding:0; justify-content:flex-start; }
- #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { height:22px; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {padding:0;}
+ 
  #rl-app .pw-mobile-header .pw-account-label::after { display:none; }
  #rl-app .pw-mobile-identity button.pw-mobile-folder-label:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
- #rl-app #messageItem > .messageItemHeader { padding-inline-start:64px; }
- #rl-app .messageListItem { min-height:64px; }
+ 
+ 
 }
 /* Iteration 13: deliberate density and contextual folder actions. */
-#rl-app { --pw-rail:color-mix(in oklch,var(--nc-color-main-background) 95%,var(--nc-color-main-text)); }
+
 html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padding:0; }
 #rl-app .messageListItem { min-height:60px; margin-inline:6px; width:auto; border-radius:5px; }
 #rl-app .pw-folder-section { display:flex; align-items:center; justify-content:space-between; padding-block:18px 4px; }
@@ -3788,7 +3763,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app .messageView .messageItemHeader .pw-from { flex:1; min-width:0; }
 @media(min-width:800px){
  #rl-app .b-folders li a.selectable { height:34px; line-height:34px!important; }
- #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline-start:46px; }
+ 
  #rl-app .messageListItem { padding-inline-start:16px; }
 }
 @media(max-width:799px){
@@ -3803,23 +3778,21 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign:not(.icon-none)::before { content:''; display:block; width:13px; height:13px; background:currentColor; mask:var(--pw-icon) center/contain no-repeat; --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign.icon-right-mini::before { transform:rotate(-90deg); }
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:0; border-radius:4px; }
-@media(min-width:800px){#rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline-start:62px; }}
+@media(min-width:800px){}
 @media(max-width:799px){#rl-app #V-MailMessageList .messageListItem { min-height:64px; padding:10px 18px; }}
 /* Iteration 15: consistent optical weight and shorter action distances. */
-#rl-app #V-MailMessageList .messageListItem > div + div { padding:0; }
+
 #rl-app .messageListItem .subjectParent { font-size:15px; }
-#rl-app .messageListItem.unseen .subjectParent { font-weight:580; }
-#rl-app .messageListItem time { font-size:12px; }
+
 #rl-app .messageListItem .senderParent { font-size:13px; }
-#rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-block:12px 6px; min-height:32px; }
-#rl-app .bodyText { padding-bottom:8px; }
+
 #rl-app .pw-reading-actions { padding-top:0; }
 #rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] { background:transparent; color:var(--pw-muted); }
 #rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon]:hover { background:var(--pw-selected); color:var(--nc-color-primary-element); }
 #rl-app [data-pw-icon="reply"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 5-5 5 5 5M3 10h10a7 7 0 0 1 7 7v3'/%3E%3C/svg%3E"); }
 #rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) { opacity:1; color:var(--pw-muted); }
 @media(max-width:799px){
- #rl-app .pw-mobile-identity button.pw-mobile-folder-label { font-size:18px; }
+ 
  #rl-app #V-MailMessageList .messageListItem .subjectParent { font-size:15px; }
 }
 /* Iteration 16: explicitly scoped mail search, separate from Nextcloud search. */
@@ -3829,50 +3802,50 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { border:1px solid var(--pw-line); border-radius:6px; padding:0; margin-inline-end:8px; gap:0; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions > .btn { width:36px; min-width:36px; height:34px; min-height:34px; }
 @media(min-width:800px){
- #rl-app #V-MailMessageList .messageListItem { padding-block:8px; min-height:60px; }
+ 
  #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline-start:48px; }
 }
 @media(max-width:799px){
- #rl-app #rl-right > .pw-mobile-header { flex-basis:44px!important; padding-inline:12px; gap:8px; }
- #rl-app .pw-mobile-identity { flex-direction:row; align-items:center; justify-content:space-between; gap:8px; }
- #rl-app .pw-mobile-identity button.pw-mobile-folder-label { height:44px; min-height:44px; flex:0 1 auto; font-size:17px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown { flex:0 1 auto; max-width:165px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { min-height:44px; height:44px; justify-content:center; font-size:11px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { height:44px; }
- #rl-app #rl-right > .pw-mobile-header > .pw-search-toggle { display:none; }
- #rl-app #V-MailMessageList .messageList > .second-toolbar { display:flex!important; min-height:44px; padding:0 12px 8px; }
+ #rl-app #rl-right > .pw-mobile-header {padding-inline:12px;}
+ 
+ 
+ #rl-app .pw-mobile-identity #V-SystemDropDown {flex:0 1 auto;}
+ 
+ 
+ 
+ #rl-app #V-MailMessageList .messageList > .second-toolbar {min-height:44px;padding:0 12px 8px;}
  #rl-app #V-MailMessageList .messageList > .second-toolbar button.pw-threads { display:flex; align-items:center; justify-content:center; margin:0; }
  #rl-app #V-MailMessageList .messageList > .second-toolbar .inputSearch { font-size:13px; }
  #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-block:10px 6px; min-height:30px; }
 }
 
 /* Iteration 17: one control language and a compact reading hierarchy. */
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group { border:1px solid var(--pw-line); border-radius:6px; padding:0; margin-inline-end:0; gap:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group {margin-inline-end:0;}
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { height:34px; min-height:34px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { border:0; }
-#rl-app .pw-day-label,#rl-app .messageList .groupLabel { display:flex; align-items:center; gap:12px; padding-block:12px 6px; min-height:32px; }
+
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {display:flex;align-items:center;gap:12px;}
 #rl-app .pw-day-label::after,#rl-app .messageList .groupLabel::after { content:''; height:1px; flex:1; background:var(--pw-line); opacity:.65; }
 #rl-app .pw-folder-section { text-transform:none; font-size:12px; letter-spacing:0; }
-#rl-app .messageView .messageItemHeader { padding-top:20px; }
+
 #rl-app .messageView .messageItemHeader .informationShort { margin-top:10px; }
-#rl-app #messageItem > .messageItemHeader { padding-bottom:16px; }
+
 #rl-app .bodyText { padding-top:24px; }
-@media(min-width:800px){html.sm-msgView-side #rl-app #V-MailMessageList .messageList { width:35vw; }}
+@media(min-width:800px){}
 
 /* Iteration 18: a single mobile mail header, with search on demand. */
-#rl-app { --pw-selected:color-mix(in oklch,var(--nc-color-primary-element) 7%,var(--nc-color-main-background)); }
+
 #rl-app .messageListItem .subjectParent { letter-spacing:-.15px; }
 #rl-app .pw-mobile-select { display:none; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group { border:0; background:var(--pw-rail); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group {border:0;}
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { background:transparent; }
 @media(min-width:800px){html.sm-msgView-side #rl-app #V-MailMessageList .messageList { width:33vw; }}
 @media(max-width:799px){
  #rl-app #rl-right > .pw-mobile-header { flex-basis:64px!important; gap:4px; }
  #rl-app .pw-mobile-identity { flex-direction:column; align-items:flex-start; justify-content:center; gap:0; }
- #rl-app .pw-mobile-identity button.pw-mobile-folder-label { height:26px; min-height:26px; flex:0 0 26px; }
- #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { min-height:22px; height:22px; justify-content:flex-start; }
- #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { height:22px; }
- #rl-app #rl-right > .pw-mobile-header > .pw-search-toggle { display:flex; font:500 12px/1 var(--pw-font)!important; width:56px; min-width:56px; flex:0 0 56px; }
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label {flex:0 0 26px;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {justify-content:flex-start;}
+ 
+ #rl-app #rl-right > .pw-mobile-header > .pw-search-toggle {display:flex;font:500 12px/1 var(--pw-font)!important;flex:0 0 56px;}
  #rl-app .pw-mobile-header > .pw-search-toggle::before { display:none; }
  #rl-app .pw-mobile-header > .btn-group { margin:0; flex:0 0 32px; }
  #rl-app .pw-mobile-header > .btn-group > .btn { width:32px; min-width:32px; }
@@ -3885,11 +3858,11 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 
 /* Iteration 19: a continuous workspace toolbar and distinct mobile actions. */
 #rl-app { --pw-selected:color-mix(in oklch,var(--nc-color-primary-element) 9%,var(--nc-color-main-background)); }
-#rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { background:var(--pw-rail); }
+
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group { background:transparent; border-radius:0; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { border-inline-start:1px solid var(--pw-line); padding-inline-start:8px; margin-inline-start:8px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { border:0; padding:0; margin-inline-start:4px; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { border:0; margin-inline-start:auto; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group {border-inline-start:1px solid var(--pw-line);padding-inline-start:8px;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu {border:0;padding:0;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) {border:0;}
 #rl-app #V-MailMessageList button.pw-threads::before,#rl-app .pw-mobile-header > button.pw-threads::before { width:18px; height:18px; }
 #rl-app [data-pw-icon="compose"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4H4v16h16v-8M9 15l1-5L19 1l4 4-9 9-5 1zm8-12 4 4'/%3E%3C/svg%3E"); }
 @media(max-width:799px){
@@ -3907,10 +3880,10 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app .pw-desktop-identity { min-height:56px; box-sizing:border-box; border-bottom:1px solid var(--pw-line); }
 #rl-app .b-folders .b-toolbar { padding-block:12px; }
 @media(max-width:799px){
- #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header { background:var(--pw-rail); }
- #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle { border:1px solid var(--pw-line)!important; border-radius:6px; width:66px; min-width:66px; flex:0 0 66px; height:34px; min-height:34px; background:var(--pw-paper); margin-inline-end:4px; }
+ 
+ #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle {border-radius:6px;flex:0 0 66px;margin-inline-end:4px;}
  #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved:not(.hasChecked) { height:0; min-height:0!important; border:0; }
- #rl-app .pw-mobile-header .pw-mobile-identity { min-width:0; }
+ 
  #rl-app .pw-mobile-identity #V-SystemDropDown { max-width:100%; }
 }
 
@@ -3919,36 +3892,36 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { background:var(--pw-paper); }
 #rl-app .messageView .messageItemHeader .subjectParent { font-size:22px; font-weight:600; letter-spacing:-.45px; }
 #rl-app .pw-sender-initial { display:none; }
-#rl-app .pw-sender > span:last-child { display:flex; align-items:baseline; gap:8px; }
+#rl-app .pw-sender > span:last-child {display:flex;align-items:baseline;}
 #rl-app .pw-sender-address { display:inline; }
 #rl-app #messageItem > .messageItemHeader { padding-inline-start:32px; }
-#rl-app .messageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:18px; }
+
 #rl-app .pw-mobile-list-tools { display:none; }
 @media(max-width:799px){
  #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header { background:var(--pw-paper); padding-inline:18px; gap:12px; }
  #rl-app .pw-mobile-list-tools { display:flex; gap:6px; align-items:center; order:2; margin-inline-start:auto; }
- #rl-app .pw-day-label:has(.pw-mobile-list-tools) { padding-block:2px; min-height:44px; }
+ 
  #rl-app .pw-day-label:has(.pw-mobile-list-tools)::after { order:1; }
  #rl-app .pw-mobile-list-tools > .btn-group { margin:0; }
- #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads { display:inline-flex; align-items:center; width:auto; min-width:0; padding:0 4px; height:32px; min-height:32px; gap:6px; font-size:11px; }
+ #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads {display:inline-flex;align-items:center;width:auto;min-width:0;padding:0 4px;height:32px;min-height:32px;gap:6px;}
  #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads::before { width:16px; height:16px; }
  #rl-app .pw-mobile-list-tools .btn-group > .btn { width:32px; min-width:32px; height:32px; min-height:32px; }
  #rl-app #V-MailMessageList.pw-tools-fallback .messageList > .second-toolbar { display:flex!important; }
- #rl-app .pw-sender > span:last-child { flex-direction:column; gap:2px; }
+ #rl-app .pw-sender > span:last-child {flex-direction:column;}
  #rl-app #messageItem > .messageItemHeader { padding-inline-start:20px; }
 }
 
 /* Iteration 22: compact metadata and a measured icon scale. */
-#rl-app .messageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:10px; }
+
 #rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) { min-width:28px; width:28px; min-height:28px; height:28px; margin:0; padding:0; line-height:1; }
-#rl-app #messageItem > .messageItemHeader { padding-top:0; }
+
 #rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent)::before { width:16px; height:16px; }
 #rl-app [data-pw-icon].btn::before { width:18px; height:18px; }
 #rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before { width:18px; height:18px; min-width:18px; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions { background:var(--pw-selected); border-radius:6px; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions .btn { color:var(--nc-color-primary-element); }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { border:0; }
-#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { margin-inline-start:0; }
+
 #rl-app .pw-account-label { min-width:0; max-width:100%; }
 #rl-app .pw-account-local { min-width:0; overflow:hidden; text-overflow:ellipsis; }
 @media(max-width:799px){
@@ -3958,9 +3931,9 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 
 /* Iteration 23: subject-first scanning and even section spacing. */
 #rl-app .messageListItem .senderParent { color:color-mix(in oklch,var(--nc-color-main-text) 76%,var(--pw-paper)); }
-#rl-app .messageListItem time { color:color-mix(in oklch,var(--nc-color-main-text) 60%,var(--pw-paper)); font-size:11px; }
+#rl-app .messageListItem time {color:color-mix(in oklch,var(--nc-color-main-text) 60%,var(--pw-paper));}
 #rl-app .messageListItem.unseen .subjectParent { font-weight:600; }
-#rl-app .pw-day-label,#rl-app .messageList .groupLabel { font-size:11px; font-weight:600; min-height:28px; padding-block:8px 4px; }
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {min-height:28px;padding-block:8px 4px;}
 #rl-app .messageView .messageItemHeader { padding-top:24px; }
 #rl-app .messageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:12px; }
 #rl-app #messageItem > .messageItemHeader { padding-bottom:12px; }
@@ -4005,7 +3978,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 }
 
 /* Iteration 26: one coherent message action group. */
-#rl-app .pw-reader-commands { display:flex; align-items:center; border:1px solid var(--pw-line); border-radius:6px; height:34px; padding:0 2px; background:var(--pw-paper); }
+#rl-app .pw-reader-commands {display:flex;align-items:center;border:1px solid var(--pw-line);border-radius:6px;height:34px;padding:0 2px;}
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group { display:flex; align-items:center; gap:0; margin:0; padding:0; border:0; background:transparent; }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group > .btn { width:34px; min-width:34px; height:32px; min-height:32px; border-radius:4px; background:transparent; color:var(--pw-muted); }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions { border-inline-end:1px solid var(--pw-line); margin-inline-end:4px; padding-inline-end:4px; border-radius:0; }
@@ -4022,7 +3995,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
  #rl-app #V-MailMessageView .pw-copy-md:not([disabled]):active { transform:none; }
 }
 #rl-app .pw-copy-md-status { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
-#rl-app #V-MailMessageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:14px; }
+
 #rl-app #messageItem > .messageItemHeader { padding-top:2px; }
 #rl-app .pw-sender-name { font-weight:550; }
 #rl-app .pw-sender > span:last-child { gap:10px; }
@@ -4047,9 +4020,9 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app #V-MailMessageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:8px; }
 @media(max-width:799px){
  #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle { display:none; }
- #rl-app .pw-mobile-header > .search-input-wrp { display:flex; position:relative; align-items:center; flex:0 1 132px; width:132px; min-width:110px; }
- #rl-app .pw-mobile-header > .search-input-wrp input { box-sizing:border-box; width:100%; height:34px; min-height:34px; border:1px solid var(--pw-line); border-radius:6px; box-shadow:none; padding:0 30px 0 10px; font:400 12px/1.2 var(--pw-font); background:var(--pw-paper); color:var(--nc-color-main-text); }
- #rl-app .pw-mobile-header > .search-input-wrp .buttonMoreSearch { position:absolute; right:0; top:0; width:28px; min-width:28px; height:34px; min-height:34px; }
+ #rl-app .pw-mobile-header > .search-input-wrp {display:flex;position:relative;align-items:center;min-width:110px;}
+ #rl-app .pw-mobile-header > .search-input-wrp input {box-sizing:border-box;width:100%;border:1px solid var(--pw-line);border-radius:6px;box-shadow:none;padding:0 30px 0 10px;font:400 12px/1.2 var(--pw-font);background:var(--pw-paper);color:var(--nc-color-main-text);}
+ #rl-app .pw-mobile-header > .search-input-wrp .buttonMoreSearch {position:absolute;right:0;top:0;width:28px;min-width:28px;}
  #rl-app #rl-right.message-selected > .pw-mobile-header > .search-input-wrp { display:none; }
  #rl-app .pw-mobile-header > .search-input-wrp input:focus { border-color:var(--nc-color-primary-element); outline:2px solid color-mix(in oklch,var(--nc-color-primary-element) 25%,transparent); }
  #rl-app #V-MailMessageList .messageListItem.selected { background:color-mix(in oklch,var(--nc-color-primary-element) 12%,var(--nc-color-main-background))!important; }
