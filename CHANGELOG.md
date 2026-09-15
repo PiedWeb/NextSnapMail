@@ -1,5 +1,87 @@
 # Releases
 
+## 1.7.31, 2026-09-15
+
+Performance release. The reader conversation stack no longer drives its search
+from the browser. Opening a message in a long thread used to issue up to
+twenty sequential `MessageList` requests plus one full `Message` fetch per
+visible card; a fourteen-message conversation was measured at 31 backend
+requests and 4,7 s of activity, and the scan repeated every 60 seconds while
+the message stayed open. Each of those requests paid a full Nextcloud bootstrap
+and a fresh IMAP connect and login, because PHP keeps no connection between
+requests.
+
+The same walk now runs in a new `PiedWebConversation` endpoint on a single
+authenticated IMAP connection, so an extra search costs one IMAP command
+instead of one HTTP request. The algorithm, the twenty-identifier ceiling and
+the 200-message page ceiling are unchanged, and rows are still filtered on the
+actual `References` and `In-Reply-To` headers rather than on the search hit.
+The periodic refresh now sends back the folder state it was given: an unchanged
+mailbox is answered from two IMAP `STATUS` commands, with no search and no
+fetch.
+
+Card summaries are fetched when the reader points at a card, by pointer or by
+keyboard focus, instead of for every card the viewport crosses. When the IMAP
+server offers RFC 8970 `PREVIEW`, the summary comes from the message list and
+costs nothing.
+
+Inline message images are left to the engine. A queue that held their sources
+back was tried and dropped: SnappyMail already marks them `loading="lazy"`, and
+taking the source away only interferes with the browser's own deferral, while
+images in a hidden message body fire neither `load` nor `error`. A newsletter
+with 62 inline images still opens 44 simultaneous PHP processes on first read,
+because each image is a separate request that reopens its own IMAP connection.
+The remedy is to give those images an intrinsic size so the native lazy
+threshold applies, which needs a browser fixture and is not in this release.
+
+The unread-drafts reminder takes the same folder-state shortcut, so the second
+IMAP round trip after each Inbox refresh is skipped when the Drafts folder has
+not moved.
+
+New read-only checks cover the conversation endpoint: single login, folder
+scoping, header verification, the bounded walk, the unchanged-mailbox shortcut
+and the login/POST guards.
+
+This release also carries the desktop attachment controls that were pending in
+the working tree: the reader hides SnappyMail's ambiguous settings cog for a
+single attachment, shows the native selection controls and “Download as zip”
+from two attachments on, and gives the attachment tiles 18 px before the lower
+divider.
+
+## 1.7.30, 2026-09-15
+
+Plugin-only intermediate step, superseded within the same session and never
+published. The stylesheet had to travel with it: the served CSS bundle is keyed
+on `Plugins()->Hash()`, the theme name and `APP_VERSION`, so deploying a new
+`style.css` under an unchanged plugin version leaves the previous compiled
+stylesheet cached and served.
+
+## 1.7.29, 2026-09-15
+
+Withdrawn during deployment and never published. The conversation scan called
+the new endpoint through `rl.app.Remote.post`, which serves native message
+actions; plugin hooks answer through `rl.pluginRemoteRequest`, as the unread
+drafts reminder already did. Every scan rejected and the reader showed
+“Conversation incomplète”. Fixed in 1.7.30.
+
+## 1.7.27, 2026-09-15
+
+Withdrawn during deployment and never published. Its inline-image queue waited
+for `load` or `error` before releasing the next slot, but SnappyMail marks these
+images `loading="lazy"`, so an image in a hidden message body fires neither. The
+queue stalled as soon as the reader moved on and later inline images stayed
+blank. 1.7.28 releases each slot on a timer as well.
+
+## 1.7.26, 2026-09-15
+
+Withdrawn during deployment and never published. Its inline-image queue also
+watched the `src` attribute, so the mutation observer saw the queue's own write
+and took each image back the instant it was released; inline images stayed
+blank. Superseded by 1.7.27, which only watches insertions and takes over each
+image once. Note for future payload changes on this engine: the served plugin
+bundle is keyed on the plugin version and the script file names, never on file
+content, so a same-version script change is answered from the SnappyMail cache.
+
 ## 1.7.25, 2026-09-15
 
 Desktop message rows retain SnappyMail's native calendar glyph when their sole
@@ -8,6 +90,12 @@ now limited to generic/mixed and text-file indicators instead of overriding
 every recognized attachment type. A fictional browser check covers the
 computed `.icon-file-calendar` content and confirms that no paperclip mask is
 applied. Mobile and reader attachment styling are unchanged.
+
+The desktop reader also gives attachment tiles 18 px of space before the
+lower divider. A single attachment no longer shows SnappyMail's ambiguous
+settings cog because clicking its tile already downloads it. With two or more
+attachments, the native selection controls and “Download as zip” action are
+shown directly. The compact native disclosure remains unchanged on mobile.
 
 ## 1.7.24, 2026-09-14
 

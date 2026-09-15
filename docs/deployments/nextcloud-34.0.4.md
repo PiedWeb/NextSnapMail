@@ -110,7 +110,7 @@ claiming exhaustive coverage of every possible app workflow or provider configur
 ## Recovery sources
 
 Mail source: this repository, v1.7.3 runtime. Calendar: integrations/calendar, calendar-v1.0.1.
-Office canonical source: `~/localhost/eurooffice-pied-web`, v1.0.3; its installable archive
+Office canonical source: `~/localhost/Nextcloud/eurooffice-pied-web`, v1.0.3; its installable archive
 is also attached to this verification release for centralized recovery.
 Office archive SHA-256: `22bcc63cdb5176a609bdd395a9509210a824991b1eb3ec8d0d66a02111026111`.
 An Office source snapshot (source, docs and tests, excluding screenshots) is also attached:

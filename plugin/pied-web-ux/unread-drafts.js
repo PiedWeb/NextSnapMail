@@ -18,7 +18,7 @@
         const note = document.createElement('p'); note.className = 'pw-draft-status'; note.setAttribute('role','status'); note.hidden = true;
         const more = document.createElement('button'); more.type = 'button'; more.className = 'pw-drafts-more'; more.hidden = true;
         section.append(header,rows,note,more); content.prepend(section);
-        let scope = '', generation = 0, entries = [], folder = '', total = 0, visible = 3, nextOffset = 0;
+        let scope = '', generation = 0, entries = [], folder = '', total = 0, visible = 3, nextOffset = 0, etag = '';
         let loading = false, opening = false, disposed = false, timer, CollectionModel, error = '', failedPage = false;
         const currentScope = () => JSON.stringify([rl.settings.get('accountHash'),list()?.folder,list.page?.(),list()?.search,list.threadUid?.()]);
         const eligible = () => active() && String(list()?.folder || '').toUpperCase() === 'INBOX'
@@ -89,8 +89,11 @@
                 const result = await new Promise((resolve,reject) => rl.pluginRemoteRequest((code,data) => {
                     const result = data?.Result;
                     code || !result || result.error ? reject(new Error('drafts')) : resolve(result);
-                }, 'PiedWebUnreadDrafts', {offset}, 60000));
+                }, 'PiedWebUnreadDrafts', append ? {offset} : {offset, etag}, 60000));
                 if (!valid(version,snapshot)) return;
+                etag = String(result.etag || '');
+                // The Drafts folder did not move, so the list on screen still holds.
+                if (result.unchanged) { failedPage = false; return; }
                 const collection = result.messages, next = collection?.['@Collection'] || [];
                 if (collection && (!Array.isArray(next) || Number(collection.offset) !== offset || collection.folder?.name !== result.folder)) throw new Error('response');
                 if (!append || result.folder !== folder) entries = [];
@@ -122,7 +125,7 @@
             if (disposed) return;
             const snapshot = currentScope();
             if (scope !== snapshot || !eligible()) {
-                ++generation; scope = snapshot; loading = false; opening = false; entries = []; total = 0; visible = 3; error = ''; folder = '';
+                ++generation; scope = snapshot; loading = false; opening = false; entries = []; total = 0; visible = 3; error = ''; folder = ''; etag = '';
                 render();
             }
             clearTimeout(timer); timer = setTimeout(() => void refresh(), 150);

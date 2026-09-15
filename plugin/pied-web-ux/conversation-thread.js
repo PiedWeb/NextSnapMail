@@ -40,11 +40,11 @@
 
         let generation = 0, timer, disposed = false, context = null, entries = [];
         let loading = false, error = false, silentRefresh = false;
-        let previewAccount = '', previewObserver, previewActive = 0;
+        let previewAccount = '', previewActive = 0;
         const previews = new Map();
         const previewQueue = [];
         const previewText = raw => {
-            let value = String(ko.unwrap(raw.plain) || '').trim();
+            let value = String(ko.unwrap(raw.preview) || '').trim() || String(ko.unwrap(raw.plain) || '').trim();
             if (!value && raw.html) {
                 const doc = new DOMParser().parseFromString(String(ko.unwrap(raw.html) || ''), 'text/html');
                 doc.querySelectorAll('script,style,template,svg').forEach(node => node.remove());
@@ -113,9 +113,20 @@
             const knownPreview = previewText(raw);
             summary.textContent = knownPreview;
             summary.hidden = !knownPreview;
-            if (!knownPreview && previewObserver) {
-                button.dataset.pwPreviewKey = entry.key;
-                previewObserver.observe(button);
+            if (!knownPreview) {
+                // A summary costs one full message fetch, so ask for it when the
+                // reader actually points at the card instead of for every card
+                // the viewport happens to cross.
+                const reveal = () => {
+                    const owner = account();
+                    void fetchPreview(entry).then(value => {
+                        if (!disposed && account() === owner && button.isConnected && value) {
+                            summary.textContent = value; summary.hidden = false;
+                        }
+                    });
+                };
+                button.addEventListener('pointerenter', reveal, {once:true});
+                button.addEventListener('focus', reveal, {once:true});
             }
             button.append(sender,recipient,date,summary);
             button.addEventListener('click', () => {
@@ -125,22 +136,7 @@
         }
 
         function render() {
-            previewObserver?.disconnect();
             if (previewAccount !== account()) { previews.clear(); previewAccount = account(); }
-            previewObserver = new IntersectionObserver(records => records.forEach(record => {
-                if (!record.isIntersecting) return;
-                const button = record.target, key = button.dataset.pwPreviewKey;
-                previewObserver.unobserve(button);
-                const entry = entries.find(candidate => candidate.key === key);
-                if (!entry || !context) return;
-                const owner = account();
-                void fetchPreview(entry).then(value => {
-                    if (!disposed && account() === owner && button.isConnected && value) {
-                        const summary = button.querySelector('.pw-conversation-card-summary');
-                        if (summary) { summary.textContent = value; summary.hidden = false; }
-                    }
-                });
-            }), {root:dom.querySelector('.messageView'), rootMargin:'160px'});
             const index = entries.findIndex(entry => entry.key === currentKey());
             const visible = active() && !!context && index >= 0
                 && (entries.length > 1 || loading && !silentRefresh || error);
@@ -161,80 +157,52 @@
             });
         }
 
-        async function search(folder, params, version, ctx) {
-            const found = [];
-            for (let offset = 0; offset < 200; offset += 50) {
-                const response = await rl.app.Remote.post('MessageList', null,
-                    {folder, offset, limit:50, sort:'REVERSE DATE', ...params}, 60000);
-                if (!valid(version,ctx)) return [];
-                const result = response?.Result, page = result?.['@Collection'];
-                if (!Array.isArray(page) || result.folder?.name !== folder || Number(result.offset) !== offset)
-                    throw new Error('message list');
-                found.push(...page);
-                if (page.length < 50 || offset + 50 >= Number(result.totalEmails || 0)) break;
-            }
-            return found;
-        }
-
-        async function collectFolder(ctx, version) {
+        // The whole walk runs server side on one IMAP connection. Doing it here
+        // meant one HTTP request, one Nextcloud bootstrap and one IMAP login per
+        // search; a long thread reached about thirty round trips per opened mail.
+        async function collect(ctx, version) {
             const list = rl.app.messageList?.();
-            if (list?.folder === ctx.folder && rl.app.messageList.threadUid?.()
-                && [...list].some(message => itemKey(message) === ctx.originKey)) {
-                return [...list].map(message => ({raw:plain(message),model:message}));
-            }
-            if (!ctx.threadUid) return [];
-            const rows = await search(ctx.folder, {search:'',useThreads:1,
-                threadUid:ctx.threadUid,threadAlgorithm:rl.settings.get('threadAlgorithm') || ''}, version,ctx);
-            return rows.filter(row => row.folder === ctx.folder).map(raw => ({raw}));
-        }
-
-        async function collectSent(ctx, folderRows, version) {
-            const sent = ctx.sent; if (!sent) return [];
-            const anchors = new Map();
-            [ctx.origin,...folderRows.map(row => row.raw)].forEach(row => {
-                ids(row.messageId).forEach(id => anchors.set(normalize(id),id));
-            });
-            const root = ids(ctx.origin.references)[0] || ids(ctx.origin.inReplyTo)[0]
-                || ids(ctx.origin.messageId)[0];
-            if (root) anchors.set(normalize(root),root);
-            const found = new Map(), queue = [...anchors.values()], scanned = new Set();
-            if (root) {
-                const query = new URLSearchParams({header:'References ' + root}).toString();
-                for (const raw of await search(sent,{search:query,useThreads:0},version,ctx)) {
-                    if (raw.folder === sent && ids(raw.references).some(id => normalize(id) === normalize(root))) {
-                        found.set(itemKey(raw),raw);
-                        ids(raw.messageId).forEach(id => queue.push(id));
-                    }
-                }
-            }
-            while (queue.length && scanned.size < 20 && valid(version,ctx)) {
-                const id = queue.shift(), normalized = normalize(id);
-                if (scanned.has(normalized)) continue;
-                scanned.add(normalized);
-                const query = new URLSearchParams({header:'In-Reply-To ' + id}).toString();
-                for (const raw of await search(sent,{search:query,useThreads:0},version,ctx)) {
-                    if (raw.folder === sent && ids(raw.inReplyTo).some(value => normalize(value) === normalized)) {
-                        found.set(itemKey(raw),raw);
-                        ids(raw.messageId).forEach(value => queue.push(value));
-                    }
-                }
-            }
-            return [...found.values()].map(raw => ({raw}));
+            const localThread = list?.folder === ctx.folder && rl.app.messageList.threadUid?.()
+                && [...list].some(message => itemKey(message) === ctx.originKey)
+                ? [...list].map(message => ({raw:plain(message), model:message}))
+                : null;
+            // Plugin hooks answer through the native plugin dispatcher, not the
+            // message action endpoint.
+            const result = await new Promise((resolve, reject) => rl.pluginRemoteRequest(
+                (code, data) => {
+                    const value = data?.Result;
+                    code || !value || value.error ? reject(new Error('conversation')) : resolve(value);
+                },
+                'PiedWebConversation', {
+                    folder: ctx.folder,
+                    uid: Number(ctx.origin.uid) || 0,
+                    threadUid: localThread ? 0 : Number(ctx.threadUid) || 0,
+                    threadAlgorithm: rl.settings.get('threadAlgorithm') || '',
+                    messageId: ctx.origin.messageId || '',
+                    inReplyTo: ctx.origin.inReplyTo || '',
+                    references: ctx.origin.references || '',
+                    etag: ctx.etag || ''
+                }, 60000));
+            if (!valid(version,ctx)) return null;
+            ctx.etag = String(result.etag || '');
+            // Unchanged mailbox: the endpoint answered from two STATUS commands and
+            // returned no rows, so the entries already on screen stay authoritative.
+            if (result.unchanged) return null;
+            const rows = Array.isArray(result.messages) ? result.messages : [];
+            return [...(localThread || []), ...rows.map(raw => ({raw}))];
         }
 
         async function scan(ctx, silent = false) {
             const version = ++generation, selectedBefore = currentKey();
             loading = true; error = false; silentRefresh = silent;
             if (!silent) render();
-            let folderRows = [], sentRows = [];
-            try { folderRows = await collectFolder(ctx,version); }
+            let rows = null;
+            try { rows = await collect(ctx,version); }
             catch { if (valid(version,ctx)) error = true; }
             if (!valid(version,ctx)) return;
-            try { sentRows = await collectSent(ctx,folderRows,version); }
-            catch { if (valid(version,ctx)) error = true; }
-            if (!valid(version,ctx)) return;
+            if (rows === null && !error) { loading = silentRefresh = false; render(); settle(); return; }
             const combined = new Map();
-            for (const row of [{raw:ctx.origin,model:ctx.originModel},...folderRows,...sentRows]) {
+            for (const row of [{raw:ctx.origin,model:ctx.originModel},...(rows || [])]) {
                 const key = itemKey(row.raw);
                 if (key && (!combined.has(key) || row.model)) combined.set(key,{...row,key});
             }
@@ -293,11 +261,14 @@
         theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const wake = () => { if (!document.hidden) schedule(); };
         document.addEventListener('visibilitychange',wake);
-        const poll = setInterval(() => { if (context && active() && !loading) void scan(context,true); },60000);
+        // Cheap now: an unchanged mailbox answers from two IMAP STATUS commands.
+        const poll = setInterval(() => {
+            if (context && active() && !loading && !document.hidden) void scan(context,true);
+        },60000);
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();
-            previewObserver?.disconnect(); previews.clear();
+            previews.clear();
             subscriptions.forEach(subscription => subscription.dispose());
             document.removeEventListener('visibilitychange',wake); before.remove(); after.remove();
         });

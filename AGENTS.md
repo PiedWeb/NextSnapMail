@@ -34,7 +34,7 @@ If both fail, say so and stop browser work; do not keep diagnosing connection er
 
 ## Local layout
 
-Canonical source: `~/localhost/nextsnapmail-pied-web`.
-Upstream source for native fixtures: `~/localhost/NextSnapMail`.
-Historical design report: `~/localhost/nextsnapmail/report.html`.
+Canonical source: `~/localhost/Nextcloud/nextsnapmail-pied-web`.
+Upstream source for native fixtures: `~/localhost/Nextcloud/NextSnapMail`.
+Historical design report: `~/localhost/Nextcloud/nextsnapmail/report.html`.
 The former `.local-work` directory contains historical private artifacts, not the current source.

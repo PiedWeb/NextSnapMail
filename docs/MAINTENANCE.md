@@ -1,6 +1,6 @@
 # Keeping every customization recoverable
 
-The canonical working copy is `~/localhost/nextsnapmail-pied-web`, with the existing GitHub
+The canonical working copy is `~/localhost/Nextcloud/nextsnapmail-pied-web`, with the existing GitHub
 remote `RobinDev/nextsnapmail-pied-web`. It was created private and made public after a
 repository and release-asset audit. Source, documentation,
 checks and releases live together; private runtime configuration lives only on the server.

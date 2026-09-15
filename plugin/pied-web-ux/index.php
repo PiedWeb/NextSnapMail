@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.7.25',
+        VERSION = '1.7.31',
         RELEASE = '2026-09-15',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -36,6 +36,18 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
+        $this->addJsonHook('PiedWebConversation', 'Conversation');
+    }
+
+    public function Conversation(): array
+    {
+        require_once __DIR__ . '/Conversation.php';
+        try {
+            $result = PiedWebConversation::scan(\RainLoop\Api::Actions());
+        } catch (\Throwable $error) {
+            $result = ['error' => 'conversation'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebConversation', $result);
     }
 
     public function UnreadDrafts(): array

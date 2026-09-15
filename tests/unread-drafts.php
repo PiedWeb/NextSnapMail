@@ -33,6 +33,8 @@ namespace {
         public function ImapClient() { return $this->imap; }
         public function MailClient() { return $this; }
         public function MessageList($params) { $this->calls[] = $params; return $this->collection; }
+        public string $hash = 'etag-1'; public int $hashCalls = 0;
+        public function FolderHash($folder) { ++$this->hashCalls; return $this->hash; }
     };
     \RainLoop\Api::$actions = $actions; $plugin = new \PiedWebUxPlugin;
     $n = 0; $check = function($ok, $label) use (&$n) { if (!$ok) throw new \RuntimeException($label); ++$n; echo "PASS $label\n"; };
@@ -44,6 +46,20 @@ namespace {
     $check(!$params->bUseThreads && $params->sSort === 'REVERSE DATE', 'Newest drafts first, independent of Inbox thread mode');
     $check($params->iLimit === 10 && $params->iOffset === 0, 'Bounded first page');
     $check($result['messages'] === $actions->collection && $result['messages']->totalEmails === 27, 'Preserves the full native filtered count for pagination');
+    $check($result['etag'] === 'etag-1' && $result['unchanged'] === false, 'First read returns the Drafts folder state');
+
+    // An unchanged Drafts folder must cost one STATUS and no search.
+    $before = count($actions->calls); $actions->params = ['offset'=>0,'etag'=>'etag-1'];
+    $result = $plugin->UnreadDrafts();
+    $check($result['unchanged'] === true && $result['messages'] === null && count($actions->calls) === $before,
+        'Unchanged Drafts folder skips the search and the header fetch');
+    $actions->params = ['offset'=>0,'etag'=>'stale'];
+    $result = $plugin->UnreadDrafts();
+    $check($result['unchanged'] === false && count($actions->calls) === $before + 1, 'A moved Drafts folder is read again');
+    $before = count($actions->calls); $actions->params = ['offset'=>20,'etag'=>'etag-1'];
+    $plugin->UnreadDrafts();
+    $check(count($actions->calls) === $before + 1, 'Pagination never takes the unchanged shortcut');
+    $actions->params = [];
     $actions->params = ['offset'=>20,'folder'=>'Trash','search'=>'','limit'=>99999,'useThreads'=>1];
     $plugin->UnreadDrafts(); $params = end($actions->calls);
     $check($params->iOffset === 20 && $params->iLimit === 10, 'Later pages do not truncate the unread feed to the first page');
@@ -54,8 +70,8 @@ namespace {
     }
     $actions->params = [];
     foreach (['','__UNUSE__','INBOX','inbox'] as $folder) {
-        $actions->folder = $folder; $before = count($actions->calls); $result = $plugin->UnreadDrafts();
-        $check($result === ['folder'=>'','messages'=>null] && count($actions->calls) === $before, 'Disabled/Inbox folder mapping cannot expose received mail as drafts: ' . $folder);
+        $actions->folder = $folder; $before = count($actions->calls); $hashBefore = $actions->hashCalls; $result = $plugin->UnreadDrafts();
+        $check($result === ['folder'=>'','messages'=>null] && count($actions->calls) === $before && $actions->hashCalls === $hashBefore, 'Disabled/Inbox folder mapping cannot expose received mail as drafts: ' . $folder);
     }
     $actions->folder = 'Drafts-other-account'; $plugin->UnreadDrafts();
     $check(end($actions->calls)->sFolderName === 'Drafts-other-account', 'Current account settings are reloaded on every request');

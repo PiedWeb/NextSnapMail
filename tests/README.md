@@ -18,6 +18,7 @@ NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.

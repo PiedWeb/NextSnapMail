@@ -63,7 +63,7 @@ await reader.evaluate(()=>{
     const calendar=document.createElement('button');calendar.className='btn pw-import-calendar';
     calendar.textContent='Ajouter au calendrier';extras.append(calendar);
     const sub=document.createElement('div');sub.className='bodySubHeader';
-    sub.innerHTML='<details class="attachmentsPlace" open><summary>Pièces jointes</summary><ul class="attachmentList"><li class="attachmentItem"><div class="attachmentIcon"><i class="iconMain icon-file-calendar"></i></div><div class="attachmentNameParent"><div class="attachmentName">invitation.ics</div><div class="attachmentSize">2 KiB</div></div></li></ul></details>';
+    sub.innerHTML='<details class="attachmentsPlace" open><summary>Pièces jointes</summary><ul class="attachmentList"><li class="attachmentItem"><div class="attachmentIcon"><i class="iconMain icon-file-calendar"></i></div><div class="attachmentNameParent"><div class="attachmentName">invitation.ics</div><div class="attachmentSize">2 KiB</div></div><div class="checkboxAttachment">☑</div></li></ul><i class="fontastic controls-handle">⚙</i><div class="attachmentsControls" style="display:none"><span><i class="icon-file-archive"></i><span class="g-ui-link">Télécharger le zip</span></span></div></details>';
     document.querySelector('#messageItem .bodyText').before(sub);
 });
 check('Reader typography is compact and sender name and address share one size',await reader.evaluate(()=>{
@@ -91,6 +91,23 @@ check('Attachment uses a compact file tile with no oversized glyph or overflow',
     return box.height===72&&box.width<=280&&getComputedStyle(icon).fontSize==='25px'
         &&getComputedStyle(icon).filter==='none'&&document.documentElement.scrollWidth<=innerWidth;
 }));
+check('A single desktop attachment has breathing room without a redundant settings control',await reader.evaluate(()=>{
+    const place=document.querySelector('.attachmentsPlace');
+    return getComputedStyle(place).paddingBottom==='18px'
+        &&getComputedStyle(place.querySelector('.controls-handle')).display==='none'
+        &&getComputedStyle(place.querySelector('.attachmentsControls')).display==='none'
+        &&getComputedStyle(place.querySelector('.checkboxAttachment')).display==='none';
+}));
+await reader.evaluate(()=>{
+    const list=document.querySelector('.attachmentList');
+    list.append(list.firstElementChild.cloneNode(true));
+});
+check('Multiple desktop attachments expose selection and the native zip action directly',await reader.evaluate(()=>{
+    const place=document.querySelector('.attachmentsPlace');
+    return getComputedStyle(place.querySelector('.attachmentsControls')).display==='flex'
+        &&getComputedStyle(place.querySelector('.attachmentsControls > span')).display.includes('flex')
+        &&[...place.querySelectorAll('.checkboxAttachment')].every(box=>getComputedStyle(box).display!=='none');
+}));
 await reader.setViewportSize({width:390,height:844});
 await reader.waitForFunction(()=>document.querySelector('.b-message > .messageItemHeader')?.nextElementSibling?.classList.contains('pw-message-extras'));
 check('Phone keeps its native footer and attachment geometry',await reader.evaluate(()=>{
@@ -101,6 +118,8 @@ check('Phone keeps its native footer and attachment geometry',await reader.evalu
     const senderLine=originalHeader.querySelector('.informationShort:has(.pw-from)');
     return footer.borderTopWidth==='0px'&&attachment.height!==72
         &&getComputedStyle(senderLine).marginTop==='8px'
+        &&getComputedStyle(document.querySelector('.controls-handle')).display!=='none'
+        &&getComputedStyle(document.querySelector('.attachmentsControls')).display==='none'
         &&originalHeader.nextElementSibling===extras
         &&document.documentElement.scrollWidth<=innerWidth;
 }));
