@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.7.33',
+        VERSION = '1.7.34',
         RELEASE = '2026-09-15',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -19,6 +19,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('ux.js');
         $this->addJs('studio.js');
         $this->addJs('message-flag.js');
+        $this->addJs('address-actions.js');
         $this->addJs('quote-readability.js');
         $this->addJs('list-interactions.js');
         $this->addJs('markdown-vendors.js');

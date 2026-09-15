@@ -4183,6 +4183,19 @@ html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:hov
 html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags.show > #tags-dropdown-id { color:var(--nc-color-main-text); background:var(--pw-rail); }
 html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
 
+/* Reader header addresses: a click writes a new message, Ctrl/Cmd+click copies. */
+html.pw-theme #rl-app #V-MailMessageView .pw-native-addresses { display:none; }
+#rl-app #V-MailMessageView .pw-addresses a.pw-address { color:inherit; }
+#rl-app #V-MailMessageView a.pw-address {
+ padding:0; border-radius:3px; text-decoration:none; overflow-wrap:anywhere; cursor:pointer;
+}
+#rl-app #V-MailMessageView a.pw-address:hover {
+ color:var(--nc-color-primary-element); text-decoration:underline; text-underline-offset:3px;
+}
+#rl-app #V-MailMessageView a.pw-address:focus-visible {
+ outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+}
+
 /* List metadata: a quiet total, explicit unread count, and native flag controls. */
 #rl-app {
     --pw-list-metadata-version:1.7.14;

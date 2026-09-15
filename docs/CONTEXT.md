@@ -85,6 +85,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   never returned.
 - Since 1.7.33, the desktop calendar action keeps 6 px between the metadata rule and
   its own hover surface, so the tinted background never touches a divider.
+- Since 1.7.34, every address in the reader header is a link on the address text only,
+  keeping the native `"Name" <address>` line. A click composes through the native mailto
+  handler with the display name; Ctrl/Cmd+click and Ctrl+Enter copy the bare address and
+  are captured before that handler. The confirmation is a page-level live region, because
+  the recipient rows are clipped and scrollable. See READER_ADDRESSES.md.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

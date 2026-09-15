@@ -1,5 +1,34 @@
 # Releases
 
+## 1.7.34, 2026-09-15
+
+Addresses in the message header are now links. The sender line, the À/Cc recipients under
+the date and the From, To, Cc, Bcc and Reply-To rows of the expanded details each keep the
+native `"Name" <address>` text, with the address itself linked exactly as SnappyMail already
+links the sender. A click writes a new message to that address and carries its display name
+into the composer; Ctrl+click, or Ctrl+Enter on the focused address, copies the bare address
+instead and never opens the composer. Enter still writes a new message.
+
+The composer is reached through SnappyMail's own reader: the address is a real `mailto:`
+link, and the native view already turns a left click on one into its compose popup, so no
+new mail command was added. The copy shortcut is captured before that handler, otherwise
+Ctrl+click would copy and compose at once. A confirmation naming the copied address appears
+beside it for 2.4 seconds, announced to screen readers, and is drawn over the page so the
+clipped, scrollable recipient rows cannot cut it off or shift the header under it. A refused
+Clipboard API falls back to a temporary selection and the legacy copy command, and says so in
+the error colour when both fail.
+
+The links belong to the theme: leaving Pied Web restores SnappyMail's own address text, and
+the sender line keeps the muted colour it had, gaining only a hover underline and a focus
+ring. On a phone a tap writes a new message and a long press offers the browser's own copy
+item, since Ctrl+click has no touch equivalent.
+
+`tests/browser/test-reader-addresses.js` adds 17 fixture cases for that behavior, on a reader
+fixture that now carries native-shaped recipient rows, an expanded details table and the
+native mailto interception of SnappyMail 2.38.2. The reader copy, label, signature, mail
+polish, desktop scan, selection, list metadata, conversation toggle, panel state, app shell
+and conversation fixtures were re-run unchanged.
+
 ## 1.7.33, 2026-09-15
 
 The desktop calendar action no longer hangs off the divider above it. Its hover and

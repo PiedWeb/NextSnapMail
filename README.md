@@ -17,6 +17,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Readable interleaved quotations and native message flag controls.
 - Floating five-second Undo Send while continuing to use the mailbox.
 - Markdown editing and formatted Markdown paste, alongside HTML source and visual editing.
+- Clickable addresses in the message header: a click writes a new message with the display name,
+  Ctrl/Cmd+click or Ctrl+Enter copies the bare address.
 - Copy an open message body as Markdown from the reader toolbar, with compact text for common HTML signatures.
 - A lighter editor toolbar with advanced controls behind More.
 - Inline image sizing, pointer/keyboard resize, alt text and removal.
@@ -46,7 +48,7 @@ python3 tools/check-install.py --nextcloud /path/to/nextcloud
 
 The plugin is stored in NextSnapMail's data directory, and the theme under Nextcloud's custom themes. Normal updates generally preserve those files. Preserved files do not guarantee compatibility with new DOM, editor or PHP APIs. The optional core patch is overwritten when the app is replaced.
 
-[Unread drafts](docs/UNREAD_DRAFTS.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
+[Unread drafts](docs/UNREAD_DRAFTS.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
 
 ## Develop
 

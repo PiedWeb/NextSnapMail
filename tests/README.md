@@ -43,6 +43,7 @@ dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser --timeout 30 < tests/browser/test-reader-copy-md.js
+dev-browser --timeout 40 < tests/browser/test-reader-addresses.js
 dev-browser --timeout 60 < tests/browser/test-virtual-conversation.js
 dev-browser --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
@@ -87,6 +88,14 @@ sidebar choice. It checks the native default, storing a collapse and an expansio
 restoration after reload at the 72 px rail width, the mobile drawer left alone in both
 directions, the return over the 800 px breakpoint and an application-driven expansion
 that is neither stored nor undone.
+
+`test-reader-addresses.js` uses the reader fixture's native-shaped recipient rows,
+expanded details table and a copy of the mailto interception that the native reader of
+SnappyMail 2.38.2 performs. It checks the linked address lines, composing with and
+without a display name, Ctrl+click and Ctrl+Enter copying without composing, Enter still
+composing, the placement and clearing of the confirmation, the focus ring, the sender
+line, a refused clipboard, theme exit and a 320 px reader. The clipboard is mocked; no
+message is sent.
 
 `test-virtual-conversation.js` opens the native reader fixture with fictional
 received and Sent messages. It verifies late mounting, the newest message from
