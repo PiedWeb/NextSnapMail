@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.7.31',
+        VERSION = '1.7.32',
         RELEASE = '2026-09-15',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -33,6 +33,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('list-metadata.js');
         $this->addJs('conversation-thread.js');
         $this->addJs('app-shell.js');
+        $this->addJs('left-panel-state.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');

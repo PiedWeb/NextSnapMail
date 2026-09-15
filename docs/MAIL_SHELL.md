@@ -19,6 +19,19 @@ it remains the native mail search field, with its bindings and keyboard scope. T
 compact desktop sidebar reserves space above Compose. Settings reserve the launcher
 slot alongside their back controls.
 
+Since 1.7.32, the desktop sidebar keeps the state the reader chose. Collapsing or
+expanding it with the native toggle stores `pw-left-panel` in the browser's
+`localStorage`, and the next page load restores that choice while the folder pane is
+still being built, before the first paint. Nothing is sent to the server and no native
+setting is written.
+
+Only an explicit desktop toggle is stored. The same native observable also drives the
+mobile folder drawer and is opened by the application itself while a message is dragged
+over the folders, so those changes are neither recorded nor reverted. On mobile, the
+native closed drawer always wins; crossing back over the 800 px breakpoint, where the
+application reopens the panel, puts the stored desktop choice back. A browser that
+refuses storage simply keeps the native default.
+
 Message checkboxes are vertically centered in the same full-height row as the star.
 Checked rows use a stronger teal surface and a full thin outline; the current opened
 message has a lighter surface. Unread weight remains limited to the subject. Native
@@ -27,6 +40,11 @@ in real mail data. Tests use fictional checked/current rows, while live preview 
 checked and unchecked existing boxes without a mail mutation.
 
 ## Validation
+
+`tests/browser/test-left-panel-state.js` covers 11 cases on the fixture: the native
+default, storing both directions, restoration after reload with the 72 px rail, the
+mobile drawer left untouched, the breakpoint return and an application-driven expansion
+that is neither stored nor undone.
 
 `tests/browser/test-app-shell.js` covers 18 cases: full viewport, original launcher,
 checkbox/star centers, distinct selected states, mobile search, 320 px, dark mode,

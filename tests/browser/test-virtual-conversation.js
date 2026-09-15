@@ -31,21 +31,34 @@ await p.evaluate(()=>{
         const all=[sourceRaw,receivedRaw,...sentMatches];
         document.querySelector('#messageItem > .bodyText').textContent=all.find(item=>item.folder===model.folder&&item.uid===model.uid)?.plain||'';
     }}};
+    window.threadRows=()=>[sourceRaw,receivedRaw,...sentMatches,...(window.thirdReceived?[thirdReceived]:[])];
     rl.app.Remote.post=async(action,trigger,params)=>{
-        threadRequests.push({action,folder:params.folder,uid:params.uid,search:params.search,useThreads:params.useThreads,account:threadAccount});
-        if(action==='Message') {
-            const message=[sourceRaw,receivedRaw,...sentMatches].find(item=>item.folder===params.folder&&item.uid===params.uid);
-            return {Result:structuredClone(message||{})};
-        }
-        if(holdThreadSearch)await new Promise(resolve=>window.releaseThreadSearch=resolve);
-        if(failThreadSearch)throw new Error('fictional search failure');
-        const rows=params.folder==='Sent'?sentMatches:[sourceRaw,receivedRaw,...(window.thirdReceived?[thirdReceived]:[])];
-        const selected=params.useThreads?rows:rows.filter(item=>{
-            const header=new URLSearchParams(params.search).get('header')||'';
-            const field=header.split(' ')[0],id=header.slice(field.length+1);
-            return String(item[field==='References'?'references':'inReplyTo']).includes(id);
-        });
-        return {Result:{'@Object':'Collection/MessageCollection','@Collection':structuredClone(selected.slice(params.offset,params.offset+params.limit)),folder:{name:params.folder},offset:params.offset,totalEmails:selected.length}};
+        threadRequests.push({action,folder:params.folder,uid:params.uid,account:threadAccount});
+        return {Result:structuredClone(threadRows().find(item=>item.folder===params.folder&&item.uid===params.uid)||{})};
+    };
+    // Since 1.7.31 the stack is assembled by the PiedWebConversation plugin hook
+    // on one IMAP connection; the reader sends the folder state it was given back.
+    const otherHooks=rl.pluginRemoteRequest;
+    rl.pluginRemoteRequest=(callback,action,params)=>{
+        if(action!=='PiedWebConversation')return otherHooks(callback,action,params);
+        threadRequests.push({action,folder:params.folder,uid:params.uid,threadUid:params.threadUid,
+            etag:params.etag,account:threadAccount});
+        const answer=()=>{
+            if(failThreadSearch)return callback(0,{Result:{error:'conversation'}});
+            const all=threadRows(),anchors=new Set([params.messageId,params.inReplyTo,
+                ...String(params.references||'').split(/\s+/)].filter(Boolean));
+            for(let size=-1;size!==anchors.size;){
+                size=anchors.size;
+                for(const item of all)
+                    if([...anchors].some(id=>item.messageId===id||String(item.references).includes(id)
+                        ||String(item.inReplyTo).includes(id))) anchors.add(item.messageId);
+            }
+            const rows=all.filter(item=>anchors.has(item.messageId));
+            const etag=rows.map(item=>item.folder+item.uid).join(' ');
+            callback(0,{Result:params.etag===etag?{etag,unchanged:true,messages:[]}
+                :{etag,unchanged:false,messages:structuredClone(rows)}});
+        };
+        if(holdThreadSearch)window.releaseThreadSearch=answer;else setTimeout(answer,20);
     };
     ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageList'),{css:()=>({})},listVM);
     ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageView'),{css:()=>({})},readerVM);
@@ -83,9 +96,9 @@ check('A folded message has one border, and native Close sits beside the toolbar
         &&getComputedStyle(subjectClose).display==='none';
 }));
 check('The stack includes both received messages and historical Sent replies without making copies',await p.evaluate(()=>
-    threadRequests.every(request=>['MessageList','Message'].includes(request.action))
-    &&threadRequests.some(request=>request.folder==='INBOX'&&request.useThreads===1)
-    &&threadRequests.some(request=>request.folder==='Sent'&&request.useThreads===0)
+    threadRequests.every(request=>['PiedWebConversation','Message'].includes(request.action))
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===1
+    &&threadRequests[0].action==='PiedWebConversation'&&threadRequests[0].folder==='INBOX'
     &&nativeOpens.length===1));
 await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Première réponse envoyée'));
 check('Folded cards show one-line plain-text body previews, never the repeated subject or active HTML',await p.evaluate(()=>
@@ -121,6 +134,33 @@ check('When the latest message is received it stays expanded, with older Sent an
     &&document.querySelector('.pw-conversation-before h2').textContent==='Projet Alpha'
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4
     &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
+await p.setViewportSize({width:1280,height:420});
+await p.locator('.pw-conversation-card-toggle').first().click();
+await p.waitForFunction(()=>readerVM.message()?.uid===11
+    &&!document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length
+    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===4);
+check('The oldest message keeps the conversation heading and the latest-message action in view',await p.evaluate(()=>
+    document.querySelector('.messageView').scrollTop===0
+    &&!document.querySelector('.pw-conversation-before > button').hidden));
+await p.locator('.pw-conversation-before > button').first().click();
+await p.waitForFunction(()=>readerVM.message()?.uid===13
+    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4);
+check('A message opened under a long folded history starts in the viewport',await p.evaluate(()=>{
+    const box=document.querySelector('.messageView').getBoundingClientRect();
+    const head=document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect();
+    const last=[...document.querySelectorAll('.pw-conversation-before .pw-conversation-card')].at(-1);
+    return document.querySelector('.messageView').scrollTop>0
+        &&head.top-box.top>=0&&head.top-box.top<=40&&head.bottom<=box.bottom
+        &&last.getBoundingClientRect().bottom>box.top;
+}));
+await p.evaluate(()=>{
+    document.querySelector('.messageView').scrollTop=0;
+    readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);
+});
+await p.waitForTimeout(400);
+check('A later settle leaves a manual scroll alone',await p.evaluate(()=>
+    document.querySelector('.messageView').scrollTop===0
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending')));
 await p.setViewportSize({width:390,height:850});
 await p.evaluate(()=>{
     document.getElementById('V-MailMessageView').hidden=false;

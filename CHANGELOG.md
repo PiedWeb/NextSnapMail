@@ -1,5 +1,49 @@
 # Releases
 
+## 1.7.32, 2026-09-15
+
+The compact desktop sidebar is remembered. Collapsing the folder panel used to last
+only until the next page load, because the native `leftPanelDisabled` observable is
+initialised from the viewport on every start. An explicit toggle now stores
+`pw-left-panel` in the browser's `localStorage`, and the choice is restored while the
+folder pane is being built, before it is shown, so the reader sees no expanded panel
+first. Nothing is sent to the server and no native setting is written.
+
+Only a deliberate desktop toggle is recorded. The same observable is the mobile folder
+drawer and is also opened by the application itself while a message is dragged over the
+folders; those changes are left alone, and the stored choice is not forced back on them.
+On mobile the native closed drawer wins, and crossing back over the 800 px breakpoint,
+where the application reopens the panel, restores the desktop choice. A browser that
+refuses storage keeps the native default.
+
+`tests/browser/test-left-panel-state.js` adds 11 fixture cases for that behavior, and
+the fixture folder view now carries the native `toggleLeftPanel` and mirrors the native
+breakpoint handler in both directions. The app-shell, list-metadata, selection,
+mail-polish and conversation-toggle fixtures were re-run unchanged.
+
+This release also carries the conversation reader scroll anchor. The folded history is
+drawn above the open message, so a long thread used to start the reader on its oldest
+card: fifteen messages put about 1 300 px of folded cards before the message that was
+just opened. The reader now places the opened message at the top of its scroller once
+per message, 24 px below the previous card so the history stays in sight and one scroll
+away. Opening the earliest message of a thread keeps its heading and the “Show latest
+message” action in view instead. The position is taken exactly where the expanded reader
+is revealed, after the cross-folder lookup and the native load settle, and never again
+for the same message: a manual scroll, a revealed card summary and the periodic refresh
+keep the position they find.
+
+A failed conversation walk also used to leave its folder state behind. Only the origin
+message stays on screen after the error, but the reader still sent the state it had been
+answered with, so the next request took the unchanged shortcut added in 1.7.31 and the
+folded stack never came back, neither on Try again nor on the periodic refresh. The
+state is now dropped with the error.
+
+`tests/browser/test-virtual-conversation.js` was reconnected to the 1.7.31 endpoint: its
+fixture answered the removed client-side `MessageList` searches, so the whole script
+stopped at its first wait. It now mocks the `PiedWebConversation` hook, including the
+error and unchanged-state answers, and adds three cases for the scroll anchor. All 22
+cases pass.
+
 ## 1.7.31, 2026-09-15
 
 Performance release. The reader conversation stack no longer drives its search

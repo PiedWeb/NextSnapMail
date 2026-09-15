@@ -53,6 +53,7 @@ dev-browser --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
+dev-browser --timeout 45 < tests/browser/test-left-panel-state.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
@@ -80,6 +81,12 @@ followed rows, late binding, live counts and native stylesheet replacement.
 
 `test-conversation-toggle.js` checks the actual bootstrap key, pressed styling and
 opposite setting request in desktop/mobile and light/dark fictional list fixtures.
+
+`test-left-panel-state.js` uses `?panel=1`, the only fixture page that keeps a stored
+sidebar choice. It checks the native default, storing a collapse and an expansion,
+restoration after reload at the 72 px rail width, the mobile drawer left alone in both
+directions, the return over the 800 px breakpoint and an application-driven expansion
+that is neither stored nor undone.
 
 `test-virtual-conversation.js` opens the native reader fixture with fictional
 received and Sent messages. It verifies late mounting, the newest message from

@@ -74,6 +74,15 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   their lower divider. A single file relies on its already-downloadable tile;
   with multiple files, native selection and ZIP download controls are visible
   without the ambiguous settings cog. Mobile keeps SnappyMail's compact control.
+- Since 1.7.32, the reader places the opened message at the top of its scroller
+  when folded history is drawn above it, 24 px below the previous card, so a long
+  conversation no longer opens on its oldest card. It happens once per opened
+  message, where the expanded reader is revealed, so a manual scroll, a revealed
+  summary and the periodic refresh keep the position they find; the earliest
+  message of a thread keeps its heading and latest-message action in view
+  instead. A failed walk now drops the folder state it was answered with,
+  otherwise the unchanged shortcut answered the retry and the collapsed stack
+  never returned.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

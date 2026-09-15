@@ -385,13 +385,16 @@ window.mockRequests=[]; window.mockCount=451; window.mockError='';
 rl.pluginRemoteRequest=(cb,action,params)=>{mockRequests.push({...params});setTimeout(()=>cb(0,{Result:mockError?{error:mockError}:params.operation==='prepare'?{token:'test-snapshot',count:mockCount,cursor:0,done:false,permanent:messages.folder==='Trash'}:{count:mockCount,cursor:Math.min(mockCount,params.cursor+200),done:params.cursor+200>=mockCount}}),30);};
 window.listVM={viewModelTemplateID:'MailMessageList',viewModelDom:document.getElementById('V-MailMessageList'),composeInEdit:ko.observable(false),composeClick(){actionCalls.push('compose');},reload(){actionCalls.push('reload');},messageList};
 rl.app.messageList=messageList;
-window.folderVM={currentFolder:ko.observable({localName:ko.observable('Boîte de réception'),fullName:'INBOX',unreadEmails:ko.observable(16)}),viewModelTemplateID:'MailFolderList',viewModelDom:document.getElementById('V-MailFolderList'),filterUnseen:ko.observable(false)};
+window.folderVM={currentFolder:ko.observable({localName:ko.observable('Boîte de réception'),fullName:'INBOX',unreadEmails:ko.observable(16)}),viewModelTemplateID:'MailFolderList',viewModelDom:document.getElementById('V-MailFolderList'),filterUnseen:ko.observable(false),toggleLeftPanel:()=>document.documentElement.classList.toggle('rl-left-panel-disabled')};
 const params=new URLSearchParams(location.search), mode=params.get('mode')||'reader';
 document.getElementById('rl-right').classList.toggle('message-selected',mode==='reader');
 const mobile=matchMedia('(max-width:799px)');
-const syncMobile=()=>{document.documentElement.classList.toggle('rl-mobile',mobile.matches);if(mobile.matches)document.documentElement.classList.add('rl-left-panel-disabled');};
+// Native: isMobile.onchange sets leftPanelDisabled(matches), in both directions.
+const syncMobile=()=>{document.documentElement.classList.toggle('rl-mobile',mobile.matches);document.documentElement.classList.toggle('rl-left-panel-disabled',mobile.matches);};
 mobile.addEventListener('change',syncMobile);syncMobile();
 if(params.has('compact'))document.documentElement.classList.add('rl-left-panel-disabled');
+// Only the panel fixture starts from a stored choice; other pages get the native default.
+if(!params.has('panel'))localStorage.removeItem('pw-left-panel');
 if(params.has('side'))document.documentElement.classList.add('sm-msgView-side');
 if(params.has('embedded')){document.querySelector('.nc-shell').remove();document.querySelector('#rl-app').style.inset='0';}
 if(params.has('dark'))document.documentElement.dataset.themes='dark';
@@ -403,7 +406,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?threads=179"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script>
+</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/ux.js?threads=179"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 const demoRows=[...document.querySelectorAll('.messageListItem')];

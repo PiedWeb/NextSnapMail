@@ -77,9 +77,37 @@
         const valid = (version, ctx) => !disposed && version === generation && context === ctx
             && account() === ctx.account && active() && !!currentKey()
             && (currentKey() === ctx.originKey || entries.some(entry => entry.key === currentKey()));
+        // Folded history sits above the open message, so a long conversation would
+        // otherwise start the reader on its oldest card. Place the opened message
+        // at the top of its scroller once, leaving the previous card in sight; a
+        // manual scroll, a revealed summary and the silent refresh then keep the
+        // position they find.
+        const peek = 24;
+        let anchored = '';
+        const scroller = () => {
+            for (let node = host; node && node !== document.body; node = node.parentElement)
+                if (node.scrollHeight - node.clientHeight > 1
+                    && /auto|scroll/.test(getComputedStyle(node).overflowY)) return node;
+            return null;
+        };
+        const anchor = () => {
+            const key = currentKey();
+            if (before.hidden || !key || anchored === key
+                || host.classList.contains('pw-conversation-pending')) return;
+            const box = scroller();
+            if (!box) return;
+            anchored = key;
+            box.scrollTop = beforeCards.firstElementChild
+                ? Math.max(0, box.scrollTop + header.getBoundingClientRect().top
+                    - box.getBoundingClientRect().top - peek)
+                : 0;
+        };
         const settle = () => {
             if (!loading && (!context?.followLatest || currentKey() === entries.at(-1)?.key)
-                && !vm.messageLoadingThrottle?.()) host.classList.remove('pw-conversation-pending');
+                && !vm.messageLoadingThrottle?.()) {
+                host.classList.remove('pw-conversation-pending');
+                anchor();
+            }
         };
 
         function showMessage(entry, followLatest = false) {
@@ -198,7 +226,10 @@
             if (!silent) render();
             let rows = null;
             try { rows = await collect(ctx,version); }
-            catch { if (valid(version,ctx)) error = true; }
+            // A failed walk leaves only the origin on screen, so the folder state
+            // it was answered with no longer describes what is displayed: drop it,
+            // or the next scan is answered "unchanged" and the stack never returns.
+            catch { if (valid(version,ctx)) { error = true; ctx.etag = ''; } }
             if (!valid(version,ctx)) return;
             if (rows === null && !error) { loading = silentRefresh = false; render(); settle(); return; }
             const combined = new Map();
@@ -222,7 +253,7 @@
         }
 
         function reset() {
-            ++generation; context = null; entries = []; loading = error = silentRefresh = false;
+            ++generation; context = null; entries = []; loading = error = silentRefresh = false; anchored = '';
             host.classList.remove('pw-conversation-pending'); render();
         }
         function update() {

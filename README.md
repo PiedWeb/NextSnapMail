@@ -8,7 +8,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 
 ## Included
 
-- Clear folder hierarchy, quieter secondary counters and a compact icon sidebar. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
+- Clear folder hierarchy, quieter secondary counters and a compact icon sidebar that stays collapsed after a reload. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop; a long touch does so on mobile, with no visible checkboxes.
 - Reply, Reply all, Mark unread, visible Unsubscribe and Messages/Conversations switching. The reader's native label menu sits as an icon between message details and the star.
 - In Conversations mode, the newest received or sent message opens in the native reader; earlier messages show a one-line text preview and stay one click away, without storing extra copies.
