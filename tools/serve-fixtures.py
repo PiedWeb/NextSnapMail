@@ -15,6 +15,12 @@ mounts = {'/app/': args.upstream.resolve() / 'app', '/.local-work/pied-web-ux/':
 
 
 class Handler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        # Fixtures are rebuilt between runs; a cached theme or plugin file would
+        # silently test the previous release.
+        self.send_header('Cache-Control', 'no-store, max-age=0')
+        super().end_headers()
+
     def translate_path(self, path):
         path = unquote(urlsplit(path).path)
         for prefix, base in mounts.items():

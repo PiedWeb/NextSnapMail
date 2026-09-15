@@ -1,5 +1,31 @@
 # Releases
 
+## 1.7.40, 2026-09-16
+
+The composer had no action hierarchy. Send and Save were the same grey pill, so
+nothing said which one the window exists for, and the only saturated element on
+screen was a solid red square — an unlabeled glyph for a secondary, destructive
+action.
+
+Send is now the filled primary, Save an outlined secondary, and Discard a quiet
+ghost control that turns red only under the pointer or keyboard focus. The three
+share one corner radius. The destructive step keeps its red where it belongs,
+in the confirmation dialog, which already worked this way.
+
+The discard glyph also had no accessible name. It now carries the native
+`GLOBAL/DELETE` translation as its title and `aria-label`, so French and English
+both read correctly and nothing is invented. Native commands, markup and the
+glyph itself are unchanged.
+
+New in this release: `theme-src/composer.css`, a file scoped to the composer
+header, and `tests/browser/test-composer-actions.js` with seven cases covering
+the fill, the outline, the ghost state, the hover, the shared radius, the
+accessible name and the untouched native markup.
+
+`tools/serve-fixtures.py` now answers `Cache-Control: no-store`. Without it a
+browser could keep a previous plugin or theme file and silently test the earlier
+release, which is exactly what happened while this change was being written.
+
 ## 1.7.39, 2026-09-16
 
 A followed message no longer shouts louder than the message being read. The

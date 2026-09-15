@@ -38,6 +38,15 @@
                 });
             }
         }
+        if (vm.viewModelTemplateID === 'PopupsCompose') {
+            // The native destructive action is an unlabeled glyph. Give it the
+            // native translation for a name rather than inventing one.
+            const discard = dom.querySelector('header a.btn.button-delete');
+            if (discard && !discard.getAttribute('aria-label')) {
+                discard.title = window.rl.i18n('GLOBAL/DELETE');
+                discard.setAttribute('aria-label', discard.title);
+            }
+        }
         if (vm.viewModelTemplateID === 'SystemDropDown' && !dom.classList.contains('pw-account-ready')) {
             dom.classList.add('pw-account-ready');
             const account = dom.querySelector('.accountPlace');

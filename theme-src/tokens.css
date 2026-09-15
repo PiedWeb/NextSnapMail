@@ -69,6 +69,7 @@
   --pw-primary-300: color-mix(in oklch, var(--nc-color-primary-element) 26%, var(--nc-color-main-background));
   --pw-primary-400: color-mix(in oklch, var(--nc-color-primary-element) 40%, var(--nc-color-main-background));
   --pw-primary-500: var(--nc-color-primary-element);
+  --pw-primary-600: color-mix(in oklch, var(--nc-color-primary-element) 88%, var(--nc-color-main-text));
   --pw-primary-ink: color-mix(in oklch, var(--nc-color-primary-element) 70%, var(--nc-color-main-text));
 
   /* Accents. Amber marks a followed message and nothing else; red is reserved

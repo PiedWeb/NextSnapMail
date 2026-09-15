@@ -2768,6 +2768,7 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
   --pw-primary-300: color-mix(in oklch, var(--nc-color-primary-element) 26%, var(--nc-color-main-background));
   --pw-primary-400: color-mix(in oklch, var(--nc-color-primary-element) 40%, var(--nc-color-main-background));
   --pw-primary-500: var(--nc-color-primary-element);
+  --pw-primary-600: color-mix(in oklch, var(--nc-color-primary-element) 88%, var(--nc-color-main-text));
   --pw-primary-ink: color-mix(in oklch, var(--nc-color-primary-element) 70%, var(--nc-color-main-text));
 
   /* Accents. Amber marks a followed message and nothing else; red is reserved
@@ -4763,4 +4764,56 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   #rl-app #V-MailMessageView #messageItem .attachmentsControls .g-ui-link {
     color:inherit; text-decoration:none;
   }
+}
+
+/* Composer actions.
+ *
+ * Send, Save and Delete used to read as the same grey pill, except Delete,
+ * which was a solid red square and therefore the loudest element in the window
+ * — for a secondary, destructive action. The pyramid is restored: one obvious
+ * primary, one clear but quiet secondary, and a discreet destructive action
+ * that only turns red under the pointer. Every native command is untouched.
+ */
+#rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete),
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane) {
+  border-radius: var(--pw-radius-md);
+  font-weight: var(--pw-weight-medium);
+}
+
+/* Primary: the one action the composer exists for. */
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane) {
+  border-color: transparent !important;
+  background-color: var(--pw-primary-500);
+  color: var(--nc-color-primary-element-text);
+}
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):is(:hover, :focus-visible, :active) {
+  background-color: var(--pw-primary-600, var(--nc-color-primary-element-hover));
+  color: var(--nc-color-primary-element-text);
+}
+
+/* Secondary: clear, never prominent. */
+#rl-app #V-PopupsCompose > header > a.btn.button-save {
+  border-color: var(--pw-grey-300) !important;
+  background-color: transparent;
+  color: var(--pw-grey-800);
+}
+#rl-app #V-PopupsCompose > header > a.btn.button-save:is(:hover, :focus-visible, :active) {
+  background-color: var(--pw-grey-100);
+  color: var(--pw-grey-900);
+}
+
+/* Tertiary and destructive: discoverable, unobtrusive, red only on approach. */
+#rl-app #V-PopupsCompose > header > a.btn.button-delete {
+  border-color: transparent !important;
+  background-color: transparent;
+  color: var(--pw-grey-600);
+}
+#rl-app #V-PopupsCompose > header > a.btn.button-delete:is(:hover, :focus-visible, :active) {
+  background-color: color-mix(in oklch, var(--pw-danger) 12%, var(--nc-color-main-background));
+  color: var(--pw-danger);
+}
+#rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete):focus-visible,
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
 }
