@@ -4766,6 +4766,29 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   }
 }
 
+/* Reader surface.
+ *
+ * Rules that belong to reading a message rather than to the list or the
+ * composer. Everything here is scoped to the message view.
+ */
+
+/* Sender images carry their own background. When it matches the reader's, a
+ * logo or a signature picture loses its shape and bleeds into the page. A
+ * semi-transparent inner edge gives it back without a border that would clash
+ * with the image's own colours. Tracking pixels are too small to show it. */
+#rl-app #V-MailMessageView .bodyText img {
+  outline: 1px solid rgb(0 0 0 / .07);
+  outline-offset: -1px;
+}
+@media (prefers-color-scheme: dark) {
+  :not([data-themes~="light"]) #rl-app #V-MailMessageView .bodyText img {
+    outline-color: rgb(255 255 255 / .09);
+  }
+}
+[data-themes~="dark"] #rl-app #V-MailMessageView .bodyText img {
+  outline-color: rgb(255 255 255 / .09);
+}
+
 /* Composer actions.
  *
  * Send, Save and Delete used to read as the same grey pill, except Delete,

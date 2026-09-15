@@ -68,6 +68,17 @@ await reader.evaluate(()=>{
     sub.innerHTML='<details class="attachmentsPlace" open><summary>Pièces jointes</summary><ul class="attachmentList"><li class="attachmentItem"><div class="attachmentIcon"><i class="iconMain icon-file-calendar"></i></div><div class="attachmentNameParent"><div class="attachmentName">invitation.ics</div><div class="attachmentSize">2 KiB</div></div><div class="checkboxAttachment">☑</div></li></ul><i class="fontastic controls-handle">⚙</i><div class="attachmentsControls" style="display:none"><span><i class="icon-file-archive"></i><span class="g-ui-link">Télécharger le zip</span></span></div></details>';
     document.querySelector('#messageItem .bodyText').before(sub);
 });
+check('A message image keeps its shape against a matching background',await reader.evaluate(()=>{
+ const body=document.querySelector('#V-MailMessageView .bodyText');
+ let image=body.querySelector('img');
+ if(!image){image=document.createElement('img');
+  image.src='data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
+  image.width=80;image.height=40;body.appendChild(image);}
+ const s=getComputedStyle(image);
+ const alpha=Number((s.outlineColor.match(/[\d.]+/g)||[])[3]??1);
+ return s.outlineStyle==='solid'&&parseFloat(s.outlineWidth)===1
+  &&parseFloat(s.outlineOffset)===-1&&alpha>0&&alpha<0.2;
+}));
 check('Reader typography is compact and sender name and address share one size',await reader.evaluate(()=>{
     const name=document.querySelector('.pw-sender-name'),address=document.querySelector('.pw-sender-address');
     const subject=document.querySelector('.b-message > .messageItemHeader .subjectParent');

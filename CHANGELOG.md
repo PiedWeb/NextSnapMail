@@ -1,5 +1,21 @@
 # Releases
 
+## 1.7.41, 2026-09-16
+
+A sender's image no longer dissolves into the page. Nothing protected an image
+in the message body from carrying the same background as the reader, so a white
+logo or a signature picture on a white card lost its outline entirely.
+
+Message images get a one-pixel semi-transparent inner edge, drawn as an inset
+outline so it sits over the picture instead of adding a border that would clash
+with the image's own colours. It is black at 7 % on light surfaces and white at
+9 % on dark ones, following the base theme's own dark-mode selectors. A tracking
+pixel is too small to show it.
+
+New in this release: `theme-src/reader.css`, scoped to the message view. The
+composer's inline images, their resize handles and the attachment tiles are not
+affected. `test-mail-polish.js` gains a case for the edge.
+
 ## 1.7.40, 2026-09-16
 
 The composer had no action hierarchy. Send and Save were the same grey pill, so
