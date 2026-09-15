@@ -1,5 +1,21 @@
 # Releases
 
+## 1.7.37, 2026-09-16
+
+One colour now means one thing. Above 1200 px the desktop list painted its
+unread dot amber, while `list-metadata.css` reserved amber for followed
+messages and the conversation sub-counter in the same row stayed teal: amber
+said both "unread" and "followed", and the meaning of the dot changed when the
+window crossed 1200 px, because the phone layout had always used the primary
+colour.
+
+The desktop unread dot now uses `--pw-primary-500` like every other unread
+signal. Amber is left to the star and the followed row alone. `#efc751`, the
+last colour literal in the theme with no dark-mode counterpart, is gone.
+
+Only that one declaration changed. Dot geometry, the click target that toggles
+read state, its hover and focus ring, and the read dot's grey are untouched.
+
 ## 1.7.36, 2026-09-16
 
 Adds `theme-src/tokens.css`, the design system the theme had been working

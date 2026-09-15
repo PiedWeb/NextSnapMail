@@ -4504,7 +4504,7 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
     content:''; display:block; width:8px; height:8px; border-radius:50%;
     background:color-mix(in oklch,var(--nc-color-main-text) 25%,var(--pw-paper));
   }
-  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:#efc751; }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:var(--pw-primary-500); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:hover { background:var(--pw-selected); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
   #rl-app #V-MailMessageList .messageListItem.unseen time::before { display:none; }
