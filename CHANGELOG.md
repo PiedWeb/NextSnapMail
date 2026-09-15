@@ -1,5 +1,28 @@
 # Releases
 
+## 1.7.46, 2026-09-16
+
+Empty states exist. An empty folder, an emptied trash and a search with no
+result all fell back to the engine's bare sentence, left-aligned at the top of
+an otherwise blank pane — the one screen in an otherwise fully redrawn
+interface that had never been designed. Until now the only rule in the theme
+mentioning `listEmptyMessage` was one hiding it.
+
+The sentence itself stays native, so it stays translated and stays accurate.
+What it gains is a 56 px glyph above it, the middle of the pane, and room to
+breathe. The glyph is an open tray for an empty folder and a magnifier when a
+search is running, because a folder that is not empty and a result that is
+should not look the same. The glyph is a pseudo-element, so the engine
+rewriting the sentence never removes it.
+
+Every control stays where it is. A search that returns nothing is precisely
+when the reader needs the search field back, so nothing around the state is
+hidden. The phone keeps the state at 44 px.
+
+New: `theme-src/empty-state.css` and `tests/browser/test-empty-state.js`, seven
+cases covering the layout, the glyph, the centring, the untouched sentence, the
+search variant, the search field still being reachable, and the phone scale.
+
 ## 1.7.45, 2026-09-16
 
 The phone row carried seven marks — sender, attachment glyph, conversation
