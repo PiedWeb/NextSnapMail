@@ -11,6 +11,7 @@ await list.evaluate(()=>{
     count.textContent='14/2';count.dataset.unseen='2';
     row.querySelector('.subjectParent').after(count);
     row.querySelector('.attachmentParent').innerHTML='<i class="icon-file-text"></i>';
+    document.querySelectorAll('.messageListItem')[1].querySelector('.attachmentParent').innerHTML='<i class="icon-file-calendar"></i>';
     const back=document.createElement('div');back.className='listThreadUidDesc';
     back.textContent='Retour à la liste des messages';
     document.querySelector('.messageList .b-content').prepend(back);
@@ -27,6 +28,12 @@ check('A text attachment uses the same quiet paperclip glyph as other attachment
     const icon=document.querySelector('.messageListItem .attachmentParent i');
     const style=getComputedStyle(icon,'::before');
     return style.content==='""' && style.maskImage!=='none' && style.backgroundColor!=='rgba(0, 0, 0, 0)';
+}));
+check('A sole calendar attachment keeps its native calendar glyph',await list.evaluate(()=>{
+    const icon=document.querySelectorAll('.messageListItem')[1].querySelector('.attachmentParent i');
+    const style=getComputedStyle(icon,'::before');
+    return icon.classList.contains('icon-file-calendar')&&getComputedStyle(icon).fontSize==='17px'
+        &&style.content.includes('📅')&&style.maskImage==='none';
 }));
 check('The conversation toggle centers its icon and the back-to-list control stays compact',await list.evaluate(()=>{
     const button=document.querySelector('button.pw-threads'),pseudo=getComputedStyle(button,'::before');

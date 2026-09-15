@@ -67,6 +67,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   native resizers retain variable widths and the mobile layout stays intact.
 - Since 1.7.24, the desktop reader sender line sits directly below its preceding
   header content with no extra top margin; the mobile breakpoint is unchanged.
+- Since 1.7.25, a sole iCalendar attachment keeps SnappyMail's semantic calendar
+  glyph in desktop message rows. The custom paperclip is limited to generic/mixed
+  and text-file indicators; recognized image, archive and other file types also
+  retain their native glyphs. Reader and mobile attachment styling are unchanged.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

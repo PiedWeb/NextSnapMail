@@ -25,9 +25,12 @@
   }
   #rl-app #V-MailMessageList .messageListItem .attachmentParent i[class*="icon-"] {
     display:inline-flex; align-items:center; justify-content:center;
-    width:20px; height:20px; font-size:0; line-height:1;
+    width:20px; height:20px; font-size:17px; line-height:1;
   }
-  #rl-app #V-MailMessageList .messageListItem .attachmentParent i[class*="icon-"]::before {
+  #rl-app #V-MailMessageList .messageListItem .attachmentParent i:is(.icon-attachment,.icon-file-text) {
+    font-size:0;
+  }
+  #rl-app #V-MailMessageList .messageListItem .attachmentParent i:is(.icon-attachment,.icon-file-text)::before {
     content:''; display:block; width:17px; height:17px;
     background:currentColor;
     mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m20.5 11.5-8.7 8.7a5 5 0 0 1-7.1-7.1l9.4-9.4a3.5 3.5 0 0 1 5 5l-9.5 9.5a2 2 0 0 1-2.8-2.8l8.6-8.6'/%3E%3C/svg%3E") center/contain no-repeat;

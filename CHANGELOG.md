@@ -1,5 +1,14 @@
 # Releases
 
+## 1.7.25, 2026-09-15
+
+Desktop message rows retain SnappyMail's native calendar glyph when their sole
+attachment is an iCalendar file. The custom paperclip introduced in 1.7.23 is
+now limited to generic/mixed and text-file indicators instead of overriding
+every recognized attachment type. A fictional browser check covers the
+computed `.icon-file-calendar` content and confirms that no paperclip mask is
+applied. Mobile and reader attachment styling are unchanged.
+
 ## 1.7.24, 2026-09-14
 
 Remove the extra top margin above the sender line in the desktop message
