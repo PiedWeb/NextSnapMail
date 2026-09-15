@@ -83,6 +83,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   instead. A failed walk now drops the folder state it was answered with,
   otherwise the unchanged shortcut answered the retry and the collapsed stack
   never returned.
+- Since 1.7.33, the desktop calendar action keeps 6 px between the metadata rule and
+  its own hover surface, so the tinted background never touches a divider.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.

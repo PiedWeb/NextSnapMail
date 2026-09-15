@@ -79,11 +79,15 @@ check('The reply actions have a visible separator',await reader.evaluate(()=>{
     const style=getComputedStyle(document.querySelector('.pw-reading-actions'));
     return style.borderTopWidth==='1px'&&style.paddingTop==='18px';
 }));
+await reader.locator('.pw-message-extras .pw-import-calendar').last().hover();
 check('Calendar action follows message metadata as a secondary inline action',await reader.evaluate(()=>{
     const meta=document.querySelector('#messageItem > .messageItemHeader'),button=document.querySelector('.pw-import-calendar');
+    const hovered=document.querySelector('.pw-message-extras .pw-import-calendar:last-child');
     const style=getComputedStyle(button);
     return meta.nextElementSibling===button.parentElement&&style.borderTopWidth==='0px'
-        &&style.backgroundColor==='rgba(0, 0, 0, 0)';
+        &&style.backgroundColor==='rgba(0, 0, 0, 0)'
+        &&getComputedStyle(hovered).backgroundColor!=='rgba(0, 0, 0, 0)'
+        &&hovered.getBoundingClientRect().top-meta.getBoundingClientRect().bottom>=6;
 }));
 check('Attachment uses a compact file tile with no oversized glyph or overflow',await reader.evaluate(()=>{
     const item=document.querySelector('.attachmentItem'),icon=item.querySelector('.iconMain');

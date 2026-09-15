@@ -1,5 +1,18 @@
 # Releases
 
+## 1.7.33, 2026-09-15
+
+The desktop calendar action no longer hangs off the divider above it. Its hover and
+focus surface started exactly where the message metadata rule ends, so pointing at
+"Ajouter au calendrier" painted a tinted block glued to that line. The row now keeps a
+6 px gap below that rule, the spacing the owner chose, and the existing 12 px before
+the attachment divider, so the tinted surface stands free of both separators.
+
+Only the desktop rule above 800 px changed; the phone layout keeps its own spacing and
+is untouched, as are the button geometry, colors, icon and keyboard focus ring. The
+mail-polish browser fixture now hovers the action and checks both the tinted surface and
+the distance to the metadata rule.
+
 ## 1.7.32, 2026-09-15
 
 The compact desktop sidebar is remembered. Collapsing the folder panel used to last

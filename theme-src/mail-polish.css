@@ -90,7 +90,7 @@
     display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
   }
   #rl-app #V-MailMessageView .pw-message-extras {
-    margin:0 36px 10px; gap:0;
+    margin:6px 36px 10px; gap:0;
   }
   #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar {
     min-height:32px; padding:5px 8px; gap:7px;
