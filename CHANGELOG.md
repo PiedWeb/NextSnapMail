@@ -1,5 +1,29 @@
 # Releases
 
+## 1.7.43, 2026-09-16
+
+Floating surfaces get an elevation system. The four of them — the Undo Send
+notice, the bulk-delete confirmation, the copy confirmation and the inline image
+toolbar — each carried an invented single-blur shadow, written in a different
+notation (`#0002`, `#0003`, `rgba(0,0,0,.18)`, `#12343220`), each with its own
+corner radius, and each with a one-pixel border underneath the shadow doing the
+same job twice.
+
+They now take a level from `--pw-elevation-1` to `--pw-elevation-5` and drop
+their borders. Every level is a hairline ring plus a tight contact shadow plus a
+soft cast one, with the contact shadow fading and the cast one growing as the
+surface rises, so height is read rather than guessed: the confirmation toast sits
+at level 2, the send notice and the image toolbar at level 3, the modal at
+level 5. The ring keeps a card's edge legible when its background matches the
+page, which a shadow alone cannot do in dark mode. All four share one radius.
+
+The tokens moved from `#rl-app` to `:root` so page-level nodes — the copy
+confirmation is a live region outside the application root — can reach them.
+
+New: `tests/browser/test-elevation.js`, six cases covering presence, the absence
+of borders, the shape of each shadow, that no shadow is invented outside the
+scale, the order of the three heights, and the shared radius.
+
 ## 1.7.42, 2026-09-16
 
 The reading column reads as one block. The message body was already capped at a

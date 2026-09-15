@@ -8,7 +8,7 @@
  * primary colour or a dark theme moves the whole system at once, and no second
  * palette is imposed on the workspace.
  */
-#rl-app {
+:root {
   /* Type scale. Seven sizes cover the whole interface; nothing between them. */
   --pw-text-xs: 12px;
   --pw-text-sm: 14px;
@@ -78,11 +78,14 @@
   --pw-flag-tint: color-mix(in oklch, oklch(0.68 0.15 75) 16%, var(--nc-color-main-background));
   --pw-danger: var(--nc-color-error, #b3261e);
 
-  /* Elevation. Each level is two shadows: a soft cast one and a tight contact
-   * one that fades as the surface rises. Use a level, never a new shadow. */
-  --pw-elevation-1: 0 1px 1px rgb(0 0 0 / .06), 0 1px 3px rgb(0 0 0 / .07);
-  --pw-elevation-2: 0 1px 2px rgb(0 0 0 / .05), 0 4px 10px rgb(0 0 0 / .08);
-  --pw-elevation-3: 0 1px 2px rgb(0 0 0 / .04), 0 8px 20px rgb(0 0 0 / .10);
-  --pw-elevation-4: 0 2px 4px rgb(0 0 0 / .03), 0 14px 32px rgb(0 0 0 / .12);
-  --pw-elevation-5: 0 24px 56px rgb(0 0 0 / .18);
+  /* Elevation. Each level carries a hairline ring so a surface keeps its edge
+   * against a background of its own colour, then a tight contact shadow that
+   * fades as the surface rises, then a soft cast one that grows. Use a level,
+   * never a new shadow, and never add a border on top of one. */
+  --pw-ring: 0 0 0 1px color-mix(in oklch, var(--nc-color-main-text) 9%, transparent);
+  --pw-elevation-1: var(--pw-ring), 0 1px 1px rgb(0 0 0 / .06), 0 1px 3px rgb(0 0 0 / .06);
+  --pw-elevation-2: var(--pw-ring), 0 1px 2px rgb(0 0 0 / .05), 0 4px 10px rgb(0 0 0 / .07);
+  --pw-elevation-3: var(--pw-ring), 0 1px 2px rgb(0 0 0 / .04), 0 8px 20px rgb(0 0 0 / .09);
+  --pw-elevation-4: var(--pw-ring), 0 2px 4px rgb(0 0 0 / .03), 0 14px 32px rgb(0 0 0 / .11);
+  --pw-elevation-5: var(--pw-ring), 0 24px 56px rgb(0 0 0 / .16);
 }
