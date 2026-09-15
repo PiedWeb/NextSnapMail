@@ -68,6 +68,27 @@ await reader.evaluate(()=>{
     sub.innerHTML='<details class="attachmentsPlace" open><summary>Pièces jointes</summary><ul class="attachmentList"><li class="attachmentItem"><div class="attachmentIcon"><i class="iconMain icon-file-calendar"></i></div><div class="attachmentNameParent"><div class="attachmentName">invitation.ics</div><div class="attachmentSize">2 KiB</div></div><div class="checkboxAttachment">☑</div></li></ul><i class="fontastic controls-handle">⚙</i><div class="attachmentsControls" style="display:none"><span><i class="icon-file-archive"></i><span class="g-ui-link">Télécharger le zip</span></span></div></details>';
     document.querySelector('#messageItem .bodyText').before(sub);
 });
+check('Reader toolbar icons sit below the text in contrast and are grouped by space, not by a rule',await reader.evaluate(()=>{
+ const bar=document.querySelector('#V-MailMessageView.pw-enhanced > .top-toolbar');
+ const commands=bar.querySelector('.pw-reader-commands');
+ const actions=bar.querySelector('.pw-message-actions');
+ const icon=bar.querySelector('[data-pw-icon].btn:not(.pw-reply)');
+ const subject=document.querySelector('#V-MailMessageView .messageItemHeader .subjectParent');
+ // Computed colours can come back in any colour space; resolve them to sRGB.
+ const ctx=document.createElement('canvas').getContext('2d',{willReadFrequently:true});
+ const lum=c=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=c;ctx.fillRect(0,0,1,1);
+  const [r,g,b]=ctx.getImageData(0,0,1,1).data;
+  const f=v=>{v/=255;return v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4);};
+  return 0.2126*f(r)+0.7152*f(g)+0.0722*f(b);};
+ const iconLum=lum(getComputedStyle(icon).color), textLum=lum(getComputedStyle(subject).color);
+ const groups=[...commands.children];
+ const inner=parseFloat(getComputedStyle(groups[0]).gap)||0;
+ const outer=parseFloat(getComputedStyle(commands).gap)||0;
+ const border=getComputedStyle(actions);
+ return iconLum>textLum+0.05
+  &&outer>=inner*3&&groups.length>=3
+  &&parseFloat(border.borderInlineStartWidth)===0&&parseFloat(border.borderInlineEndWidth)===0;
+}));
 check('Every block of the reading column stops at the same measure',await reader.evaluate(()=>{
  const view=document.querySelector('#V-MailMessageView');
  const blocks=[view.querySelector('#messageItem > .messageItemHeader')||view.querySelector('.messageItemHeader'),

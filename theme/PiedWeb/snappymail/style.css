@@ -4822,6 +4822,35 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   }
 }
 
+/* Reader toolbar.
+ *
+ * Eight icon buttons of identical weight, separated by a rule, read as one
+ * undifferentiated wall. Icons cover a lot of surface, so they need less
+ * contrast than the text around them, not more; and groups are told apart by
+ * the space around them rather than by another line.
+ */
+@media (min-width: 800px) {
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar [data-pw-icon].btn:not(.pw-reply) {
+    color: var(--pw-grey-500);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar [data-pw-icon].btn:not(.pw-reply):is(:hover, :focus-visible) {
+    color: var(--pw-grey-900);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands {
+    gap: var(--pw-space-3);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group {
+    gap: 2px;
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions,
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {
+    border: 0;
+    padding-inline: 0;
+    margin-inline-end: 0;
+    background: transparent;
+  }
+}
+
 /* Composer actions.
  *
  * Send, Save and Delete used to read as the same grey pill, except Delete,

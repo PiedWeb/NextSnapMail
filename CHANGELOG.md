@@ -1,5 +1,25 @@
 # Releases
 
+## 1.7.44, 2026-09-16
+
+The reader toolbar reads as groups instead of a wall. Eight icon buttons carried
+the same weight as the text beside them and were told apart by a vertical rule.
+Icons cover far more surface than a glyph of text, so at equal colour they feel
+heavier, not equal.
+
+Toolbar icons drop to the 500 step of the grey ramp and return to full contrast
+under the pointer or keyboard focus, so they recede without becoming unreadable.
+The reply group, the filing group, the copy control and the overflow menu are
+separated by 12 px of space with 2 px inside each group, and the rule between
+them is gone. The reply button keeps its tint, and the primary Répondre under the
+message is now unmistakably the strongest action in the pane.
+
+Only widths above 800 px change; the phone toolbar keeps its geometry. Commands,
+order, titles, keyboard focus and the overflow menu are untouched.
+`test-mail-polish.js` gains a case comparing the icon and subject luminance in
+sRGB, the gap inside a group against the gap between groups, and the absence of
+the separator.
+
 ## 1.7.43, 2026-09-16
 
 Floating surfaces get an elevation system. The four of them — the Undo Send
