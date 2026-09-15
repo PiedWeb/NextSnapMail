@@ -68,6 +68,17 @@ await reader.evaluate(()=>{
     sub.innerHTML='<details class="attachmentsPlace" open><summary>Pièces jointes</summary><ul class="attachmentList"><li class="attachmentItem"><div class="attachmentIcon"><i class="iconMain icon-file-calendar"></i></div><div class="attachmentNameParent"><div class="attachmentName">invitation.ics</div><div class="attachmentSize">2 KiB</div></div><div class="checkboxAttachment">☑</div></li></ul><i class="fontastic controls-handle">⚙</i><div class="attachmentsControls" style="display:none"><span><i class="icon-file-archive"></i><span class="g-ui-link">Télécharger le zip</span></span></div></details>';
     document.querySelector('#messageItem .bodyText').before(sub);
 });
+check('Every block of the reading column stops at the same measure',await reader.evaluate(()=>{
+ const view=document.querySelector('#V-MailMessageView');
+ const blocks=[view.querySelector('#messageItem > .messageItemHeader')||view.querySelector('.messageItemHeader'),
+  view.querySelector('.bodyText'),view.querySelector('.pw-reading-actions')].filter(Boolean);
+ if(blocks.length<3)return false;
+ const rights=blocks.map(el=>Math.round(el.getBoundingClientRect().right));
+ const pane=Math.round(view.getBoundingClientRect().width);
+ const widths=blocks.map(el=>Math.round(el.getBoundingClientRect().width));
+ return new Set(rights).size===1&&widths.every(w=>w<=640)
+  &&(pane<=680||widths.every(w=>w<pane-40));
+}));
 check('A message image keeps its shape against a matching background',await reader.evaluate(()=>{
  const body=document.querySelector('#V-MailMessageView .bodyText');
  let image=body.querySelector('img');

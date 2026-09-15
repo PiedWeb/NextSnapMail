@@ -1,5 +1,25 @@
 # Releases
 
+## 1.7.42, 2026-09-16
+
+The reading column reads as one block. The message body was already capped at a
+comfortable measure, but the header rule, the calendar action, the attachment
+block and the reply row still ran the full width of the pane. On a 1 440 px
+window that drew a 1 120 px rule under a 568 px column, so the empty half of the
+pane was underlined instead of simply being left alone.
+
+Every block of the reading column now shares one measure — 640 px border box,
+568 px of text between two 36 px gutters — and its own margin is zero, so the
+header rule, the attachment divider and the reply separator all stop where the
+text stops. Folded conversation cards follow the same measure. The measure and
+the gutter are two variables on the message view, not a value repeated in five
+rules.
+
+The paragraph width itself is unchanged and stays inside the readable range,
+around 68 characters at the current body size. Only widths above 800 px are
+affected; the phone reader is untouched. `test-mail-polish.js` gains a case
+asserting that the header, the body and the reply row report one right edge.
+
 ## 1.7.41, 2026-09-16
 
 A sender's image no longer dissolves into the page. Nothing protected an image

@@ -20,3 +20,33 @@
 [data-themes~="dark"] #rl-app #V-MailMessageView .bodyText img {
   outline-color: rgb(255 255 255 / .09);
 }
+
+/* One reading measure.
+ *
+ * The body was capped at 640 px while the header, the attachment block and the
+ * reply row still ran the full width of the pane — so their rules crossed 1 120 px
+ * under a 568 px column and drew attention to the empty half instead of absorbing
+ * it. Every block of the reading column now stops where the text stops, and the
+ * margin to its right is simply left alone.
+ */
+#rl-app #V-MailMessageView {
+  --pw-measure: 640px;   /* border box: 568 px of text between two 36 px gutters */
+  --pw-gutter: 36px;
+}
+@media (min-width: 800px) {
+  #rl-app #V-MailMessageView :is(
+    #messageItem > .messageItemHeader,
+    .b-message > .messageItemHeader,
+    .bodyText,
+    .pw-message-extras,
+    #messageItem .attachmentsPlace,
+    .pw-reading-actions,
+    .pw-conversation-before,
+    .pw-conversation-after
+  ) {
+    max-width: var(--pw-measure);
+    box-sizing: border-box;
+    margin-inline: 0;
+    padding-inline: var(--pw-gutter);
+  }
+}
