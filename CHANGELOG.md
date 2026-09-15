@@ -1,5 +1,23 @@
 # Releases
 
+## 1.7.36, 2026-09-16
+
+Adds `theme-src/tokens.css`, the design system the theme had been working
+without. Five scales are decided once and named: seven type sizes, three
+weights, three line heights and two tracking values; an eight-step spacing
+scale; four corner radii; a ten-step grey ramp and a six-step primary ramp,
+both mixed from the instance's own Nextcloud colours so a custom accent or the
+dark theme still moves everything together; and five elevation levels, each a
+two-part shadow rather than a single blur.
+
+The sheet loads directly after the preserved base and before every Pied Web
+rule, so any later sheet can use a token without minding the order.
+
+Nothing consumes the tokens yet, so nothing moves: the winning declaration for
+every `(media, selector, property)` triple already in the bundle is unchanged,
+and the 42 new entries are all custom properties. Later releases replace the
+literal values rule by rule.
+
 ## 1.7.35, 2026-09-16
 
 Housekeeping with no visual change. `theme-src/studio.css` had grown as an
