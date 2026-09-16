@@ -55,7 +55,7 @@
     width:max-content; max-width:calc(100% - 24px); min-height:36px;
     box-sizing:border-box; margin:8px 12px 12px; padding:7px 10px;
     border:0; border-radius:6px; background:transparent;
-    color:var(--nc-color-primary-element); font:500 13px/1.3 var(--pw-font);
+    color:var(--nc-color-primary-element); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
     text-shadow:none; cursor:pointer;
   }
   #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc::before {
@@ -73,16 +73,16 @@
 
 @media (min-width: 800px) {
   #rl-app #V-MailMessageView .b-message:not(.pw-conversation-active) > .messageItemHeader .subjectParent {
-    font-size:18px; line-height:1.3; letter-spacing:-.25px;
+    font-size:var(--pw-text-lg); line-height:1.3; letter-spacing:var(--pw-tracking-tight);
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader .informationShort:has(.pw-from) {
-    margin-top:0; font-size:14px; line-height:1.35;
+    margin-top:0; font-size:var(--pw-text-sm); line-height:1.35;
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader :is(.pw-sender-name,.pw-sender-address) {
-    font-size:14px; line-height:1.35;
+    font-size:var(--pw-text-sm); line-height:1.35;
   }
   #rl-app #V-MailMessageView #messageItem > .messageItemHeader :is(.informationShort,.date) {
-    font-size:13px; line-height:1.4;
+    font-size:var(--pw-text-sm); line-height:1.4;
   }
   #rl-app #V-MailMessageView .pw-reading-actions {
     margin:24px 36px 0; padding:18px 0 32px;
@@ -102,7 +102,7 @@
   #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar {
     min-height:32px; padding:5px 8px; gap:7px;
     border:0!important; border-radius:6px; background:transparent;
-    color:var(--nc-color-primary-element); font:500 13px/1.3 var(--pw-font);
+    color:var(--nc-color-primary-element); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
   }
   #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar::before {
     content:''; display:block; flex:0 0 16px; width:16px; height:16px;
@@ -121,7 +121,7 @@
   }
   #rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary {
     width:max-content; max-width:100%; margin:0 0 10px;
-    color:var(--nc-color-main-text); font:600 14px/1.35 var(--pw-font);
+    color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-sm)/1.35 var(--pw-font);
     cursor:pointer;
   }
   #rl-app #V-MailMessageView #messageItem .attachmentList {
@@ -147,13 +147,13 @@
   }
   #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentNameParent {
     grid-column:2; min-width:0; margin:0; padding:8px 12px 8px 4px;
-    border:0; color:var(--nc-color-main-text); font:500 13px/1.3 var(--pw-font);
+    border:0; color:var(--nc-color-main-text); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
   }
   #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentName {
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
   }
   #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentSize {
-    margin-top:3px; color:var(--pw-muted); font-size:12px; opacity:1;
+    margin-top:3px; color:var(--pw-muted); font-size:var(--pw-text-xs); opacity:1;
   }
   #rl-app #V-MailMessageView #messageItem .attachmentsPlace .controls-handle {
     display:none!important;
@@ -182,7 +182,7 @@
   #rl-app #V-MailMessageView #messageItem .attachmentsControls > span {
     display:inline-flex; align-items:center; gap:7px; min-height:32px; box-sizing:border-box;
     padding:5px 8px; border-radius:6px; color:var(--nc-color-primary-element);
-    font:500 13px/1.3 var(--pw-font);
+    font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
   }
   #rl-app #V-MailMessageView #messageItem .attachmentsControls > span:is(:hover,:focus-within) {
     background:var(--pw-selected);

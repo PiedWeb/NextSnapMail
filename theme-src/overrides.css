@@ -14,8 +14,8 @@
   border: 0;
   border-bottom: 1px solid var(--nc-color-border);
   border-radius: 0;
-  font-size: 14px;
-  font-weight: 400;
+  font-size:var(--pw-text-sm);
+  font-weight:var(--pw-weight-regular);
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -23,7 +23,7 @@
 #rl-app .b-folders li a.selectable[data-unread],
 #rl-app .b-folders li a.selectable.unread-sub,
 #rl-app .b-folders li a.selectable.selected {
-  font-weight: 650;
+  font-weight:var(--pw-weight-strong);
 }
 
 #rl-app .b-folders li a.selectable.selected {
@@ -52,8 +52,8 @@
   border-radius: 6px;
   background: var(--nc-color-primary-element);
   color: var(--nc-color-primary-element-text);
-  font-size: 13px;
-  font-weight: 650;
+  font-size:var(--pw-text-sm);
+  font-weight:var(--pw-weight-strong);
   font-variant-numeric: tabular-nums;
   line-height: 20px;
   text-align: center;
@@ -111,11 +111,11 @@
 
 /* Unread emphasis belongs to the subject, not to the sender. */
 #rl-app .messageListItem.unseen .senderParent {
-  font-weight: 400;
+  font-weight:var(--pw-weight-regular);
 }
 
 #rl-app .messageListItem.unseen .subjectParent {
-  font-weight: 700;
+  font-weight:var(--pw-weight-strong);
 }
 
 #rl-app .b-folders hr {
@@ -147,7 +147,7 @@
   background: transparent;
   color: var(--nc-color-main-text);
   font-size: 1em;
-  font-weight: 650;
+  font-weight:var(--pw-weight-strong);
   font-variant-numeric: tabular-nums;
   line-height: inherit;
   text-shadow: none;
@@ -184,13 +184,13 @@
 
 /* Keep attention on the inbox rather than accumulated junk and deleted mail. */
 #rl-app .b-folders .b-folders-system a:is([data-icon="⚠"], [data-icon="🗑"]):not(.selected) {
-  font-weight: 400;
+  font-weight:var(--pw-weight-regular);
 }
 #rl-app .b-folders .b-folders-system a:is([data-icon="⚠"], [data-icon="🗑"])[data-unread]::after,
 #rl-app .b-folders .b-folders-user a:is([title="spam" i], [title="junk" i], [title="trash" i])[data-unread]::after {
   background: var(--nc-color-background-dark);
   color: var(--nc-color-main-text);
-  font-weight: 500;
+  font-weight:var(--pw-weight-medium);
 }
 
 /* A compact desktop rail contains usable icons, not clipped folder names. */
@@ -228,7 +228,7 @@
     transform: none;
     min-width: 18px;
     padding: 0 3px;
-    font-size: 10px;
+    font-size:var(--pw-text-xs);
     line-height: 16px;
     border-radius: 4px;
   }
@@ -280,7 +280,7 @@
 
 /* More room for subjects; the sender retains its normal weight. */
 #rl-app .messageListItem {
-  font-size: 14px;
+  font-size:var(--pw-text-sm);
 }
 #rl-app .messageListItem .senderParent {
   flex: 0 1 22%;
@@ -395,7 +395,7 @@ html:not(.sm-msgView-side):not(.sm-msgView-bottom) #rl-app #rl-right:not(.messag
   padding: 0;
   box-sizing: border-box;
   margin: 0;
-  font-size: 20px;
+  font-size:var(--pw-text-xl);
   line-height: 1;
 }
 #rl-app #V-MailMessageView .pw-mark-unread > span {
@@ -445,7 +445,7 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   }
   #rl-app #V-PopupsCompose input,
   #rl-app #V-PopupsCompose textarea {
-    font-size: 16px;
+    font-size:var(--pw-text-md);
   }
 }
 
@@ -484,14 +484,14 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   min-width: 0;
   padding: 6px 10px;
   max-width: 100%;
-  font-size: 15px;
+  font-size:var(--pw-text-sm);
   gap: 8px;
 }
 #rl-app #V-SystemDropDown .pw-account-original { display: none !important; }
 #rl-app #V-SystemDropDown .pw-account-label {
   display: flex;
   min-width: 0;
-  font-weight: 600;
+  font-weight:var(--pw-weight-strong);
 }
 #rl-app #V-SystemDropDown .pw-account-local {
   flex: 0 1 auto;
@@ -526,10 +526,10 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   padding-inline: 10px;
   min-height: 40px;
   font: inherit;
-  font-size: 14px;
+  font-size:var(--pw-text-sm);
 }
 #rl-app #V-MailMessageList .pw-threads[aria-pressed="true"] { border-color: var(--nc-color-primary-element); }
-#rl-app .pw-threads-error { font-size: 13px; color: var(--nc-color-error, #b3261e); }
+#rl-app .pw-threads-error { font-size:var(--pw-text-sm); color: var(--nc-color-error, #b3261e); }
 #rl-app .messageList .b-footer.pw-single-page { display: none; }
 #rl-app .messageList .b-content > .b-footer {
   position: static;
@@ -551,7 +551,7 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   margin: 0;
   padding: 6px 12px;
   font: inherit;
-  font-size: 14px;
+  font-size:var(--pw-text-sm);
   white-space: normal;
 }
 html.rl-fullscreen #rl-app #rl-right { padding-top: 0; }

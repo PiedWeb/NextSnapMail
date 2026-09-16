@@ -40,7 +40,7 @@
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
   #rl-app #V-MailMessageList .messageListItem.unseen time::before { display:none; }
   #rl-app #V-MailMessageList .messageListItem .senderParent {
-    font-size: 14px;
+    font-size:var(--pw-text-sm);
     line-height: 1.4;
   }
   #rl-app #V-MailMessageList .messageListItem .subjectParent { line-height: 1.5; }

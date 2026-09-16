@@ -1,5 +1,36 @@
 # Releases
 
+## 1.7.48, 2026-09-16
+
+The type scale exists and is enforced. Text was set at fourteen different sizes
+between 10 and 25 px, with steps of a single pixel — 12, 13, 14, 15 and 17, 18,
+19, 20 all in use — eight font weights including 550, 580, 620 and 650 that no
+eye separates from 500 or 600, and eleven hand-tuned tracking values between
+-0.15 and -0.6 px.
+
+Every piece of text now takes one of seven sizes, one of three weights and one
+of two tracking values, named rather than written: 150 literal values became
+token references. The two decisions worth noting: 13 px, the most common size in
+the interface, went up to 14 px, which is what the desktop list, the folder rail
+and the reader were already using above 1200 px, so the narrower layouts line up
+with them; and the list subject came down from 15 px to the same 14 px as the
+sender, because the subject is already marked by weight and did not need the
+size as well.
+
+Tracking is now tight only above 17 px, where it was doing something, and zero
+below, where it was not. Uppercase labels keep one spacing value instead of
+three.
+
+Glyph sizes are deliberately left alone: `font-size` on an attachment paperclip,
+a star, a collapsed-folder sign or a draft icon sets a picture, not text, and
+belongs to the sizing scale rather than the type scale.
+
+Two fixtures asserted a number the scale has moved: the label menu now compares
+itself to `--pw-text-sm` and to the message subject rather than to a literal
+15 px, and the no-JavaScript fallback checks the followed row's edge accent
+introduced in 1.7.39 rather than the surface it replaced. All 23 browser
+fixtures pass.
+
 ## 1.7.47, 2026-09-16
 
 Three engine defaults still spoke their own language in the middle of a Lucide

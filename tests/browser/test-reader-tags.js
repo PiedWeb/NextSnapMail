@@ -21,7 +21,11 @@ check('The original menu opens under the new icon',await page.evaluate(()=>{
 }));
 check('Label entries match the other menus rather than the message title',await page.evaluate(()=>{
  const item=document.querySelector('.pw-reader-tags .dropdown-menu a'),style=getComputedStyle(item);
- return style.fontSize==='15px' && Number(style.fontWeight)===400;
+ const scale=getComputedStyle(document.documentElement).getPropertyValue('--pw-text-sm').trim();
+ const subject=document.querySelector('.messageItemHeader .subjectParent');
+ const menuSize=parseFloat(style.fontSize);
+ return style.fontSize===scale && Number(style.fontWeight)===400
+  && (!subject || menuSize < parseFloat(getComputedStyle(subject).fontSize));
 }));
 await page.locator('.pw-reader-tags .dropdown-menu a').first().click();
 check('The bound label action still responds',await page.evaluate(()=>fixtureLabelActions.length===1 && fixtureLabelActions[0]==='Projet'));

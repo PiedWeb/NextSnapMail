@@ -13,7 +13,7 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
  html.pw-mail-shell #rl-app #rl-right > .pw-mobile-header > button.pw-search-toggle {display:flex;}
  html.pw-mail-shell #rl-app #rl-right > .pw-mobile-header > button.pw-search-toggle::before {display:block;}
  html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .search-input-wrp {display:flex;flex:1;min-width:0;position:relative;}
- html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .inputSearch {width:100%;font-size:16px;height:40px;min-height:40px;padding-inline-end:32px;}
+ html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .inputSearch {width:100%;font-size:var(--pw-text-md);height:40px;min-height:40px;padding-inline-end:32px;}
  html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .buttonMoreSearch {position:absolute;inset-inline-end:0;top:0;}
  html.pw-mail-shell #rl-app #V-MailFolderList .pw-desktop-identity {display:block;height:64px;min-height:64px;}
  html.pw-mail-shell #rl-app #V-SettingsMenu > .b-toolbar {padding-inline-start:60px;min-height:64px;}
