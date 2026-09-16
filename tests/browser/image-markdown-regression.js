@@ -55,8 +55,9 @@ const results=await p.evaluate(async()=>{
  let now=0,queue=[],prepared;
  const delay=PiedWebUx.createSendDelay(()=>{}, {now:()=>now,later:fn=>queue.push(fn),clear:()=>{queue=[];}});
  delay.start(async()=>{prepared=await getParams(false);});
- now=4999;queue.shift()();check('Markdown send still waits the full five seconds',!prepared);
- now=5000;queue.shift()();await new Promise(resolve=>setTimeout(resolve,0));
+ const undoWindow=PiedWebUx.sendDelaySeconds*1000;
+ now=undoWindow-1;queue.shift()();check('Markdown send still waits out the whole undo window',!prepared);
+ now=undoWindow;queue.shift()();await new Promise(resolve=>setTimeout(resolve,0));
  check('Delayed send serializes the current Markdown body',prepared?.html.includes('<strong>Envoi différé</strong>'));
  const sanitize=PiedWebUx.markdownDeps.dompurify.sanitize;
  PiedWebUx.markdownDeps.dompurify.sanitize=()=>{throw Error('simulated converter failure');};edit.plain.value='Texte à préserver <exactement>';

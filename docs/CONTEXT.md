@@ -98,8 +98,13 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.
   All filtered pages use a confirmed, account/folder/filter-scoped UID snapshot.
-- The five-second Undo Send floats after closing compose, while mailbox use continues.
+- The Undo Send window floats after closing compose, while mailbox use continues.
   It delays browser submission; there is no recall after delivery or server scheduled send.
+  Since 1.7.53 the window is three seconds, held in one place as
+  `PiedWebUx.sendDelaySeconds`, and a quiet send glyph beside Undo skips the rest of the
+  countdown. It skips only the wait: the send still waits for the draft save, Undo stays
+  available until the request leaves, and the glyph is hidden once the countdown is over.
+  Closing the window during the countdown still sends nothing, and the draft is in Drafts.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
 - Reader Copy as Markdown uses the displayed message body, expands quoted text in the copy,
   and flattens image-heavy contact signatures to short linked text. It leaves the message

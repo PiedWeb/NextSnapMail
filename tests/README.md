@@ -54,6 +54,7 @@ dev-browser --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser --timeout 45 < tests/browser/test-composer-actions.js
 dev-browser --timeout 45 < tests/browser/test-elevation.js
+dev-browser --timeout 75 < tests/browser/test-send-now.js
 dev-browser --timeout 45 < tests/browser/test-empty-state.js
 dev-browser --timeout 50 < tests/browser/test-native-controls.js
 dev-browser --timeout 50 < tests/browser/test-font-delivery.js
@@ -87,6 +88,18 @@ followed rows, late binding, live counts and native stylesheet replacement.
 
 `test-conversation-toggle.js` checks the actual bootstrap key, pressed styling and
 opposite setting request in desktop/mobile and light/dark fictional list fixtures.
+
+`test-send-now.js` builds the outgoing notice from the markup `background-send.js`
+ships, so a change to `render()` cannot leave it passing, and checks the Send now
+control: its place beside Undo, its 44 px target and 20 px glyph, its accessible
+name, the hidden state once the countdown ends, the resting and focused surfaces
+and ring, non-text contrast, both controls free of the Nextcloud button border,
+and the 390 px layout. It also drives `createSendDelay` with an injected clock to
+confirm that a cancelled delay never sends and a completed one sends once. The
+fixture root is pinned to `data-themes="light"`, so the dark pass compares the
+glyph with the subject line's token rather than reading an absolute dark ratio.
+The notice's own phase transitions need the native compose view model and are not
+covered here; no message is sent.
 
 `test-left-panel-state.js` uses `?panel=1`, the only fixture page that keeps a stored
 sidebar choice. It checks the native default, storing a collapse and an expansion,

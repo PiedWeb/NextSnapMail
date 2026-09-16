@@ -170,11 +170,31 @@
             render(job);
         } finally { unlock(); restoring = false; placeHost(); }
     }
+    // Skipping the countdown never skips the draft save: pump() still waits for job.persisted,
+    // and Undo stays available until the request actually leaves.
+    function sendNow(job) {
+        if (job.phase !== 'waiting') return;
+        job.timer.cancel(); job.seconds = 0; job.phase = 'ready';
+        render(job); pump();
+    }
+    function glyph(name) {
+        const source = api.composerIcons?.[name];
+        if (!source) return null;
+        const template = document.createElement('template');
+        template.innerHTML = source;
+        const image = template.content.firstElementChild;
+        image.setAttribute('aria-hidden','true'); image.setAttribute('focusable','false');
+        return image;
+    }
     function render(job) {
         if (!job.node) {
             job.node = document.createElement('div'); job.node.className = 'pw-outgoing-message';
-            job.node.innerHTML = '<div class="pw-outgoing-text"><span class="pw-outgoing-status" role="status"></span><span class="pw-outgoing-subject"></span><span class="pw-outgoing-detail"></span></div><button type="button" class="pw-outgoing-action"></button>';
-            job.node.querySelector('button').addEventListener('click', () => {
+            job.node.innerHTML = '<div class="pw-outgoing-text"><span class="pw-outgoing-status" role="status"></span><span class="pw-outgoing-subject"></span><span class="pw-outgoing-detail"></span></div><button type="button" class="pw-outgoing-now" hidden></button><button type="button" class="pw-outgoing-action"></button>';
+            const now = job.node.querySelector('.pw-outgoing-now'), label = t('Envoyer maintenant', 'Send now');
+            now.append(glyph('send-horizontal') || t('Envoyer', 'Send'));
+            now.setAttribute('aria-label', label); now.title = label;
+            now.addEventListener('click', () => sendNow(job));
+            job.node.querySelector('.pw-outgoing-action').addEventListener('click', () => {
                 if (['sent','copy-error'].includes(job.phase)) remove(job); else restore(job);
             });
             ensureHost().append(job.node);
@@ -189,7 +209,8 @@
         if (status.textContent !== messages[job.phase]) status.textContent = messages[job.phase];
         job.node.querySelector('.pw-outgoing-subject').textContent = job.state.fields.subject || t('(Sans objet)', '(No subject)');
         job.node.querySelector('.pw-outgoing-detail').textContent = job.detail || '';
-        const button = job.node.querySelector('button');
+        job.node.querySelector('.pw-outgoing-now').hidden = job.phase !== 'waiting';
+        const button = job.node.querySelector('.pw-outgoing-action');
         button.disabled = job.phase === 'sending';
         button.textContent = ['waiting','ready'].includes(job.phase)
             ? t('Annuler', 'Undo') + (job.seconds ? ` (${job.seconds})` : '')
@@ -277,7 +298,7 @@
             copy.sentFolder = () => target;
             copy.mailvelope = null;
             const job = {id:++serial,state,copy,account:identity(),armoredDraft:state.mailvelope ? draftParams.encrypted : '',
-                phase:'waiting',seconds:5,persisted:!canSaveDraft(),durable:false};
+                phase:'waiting',seconds:api.sendDelaySeconds,persisted:!canSaveDraft(),durable:false};
             job.timer = api.createSendDelay(seconds => {job.seconds=seconds;render(job);},clock);
             jobs.push(job);
             // Saving runs alongside the countdown, with the composer already released.

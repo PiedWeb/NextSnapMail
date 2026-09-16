@@ -1,5 +1,46 @@
 # Releases
 
+## 1.7.53, 2026-09-16
+
+The undo window drops from five seconds to three, and the pending-send notice
+gains a second control: a Lucide `send-horizontal` glyph that skips the rest of
+the wait. Until now the only way past the countdown was to sit through it, which
+is the wrong trade when the message is already right and the next thing you need
+is the reply. Three seconds still covers the moment a wrong recipient or a
+missing attachment registers, which is when Undo is actually reached for.
+
+The duration stops being a number written twice. `PiedWebUx.sendDelaySeconds`
+holds it, `send-delay.js` counts against it, the notice takes its first label
+from it, and the two browser checks that measure the window read it rather than
+hard-coding a deadline.
+
+It skips the countdown and nothing else. `sendNow()` cancels the delay, marks the
+job ready and calls the same `pump()` the timer would have called, so the send
+still waits for the draft to finish saving — the guarantee the delay exists for,
+and the reason closing the window mid-countdown loses nothing. Undo stays
+available in that gap, and the glyph disappears as soon as the countdown is over,
+rather than sitting there as a control that no longer does anything.
+
+Undo keeps the one filled surface in the notice; the new control rests on nothing
+and takes the primary tint only on hover or focus, on a 44 px target with the
+glyph at 20 px. Both are named in French and English, `Envoyer maintenant` and
+`Send now`, on `aria-label` and `title`.
+
+Two supporting corrections. `#rl-app button` in the preserved Nextcloud control
+sheet carries an `!important` border, so the `border: 0` both notice buttons
+already declared had never applied; the notice card is borderless by design, and
+one rule now makes that true of the controls on it. And the click handlers stop
+selecting `button` positionally, which a second button would have re-pointed at
+the wrong control.
+
+`test-send-now.js` builds the notice from the markup the plugin ships and covers
+placement, geometry, the accessible name, the hidden state, resting and focused
+surfaces, the focus ring, non-text contrast, the absent borders and the 390 px
+layout, plus the delay contract: the window is three seconds, a tick short of the
+deadline sends nothing, a cancelled countdown never sends and a completed one
+sends exactly once. `image-markdown-regression.js` keeps its own delayed-send
+assertions, now measured against the shared constant.
+
 ## 1.7.52, 2026-09-16
 
 The hour goes back to hidden in the desktop message list. 1.7.38 had restored

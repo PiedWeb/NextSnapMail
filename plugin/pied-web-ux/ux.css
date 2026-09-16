@@ -42,7 +42,6 @@ html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-acc
     margin:0;
     min-height: 44px;
     padding:var(--pw-space-2) var(--pw-space-3);
-    border: 0;
     border-radius: 6px;
     background: var(--nc-color-primary-light, #e5f2f1);
     color: var(--nc-color-primary-element, #087c75);
@@ -50,6 +49,30 @@ html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-acc
     font-weight:var(--pw-weight-strong);
     cursor: pointer;
 }
+#rl-app .pw-outgoing-notices button.pw-outgoing-now {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    margin:0;
+    /* Sized, not fixed: the label that stands in for a missing glyph still fits. */
+    min-width: 44px;
+    min-height: 44px;
+    padding:0 var(--pw-space-2);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--pw-grey-700);
+    cursor: pointer;
+}
+/* An explicit display would otherwise outrank the user-agent [hidden] rule. */
+#rl-app .pw-outgoing-notices button.pw-outgoing-now[hidden] { display: none; }
+#rl-app .pw-outgoing-notices button.pw-outgoing-now svg { width: 20px; height: 20px; }
+#rl-app .pw-outgoing-notices button.pw-outgoing-now:is(:hover, :focus-visible) {
+    background: var(--nc-color-primary-light, #e5f2f1);
+    color: var(--nc-color-primary-element, #087c75);
+}
+/* The Nextcloud control sheet draws an !important border on every #rl-app button;
+ * these two sit on a card that carries no border of its own. */
+#rl-app .pw-outgoing-notices button { border: 0 !important; }
 #rl-app .pw-outgoing-notices button:disabled { opacity: .65; cursor: default; }
 #rl-app .pw-outgoing-notices button:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 @media (max-width: 600px) {

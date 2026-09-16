@@ -1,5 +1,9 @@
 /* No message or credential is stored here: only a cancellable callback. */
 window.PiedWebUx = window.PiedWebUx || {};
+/* One window for the whole feature: the countdown, the label counting it down and
+ * the checks that measure it. Long enough to catch a wrong recipient, short enough
+ * that a message you meant to send is not held back. */
+window.PiedWebUx.sendDelaySeconds = 3;
 window.PiedWebUx.createSendDelay = function (changed, clock = {
     now: () => Date.now(), later: (fn, ms) => setTimeout(fn, ms), clear: id => clearTimeout(id)
 }) {
@@ -23,7 +27,7 @@ window.PiedWebUx.createSendDelay = function (changed, clock = {
         start(send) {
             if (task) return false;
             task = send;
-            deadline = clock.now() + 5000;
+            deadline = clock.now() + window.PiedWebUx.sendDelaySeconds * 1000;
             tick();
             return true;
         },

@@ -1,6 +1,6 @@
 # Pied Web for NextSnapMail
 
-A responsive theme and companion plugin for NextSnapMail inside Nextcloud. Clearer folders and message actions, Markdown composition, image controls and a floating five-second Undo Send.
+A responsive theme and companion plugin for NextSnapMail inside Nextcloud. Clearer folders and message actions, Markdown composition, image controls and a floating three-second Undo Send you can also cut short.
 
 Independent customization, not an official NextSnapMail or Nextcloud release.
 
@@ -15,7 +15,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Selection of all filtered results across pages, with explicit deletion confirmation.
 - Swipe to delete and Delete-key handling for selected list messages.
 - Readable interleaved quotations and native message flag controls.
-- Floating five-second Undo Send while continuing to use the mailbox.
+- Floating three-second Undo Send while continuing to use the mailbox, with a send
+  glyph that skips the rest of the countdown.
 - Markdown editing and formatted Markdown paste, alongside HTML source and visual editing.
 - Clickable addresses in the message header: a click writes a new message with the display name,
   Ctrl/Cmd+click or Ctrl+Enter copies the bare address.
