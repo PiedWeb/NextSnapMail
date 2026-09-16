@@ -1,5 +1,25 @@
 # Releases
 
+## 1.7.52, 2026-09-16
+
+The hour goes back to hidden in the desktop message list. 1.7.38 had restored
+it on the grounds that a timestamp is data rather than decoration; in this list
+it is data that is already on screen. The rows are grouped under `.pw-day-label`
+headings — "Aujourd'hui", "Hier", then a date — so an hour on every row repeats
+what the heading above it just said and adds a third column of text to a row
+that is meant to be scanned.
+
+The desktop grid returns to its three columns, sender and conversation count on
+the first line, subject with the star and the paperclip on the second, and
+`comfort-desktop.css` carries the `display:none` again with a comment saying why,
+so a later pass does not read it as an oversight. Narrow windows are untouched:
+they have no day headings, so the hour is the only thing that dates a row there
+and it stays visible.
+
+`test-desktop-scan.js` and `test-mail-polish.js` return to the assertions they
+had before 1.7.38 — every desktop row time hidden while the day headings remain
+visible, and the conversation count sharing the attachment column.
+
 ## 1.7.51, 2026-09-16
 
 The interface font stops travelling inside the stylesheet. Adwaita Sans was

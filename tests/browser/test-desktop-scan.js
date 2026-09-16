@@ -16,18 +16,11 @@ check('The attachment occupies a dedicated column after the star',await p.evalua
  const row=demoRows[0],content=row.lastElementChild,star=row.querySelector('.flagParent').getBoundingClientRect(),attachment=row.querySelector('.attachmentParent').getBoundingClientRect(),subject=row.querySelector('.subjectParent').getBoundingClientRect();
  return getComputedStyle(content).display==='grid'&&attachment.left>=star.right&&attachment.left>=subject.right&&attachment.width>=24;
 }));
-check('Desktop rows keep a quiet, right-aligned hour beside the day headings',await p.evaluate(()=>{
- const times=[...document.querySelectorAll('.messageListItem time')];
- const labels=[...document.querySelectorAll('.pw-day-label')];
- if(!times.length||labels.length<2)return false;
- const rights=new Set(times.map(el=>Math.round(el.getBoundingClientRect().right)));
- return times.every(el=>{const s=getComputedStyle(el);
-   return s.display!=='none'&&s.fontVariantNumeric==='tabular-nums'
-     &&parseFloat(s.fontSize)<=12&&s.whiteSpace==='nowrap'
-     &&el.textContent.trim().length>0;})
-  &&rights.size===1
-  &&labels.every(el=>getComputedStyle(el).display!=='none');
-}));
+check('Desktop row dates are hidden while day headings remain visible',await p.evaluate(()=>
+ [...document.querySelectorAll('.messageListItem time')].every(el=>getComputedStyle(el).display==='none')
+ &&[...document.querySelectorAll('.pw-day-label')].length>1
+ &&[...document.querySelectorAll('.pw-day-label')].every(el=>getComputedStyle(el).display!=='none')
+));
 check('A day heading replaces the preceding row divider',await p.evaluate(()=>{
  const boundary=[...document.querySelectorAll('.messageListItem')].find(row=>row.nextElementSibling?.matches('.pw-day-label,.groupLabel'));
  if(!boundary)return false;
