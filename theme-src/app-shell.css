@@ -26,14 +26,14 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
 #rl-app #rl-right #V-MailMessageList .messageListItem .checkboxMessage::before {width:16px;height:16px;}
 #rl-app #rl-right #V-MailMessageList .messageListItem.checked .checkboxMessage::after {left:5px;top:12px;}
 /* Checked messages are the action target, while selected is the message currently open. */
-#rl-app {--pw-checked-surface:color-mix(in oklab,var(--nc-color-primary-element) 22%,var(--nc-color-main-background));}
+#rl-app {--pw-checked-surface:var(--pw-primary-200);}
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.checked:hover) {
  background:var(--pw-checked-surface)!important;
- box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--nc-color-primary-element) 38%,transparent)!important;
+ box-shadow:inset 0 0 0 1px var(--pw-ring-strong)!important;
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.selected,.selected:hover):not(.checked) {
- background:color-mix(in oklab,var(--nc-color-primary-element) 13%,var(--nc-color-main-background))!important;
- box-shadow:inset 0 0 0 1px color-mix(in oklab,var(--nc-color-primary-element) 24%,transparent)!important;
+ background:var(--pw-primary-100)!important;
+ box-shadow:inset 0 0 0 1px var(--pw-ring-soft)!important;
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.selected) .senderParent {color:var(--nc-color-main-text);}
 

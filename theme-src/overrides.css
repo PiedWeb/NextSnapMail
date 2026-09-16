@@ -27,7 +27,7 @@
 }
 
 #rl-app .b-folders li a.selectable.selected {
-  background-color: color-mix(in oklch, var(--nc-color-primary-element) 13%, var(--nc-color-main-background));
+  background-color: var(--pw-primary-100);
   color: var(--nc-color-main-text);
 }
 

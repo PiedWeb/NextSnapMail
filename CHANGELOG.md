@@ -1,5 +1,40 @@
 # Releases
 
+## 1.7.50, 2026-09-16
+
+Colour is a palette. Sixteen different tints of the primary and twelve greys
+were mixed inline, several of them a single percentage point apart and
+indistinguishable — 73, 75 and 76 % of the foreground all in use at once — in
+two different interpolation spaces, so the same "20 %" did not always land on
+the same colour.
+
+Every mix now resolves to one of two ramps of nine steps, or to a named accent,
+all declared once in `tokens.css` and all interpolated in OKLCH. 36 inline mixes
+became token references; the five surfaces the theme has always had — paper,
+rail, line, muted, selected — move into the token file too, since they are
+palette decisions and not rules.
+
+Three values were deliberately changed rather than rounded:
+
+- The folder rail is deeper. At 6 % of the primary it stood 1.07:1 from the
+  reading surface and the boundary rested entirely on a hairline that is itself
+  at 1.29:1; at 12 % it is 1.16:1 and the two panes read as two panes.
+- Secondary text is softer, from 73 % of the foreground to 64 %. It was
+  7.98:1 against the reading surface, nearly as strong as the primary text it was
+  meant to sit behind; at 5.43:1 it is clearly secondary and still above the
+  4.5:1 threshold at every size the theme uses.
+- `--pw-flag-ink` was a second copy of the amber formula and is now an alias, so
+  the accent is decided in one place.
+
+Opacity no longer stands in for a colour on text: the send notice's subject, the
+Markdown hint, the resting star and the day-heading rules take a step of the
+grey ramp instead. The transparencies that remain are all on controls that are
+genuinely disabled or in progress, which is what opacity is for.
+
+Rings and hairlines mix into transparency rather than into a surface, so they
+keep working over a tinted row; two strengths replace the five that existed.
+All 23 browser fixtures pass unchanged.
+
 ## 1.7.49, 2026-09-16
 
 Spacing is a scale. Padding, margins and gaps used thirty different pixel

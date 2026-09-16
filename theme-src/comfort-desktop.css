@@ -21,7 +21,7 @@
     padding:var(--pw-space-3) var(--pw-space-6);
     padding-inline-start:var(--pw-space-2);
     margin-inline:var(--pw-space-2);
-    border-bottom: 1px solid color-mix(in oklch, var(--pw-line) 70%, var(--pw-paper)) !important;
+    border-bottom: 1px solid var(--pw-grey-100) !important;
   }
   #rl-app #V-MailMessageList .messageListItem:has(+ :is(.pw-day-label,.groupLabel)) {
     border-bottom-color: transparent !important;
@@ -33,7 +33,7 @@
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle::before {
     content:''; display:block; width:8px; height:8px; border-radius:50%;
-    background:color-mix(in oklch,var(--nc-color-main-text) 25%,var(--pw-paper));
+    background:var(--pw-grey-300);
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:var(--pw-primary-500); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:hover { background:var(--pw-selected); }
@@ -66,7 +66,7 @@
   #rl-app .messageList .groupLabel { padding-block:var(--pw-space-4) var(--pw-space-2); padding-inline-start:var(--pw-space-4); }
   #rl-app .pw-day-label::before,
   #rl-app .messageList .groupLabel::before {
-    content:''; flex:0 0 20px; height:1px; background:var(--pw-line); opacity:.65;
+    content:''; flex:0 0 20px; height:1px; background:var(--pw-grey-100);
   }
 
   #rl-app .messageView .messageItemHeader { padding-inline:var(--pw-space-8); }

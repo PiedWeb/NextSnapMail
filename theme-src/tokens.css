@@ -75,11 +75,28 @@
   --pw-primary-600: color-mix(in oklch, var(--nc-color-primary-element) 88%, var(--nc-color-main-text));
   --pw-primary-ink: color-mix(in oklch, var(--nc-color-primary-element) 70%, var(--nc-color-main-text));
 
+  /* Rings and hairlines mix into transparency rather than into a surface, so
+   * they keep working over a tinted row. Two strengths are enough. */
+  --pw-ring-soft: color-mix(in oklch, var(--nc-color-primary-element) 20%, transparent);
+  --pw-ring-strong: color-mix(in oklch, var(--nc-color-primary-element) 40%, transparent);
+  --pw-scrollbar: color-mix(in oklch, var(--pw-grey-700) 24%, transparent);
+
   /* Accents. Amber marks a followed message and nothing else; red is reserved
    * for a destructive step the reader has already confirmed. */
   --pw-flag: color-mix(in oklch, oklch(0.68 0.15 75) 72%, var(--nc-color-main-text));
   --pw-flag-tint: color-mix(in oklch, oklch(0.68 0.15 75) 16%, var(--nc-color-main-background));
   --pw-danger: var(--nc-color-error, #b3261e);
+  --pw-danger-tint: color-mix(in oklch, var(--nc-color-error, #b3261e) 12%, var(--nc-color-main-background));
+
+  /* Named surfaces, each one decision rather than a value repeated in a rule.
+   * The rail is deliberately a touch deeper than the reading surface: at 6 %
+   * the two panes were 1.07:1 apart and the boundary rested entirely on a
+   * hairline that is itself barely visible. */
+  --pw-paper: color-mix(in oklch, var(--nc-color-main-background) 99%, var(--nc-color-primary-element));
+  --pw-rail: color-mix(in oklch, var(--nc-color-main-background) 88%, var(--nc-color-primary-element));
+  --pw-line: var(--pw-grey-200);
+  --pw-muted: var(--pw-grey-600);
+  --pw-selected: var(--pw-primary-50);
 
   /* Elevation. Each level carries a hairline ring so a surface keeps its edge
    * against a background of its own colour, then a tight contact shadow that

@@ -41,7 +41,7 @@
   color: var(--pw-grey-600);
 }
 #rl-app #V-PopupsCompose > header > a.btn.button-delete:is(:hover, :focus-visible, :active) {
-  background-color: color-mix(in oklch, var(--pw-danger) 12%, var(--nc-color-main-background));
+  background-color: var(--pw-danger-tint);
   color: var(--pw-danger);
 }
 #rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete):focus-visible,

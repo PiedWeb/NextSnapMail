@@ -1,7 +1,7 @@
 /* List metadata: a quiet total, explicit unread count, and native flag controls. */
 #rl-app {
     --pw-list-metadata-version:1.7.14;
-    --pw-flag-ink:color-mix(in oklch,oklch(0.68 0.15 75) 72%,var(--nc-color-main-text));
+    --pw-flag-ink:var(--pw-flag);
     --pw-star-filled-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
 }
 #rl-app .pw-read-toggle {display:none;}
@@ -9,7 +9,7 @@
     display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
     width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;
     opacity:1;border:0;border-radius:5px;cursor:pointer;font-size:0;line-height:1;
-    color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));
+    color:var(--pw-grey-700);
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent::after {
     content:'';display:block;width:19px;height:19px;opacity:1;color:inherit;background:currentColor;
@@ -23,13 +23,13 @@
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent:hover,
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent:hover {background:var(--pw-selected);}
-#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent {color:color-mix(in oklch,var(--nc-color-main-text) 75%,var(--pw-paper));}
+#rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent {color:var(--pw-grey-700);}
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent::before {width:20px;height:20px;}
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent.flagOn {color:var(--pw-flag-ink);}
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
     display:inline-flex;align-items:center;justify-content:center;gap:var(--pw-space-1);align-self:center;
     height:24px;min-height:24px;margin:0;padding:0 var(--pw-space-2);border:0;border-radius:4px;
-    background:color-mix(in oklch,var(--nc-color-main-text) 7%,var(--pw-paper));
+    background:var(--pw-grey-100);
     color:var(--nc-color-main-text);font:500 12px/1 var(--pw-font);font-variant-numeric:tabular-nums;
     white-space:nowrap;cursor:pointer;box-shadow:none;
 }
@@ -80,13 +80,13 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent,
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent.flagOn {
-    background:color-mix(in oklab,var(--pw-flag-ink) 19%,var(--nc-color-main-background));
+    background:var(--pw-flag-tint);
     color:var(--pw-flag-ink);
 }
 /* The star keeps one size in both states so the row never shifts under the pointer. */
 /* Unread counts retain teal; amber is reserved for followed messages. */
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
-    color:color-mix(in oklch,var(--nc-color-primary-element) 70%,var(--nc-color-main-text));
+    color:var(--pw-primary-ink);
 }
 
 /* Phone rows: four signals, not seven.

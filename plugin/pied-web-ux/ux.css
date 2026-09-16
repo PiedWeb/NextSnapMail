@@ -34,7 +34,7 @@ html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-acc
 }
 #rl-app .pw-outgoing-text { flex: 1; min-width: 0; display: grid; gap:var(--pw-space-0-5); }
 #rl-app .pw-outgoing-status { font-weight:var(--pw-weight-strong); }
-#rl-app .pw-outgoing-subject { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:var(--pw-text-xs); opacity: .75; }
+#rl-app .pw-outgoing-subject { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size:var(--pw-text-xs); color: var(--pw-grey-700); }
 #rl-app .pw-outgoing-detail { font-size:var(--pw-text-xs); overflow-wrap: anywhere; }
 #rl-app .pw-outgoing-detail:empty { display: none; }
 #rl-app .pw-outgoing-notices button.pw-outgoing-action {
@@ -202,8 +202,7 @@ html.pw-theme #rl-app .pw-swipe-ready .pw-swipe-hint { color:white; background:#
     margin:var(--pw-space-2) var(--pw-space-1) 0;
     font-size:var(--pw-text-xs);
     line-height: 1.5;
-    color: var(--nc-color-main-text, CanvasText);
-    opacity: .8;
+    color: var(--pw-grey-700);
     white-space: normal;
 }
 
@@ -244,7 +243,7 @@ html.pw-theme #rl-app #messageItem .pw-quote > summary {
     font:var(--pw-weight-medium) var(--pw-text-xs)/18px system-ui,sans-serif; cursor:pointer; white-space:normal;
 }
 html.pw-theme #rl-app #messageItem .pw-quote > summary:hover {
-    background:color-mix(in srgb,currentColor 8%,transparent);
+    background:color-mix(in oklch,currentColor 8%,transparent);
 }
 html.pw-theme #rl-app #messageItem .pw-quote > summary:focus-visible {
     outline:2px solid currentColor; outline-offset:2px;
@@ -287,11 +286,11 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn
     width:18px; height:18px; flex:0 0 18px; stroke-width:1.8; pointer-events:none;
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:not(:disabled):hover {
-    background:color-mix(in oklch,var(--nc-color-main-text) 7%,var(--nc-color-main-background));
+    background:var(--pw-grey-100);
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn.active,
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn[aria-expanded="true"] {
-    color:var(--nc-color-main-text); background:color-mix(in oklch,var(--nc-color-primary-element) 12%,var(--nc-color-main-background));
+    color:var(--nc-color-main-text); background:var(--pw-primary-100);
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:disabled { opacity:.35; cursor:default; }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:focus-visible {
@@ -359,7 +358,7 @@ html.pw-theme #V-PopupsCompose .pw-attachment-compression button:hover {
   background:var(--nc-color-background-hover);
 }
 html.pw-theme #V-PopupsCompose .pw-image-tools button[aria-pressed="true"] {
-  background:color-mix(in srgb,var(--nc-color-primary-element) 12%,var(--nc-color-main-background));
+  background:var(--pw-primary-100);
   color:var(--nc-color-main-text);font-weight:var(--pw-weight-strong);
 }
 html.pw-theme #V-PopupsCompose .pw-image-tools button:focus-visible,
@@ -387,7 +386,7 @@ html.pw-theme #V-PopupsCompose .pw-image-handle::after {
 html.pw-theme #V-PopupsCompose .pw-image-status {padding:var(--pw-space-1) var(--pw-space-4);font:var(--pw-text-xs)/1.5 system-ui,sans-serif;color:var(--nc-color-text-maxcontrast);flex-shrink:0;}
 html.pw-theme #V-PopupsCompose .pw-attachment-compression {display:flex;align-items:center;flex-wrap:wrap;gap:var(--pw-space-1);margin-top:var(--pw-space-1);font:var(--pw-text-xs)/1.4 system-ui,sans-serif;}
 html.pw-theme #V-PopupsCompose .pw-attachment-compression button {
-  border:1px solid color-mix(in srgb,var(--nc-color-main-text) 25%,var(--nc-color-main-background))!important;
+  border:1px solid var(--pw-grey-300)!important;
   background:var(--nc-color-main-background);color:var(--nc-color-main-text);font-weight:var(--pw-weight-medium);
 }
 html.pw-theme #V-PopupsCompose .pw-attachment-compression button:disabled {opacity:.6;cursor:default;}
