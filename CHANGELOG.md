@@ -1,5 +1,36 @@
 # Releases
 
+## 1.7.51, 2026-09-16
+
+The interface font stops travelling inside the stylesheet. Adwaita Sans was
+embedded as 261 kB of base64 in `font-face.css`, which made the theme bundle
+488 kB of render-blocking CSS, put `font-display: swap` in a position where it
+could never do anything — the font arrived with the sheet, so there was no
+fallback phase to swap out of — and, since the served bundle is keyed on the
+plugin hash and `APP_VERSION`, made every release re-download the whole font.
+
+The family is now two subsetted files served beside the stylesheet, declared
+with matching `unicode-range`: Latin at 63 kB, always fetched, and
+Latin-Extended at 60 kB, fetched only when a glyph needs it. Both keep the full
+variable weight axis from 100 to 900 and the optical-size axis, so no weight the
+theme uses is lost, and tabular figures survive the subsetting, which the
+timestamps and counters depend on. The stylesheet drops from 488 kB to 226 kB,
+and the font is cached independently of it.
+
+The URL is written relative to the Nextcloud web root because
+`RainLoop\Actions\Themes::compileCss()` rewrites a theme's relative `url()` that
+way. The fixture server did not model that rewrite at all — nothing had needed
+it, since every other asset in the theme is a `data:` URL, which the engine
+leaves alone — so it now performs the same substitution and serves the theme
+directory at the path the rewritten URL asks for. `docs/INSTALL.md` gains the
+matching deployment check; if the file is blocked the interface falls back to
+the system stack it already declares, with no other effect.
+
+New: `tests/browser/test-font-delivery.js`, nine cases covering the two faces,
+the preserved axes, the Latin face being applied, the Latin-Extended face
+staying unloaded until a glyph needs it, and the stylesheet carrying no payload
+of its own.
+
 ## 1.7.50, 2026-09-16
 
 Colour is a palette. Sixteen different tints of the primary and twelve greys

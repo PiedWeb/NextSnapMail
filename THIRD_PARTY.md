@@ -4,7 +4,7 @@
 | --- | --- | --- |
 | NextSnapMail / SnappyMail theme and editor integration | NextSnapMail 0.1.10 / SnappyMail 2.38.2 | AGPL-3.0-only, repository LICENSE; upstream https://github.com/oe79/NextSnapMail |
 | Lucide icons | Individual SVGs vendored with source URLs and SHA-256 | ISC and included Feather notices, `plugin/pied-web-ux/lucide-license.txt`, `composer-icons.json`, `lucide-source.json` |
-| Adwaita Sans / Inter-derived font subset | Renamed Pied Web UI, embedded in `theme-src/font-face.css` | SIL OFL 1.1, `theme-src/font-license.txt` and CSS notices; source https://gitlab.gnome.org/GNOME/adwaita-fonts |
+| Adwaita Sans / Inter-derived font subset | Renamed Pied Web UI, Latin and Latin-Extended subsets served from `theme/PiedWeb/snappymail/pied-web-ui-*.woff2`, declared in `theme-src/font-face.css` | SIL OFL 1.1, `theme-src/font-license.txt` and CSS notices; source https://gitlab.gnome.org/GNOME/adwaita-fonts |
 | marked | 18.0.12 | MIT, `markdown-licenses.txt` and `markdown-dependencies.json` in the plugin |
 | DOMPurify | 3.4.15 | Apache-2.0 or MPL-2.0, both notices included in `markdown-licenses.txt` |
 | turndown-plugin-gfm | 1.0.2 | MIT, `markdown-licenses.txt` and `markdown-dependencies.json` |

@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Serve synthetic browser fixtures and an existing upstream checkout on localhost."""
 import argparse
+import re
+from io import BytesIO
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlsplit
@@ -11,10 +13,29 @@ parser.add_argument('--port', type=int, default=8876)
 args = parser.parse_args()
 root = Path(__file__).resolve().parent.parent
 mounts = {'/app/': args.upstream.resolve() / 'app', '/.local-work/pied-web-ux/': root / 'plugin/pied-web-ux',
+          # The theme asks for its font at the path the engine rewrites it to.
+          '/themes/PiedWeb/snappymail/': root / 'theme/PiedWeb/snappymail',
           '/.local-work/theme/': root / 'theme/PiedWeb/snappymail', '/.local-work/': root / 'tests/browser'}
 
 
+THEME_CSS = root / 'theme/PiedWeb/snappymail/style.css'
+# RainLoop\Actions\Themes::compileCss() rewrites every relative url() in a theme
+# to the Nextcloud web root before serving it. Fixtures have to do the same, or a
+# theme asset resolves against the fixture path and silently fails to load.
+ENGINE_URL_REWRITE = re.compile(r'(url\(["\']?)(\./)?([a-z]+[^:a-z])')
+
+
 class Handler(SimpleHTTPRequestHandler):
+    def send_head(self):
+        if Path(self.translate_path(self.path)) == THEME_CSS:
+            body = ENGINE_URL_REWRITE.sub(r'\1/\3', THEME_CSS.read_text()).encode()
+            self.send_response(200)
+            self.send_header('Content-Type', 'text/css; charset=utf-8')
+            self.send_header('Content-Length', str(len(body)))
+            self.end_headers()
+            return BytesIO(body)
+        return super().send_head()
+
     def end_headers(self):
         # Fixtures are rebuilt between runs; a cached theme or plugin file would
         # silently test the previous release.

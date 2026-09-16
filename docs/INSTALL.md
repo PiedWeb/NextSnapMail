@@ -16,6 +16,10 @@ Target: an existing NextSnapMail installation using embedded SnappyMail 2.38.2. 
 3. In SnappyMail's plugin settings, enable `pied-web-ux` alongside `nextcloud`. If configuring via `configs/application.ini`, set `[plugins] enable = On` and append `pied-web-ux` to the existing comma-separated `enabled_list`; preserve all existing plugin names and other settings.
 4. Select **Pied Web** (`PiedWeb@nextcloud`) in each user's appearance settings. Existing per-account overrides may also need selecting the theme.
 5. Reload the webmail with Ctrl+F5, then check the message list and composer on desktop and mobile.
+6. Confirm the interface font is served: `NEXTCLOUD/themes/PiedWeb/snappymail/pied-web-ui-latin.woff2`
+   must answer 200 over the web. The stylesheet asks for it at that path because the engine rewrites a
+   theme's relative `url()` to the Nextcloud web root. If the file is blocked or missing the interface
+   still works and falls back to the system font stack, with no other effect.
 
 The plugin and theme are intended to be installed together. Some composition extensions, such as the Markdown view and pending-operation guards, initialize independently of the theme. To disable every enhancement, disable the plugin as well as switching themes. Finish or cancel pending outgoing messages first.
 
