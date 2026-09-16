@@ -120,9 +120,12 @@ check('Reader typography is compact and sender name and address share one size',
         &&parseFloat(getComputedStyle(subject).lineHeight)<26
         &&getComputedStyle(senderLine).marginTop==='0px';
 }));
-check('The reply actions have a visible separator',await reader.evaluate(()=>{
+check('The reply actions have a visible separator and a step of the spacing scale above them',await reader.evaluate(()=>{
     const style=getComputedStyle(document.querySelector('.pw-reading-actions'));
-    return style.borderTopWidth==='1px'&&style.paddingTop==='18px';
+    const scale=['--pw-space-3','--pw-space-4','--pw-space-6'].map(n=>
+        getComputedStyle(document.documentElement).getPropertyValue(n).trim());
+    return style.borderTopWidth==='1px'&&style.borderTopStyle==='solid'
+        &&scale.includes(style.paddingTop);
 }));
 await reader.locator('.pw-message-extras .pw-import-calendar').last().hover();
 check('Calendar action follows message metadata as a secondary inline action',await reader.evaluate(()=>{
@@ -142,7 +145,9 @@ check('Attachment uses a compact file tile with no oversized glyph or overflow',
 }));
 check('A single desktop attachment has breathing room without a redundant settings control',await reader.evaluate(()=>{
     const place=document.querySelector('.attachmentsPlace');
-    return getComputedStyle(place).paddingBottom==='18px'
+    const scale=['--pw-space-3','--pw-space-4','--pw-space-6'].map(n=>
+        getComputedStyle(document.documentElement).getPropertyValue(n).trim());
+    return scale.includes(getComputedStyle(place).paddingBottom)
         &&getComputedStyle(place.querySelector('.controls-handle')).display==='none'
         &&getComputedStyle(place.querySelector('.attachmentsControls')).display==='none'
         &&getComputedStyle(place.querySelector('.checkboxAttachment')).display==='none';

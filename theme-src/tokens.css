@@ -32,7 +32,10 @@
   --pw-tracking-tight: -.01em;  /* headings at 18px and above */
   --pw-tracking-caps: .05em;    /* all-caps labels            */
 
-  /* Spacing and sizing. No two steps closer than about a quarter. */
+  /* Spacing. Nine steps, none closer than a quarter of the one below. Offsets
+   * that reserve room for a control — a 44 px touch target, the 56 px app grid —
+   * are measured against that control and stay out of the scale. */
+  --pw-space-0-5: 2px;
   --pw-space-1: 4px;
   --pw-space-2: 8px;
   --pw-space-3: 12px;

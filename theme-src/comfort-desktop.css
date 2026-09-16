@@ -2,14 +2,14 @@
 @media (min-width: 1200px) {
   html:not(.rl-left-panel-disabled) #rl-app #rl-left { width: 248px; min-width: 200px; max-width: 360px; }
   html.rl-left-panel-disabled #rl-app #rl-left { width: 72px !important; min-width: 72px; max-width: 72px; }
-  #rl-app .b-folders .b-content { padding-inline: 14px; }
+  #rl-app .b-folders .b-content { padding-inline:var(--pw-space-4); }
   #rl-app .b-folders li a.selectable {
     height: 40px;
     line-height: 40px !important;
-    margin-block: 1px;
-    padding-inline: 12px 44px;
+    margin-block:var(--pw-space-0-5);
+    padding-inline:var(--pw-space-3) 44px;
   }
-  #rl-app .pw-folder-section { padding-block: 24px 8px; }
+  #rl-app .pw-folder-section { padding-block:var(--pw-space-6) var(--pw-space-2); }
 
   html.sm-msgView-side #rl-app #V-MailMessageList .messageList {
     width: 36vw;
@@ -18,9 +18,9 @@
   }
   #rl-app #V-MailMessageList .messageListItem {
     min-height: 68px;
-    padding: 12px 20px;
-    padding-inline-start: 8px;
-    margin-inline: 8px;
+    padding:var(--pw-space-3) var(--pw-space-6);
+    padding-inline-start:var(--pw-space-2);
+    margin-inline:var(--pw-space-2);
     border-bottom: 1px solid color-mix(in oklch, var(--pw-line) 70%, var(--pw-paper)) !important;
   }
   #rl-app #V-MailMessageList .messageListItem:has(+ :is(.pw-day-label,.groupLabel)) {
@@ -28,7 +28,7 @@
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle {
     display:flex; align-items:center; justify-content:center; align-self:center;
-    flex:0 0 24px; width:24px; height:32px; margin:0 4px 0 0; padding:0;
+    flex:0 0 24px; width:24px; height:32px; margin:0 var(--pw-space-1) 0 0; padding:0;
     border:0!important; border-radius:6px; background:transparent; cursor:pointer;
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle::before {
@@ -63,14 +63,14 @@
   #rl-app #rl-right #V-MailMessageList .messageListItem:hover .flagParent,
   #rl-app #rl-right #V-MailMessageList .messageListItem:focus-within .flagParent { opacity:1; }
   #rl-app .pw-day-label,
-  #rl-app .messageList .groupLabel { padding-block: 18px 8px; padding-inline-start:16px; }
+  #rl-app .messageList .groupLabel { padding-block:var(--pw-space-4) var(--pw-space-2); padding-inline-start:var(--pw-space-4); }
   #rl-app .pw-day-label::before,
   #rl-app .messageList .groupLabel::before {
     content:''; flex:0 0 20px; height:1px; background:var(--pw-line); opacity:.65;
   }
 
-  #rl-app .messageView .messageItemHeader { padding-inline: 36px; }
-  #rl-app #messageItem > .messageItemHeader { padding-inline-start: 36px; }
-  #rl-app .bodyText { max-width: 640px; padding: 30px 36px 8px; line-height: 1.6; }
-  #rl-app .pw-reading-actions { padding-inline: 36px; }
+  #rl-app .messageView .messageItemHeader { padding-inline:var(--pw-space-8); }
+  #rl-app #messageItem > .messageItemHeader { padding-inline-start:var(--pw-space-8); }
+  #rl-app .bodyText { max-width: 640px; padding:var(--pw-space-8) var(--pw-space-8) var(--pw-space-2); line-height: 1.6; }
+  #rl-app .pw-reading-actions { padding-inline:var(--pw-space-8); }
 }

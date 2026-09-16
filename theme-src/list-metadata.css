@@ -27,8 +27,8 @@
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent::before {width:20px;height:20px;}
 #rl-app #rl-right #V-MailMessageView .messageItemHeader .flagParent.flagOn {color:var(--pw-flag-ink);}
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
-    display:inline-flex;align-items:center;justify-content:center;gap:5px;align-self:center;
-    height:24px;min-height:24px;margin:0;padding:0 6px;border:0;border-radius:4px;
+    display:inline-flex;align-items:center;justify-content:center;gap:var(--pw-space-1);align-self:center;
+    height:24px;min-height:24px;margin:0;padding:0 var(--pw-space-2);border:0;border-radius:4px;
     background:color-mix(in oklch,var(--nc-color-main-text) 7%,var(--pw-paper));
     color:var(--nc-color-main-text);font:500 12px/1 var(--pw-font);font-variant-numeric:tabular-nums;
     white-space:nowrap;cursor:pointer;box-shadow:none;
@@ -38,7 +38,7 @@
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len::after {content:none;}
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
     content:attr(data-pw-unread);font:600 10px/1 var(--pw-font);color:var(--pw-flag-ink);
-    padding-inline-start:5px;border-inline-start:1px solid var(--pw-line);
+    padding-inline-start:var(--pw-space-1);border-inline-start:1px solid var(--pw-line);
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len:hover {background:var(--pw-selected);}
 #rl-app #rl-right #V-MailMessageList .messageListItem :is(.flagParent,.threads-len):focus-visible {
@@ -46,7 +46,7 @@
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-muted);margin:0;min-width:16px;font-size:14px;}
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
-    grid-template-columns:minmax(0,1fr) auto auto auto 32px;grid-template-rows:minmax(24px,auto) auto;column-gap:6px;align-items:center;
+    grid-template-columns:minmax(0,1fr) auto auto auto 32px;grid-template-rows:minmax(24px,auto) auto;column-gap:var(--pw-space-2);align-items:center;
 }
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-area:1/5/3/6;align-self:center;}
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {grid-area:1/2;}
@@ -54,9 +54,9 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time {grid-area:1/4;}
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/5;}
 @media(max-width:799px) {
-    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto auto auto 44px;grid-template-rows:minmax(32px,auto) auto;column-gap:4px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {grid-template-columns:minmax(0,1fr) auto auto auto 44px;grid-template-rows:minmax(32px,auto) auto;column-gap:var(--pw-space-1);}
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {width:44px;min-width:44px;height:44px;min-height:44px;}
-    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {height:32px;min-height:32px;padding-inline:5px;gap:4px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {height:32px;min-height:32px;padding-inline:var(--pw-space-1);gap:var(--pw-space-1);}
 }
 /* Very narrow phones keep the sender readable by placing conversation metadata below the subject. */
 @media(max-width:360px) {
@@ -64,7 +64,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-area:1/3/3/4;}
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time {grid-area:1/2;}
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent {grid-area:2/1/3/3;}
-    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {grid-area:3/1;justify-self:start;margin-top:3px;}
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {grid-area:3/1;justify-self:start;margin-top:var(--pw-space-1);}
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {grid-area:3/2;justify-self:end;}
     html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent:not(:has(> i[class*="icon-"])) {display:none;}
 }

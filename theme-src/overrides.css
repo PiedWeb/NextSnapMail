@@ -7,8 +7,8 @@
 
 #rl-app .b-folders li a.selectable {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0 4.4em 0 4px;
+  margin:0;
+  padding:0 4.4em 0 var(--pw-space-1);
   height: 42px;
   line-height: 42px !important;
   border: 0;
@@ -46,8 +46,8 @@
   inset-inline-start: auto;
   top: 50%;
   transform: translateY(-50%);
-  margin: 0;
-  padding: 2px 7px;
+  margin:0;
+  padding:var(--pw-space-0-5) var(--pw-space-2);
   min-width: 26px;
   border-radius: 6px;
   background: var(--nc-color-primary-element);
@@ -67,7 +67,7 @@
   width: 21px;
   height: 21px;
   min-width: 21px;
-  margin-inline-end: 11px;
+  margin-inline-end:var(--pw-space-3);
   background-color: currentColor;
   mask-image: var(--mail-folder-icon);
   mask-repeat: no-repeat;
@@ -77,18 +77,18 @@
 }
 
 #rl-app .b-folders .b-folders-user a:not(.system) {
-  padding-inline-start: 4px;
+  padding-inline-start:var(--pw-space-1);
 }
 
 #rl-app .b-folders .b-content > .b-folders-system,
 #rl-app .b-folders .b-content > .b-folders-user {
-  padding-inline-start: 0;
+  padding-inline-start:0;
 }
 
 #rl-app .b-folders .b-content > .e-checkbox {
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap:var(--pw-space-3);
 }
 
 #rl-app .b-folders .b-content > .e-checkbox > i {
@@ -98,7 +98,7 @@
 }
 
 #rl-app .b-folders .b-content > .e-checkbox > span {
-  margin-inline-start: 0;
+  margin-inline-start:0;
 }
 
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign {
@@ -119,20 +119,20 @@
 }
 
 #rl-app .b-folders hr {
-  margin: 9px 0;
+  margin:var(--pw-space-2) 0;
 }
 
 #rl-app #V-SystemDropDown .dropdown-menu a.email-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap:var(--pw-space-2);
   min-height: 36px;
-  padding-inline-end: 14px;
+  padding-inline-end:var(--pw-space-4);
 }
 
 #rl-app #V-SystemDropDown .dropdown-menu a.email-title::before {
   flex: 0 0 1em;
-  margin-inline-end: 0;
+  margin-inline-end:0;
 }
 
 #rl-app #V-SystemDropDown a.email-title[data-unread]::after {
@@ -140,8 +140,8 @@
   position: static;
   display: inline-block;
   flex-shrink: 0;
-  margin-inline-start: auto;
-  padding: 0;
+  margin-inline-start:auto;
+  padding:0;
   min-width: 0;
   border-radius: 0;
   background: transparent;
@@ -201,7 +201,7 @@
   }
   html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-content {
     opacity: 1;
-    padding: 4px;
+    padding:var(--pw-space-1);
     min-width: 0;
     width: 100%;
     box-sizing: border-box;
@@ -209,7 +209,7 @@
   html.rl-left-panel-disabled #rl-app .b-folders li a.selectable {
     height: 52px;
     line-height: 52px !important;
-    padding: 0;
+    padding:0;
     font-size: 0;
     text-align: center;
     border: 0;
@@ -218,7 +218,7 @@
   html.rl-left-panel-disabled #rl-app .b-folders li a.selectable::before {
     width: 23px;
     height: 23px;
-    margin: 0;
+    margin:0;
     vertical-align: -6px;
   }
   html.rl-left-panel-disabled #rl-app .b-folders li a.selectable[data-unread]::after {
@@ -227,7 +227,7 @@
     bottom: 3px;
     transform: none;
     min-width: 18px;
-    padding: 0 3px;
+    padding:0 var(--pw-space-1);
     font-size:var(--pw-text-xs);
     line-height: 16px;
     border-radius: 4px;
@@ -239,10 +239,10 @@
     display: none !important;
   }
   html.rl-left-panel-disabled #rl-app .b-folders .b-folders-user ul {
-    padding-inline-start: 0;
+    padding-inline-start:0;
   }
   html.rl-left-panel-disabled #rl-app .b-folders .b-toolbar {
-    padding: 4px;
+    padding:var(--pw-space-1);
     align-items: center;
   }
   html.rl-left-panel-disabled #rl-app .b-folders .b-toolbar .btn,
@@ -250,12 +250,12 @@
     box-sizing: border-box !important;
     width: 52px !important;
     min-width: 44px;
-    padding: 4px !important;
+    padding:var(--pw-space-1) !important;
     text-align: center;
     overflow: hidden;
   }
   html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-footer {
-    padding: 4px;
+    padding:var(--pw-space-1);
   }
 }
 
@@ -286,7 +286,7 @@
   flex: 0 1 22%;
   min-width: 0;
   max-width: 16rem;
-  padding-inline-end: 8px;
+  padding-inline-end:var(--pw-space-2);
 }
 #rl-app .messageListItem .subjectParent {
   min-width: 0;
@@ -295,7 +295,7 @@ html.sm-msgView-side #rl-app .messageListItem > div + div,
 html.rl-mobile #rl-app .messageListItem > div + div {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto auto auto;
-  gap: 3px 6px;
+  gap:var(--pw-space-1) var(--pw-space-2);
 }
 html.sm-msgView-side #rl-app .messageListItem .senderParent,
 html.rl-mobile #rl-app .messageListItem .senderParent {
@@ -357,8 +357,8 @@ html:not(.sm-msgView-side):not(.sm-msgView-bottom) #rl-app #rl-right:not(.messag
   flex: 0 0 auto;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
-  padding: 8px;
+  gap:var(--pw-space-1);
+  padding:var(--pw-space-2);
   height: auto;
   white-space: normal;
 }
@@ -372,18 +372,18 @@ html:not(.sm-msgView-side):not(.sm-msgView-bottom) #rl-app #rl-right:not(.messag
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
-  gap: 0;
+  gap:0;
 }
 #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-toolbar :is(.buttonReply, .buttonReplyAll) {
   display: none !important;
 }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group {
-  margin: 0;
+  margin:0;
   display: inline-flex;
-  gap: 0;
+  gap:0;
 }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) {
-  margin-inline-start: auto;
+  margin-inline-start:auto;
 }
 #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn {
   display: inline-flex;
@@ -392,9 +392,9 @@ html:not(.sm-msgView-side):not(.sm-msgView-bottom) #rl-app #rl-right:not(.messag
   width: 40px;
   height: 40px;
   min-width: 40px;
-  padding: 0;
+  padding:0;
   box-sizing: border-box;
-  margin: 0;
+  margin:0;
   font-size:var(--pw-text-xl);
   line-height: 1;
 }
@@ -423,12 +423,12 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  gap:var(--pw-space-1);
   height: auto;
   white-space: normal;
 }
 #rl-app #V-PopupsCompose > header > .pull-right {
-  margin-inline-start: auto;
+  margin-inline-start:auto;
 }
 #rl-app :is(.pw-message-actions button, #V-SettingsMenu .btn, #V-SettingsPane .toggleLeft):focus-visible {
   outline: 2px solid var(--nc-color-primary-element);
@@ -452,22 +452,22 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
 /* The mobile account stays visible above the mail controls. */
 #rl-app #rl-right {
   position: relative;
-  padding-top: 54px;
+  padding-top:54px;
   box-sizing: border-box;
 }
 #rl-app #V-SystemDropDown {
   display: block;
   inset: 4px 6px auto auto;
   max-width: calc(100% - 12px);
-  padding: 0;
-  margin: 0;
+  padding:0;
+  margin:0;
 }
 #rl-app #V-SystemDropDown[hidden] { display: none; }
 #rl-app #V-SystemDropDown .btn-toolbar {
   height: 40px;
   max-width: 100%;
-  gap: 4px;
-  padding: 0;
+  gap:var(--pw-space-1);
+  padding:0;
   border: 0;
 }
 #rl-app #V-SystemDropDown .dropdown {
@@ -482,10 +482,10 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   height: 44px;
   min-height: 44px;
   min-width: 0;
-  padding: 6px 10px;
+  padding:var(--pw-space-2) var(--pw-space-3);
   max-width: 100%;
   font-size:var(--pw-text-sm);
-  gap: 8px;
+  gap:var(--pw-space-2);
 }
 #rl-app #V-SystemDropDown .pw-account-original { display: none !important; }
 #rl-app #V-SystemDropDown .pw-account-label {
@@ -511,7 +511,7 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   align-items: center;
   flex-wrap: wrap;
   flex: 0 0 auto;
-  gap: 4px;
+  gap:var(--pw-space-1);
   height: auto;
   white-space: normal;
 }
@@ -522,8 +522,8 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
 }
 #rl-app #V-MailMessageList .messageList .b-content { min-height: 0; }
 #rl-app #V-MailMessageList .pw-threads {
-  margin: 0 0 0 auto;
-  padding-inline: 10px;
+  margin:0 0 0 auto;
+  padding-inline:var(--pw-space-3);
   min-height: 40px;
   font: inherit;
   font-size:var(--pw-text-sm);
@@ -533,14 +533,14 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
 #rl-app .messageList .b-footer.pw-single-page { display: none; }
 #rl-app .messageList .b-content > .b-footer {
   position: static;
-  margin-top: 10px;
-  padding: 8px;
+  margin-top:var(--pw-space-3);
+  padding:var(--pw-space-2);
 }
 #rl-app .pw-message-extras {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
-  margin: 0 10px 12px;
+  gap:var(--pw-space-2);
+  margin:0 var(--pw-space-3) var(--pw-space-3);
 }
 #rl-app .pw-message-extras:not(:has(> :not([style*="display: none"]))) { display: none; }
 #rl-app #V-MailMessageView .pw-message-extras .btn {
@@ -548,13 +548,13 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   align-items: center;
   min-height: 40px;
   box-sizing: border-box;
-  margin: 0;
-  padding: 6px 12px;
+  margin:0;
+  padding:var(--pw-space-2) var(--pw-space-3);
   font: inherit;
   font-size:var(--pw-text-sm);
   white-space: normal;
 }
-html.rl-fullscreen #rl-app #rl-right { padding-top: 0; }
+html.rl-fullscreen #rl-app #rl-right { padding-top:0; }
 html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
 @media (pointer: coarse) {
   #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn {
@@ -565,31 +565,31 @@ html.rl-fullscreen #rl-app #V-SystemDropDown { display: none; }
   #rl-app #V-MailMessageView .pw-message-extras .btn { min-height: 44px; }
 }
 @container (max-width: 350px) {
-  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline: 0; gap: 2px; }
-  #rl-app #V-MailMessageView .pw-message-actions { gap: 0; }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline:0; gap:var(--pw-space-0-5); }
+  #rl-app #V-MailMessageView .pw-message-actions { gap:0; }
 }
 @media print {
-  #rl-app #rl-right { padding-top: 0; }
+  #rl-app #rl-right { padding-top:0; }
   #rl-app .pw-message-extras { display: none; }
 }
 
-#rl-app #V-SystemDropDown :is(.pw-account-label, .pw-account-local, .pw-account-domain) { margin: 0; padding: 0; }
+#rl-app #V-SystemDropDown :is(.pw-account-label, .pw-account-local, .pw-account-domain) { margin:0; padding:0; }
 #rl-app #V-SystemDropDown * { transition-property: background-color, color; }
 
 /* On desktop, the account participates in the existing toolbar layout. */
 @media (min-width: 800px) {
-  #rl-app #rl-right.pw-compact-header { padding-top: 0; }
+  #rl-app #rl-right.pw-compact-header { padding-top:0; }
   #rl-app #V-SystemDropDown.pw-docked-account {
     position: relative;
     inset: auto;
     flex: 0 1 auto;
     min-width: 0;
     max-width: 100%;
-    margin-inline-start: auto;
+    margin-inline-start:auto;
     z-index: 120;
   }
   #rl-app #V-SystemDropDown.pw-docked-account .btn-toolbar { height: 44px; }
   #rl-app #V-MailMessageView.pw-enhanced { overflow: visible; }
   #rl-app #V-MailMessageList > .btn-toolbar { overflow: visible; }
-  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { margin-inline-start: 0; }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { margin-inline-start:0; }
 }

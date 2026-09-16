@@ -30,8 +30,8 @@
  * margin to its right is simply left alone.
  */
 #rl-app #V-MailMessageView {
-  --pw-measure: 640px;   /* border box: 568 px of text between two 36 px gutters */
-  --pw-gutter: 36px;
+  --pw-measure: 640px;   /* border box: 576 px of text between two gutters */
+  --pw-gutter: var(--pw-space-8);
 }
 @media (min-width: 800px) {
   #rl-app #V-MailMessageView :is(
@@ -46,8 +46,8 @@
   ) {
     max-width: var(--pw-measure);
     box-sizing: border-box;
-    margin-inline: 0;
-    padding-inline: var(--pw-gutter);
+    margin-inline:0;
+    padding-inline:var(--pw-gutter);
   }
 }
 
@@ -66,16 +66,16 @@
     color: var(--pw-grey-900);
   }
   #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands {
-    gap: var(--pw-space-3);
+    gap:var(--pw-space-3);
   }
   #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group {
-    gap: 2px;
+    gap:var(--pw-space-0-5);
   }
   #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions,
   #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {
     border: 0;
-    padding-inline: 0;
-    margin-inline-end: 0;
+    padding-inline:0;
+    margin-inline-end:0;
     background: transparent;
   }
 }

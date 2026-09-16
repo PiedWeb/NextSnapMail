@@ -27,7 +27,7 @@
 #rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary {
   display: flex;
   align-items: center;
-  gap: var(--pw-space-2);
+  gap:var(--pw-space-2);
   list-style: none;
 }
 #rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary::-webkit-details-marker {

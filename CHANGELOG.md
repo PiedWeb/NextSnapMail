@@ -1,5 +1,27 @@
 # Releases
 
+## 1.7.49, 2026-09-16
+
+Spacing is a scale. Padding, margins and gaps used thirty different pixel
+values, eleven of them consecutive between 4 and 14 px, so choosing between 9 and
+10 px was a decision taken hundreds of times and never once settled.
+
+172 values moved onto nine steps — 2, 4, 8, 12, 16, 24, 32, 48, 64 — and are
+named rather than written. The largest movements are 6 px to 8 and 10 px to 12,
+which is why rows and folder entries have a little more air; 18 px comes down to
+16 and 20 up to 24. The reading gutter joins the scale at 32 px, so the message
+body measures 576 characters' worth of column instead of 568.
+
+Offsets that reserve room for a control stay out of the scale and keep their
+measured value: the 44 px touch targets, the 56 px clearance for the Nextcloud
+app grid, the 48 px reserved for a folder's unread badge, the 62 px reserved for
+the search button. Those are measured against a control, not chosen from a
+scale, and rounding them would misalign what they align to.
+
+Widths, heights and inset values are untouched; this pass is spacing only. All
+23 browser fixtures pass, with two assertions in `test-mail-polish.js` rewritten
+to check that a value belongs to the scale rather than to equal 18 px.
+
 ## 1.7.48, 2026-09-16
 
 The type scale exists and is enforced. Text was set at fourteen different sizes
