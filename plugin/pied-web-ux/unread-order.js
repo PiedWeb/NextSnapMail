@@ -1,4 +1,4 @@
-/* Inbox-only mixed order: unread oldest-first, then read newest-first. */
+/* Inbox-only mixed order: unread roots, unread conversations, then read rows. */
 (() => {
     'use strict';
     const api = window.PiedWebUx = window.PiedWebUx || {};
@@ -13,9 +13,10 @@
         const stamp = Number(value(message?.dateTimestamp));
         return Number.isFinite(stamp) && stamp > 0 ? stamp : null;
     };
-    const unread = message => {
+    const unreadRank = message => {
+        if (value(message?.isUnseen)) return 2;
         const thread = value(message?.threadUnseen);
-        return !!value(message?.isUnseen) || (Array.isArray(thread) && thread.length > 0);
+        return Array.isArray(thread) && thread.length > 0 ? 1 : 0;
     };
     const messageKey = message => {
         const folder = String(value(message?.folder) || ''), uid = value(message?.uid);
@@ -148,9 +149,9 @@
         const pinned = behavior === 2 && heldMessageKey
             ? collection.find(message => messageKey(message) === heldMessageKey) : null;
         const ordered = collection.filter(message => message !== pinned).sort((left, right) => {
-            const leftUnread = unread(left), rightUnread = unread(right);
-            if (leftUnread !== rightUnread) return leftUnread ? -1 : 1;
-            return compareDate(left, right, leftUnread) || positions.get(left) - positions.get(right);
+            const leftRank = unreadRank(left), rightRank = unreadRank(right);
+            if (leftRank !== rightRank) return rightRank - leftRank;
+            return compareDate(left, right, leftRank > 0) || positions.get(left) - positions.get(right);
         });
         if (pinned) ordered.splice(Math.max(0, Math.min(heldIndex, ordered.length)), 0, pinned);
         return ordered;
@@ -201,8 +202,8 @@
         button.textContent = t('Non lus : anciens d’abord', 'Unread: oldest first');
         button.title = enabled
             ? t('Rétablir l’ordre natif des messages', 'Restore the native message order')
-            : t('Rassembler tous les non-lus, du plus ancien au plus récent, puis afficher les lus du plus récent au plus ancien',
-                'Gather every unread message oldest first, then show read messages newest first');
+            : t('Afficher d’abord les messages non lus, puis les conversations avec un ancien message non lu, et enfin les messages lus',
+                'Show unread messages first, then conversations with an older unread member, and finally read messages');
         error.hidden = !visible || !error.textContent;
         const threads = group?.querySelector('.pw-threads');
         if (group) group.hidden = button.hidden && (!threads || threads.hidden);

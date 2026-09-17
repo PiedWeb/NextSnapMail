@@ -48,10 +48,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
   a custom folder. An Inbox conversation may still contain its matching Sent replies.
 - Since 1.8.5, `INBOX` also has an independent per-account mixed-order preference.
-  Since 1.8.9, the first page gathers every unread received row oldest-first, followed by
-  the first native page's read rows newest-first; later pages suppress gathered unread
-  duplicates without moving or dropping their native read rows. A conversation is unread
-  when its root or any `threadUnseen` member is unread. Enrich the existing `MessageList`
+  Since 1.8.9, the first page gathers every unread received row, followed by the first
+  native page's read rows newest-first; later pages suppress gathered unread duplicates
+  without moving or dropping their native read rows. Since 1.8.10, unread root messages
+  stay together oldest-first, then read roots whose `threadUnseen` metadata says an older
+  conversation member is unread form their own oldest-first group. Preserve the native root
+  read indicator and its action rather than making a read root look unread. Enrich the existing `MessageList`
   response so the supplementary `UNSEEN` read reuses its IMAP login and UID/thread caches;
   do not add a second browser request. Unread Draft reminders are queried oldest-first too.
   Keep Draft rows outside native Inbox selection, preserve native pagination, and leave
@@ -217,6 +219,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.8.10 | Keep visibly unread roots together before read-root conversations that still contain an unread member. |
 | 1.8.9 | Gather every unread Inbox row on page one through the existing native request, with cached IMAP work and later-page deduplication. |
 | 1.8.8 | Prefer Reply all for multi-correspondent messages in the reader toolbar and footer while keeping direct replies unchanged. |
 | 1.8.7 | Dock Reply/Reply all in the active conversation and expand the same native editor back to its popup without losing the draft or cursor. |

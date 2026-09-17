@@ -29,11 +29,17 @@ check('The existing read-transition preference is preserved', await page.evaluat
     document.querySelector('#pw-unread-order-read-behavior')?.value === '2'
     && document.querySelectorAll('.pw-unread-order-setting').length === 1));
 
-await page.evaluate(() => listVM.messageList().find(message => message.uid === 4).threadUnseen([44]));
-await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,4,3,2,1,6,7,8,9,10');
-check('A conversation containing an unread member belongs to the unread segment', await page.evaluate(() =>
-    listVM.messageList().map(message => message.uid).join(',') === '5,4,3,2,1,6,7,8,9,10'));
-await page.evaluate(() => listVM.messageList().find(message => message.uid === 4).threadUnseen([]));
+await page.evaluate(() => {
+    listVM.messageList().find(message => message.uid === 4).threadUnseen([44]);
+    listVM.messageList().find(message => message.uid === 6).threadUnseen([66]);
+});
+await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,6,4,7,8,9,10');
+check('Unread roots stay together before conversations whose older member is unread', await page.evaluate(() =>
+    listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,6,4,7,8,9,10'));
+await page.evaluate(() => {
+    listVM.messageList().find(message => message.uid === 4).threadUnseen([]);
+    listVM.messageList().find(message => message.uid === 6).threadUnseen([]);
+});
 await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
 
 await page.evaluate(() => {

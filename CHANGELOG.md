@@ -1,5 +1,18 @@
 # Releases
 
+## 1.8.10, 2026-09-18
+
+**Unread: oldest first** now keeps the rows whose visible/root message is unread in one
+continuous oldest-first group. Conversations whose root is read but whose badge reports an
+older unread member follow in a separate oldest-first group, before fully read rows. This
+prevents native grey/read indicators from appearing between the teal unread rows while still
+bringing every unread conversation onto the first page.
+
+The root's native read indicator and toggle remain truthful; no IMAP flag is changed or
+invented for presentation. The change is only one extra integer comparison in the existing
+in-memory sort, so it adds no request and no mailbox work. The browser fixture covers both
+conversation groups and their chronological order.
+
 ## 1.8.9, 2026-09-18
 
 **Unread: oldest first** now gathers the complete unread Inbox set on the first page,

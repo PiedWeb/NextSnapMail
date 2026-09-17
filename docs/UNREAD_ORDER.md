@@ -19,12 +19,15 @@ The choice has no effect when the mixed-order preference is off.
 
 When enabled in the ordinary `INBOX` feed:
 
-- every unread received row is gathered on the first Inbox page, from oldest to newest;
+- every unread received row is gathered on the first Inbox page;
+- rows whose visible/root message is unread come first, from oldest to newest;
+- conversations whose visible/root message is read but an older member is unread form a
+  second oldest-first group, so read-looking roots never interrupt the visibly unread rows;
 - the native first page's read rows follow, from newest to oldest;
 - later pages omit unread rows already gathered on page one while retaining their native
   read rows and pagination;
-- a conversation is in the unread segment when its root or one of its `threadUnseen`
-  members is unread;
+- a conversation is still retained when one of its `threadUnseen` members is unread, but its
+  native root read state and read-status action are not falsified;
 - the unread Drafts reminder query uses ascending date order, so its first page contains
   the genuinely oldest reminders instead of merely reversing the newest ten.
 
@@ -52,5 +55,5 @@ never run or merge the supplementary collection.
 first-page scope, the targeted query shape and the no-query fast path.
 `tests/unread-drafts.php` checks the matching IMAP sort direction. The fictional browser
 fixture checks Conversation coexistence, complete native merging, later-page deduplication,
-conversation-member unread state, received and Draft ordering, read-state changes, scope,
+separate root-unread and conversation-member groups, received and Draft ordering, read-state changes, scope,
 failure feedback and the mobile toolbar. No real message is opened, moved or changed.

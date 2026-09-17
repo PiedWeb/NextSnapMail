@@ -108,7 +108,8 @@ removed while Inbox requests keep the saved preference.
 
 `test-unread-order.js` keeps the Inbox Conversation and mixed-order controls active together,
 checks complete first-page unread merging and later-page deduplication, treats a conversation
-with an unread member as unread, verifies oldest-first unread/read segmentation, moves a row
+with an unread member as its own group after visibly unread roots, verifies oldest-first
+unread/read segmentation, moves a row
 between those segments when its read state changes, and verifies true oldest-first Draft
 pagination. It also covers the existing per-account read-transition setting, load/save calls,
 Inbox/search scope, failure feedback and the mobile control group. The fixture uses fictional
