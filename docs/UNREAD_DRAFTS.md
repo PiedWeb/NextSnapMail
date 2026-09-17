@@ -10,6 +10,11 @@ reveals the fetched page, then loads further pages of ten. The section disappear
 unread drafts remain. It is hidden while searching, viewing another folder, opening a
 conversation or browsing later Inbox pages. Search and Inbox pagination retain their scope.
 
+Since 1.8.5, the Inbox’s optional mixed-order preference also changes this query to
+ascending date order. Its first page then contains the genuinely oldest unread drafts;
+without that preference the established newest-first order remains. Draft reminders stay
+in their separate section rather than entering native Inbox selection.
+
 Clicking a reminder resumes native Draft composition with the original folder/UID,
 recipients, attachments, HTML/plain content and reply references. Listing/opening here does
 not mark the draft read. Native saving normally writes the draft with the Seen flag; it

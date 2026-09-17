@@ -133,11 +133,17 @@
         const subscriptions = [list,list.loading,list.page,list.threadUid,vm.popupVisibility].filter(value => value?.subscribe).map(value => value.subscribe(schedule));
         const theme = new MutationObserver(schedule); theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const wake = () => { if (!document.hidden) schedule(); };
+        const orderChanged = () => {
+            ++generation; loading = false; opening = false; entries = []; total = 0;
+            visible = 3; error = ''; folder = ''; etag = ''; render(); schedule();
+        };
         addEventListener('focus',wake); document.addEventListener('visibilitychange',wake);
+        addEventListener('pw-unread-order-changed', orderChanged);
         const poll = setInterval(() => void refresh(),60000); schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; ++generation; clearTimeout(timer); clearInterval(poll); theme.disconnect();
             subscriptions.forEach(sub => sub.dispose()); removeEventListener('focus',wake); document.removeEventListener('visibilitychange',wake);
+            removeEventListener('pw-unread-order-changed', orderChanged);
         });
     });
 })();

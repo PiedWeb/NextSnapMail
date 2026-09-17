@@ -29,6 +29,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Browser-side compression for clipboard images and local, Nextcloud or restored image attachments.
 - Nextcloud files from the Image toolbar, compressed and inserted directly in the message body.
 - Genuinely unread drafts at the top of the Inbox feed, with one-click resume.
+- An Inbox-only mixed order that puts unread messages oldest-first and keeps read messages newest-first, independently of Conversations.
 
 The optional linked-account unread counter correction is a separate [upstream PR](https://github.com/oe79/NextSnapMail/pull/41) and [version-specific patch](patches/README.md).
 Selected UX enhancements are proposed for upstream integration in [NextSnapMail issue #46](https://github.com/oe79/NextSnapMail/issues/46). This public repository provides the prototype and validation history; the proposal asks the maintainer which focused changes to accept and does not claim the plugin can be merged as-is.
@@ -40,7 +41,7 @@ This does **not** implement a unified inbox or a new vacation responder. Nextclo
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.8.4**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.8.5**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).
@@ -52,7 +53,7 @@ python3 tools/check-install.py --nextcloud /path/to/nextcloud
 
 The plugin is stored in NextSnapMail's data directory, and the theme under Nextcloud's custom themes. Normal updates generally preserve those files. Preserved files do not guarantee compatibility with new DOM, editor or PHP APIs. The optional core patch is overwritten when the app is replaced.
 
-[Unread drafts](docs/UNREAD_DRAFTS.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
+[Unread drafts](docs/UNREAD_DRAFTS.md) · [Unread order](docs/UNREAD_ORDER.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
 
 ## Develop
 

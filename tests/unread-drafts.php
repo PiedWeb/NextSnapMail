@@ -16,7 +16,8 @@ namespace {
         public function hasCapability(string $name): bool { return false; }
     }
     $actions = new class {
-        public $account; public string $folder = 'INBOX.Brouillons'; public array $params = [], $calls = [];
+        public $account; public string $folder = 'INBOX.Brouillons'; public bool $oldestFirst = false;
+        public array $params = [], $calls = [];
         public $imap; public $collection;
         public function __construct() {
             $this->imap = new ReadOnlyImap;
@@ -26,7 +27,7 @@ namespace {
         public function getAccountFromToken() { return $this->account; }
         public function SettingsProvider($local) { return $this; }
         public function Load($account) { return $this; }
-        public function GetConf($name, $default) { return $this->folder; }
+        public function GetConf($name, $default) { return $name === 'DraftsFolder' ? $this->folder : ($name === 'PiedWebUnreadOldestFirst' ? $this->oldestFirst : $default); }
         public function GetActionParam($name, $default) { return $this->params[$name] ?? $default; }
         public function Plugins() { return null; }
         public function Config() { return null; }
@@ -44,6 +45,9 @@ namespace {
     $cache = false; $criteria = (string) \MailSo\Imap\SearchCriterias::fromString($actions->imap, $params->sFolderName, $params->sSearch, $params->bHideDeleted, $cache);
     $check(str_contains($criteria, 'UNSEEN') && str_contains($criteria, 'UNDELETED') && !str_contains($criteria, 'DRAFT'), 'Native parser means UNSEEN and UNDELETED, independent of the Draft flag');
     $check(!$params->bUseThreads && $params->sSort === 'REVERSE DATE', 'Newest drafts first, independent of Inbox thread mode');
+    $actions->oldestFirst = true; $actions->params = ['offset'=>0,'etag'=>'stale-order']; $plugin->UnreadDrafts(); $orderedParams = end($actions->calls);
+    $check($orderedParams->sSort === 'DATE', 'Saved mixed-order preference requests the oldest unread drafts first');
+    $actions->oldestFirst = false; $actions->params = [];
     $check($params->iLimit === 10 && $params->iOffset === 0, 'Bounded first page');
     $check($result['messages'] === $actions->collection && $result['messages']->totalEmails === 27, 'Preserves the full native filtered count for pagination');
     $check($result['etag'] === 'etag-1' && $result['unchanged'] === false, 'First read returns the Drafts folder state');

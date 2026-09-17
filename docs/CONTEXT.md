@@ -47,6 +47,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   strip native thread parameters from list and reader requests outside `INBOX`, and
   never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
   a custom folder. An Inbox conversation may still contain its matching Sent replies.
+- Since 1.8.5, `INBOX` also has an independent per-account mixed-order preference.
+  When active in the ordinary feed, unread received rows on each native page are oldest-first,
+  followed by read rows newest-first; unread Draft reminders are queried oldest-first too.
+  Keep Draft rows outside native Inbox selection, keep native pagination, and leave searches,
+  opened threads and other folders in their native order. See `UNREAD_ORDER.md`.
 - Native IMAP threads are folder-scoped. Since 1.7.20, Conversations mode
   assembles the opened message's native folder thread with matching Sent replies
   from read-only header searches. The newest message, received or sent, opens

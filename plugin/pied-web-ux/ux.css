@@ -1,8 +1,8 @@
 /* Toolbar additions belong to Pied Web; delayed sending works with every theme. */
-html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-threads, .pw-threads-error) {
+html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-feed-settings, .pw-threads, .pw-threads-error, .pw-unread-order-error) {
     display: none !important;
 }
-#rl-app :is(.pw-threads, .pw-threads-error)[hidden] { display: none !important; }
+#rl-app :is(.pw-feed-settings, .pw-threads, .pw-threads-error, .pw-unread-order-error)[hidden] { display: none !important; }
 /* A non-modal notification, including above a newly opened composer. */
 #rl-app .pw-outgoing-notices {
     position: fixed;
@@ -79,7 +79,7 @@ html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-acc
 @media (max-width: 600px) {
     #rl-app .pw-outgoing-notices { inset-inline: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: auto; margin:-10px; }
 }
-#rl-app :is(.pw-threads, .pw-message-actions .btn, .pw-message-extras .btn, .pw-select-results, .pw-bulk-dialog button):focus-visible {
+#rl-app :is(.pw-threads, .pw-unread-order, .pw-message-actions .btn, .pw-message-extras .btn, .pw-select-results, .pw-bulk-dialog button):focus-visible {
     outline: 2px solid var(--nc-color-primary-element, #087c75);
     outline-offset: 2px;
 }

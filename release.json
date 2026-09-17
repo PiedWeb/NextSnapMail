@@ -1,5 +1,5 @@
 {
-  "version": "1.8.4",
+  "version": "1.8.5",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.11",
@@ -10,7 +10,8 @@
     "plugin/pied-web-ux/Conversation.php": "f1db00f7ad808c8e70a5c43790bd22517f85161796675022b788c6a021eead29",
     "plugin/pied-web-ux/FilteredSelection.php": "67daf171ac6ded5b0fd417d29a979b2b76c63c371b630f970740e0fa6d863d80",
     "plugin/pied-web-ux/ScheduledSend.php": "6ca2c59ccf71b6b8c9628ba00627bcebb96b9965cf1149856ffb612c1e11dad9",
-    "plugin/pied-web-ux/UnreadDrafts.php": "a711ae03276395824f45ced0b9b67af5dfe7c6829144f0916f50065de1342436",
+    "plugin/pied-web-ux/UnreadDrafts.php": "2bba6fed9c9e8ece166ff0115858e0280e43ff28f94b766d104faa95fc979e62",
+    "plugin/pied-web-ux/UnreadOrder.php": "21aee8b0faf1c709c5d629c7d352510497e7d62d531b7b32bd5686a0e9a17994",
     "plugin/pied-web-ux/address-actions.js": "8e232a0d2dfde8855453727ee933aa344a6c32f8a6ec73b3d78e9b612a99d1d5",
     "plugin/pied-web-ux/app-shell.js": "1b43b9e508e51920ec4faceff3db8e4c5ed55a1137a2b6adf96b0a93e490b253",
     "plugin/pied-web-ux/attachment-images.js": "f9c820b36198ede4364baeaa2a3cf546cfbb062e237b010e0528abc922c5d1ff",
@@ -26,7 +27,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "76700a88365fe0ac9431e4d6c01c8a1f48bdf74d6828ae6a63693cf294d8df58",
+    "plugin/pied-web-ux/index.php": "e55cb829717796cad88f525545eba93660fc7e8b9d8b8166e39e40d5e8d4216d",
     "plugin/pied-web-ux/left-panel-state.js": "f3970d887448903d92d53eb700abad0073da0c8e0967cfbe545be4f8f8356ebd",
     "plugin/pied-web-ux/list-interactions.js": "d0c6981b421ff99961f0edf229a4eb170921d0ef964b57da9171aca5e1919a00",
     "plugin/pied-web-ux/list-metadata.js": "8d62f93e83fa8cc83778c846718658c5bd1952ee3ed599a4b9f79650935203c9",
@@ -41,14 +42,15 @@
     "plugin/pied-web-ux/quote-readability.js": "38df449da67cc3bd2b15545d50d23620ab794c60071eed4a407d459dde2a746c",
     "plugin/pied-web-ux/scheduled-send.js": "2f212c85ab12678588d2c528841313ba4864bb7a458f269cbd105a0dbe956c8a",
     "plugin/pied-web-ux/send-delay.js": "282a62c55131fc28ace31069e736733e89e6879fcfe0d00af59e6d811b7db6f7",
-    "plugin/pied-web-ux/studio.js": "b2f301d8d921909fe8a7bc034ea50a30ecc49f6eef2a0946c920b79cd7ea2d4e",
-    "plugin/pied-web-ux/unread-drafts.js": "5511e35a16a371b12670ea6d04a1cc654e408e50328ab5c0d4f782d81c4a5025",
-    "plugin/pied-web-ux/ux.css": "808a788d8ca5614687e26567774cf11c9e901e8cf4a33619434a7f185b656c6d",
+    "plugin/pied-web-ux/studio.js": "ab1166ec1ff7d38aed95f316d5467503ecbc31beed4b0672a370576b1e5239a6",
+    "plugin/pied-web-ux/unread-drafts.js": "1400b854aafcc68302a6e0376b96ac5d25caa928735d8f2c309a8dd2e2500c61",
+    "plugin/pied-web-ux/unread-order.js": "1a9059f19252e4da6502193cc4dd64d74cace32376dc48049bebf726b7ca9ffe",
+    "plugin/pied-web-ux/ux.css": "afc1b31e14531e3ec43c7c80c88ea0291732201f58c4af43dfd1622f96569676",
     "plugin/pied-web-ux/ux.js": "1f517d4eb617c8054f23b58ee12cde41f1623e2dbecb8bac7836f9a2d6b14022",
     "theme/PiedWeb/snappymail/pied-web-ui-latin-ext.woff2": "38f1483ab1f20c8fa86347c83dc20fff5e68bc198aaf2cd8679b2a4db233403b",
     "theme/PiedWeb/snappymail/pied-web-ui-latin.woff2": "21831cc7940800de3c8a0c0760cd001d110090fc6f0f7c02387ca1256649a56c",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
-    "theme/PiedWeb/snappymail/style.css": "11fae7e368c709859041477cffcde43f459bb286dde97fb3492746966fb527ea"
+    "theme/PiedWeb/snappymail/style.css": "9dc7968585d519f3e5151269131be8e3e2dc2cf57d25b180982a30d4d0709f25"
   },
   "core_patch": {
     "pull_request": "https://github.com/oe79/NextSnapMail/pull/41",

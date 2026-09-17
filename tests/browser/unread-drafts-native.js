@@ -39,11 +39,18 @@ ko.isObservableArray=ko.isObservableArray|| (value=>ko.isObservable(value)&&!!va
     listVM.messageList(inbox); listVM.messageList.page=ko.observable(1); listVM.popupVisibility=ko.observable(false);
     rl.app.messageList=listVM.messageList;
     rl.pluginRemoteRequest = (callback,action,params) => {
+        if (action === 'PiedWebUnreadOrder') {
+            unreadOrderRequests.push({...params});
+            if (Object.hasOwn(params, 'enabled')) unreadOrderEnabled = !!Number(params.enabled);
+            return setTimeout(() => callback(window.unreadOrderFailure ? 1 : 0,
+                {Result:window.unreadOrderFailure ? {error:'settings'} : {enabled:unreadOrderEnabled}}), 20);
+        }
         draftRequests.push({action,...params,account:draftAccount});
         const snapshot = structuredClone(draftData), folderSnapshot = draftFolder;
         const send = () => {
             if (window.draftFailure) return callback(1,{});
-            const matching = snapshot.filter(item=>!item.flags.some(flag=>['\\seen','\\deleted'].includes(flag.toLowerCase())));
+            const matching = snapshot.filter(item=>!item.flags.some(flag=>['\\seen','\\deleted'].includes(flag.toLowerCase())))
+                .sort((left,right)=>unreadOrderEnabled ? left.dateTimestamp-right.dateTimestamp : right.dateTimestamp-left.dateTimestamp);
             const messages = {'@Object':'Collection/MessageCollection','@Collection':matching.slice(params.offset,params.offset+10),folder:{name:folderSnapshot},offset:params.offset,totalEmails:matching.length};
             callback(0,{Result:{folder:folderSnapshot,messages}});
         };

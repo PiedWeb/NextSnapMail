@@ -1,5 +1,26 @@
 # Releases
 
+## 1.8.5, 2026-09-17
+
+The Inbox has a second preference beside **Conversations**: **Unread: oldest first**.
+It is independent, so both controls can remain active. When enabled, unread received
+messages on the native Inbox page come first in chronological order; read messages
+follow in reverse chronological order. A message that becomes read moves between those
+segments without replacing its native model, selection or commands.
+
+Unread Draft reminders follow the same direction. Their server query changes from
+`REVERSE DATE` to `DATE`, so the first ten are the genuinely oldest reminders instead
+of the newest ten displayed backwards. They remain a separate, folder-safe section:
+Draft and Inbox UIDs are never mixed in native selection. Search, thread detail and every
+folder outside `INBOX` retain their native order. Received messages retain native
+pagination and are rearranged only within the current page.
+
+The preference is stored per account in SnappyMail local settings. Disabling it reloads
+the native list order; failures leave the previous state intact and visible. Validation:
+11 endpoint checks, 24 unread-Draft endpoint checks and 13 fictional browser scenarios,
+plus the existing Conversation, Draft and metadata browser suites. No real mail was read,
+moved or changed. See `docs/UNREAD_ORDER.md`.
+
 ## 1.8.4, 2026-09-17
 
 Conversations now belongs to the Inbox, rather than to every folder in the account.

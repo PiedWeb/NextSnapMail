@@ -383,7 +383,15 @@ const messages=Object.assign([{}, {}, {}],{folder:fixtureFolder,search:''});
 const messageList=ko.observableArray(messages);
 Object.assign(messageList,{mainSearch(value){actionCalls.push('search:'+value);},count:ko.observable(128),pageCount:ko.observable(1),loading:ko.observable(false),isIncomplete:ko.observable(false),threadUid:ko.observable(0),reload(){actionCalls.push('reload');}});
 window.mockRequests=[]; window.mockCount=451; window.mockError='';
-rl.pluginRemoteRequest=(cb,action,params)=>{mockRequests.push({...params});setTimeout(()=>cb(0,{Result:mockError?{error:mockError}:params.operation==='prepare'?{token:'test-snapshot',count:mockCount,cursor:0,done:false,permanent:messages.folder==='Trash'}:{count:mockCount,cursor:Math.min(mockCount,params.cursor+200),done:params.cursor+200>=mockCount}}),30);};
+window.unreadOrderEnabled=new URLSearchParams(location.search).get('unreadOrder')==='1';window.unreadOrderRequests=[];
+rl.pluginRemoteRequest=(cb,action,params)=>{
+ if(action==='PiedWebUnreadOrder'){
+  unreadOrderRequests.push({...params});
+  if(Object.hasOwn(params,'enabled'))unreadOrderEnabled=!!Number(params.enabled);
+  return setTimeout(()=>cb(window.unreadOrderFailure?1:0,{Result:window.unreadOrderFailure?{error:'settings'}:{enabled:unreadOrderEnabled}}),20);
+ }
+ mockRequests.push({...params});setTimeout(()=>cb(0,{Result:mockError?{error:mockError}:params.operation==='prepare'?{token:'test-snapshot',count:mockCount,cursor:0,done:false,permanent:messages.folder==='Trash'}:{count:mockCount,cursor:Math.min(mockCount,params.cursor+200),done:params.cursor+200>=mockCount}}),30);
+};
 window.listVM={viewModelTemplateID:'MailMessageList',viewModelDom:document.getElementById('V-MailMessageList'),composeInEdit:ko.observable(false),composeClick(){actionCalls.push('compose');},reload(){actionCalls.push('reload');},messageList};
 rl.app.messageList=messageList;
 window.folderVM={currentFolder:ko.observable({localName:ko.observable(fixtureFolder==='INBOX'?'Boîte de réception':fixtureFolder),fullName:fixtureFolder,unreadEmails:ko.observable(16)}),viewModelTemplateID:'MailFolderList',viewModelDom:document.getElementById('V-MailFolderList'),filterUnseen:ko.observable(false),toggleLeftPanel:()=>document.documentElement.classList.toggle('rl-left-panel-disabled')};
@@ -407,7 +415,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
+</script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/unread-order.js?order=185"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 window.composerOpened=[];
@@ -422,7 +430,7 @@ composerOpened.push({to:to?email+','+to:email,cc:params.get('cc')||'',subject:pa
 });
 
 const demoRows=[...document.querySelectorAll('.messageListItem')];
-const demoMessages=demoRows.map((row,i)=>{const data={uid:i+1,folder:fixtureFolder,checked:ko.observable(false),threadsLen:()=>1,threads:()=>[],isUnseen:()=>row.classList.contains('unseen')};
+const demoMessages=demoRows.map((row,i)=>{const data={uid:i+1,folder:fixtureFolder,checked:ko.observable(false),threadsLen:()=>1,threads:()=>[],isUnseen:ko.observable(row.classList.contains('unseen')),dateTimestamp:ko.observable(1789200000-i*3600)};
 ko.applyBindingAccessorsToNode(row,{css:()=>({checked:data.checked()})},data);
 const check=row.querySelector('.checkboxMessage');
 ko.applyBindingAccessorsToNode(check,{text:()=>data.checked()?'☑':'☐'},data);
@@ -431,9 +439,12 @@ return data;});
 listVM.groupedList=ko.observable([{label:'Aujourd’hui',messages:demoMessages.slice(0,5)},{label:'Hier',messages:demoMessages.slice(5,9)},{label:'Samedi 5 septembre',messages:demoMessages.slice(9)}]);
 listVM.listGrouped=ko.observable(false);
 
+const demoRowForMessage=new Map(demoMessages.map((message,index)=>[message,demoRows[index]]));
 Object.assign(demoMessages,{folder:fixtureFolder,search:''});messageList(demoMessages);
+// The page carries static native-shaped rows; mirror Knockout's foreach DOM moves when the store is reordered.
+messageList.subscribe(items=>{const container=document.querySelector('.fixture-list');items.forEach(message=>{const row=demoRowForMessage.get(message);if(row)container.append(row);});});
 window.fixtureSeenActions=[];
-messageList.setAction=(folder,action,messages)=>{fixtureSeenActions.push({folder,action,uids:messages.map(m=>m.uid)});messages.forEach(m=>demoRows[demoMessages.indexOf(m)].classList.toggle('unseen',action===1));};
+messageList.setAction=(folder,action,messages)=>{fixtureSeenActions.push({folder,action,uids:messages.map(m=>m.uid)});messages.forEach(m=>{demoRowForMessage.get(m)?.classList.toggle('unseen',action===1);m.isUnseen(action===1);});};
 window.fixtureMoves=[];window.nativeReaderDelete=0;
 rl.app.moveMessagesToFolderType=(type,folder,uids)=>fixtureMoves.push({type,folder,uids:[...uids]});
 listVM.popupVisibility=ko.observable(false);

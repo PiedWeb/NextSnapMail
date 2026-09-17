@@ -331,7 +331,7 @@
                 selection.firstChild.addEventListener('click',e=>{e.preventDefault();dom.classList.add('pw-search-open');searchToggle.setAttribute('aria-expanded','true');dom.querySelector('.checkboxCheckAll')?.focus();});
                 moreMenu.prepend(refresh,selection);
             }
-            const movable = [dom.querySelector('.pw-threads'), dom.querySelector('#more-list-dropdown-id')?.closest('.btn-group')].filter(Boolean).map(node => {
+            const movable = [dom.querySelector('.pw-feed-settings') || dom.querySelector('.pw-threads'), dom.querySelector('#more-list-dropdown-id')?.closest('.btn-group')].filter(Boolean).map(node => {
                 const marker = document.createComment('Pied Web control home'); node.before(marker); return [node, marker];
             });
             const adapt = () => {

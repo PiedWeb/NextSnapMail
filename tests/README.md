@@ -17,6 +17,7 @@ Use a separate source checkout of the NextSnapMail revision recorded in `release
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
+php tests/unread-order.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
@@ -62,6 +63,7 @@ dev-browser --timeout 50 < tests/browser/test-native-controls.js
 dev-browser --timeout 50 < tests/browser/test-font-delivery.js
 dev-browser --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
+dev-browser --timeout 40 < tests/browser/test-unread-order.js
 dev-browser --timeout 45 < tests/browser/test-left-panel-state.js
 dev-browser --timeout 60 < tests/browser/test-scheduled-send.js
 ```
@@ -94,6 +96,12 @@ opposite setting request in desktop/mobile and light/dark fictional list fixture
 It also switches the list to Trash, where the control must disappear, and verifies
 that both POST and cached GET list/reader requests have their thread parameters
 removed while Inbox requests keep the saved preference.
+
+`test-unread-order.js` keeps the Inbox Conversation and mixed-order controls active together,
+checks unread received rows oldest-first and read rows newest-first, moves a row between those
+segments when its read state changes, and verifies true oldest-first Draft pagination. It also
+covers per-account load/save calls, Inbox/search scope, failure feedback and the mobile control
+group. The fixture uses fictional rows and mocked preference/mail endpoints.
 
 `test-send-now.js` builds the outgoing notice from the markup `background-send.js`
 ships, so a change to `render()` cannot leave it passing, and checks the Send now

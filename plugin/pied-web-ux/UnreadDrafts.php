@@ -7,7 +7,8 @@ final class PiedWebUnreadDrafts
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') throw new \RuntimeException('POST required');
         $account = $actions->getAccountFromToken();
         if (!$account) throw new \RuntimeException('Login required');
-        $folder = (string) $actions->SettingsProvider(true)->Load($account)->GetConf('DraftsFolder', '');
+        $settings = $actions->SettingsProvider(true)->Load($account);
+        $folder = (string) $settings->GetConf('DraftsFolder', '');
         if (!$folder || $folder === '__UNUSE__' || strcasecmp($folder, 'INBOX') === 0) {
             return ['folder' => '', 'messages' => null];
         }
@@ -31,7 +32,8 @@ final class PiedWebUnreadDrafts
         $params = new \MailSo\Mail\MessageListParams;
         $params->sFolderName = $folder;
         $params->sSearch = 'is:unseen';
-        $params->sSort = 'REVERSE DATE';
+        $params->sSort = (bool) $settings->GetConf('PiedWebUnreadOldestFirst', false)
+            ? 'DATE' : 'REVERSE DATE';
         $params->bHideDeleted = true;
         $params->bUseThreads = false;
         $params->iOffset = $offset;
