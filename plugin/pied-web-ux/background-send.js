@@ -269,6 +269,26 @@
         if (host.parentNode !== parent) { if ((host.showPopover && host.matches(':popover-open'))) host.hidePopover(); parent.append(host); }
         if (host.showPopover && !(host.showPopover && host.matches(':popover-open'))) host.showPopover();
     }
+    function addFlag(message, flag) {
+        const flags = message?.flags;
+        if (!flag || typeof flags !== 'function' || flags().includes(flag)) return false;
+        flags.push(flag); return true;
+    }
+    function sent(job, flag) {
+        const draft = job.state.plain.aDraftInfo;
+        const folder = String(draft?.[2] || job.state.source?.folder || '');
+        const uid = Number(draft?.[1] || job.state.source?.uid || 0);
+        addFlag(job.state.source, flag);
+        const rows = typeof listView?.messageList === 'function' ? listView.messageList() : [];
+        if (flag && folder && uid > 0 && Array.isArray(rows)) rows.forEach(message => {
+            const thread = typeof message?.threads === 'function' ? message.threads() : [];
+            if (message?.folder === folder && (Number(message.uid) === uid
+                || thread.some(value => Number(value) === uid))) addFlag(message, flag);
+        });
+        dispatchEvent(new CustomEvent('pw-message-sent', {
+            detail:{account:job.account,folder,uid,flag:flag || ''}
+        }));
+    }
     function pump() {
         if (activeSend || leaving) return;
         const job = jobs.find(item => item.phase === 'ready' && item.persisted);
@@ -288,8 +308,11 @@
                 } else if (copy.pwSent) {
                     job.phase = 'sent';
                     const flag = {reply:'\\answered','reply-all':'\\answered',forward:'$forwarded'}[job.state.plain.aDraftInfo?.[0]];
-                    if (flag && job.state.source?.flags && !job.state.source.flags().includes(flag)) job.state.source.flags.push(flag);
-                    listView?.reload?.();
+                    sent(job,flag);
+                    // Native send keeps the replied/forwarded row model in place and
+                    // changes its flag. Replacing that model here made the immediate
+                    // visual state disappear, especially for a conversation row.
+                    if (!flag) listView?.reload?.();
                     job.noticeTimer = clock.later(() => remove(job), 3500);
                 } else {
                     job.phase = 'error'; job.detail = copy.sendErrorDesc() || t('Vérifiez les Envoyés avant de réessayer.', 'Check Sent before trying again.');

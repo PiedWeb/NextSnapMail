@@ -1,8 +1,11 @@
 (() => {
 const createElement = (name,attrs={}) => Object.assign(document.createElement(name), attrs);
-const SettingsUserStore = new Proxy({}, {get:(_,key) => () => key === 'editorWysiwyg' ? 'Squire' : key === 'allowStyles'});
+const SettingsUserStore = new Proxy({}, {get:(_,key) => () => key === 'editorWysiwyg'
+	? (new URLSearchParams(location.search).has('squireNext') ? 'Squire 2.4 (test)' : 'Squire')
+	: key === 'allowStyles'});
 const isArray=Array.isArray, pInt=v=>parseInt(v)||0;
-const WYSIWYGS=[{name:'Squire',construct:(_owner,container,ready)=>ready(new SquireUI(container))}];
+const WYSIWYGS=[{name:'Squire',construct:(_owner,container,ready)=>ready(new SquireUI(container))},...(window.fixtureWysiwygs||[])];
+window.fixtureWysiwygNames=WYSIWYGS.map(editor=>editor.name);
 	const
 		tmpl = createElement('template'),
 

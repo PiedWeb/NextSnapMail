@@ -1,5 +1,37 @@
 # Releases
 
+## 1.8.6, 2026-09-18
+
+General settings now offer **Squire 2.4 (test)** beside the native **Squire** editor.
+The native editor remains the default; the saved per-account choice applies when the next
+composer opens, never by replacing a live editor and its cursor or undo history.
+
+The trial uses upstream Squire 2.4.9 behind the existing SnappyMail `SquireUI` and Pied Web
+composer tools. It fixes the two motivating regressions: `Ctrl+I` formats the next typed
+character, and quoting a partial sentence acts on its whole paragraph. Selections spanning
+several paragraphs quote each complete paragraph. The vendor global is isolated so merely
+loading the option cannot change the native editor.
+
+A confirmed Reply or Reply all now updates the opened Inbox conversation as one
+operation. Its feed row receives the native answered/« envoyé » mark immediately;
+the conversation lookup runs as soon as the Sent copy exists, opens that new last
+message and anchors it at the top of the reader. Previously the background sender
+reloaded the feed model that carried the local flag, while the conversation reader
+learned about the Sent copy only from its next 60-second poll.
+
+The visual editor's suggested colors now use Tailwind 600: orange, amber, yellow, lime,
+green, emerald, teal, cyan, sky, blue, indigo, violet, purple, fuchsia, pink, rose and
+slate. This replaces Tableau 10 in the native color control while Pied Web is active,
+without replacing the control, its custom-color choice or its built-in neutral swatches.
+Leaving the theme restores NextSnapMail's native suggestions.
+
+Validation runs both editor choices in the native composer fixture, the exact italic and
+blockquote scenarios, cross-paragraph quoting, the style adapter and representative email
+HTML containing nested quotes, a table, a signature, a link and a CID image. No real mailbox
+or message transport is used. The background-send and conversation fixtures also cover
+the immediate feed flag, refresh and scroll after a successful mocked reply. See
+`docs/SQUIRE_24.md`.
+
 ## 1.8.5, 2026-09-17
 
 The Inbox has a second preference beside **Conversations**: **Unread: oldest first**.

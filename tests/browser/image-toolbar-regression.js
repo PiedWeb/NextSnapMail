@@ -1,10 +1,12 @@
 const p=await browser.getPage('nextsnapmail-toolbar-actions');await p.setViewportSize({width:1280,height:900});
 await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html');await p.waitForSelector('.pw-compose-more');
 const results=[];const check=(name,ok)=>{if(!ok)throw Error(name);results.push(name);console.log('PASS',name);};
+const expectedPalette='#F54900,#E17100,#D08700,#5EA500,#00A63E,#009966,#009689,#0092B8,#0084D1,#155DFC,#4F39F6,#7F22FE,#9810FA,#C800DE,#E60076,#EC003F,#45556C';
 const select=()=>p.evaluate(()=>{htmlEditor.setHtml('<div>Texte sélectionné</div>');edit.focus();const r=document.createRange();r.selectNodeContents(edit.wysiwyg.firstChild);edit.squire.setSelection(r);edit.squire.saveUndoState();});
 check('All 26 native controls retained once',await p.evaluate(()=>{const a=[...document.querySelectorAll('.squire-toolbar [data-action]')].map(n=>n.dataset.action);return a.length===26&&new Set(a).size===26;}));
 check('Main toolbar has no horizontal overflow',await p.evaluate(()=>{const n=document.querySelector('.squire-toolbar');return n.scrollWidth<=n.clientWidth+1;}));
 check('Every native control has an accessible name',await p.evaluate(()=>[...document.querySelectorAll('.squire-toolbar [data-action]')].every(n=>n.getAttribute('aria-label')?.trim())));
+check('Color suggestions use Tailwind 600',await p.evaluate(expected=>[...document.querySelectorAll('#squire-colors option')].map(n=>n.value).join(',')===expected,expectedPalette));
 await select();await p.click('[data-action=bold]');check('Native Bold acts on the selected text',await p.evaluate(()=>edit.wysiwyg.querySelector('b,strong')?.textContent==='Texte sélectionné'));
 await p.click('[data-action=undo]');check('Native Undo removes applied bold',await p.evaluate(()=>!edit.wysiwyg.querySelector('b,strong')));
 await p.click('[data-action=redo]');check('Native Redo restores applied bold',await p.evaluate(()=>!!edit.wysiwyg.querySelector('b,strong')));
@@ -25,8 +27,10 @@ await p.click('[data-action=source]');check('Source hides formatting but keeps v
 await p.click('[data-action=source]');await p.click('[data-action=markdown]');check('Markdown keeps source/visual switches reachable',await p.evaluate(()=>edit.mode==='markdown'&&!document.querySelector('.pw-compose-more').getClientRects().length&&document.querySelector('[data-action=markdown]').textContent==='Visuel'));await p.click('[data-action=markdown]');
 await p.evaluate(()=>{window.toolbarNodes=[...document.querySelectorAll('.squire-toolbar [data-action]')];document.documentElement.classList.remove('pw-theme');});
 check('Leaving Pied Web restores original groups and glyphs',await p.evaluate(()=>!document.querySelector('.pw-composer-toolbar')&&document.querySelector('[data-action=link]').textContent==='🔗'&&document.querySelector('#squire-toolgroup-inline [data-action=sub]')));
+check('Leaving Pied Web restores the native color suggestions',await p.evaluate(()=>[...document.querySelectorAll('#squire-colors option')].map(n=>n.value).join(',')==='#4E79A7,#F28E2B,#E15759,#76B7B2,#59A14F,#EDC948,#B07AA1,#FF9DA7,#9C755F,#BAB0AC'));
 await p.evaluate(()=>document.documentElement.classList.add('pw-theme'));
 check('Returning to theme reuses the same bound control nodes',await p.evaluate(()=>toolbarNodes.every(n=>document.querySelector('.squire-toolbar').contains(n))&&document.querySelectorAll('.pw-compose-main').length===1));
+check('Returning to theme restores Tailwind color suggestions',await p.evaluate(expected=>[...document.querySelectorAll('#squire-colors option')].map(n=>n.value).join(',')===expected,expectedPalette));
 await p.setViewportSize({width:320,height:900});await p.waitForSelector('.pw-compact-tools');await p.click('.pw-compose-more');
 check('Mobile keeps all actions reachable with 44px targets',await p.evaluate(()=>[...document.querySelectorAll('.squire-toolbar [data-action]')].every(n=>n.getBoundingClientRect().height>=43.9)));
 check('Mobile advanced row remains inside viewport and above editor',await p.evaluate(()=>{const a=document.querySelector('.pw-compose-extra'),r=a.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=edit.wysiwyg.getBoundingClientRect().top+1&&a.scrollWidth<=a.clientWidth+1;}));

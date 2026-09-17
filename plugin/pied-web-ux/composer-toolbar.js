@@ -4,7 +4,23 @@
     let sequence = 0;
     const icons = window.PiedWebUx?.composerIcons;
     if (!icons) return;
+    const editorPalette = [
+        '#F54900', '#E17100', '#D08700', '#5EA500', '#00A63E', '#009966',
+        '#009689', '#0092B8', '#0084D1', '#155DFC', '#4F39F6', '#7F22FE',
+        '#9810FA', '#C800DE', '#E60076', '#EC003F', '#45556C'
+    ];
+    let nativeEditorPalette;
+    const replacePalette = (list, colors) => {
+        if (list) list.replaceChildren(...colors.map(color => new Option(color)));
+    };
     const active = () => document.documentElement.classList.contains('pw-theme');
+    const syncPalette = () => {
+        const list = document.getElementById('squire-colors');
+        if (!list) return;
+        nativeEditorPalette ||= [...list.options].map(option => option.value);
+        replacePalette(list, active() ? editorPalette : nativeEditorPalette);
+    };
+    new MutationObserver(syncPalette).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
     const fr = () => (document.documentElement.lang || 'fr').startsWith('fr');
     const names = {bold:'bold',italic:'italic',underline:'underline',strike:'strikethrough',sub:'subscript',sup:'superscript',
         ul:'list',ol:'list-ordered',quote:'quote',indentDecrease:'list-indent-decrease',indentIncrease:'list-indent-increase',
@@ -19,6 +35,7 @@
     };
     addEventListener('squire-toolbar', ({detail:{squire:editor,actions}}) => {
         const container = editor.container;
+        syncPalette();
         if (!container.closest('#V-PopupsCompose') || container.dataset.pwComposeTools) return;
         container.dataset.pwComposeTools = '1';
         queueMicrotask(() => {

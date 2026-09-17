@@ -4,8 +4,8 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.8.5',
-        RELEASE = '2026-09-17',
+        VERSION = '1.8.6',
+        RELEASE = '2026-09-18',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
         DESCRIPTION = 'Accessible message actions for the Pied Web theme, using native mail commands.';
@@ -13,6 +13,9 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
     public function Init(): void
     {
         $this->addCss('ux.css');
+        $this->addJs('squire-next-capture.js');
+        $this->addJs('squire-next-vendor.js');
+        $this->addJs('squire-next.js');
         $this->addJs('send-delay.js');
         $this->addJs('background-send.js');
         $this->addJs('scheduled-send.js');

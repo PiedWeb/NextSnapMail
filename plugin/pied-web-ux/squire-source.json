@@ -1,0 +1,8 @@
+{
+  "name": "squire-rte",
+  "version": "2.4.9",
+  "entry": "dist/squire.js",
+  "source": "https://github.com/fastmail/Squire/tree/v2.4.9",
+  "tar_sha256": "74a93d647da09e4e0b6e84a5126aad1c8780d0b7ad2ee2351f0b878bb913d840",
+  "source_sha256": "2fc7ce78b2e3a73bc81d3d143725fea4e424a778434f5982d53db233599ab981"
+}

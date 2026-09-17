@@ -31,6 +31,7 @@ const build=()=>p.evaluate(async()=>{
 await p.emulateMedia({colorScheme:'light'});
 await p.goto(base+'?mode=list&side=1&shell=1');
 await p.waitForFunction(()=>window.PiedWebUx?.composerIcons&&window.PiedWebUx.createSendDelay);
+await p.addScriptTag({url:'http://127.0.0.1:8876/.local-work/pied-web-ux/background-send.js'});
 check('The plugin ships the Lucide send glyph with the icon set',await p.evaluate(()=>{
  const svg=PiedWebUx.composerIcons['send-horizontal'];
  return typeof svg==='string'&&svg.startsWith('<svg')&&svg.includes('stroke="currentColor"');
@@ -98,6 +99,57 @@ check('The glyph clears non-text contrast against the notice surface',await p.ev
  const a=lum(getComputedStyle(document.querySelector('.pw-outgoing-now')).color);
  const b=lum(getComputedStyle(document.querySelector('.pw-outgoing-message')).backgroundColor);
  return (Math.max(a,b)+0.05)/(Math.min(a,b)+0.05)>=3;
+}));
+
+// Exercise the actual background-send success path with a native-shaped compose model.
+// It must update the source and its Inbox conversation row before any server reload can
+// replace those models, then tell the open conversation reader to fetch the Sent copy.
+await p.evaluate(()=>{
+ document.querySelector('.pw-outgoing-notices')?.remove();
+ const get=rl.settings.get;
+ rl.settings.get=key=>({DraftsFolder:'__UNUSE__',accountHash:'fixture-send'}[key]??get(key));
+ const source={folder:'INBOX',uid:12,flags:ko.observableArray(['\\seen'])};
+ const row={folder:'INBOX',uid:11,flags:ko.observableArray(['\\seen']),threads:ko.observableArray([11,12])};
+ listVM.messageList([row]);
+ window.sentSource=source;window.sentRow=row;window.sentEvents=[];
+ window.sendReloadsBefore=actionCalls.filter(value=>value==='reload').length;
+ addEventListener('pw-message-sent',event=>sentEvents.push(event.detail),{once:true});
+ class FakeReplyCompose {
+  constructor(){
+   this.viewModelTemplateID='PopupsCompose';
+   this.viewModelDom=document.createElement('dialog');
+   this.viewModelDom.append(document.createElement('div'));document.body.append(this.viewModelDom);this.viewModelDom.show();
+   const fields={currentIdentity:'fixture',from:'alex@example.test',to:'camille@example.test',cc:'',bcc:'',replyTo:'',
+    subject:'Re: Projet Alpha',requestDsn:false,requestReadReceipt:false,requireTLS:false,markAsImportant:false,
+    showCc:false,showBcc:false,showReplyTo:false,doSign:false,doEncrypt:false,draftsFolder:'',draftUid:0,savedTime:0,
+    sending:false,saving:false,sendError:false,savedError:false,sendSuccessButSaveError:false};
+   Object.entries(fields).forEach(([key,value])=>this[key]=ko.observable(value));
+   this.sendErrorDesc=ko.observable('');this.savedErrorDesc=ko.observable('');
+   this.aDraftInfo=['reply',12,'INBOX'];this.sInReplyTo='<received@example.test>';
+   this.sReferences='<root@example.test>';this.bFromDraft=false;this.pwReplyMessage=source;
+   this.attachments=ko.observableArray([]);this.signOptions=ko.observableArray([]);this.encryptOptions=ko.observableArray([]);
+   this.attachmentsInProcess=this.attachmentsInError=()=>[];this.sentFolder=()=> 'Sent';
+   this.viewArea=()=> 'body';this.mailvelope=null;this.modalVisible=ko.observable(true);
+   this.oEditor={isHtml:()=>true,getData:()=>'<p>Réponse</p>',editor:{mode:'visual',plain:{value:''}}};
+  }
+  getMessageRequestParams(folder){return Promise.resolve({saveFolder:folder});}
+  sendCommand(){this.sending(true);setTimeout(()=>{this.close();this.sending(false);},20);}
+  close(){this.modalVisible(false);}
+ }
+ FakeReplyCompose.inEdit=ko.observable(false);FakeReplyCompose.prototype.sendCommand.canExecute=()=>true;
+ window.fakeReplyCompose=new FakeReplyCompose;
+ dispatchEvent(new CustomEvent('rl-view-model',{detail:listVM}));
+ dispatchEvent(new CustomEvent('rl-view-model.create',{detail:fakeReplyCompose}));
+ fakeReplyCompose.sendCommand();
+});
+await p.waitForSelector('.pw-outgoing-now:not([hidden])');
+await p.click('.pw-outgoing-now');
+await p.waitForFunction(()=>sentEvents.length===1);
+check('A successful reply marks the feed immediately and announces the Sent copy to the conversation reader',await p.evaluate(()=>{
+ const detail=sentEvents[0];
+ return sentSource.flags().includes('\\answered')&&sentRow.flags().includes('\\answered')
+  &&detail.account==='fixture-send'&&detail.folder==='INBOX'&&detail.uid===12&&detail.flag==='\\answered'
+  &&actionCalls.filter(value=>value==='reload').length===sendReloadsBefore;
 }));
 
 // Skipping the wait must not skip the guarantee the wait exists for: a cancelled

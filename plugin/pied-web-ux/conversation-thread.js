@@ -75,6 +75,22 @@
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
         const current = () => vm.message?.();
         const currentKey = () => itemKey(current());
+        const addFlag = (message, flag) => {
+            const flags = message?.flags;
+            if (!flag || typeof flags !== 'function' || flags().includes(flag)) return;
+            flags.push(flag);
+        };
+        const reflectListFlag = (ctx, flag) => {
+            addFlag(ctx?.originModel, flag);
+            const rows = typeof listVM?.messageList === 'function' ? listVM.messageList() : [];
+            const originUid = Number(ctx?.origin?.uid || 0);
+            if (!Array.isArray(rows) || !ctx?.folder || originUid < 1) return;
+            rows.forEach(message => {
+                const thread = typeof message?.threads === 'function' ? message.threads() : [];
+                if (message?.folder === ctx.folder && (itemKey(message) === ctx.originKey
+                    || thread.some(value => Number(value) === originUid))) addFlag(message,flag);
+            });
+        };
         const active = () => {
             const key = currentKey();
             const folder = context && entries.some(entry => entry.key === key) ? context.folder : current()?.folder;
@@ -238,7 +254,14 @@
             // or the next scan is answered "unchanged" and the stack never returns.
             catch { if (valid(version,ctx)) { error = true; ctx.etag = ''; } }
             if (!valid(version,ctx)) return;
-            if (rows === null && !error) { loading = silentRefresh = false; render(); settle(); return; }
+            const repeat = () => {
+                if (!ctx.needsRefresh || disposed || context !== ctx || !active() || document.hidden) return;
+                ctx.needsRefresh = false; ctx.etag = '';
+                queueMicrotask(() => { if (!loading) void scan(ctx,true); });
+            };
+            if (rows === null && !error) {
+                loading = silentRefresh = false; render(); settle(); repeat(); return;
+            }
             const combined = new Map();
             for (const row of [{raw:ctx.origin,model:ctx.originModel},...(rows || [])]) {
                 const key = itemKey(row.raw);
@@ -252,11 +275,13 @@
                 host.classList.add('pw-conversation-pending');
             entries = nextEntries;
             loading = silentRefresh = false; render();
+            if (ctx.listFlag) reflectListFlag(ctx,ctx.listFlag);
             const latest = entries.at(-1);
             if (ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key)
                 showMessage(latest,true);
             else if (changed) requestAnimationFrame(settle);
             else settle();
+            repeat();
         }
 
         function reset() {
@@ -298,7 +323,19 @@
         const theme = new MutationObserver(schedule);
         theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const wake = () => { if (!document.hidden) schedule(); };
+        const messageSent = event => {
+            const detail = event.detail || {}, key = itemKey(detail);
+            if (!context || detail.account !== account() || !active() || !key
+                || !entries.some(entry => entry.key === key)) return;
+            context.followLatest = true;
+            context.listFlag = detail.flag;
+            reflectListFlag(context,detail.flag);
+            context.etag = '';
+            if (loading || document.hidden) context.needsRefresh = true;
+            else void scan(context,true);
+        };
         document.addEventListener('visibilitychange',wake);
+        addEventListener('pw-message-sent',messageSent);
         // Cheap now: an unchanged mailbox answers from two IMAP STATUS commands.
         const poll = setInterval(() => {
             if (context && active() && !loading && !document.hidden) void scan(context,true);
@@ -308,7 +345,8 @@
             disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();
             previews.clear();
             subscriptions.forEach(subscription => subscription.dispose());
-            document.removeEventListener('visibilitychange',wake); before.remove(); after.remove();
+            document.removeEventListener('visibilitychange',wake);
+            removeEventListener('pw-message-sent',messageSent); before.remove(); after.remove();
         });
     }
 

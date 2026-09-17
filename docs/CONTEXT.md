@@ -114,6 +114,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   countdown. It skips only the wait: the send still waits for the draft save, Undo stays
   available until the request leaves, and the glyph is hidden once the countdown is over.
   Closing the window during the countdown still sends nothing, and the draft is in Drafts.
+  Since 1.8.6, a confirmed reply keeps the current list model long enough to apply its
+  native `\\answered` state and emits one account/folder/UID-scoped success event. An active
+  Inbox conversation accepts that event only when the source belongs to its own stack,
+  refreshes the Sent search immediately, opens the new last message and runs its existing
+  one-shot scroll anchor. Do not replace the replied row with a reload before that state is
+  visible; ordinary new messages may still reload the current list.
 - Since 1.8.0 a message can be given a time instead of a countdown. The scheduled message is
   stored, finished and prepared as a send, in a `Scheduled` folder beside the account's own
   Drafts folder, carrying `X-Pied-Web-Send-At`; the companion Nextcloud app
@@ -124,12 +130,21 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   of repeating. The composer refuses to schedule when no sender has left a heartbeat in the
   last thirty minutes. See `SCHEDULED_SEND.md`.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
+- Since 1.8.6, General settings offer upstream `Squire 2.4 (test)` beside native `Squire`.
+  Native Squire remains the default. The per-account choice is read only when a composer is
+  created; never replace a live editor, cursor or undo stack. The upstream bundle must restore
+  the native `window.Squire` after registration and expose only the compatibility methods used
+  by SnappyMail's existing `SquireUI`. See `SQUIRE_24.md`.
 - Reader Copy as Markdown uses the displayed message body, expands quoted text in the copy,
   and flattens image-heavy contact signatures to short linked text. It leaves the message
   and its native actions unchanged. A brief checkmark or cross confirms the result on the
   button, with an accessible status announcement. See `COPY_MARKDOWN.md`.
 - Interleaved quotes stay open; trailing history can remain folded. Keep manual quote choices.
 - Formatting has a compact main row and More options. Use the existing Lucide icon assets.
+- Since 1.8.6, the native editor color control keeps its built-in greys and custom-color
+  choice, but its 17 suggestions use Tailwind 600 from orange through rose, followed by
+  slate, while Pied Web is active. Restore NextSnapMail's native Tableau 10 suggestions
+  on theme exit; do not replace the browser control.
 - Images paste into the body, with browser compression modeled on Pushword's multi-upload:
   JPEG/PNG/WebP, maximum dimension 1980 px, target 1.8 MB, initial quality 0.85.
   Compression only replaces a smaller result. Animation and transparency are preserved.
@@ -180,6 +195,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.8.6 | Add an opt-in upstream Squire 2.4.9 editor, Tailwind 600 color suggestions and immediate feed/reader synchronization after a sent reply. |
 | 1.3 | Shell/list/reader redesign; 30 screenshot-only critique attempts. Final 8.2/10, best 8.3, stopped at requested cap; never claimed 9/10. |
 | 1.7.4 | Copy the open reader body as Markdown from the action bar, including collapsed quotes. |
 | 1.7.5 | Flatten common table-based signatures in copied Markdown without changing compose HTML. |

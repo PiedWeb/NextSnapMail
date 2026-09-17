@@ -161,6 +161,26 @@ await p.waitForTimeout(400);
 check('A later settle leaves a manual scroll alone',await p.evaluate(()=>
     document.querySelector('.messageView').scrollTop===0
     &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending')));
+await p.evaluate(()=>{
+    sentMatches.push({...sentMatches.at(-1),uid:33,hash:'Sent-33',messageId:'<sent-three@example.test>',
+        inReplyTo:'<received-three@example.test>',
+        references:'<root@example.test> <received-three@example.test>',
+        dateTimestamp:1789000500,plain:'Nouvelle réponse envoyée'});
+    dispatchEvent(new CustomEvent('pw-message-sent',{detail:{
+        account:threadAccount,folder:'INBOX',uid:13,flag:'\\answered'
+    }}));
+});
+await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33
+    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===5
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+check('A successful reply refreshes the open stack immediately, marks its feed row and scrolls to the sent message',await p.evaluate(()=>{
+    const box=document.querySelector('.messageView').getBoundingClientRect();
+    const head=document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect();
+    return document.querySelector('#messageItem > .bodyText').textContent==='Nouvelle réponse envoyée'
+        &&listVM.messageList()[0].flags().includes('\\answered')
+        &&document.querySelector('.messageView').scrollTop>0
+        &&head.top-box.top>=0&&head.top-box.top<=40&&head.bottom<=box.bottom;
+}));
 await p.setViewportSize({width:390,height:850});
 await p.evaluate(()=>{
     document.getElementById('V-MailMessageView').hidden=false;
@@ -170,7 +190,7 @@ await p.evaluate(()=>{
 });
 check('The visible conversation stack fits a narrow screen',await p.evaluate(()=>{
     const cards=[...document.querySelectorAll('.pw-conversation-card')];
-    return cards.length===4&&cards.every(card=>{
+    return cards.length===5&&cards.every(card=>{
         const box=card.getBoundingClientRect();return box.width>0&&box.height>0&&box.left>=0&&box.right<=innerWidth;
     })&&document.documentElement.scrollWidth<=innerWidth;
 }));
@@ -185,7 +205,7 @@ check('Leaving the theme restores the single native reader',await p.evaluate(()=
     document.querySelector('.pw-conversation-before').hidden&&document.querySelector('.pw-conversation-after').hidden
     &&!document.querySelector('.b-message').classList.contains('pw-conversation-active')));
 await p.evaluate(()=>{document.documentElement.classList.add('pw-theme');});
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===4);
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===5);
 await p.evaluate(()=>{conversations=false;readerVM.message(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);});
 await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
 check('Individual-message mode does not show the conversation stack',true);
@@ -195,8 +215,8 @@ check('A failed search offers a retry without changing mailbox data',await p.eva
     document.querySelector('.pw-conversation-before > button:last-child')?.textContent==='Réessayer'));
 await p.evaluate(()=>{failThreadSearch=false;});
 await p.locator('.pw-conversation-before > button:last-child').click();
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===4
-    &&readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===13);
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===5
+    &&readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33);
 check('Retry restores the stack',true);
 await p.evaluate(()=>{holdThreadSearch=true;readerVM.message(NativeDraftCollection.reviveFromJson([{...sourceRaw,uid:14,hash:'INBOX-14'}])[0]);});
 await p.waitForFunction(()=>!!window.releaseThreadSearch);

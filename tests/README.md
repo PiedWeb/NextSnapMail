@@ -41,32 +41,38 @@ Fixtures run native Squire, HtmlEditor, ComposeAttachmentModel, Jua callbacks an
 Browser scripts use the dev-browser CLI's persistent `browser` API. Run these in order, using a standalone browser or an established browser connection:
 
 ```sh
-dev-browser --timeout 60 < tests/browser/test-composer-images.js
-dev-browser --timeout 40 < tests/browser/test-image-edge-cases.js
-dev-browser --timeout 35 < tests/browser/image-toolbar-regression.js
-dev-browser --timeout 35 < tests/browser/image-markdown-regression.js
-dev-browser --timeout 30 < tests/browser/test-reader-copy-md.js
-dev-browser --timeout 40 < tests/browser/test-reader-addresses.js
-dev-browser --timeout 60 < tests/browser/test-virtual-conversation.js
-dev-browser --timeout 30 < tests/browser/test-reader-signature-cleanup.js
-dev-browser --timeout 60 < tests/browser/test-nextcloud-images.js
-dev-browser --timeout 60 < tests/browser/test-unread-drafts.js
-dev-browser --timeout 40 < tests/browser/test-list-metadata.js
-dev-browser --timeout 25 < tests/browser/test-list-metadata-fallback.js
-dev-browser --timeout 45 < tests/browser/test-desktop-scan.js
-dev-browser --timeout 45 < tests/browser/test-mail-polish.js
-dev-browser --timeout 45 < tests/browser/test-composer-actions.js
-dev-browser --timeout 45 < tests/browser/test-elevation.js
-dev-browser --timeout 75 < tests/browser/test-send-now.js
-dev-browser --timeout 45 < tests/browser/test-empty-state.js
-dev-browser --timeout 50 < tests/browser/test-native-controls.js
-dev-browser --timeout 50 < tests/browser/test-font-delivery.js
-dev-browser --timeout 45 < tests/browser/test-selection-mode.js
-dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
-dev-browser --timeout 40 < tests/browser/test-unread-order.js
-dev-browser --timeout 45 < tests/browser/test-left-panel-state.js
-dev-browser --timeout 60 < tests/browser/test-scheduled-send.js
+dev-browser-agent --timeout 90 < tests/browser/test-squire-next.js
+dev-browser-agent --timeout 60 < tests/browser/test-composer-images.js
+dev-browser-agent --timeout 40 < tests/browser/test-image-edge-cases.js
+dev-browser-agent --timeout 35 < tests/browser/image-toolbar-regression.js
+dev-browser-agent --timeout 35 < tests/browser/image-markdown-regression.js
+dev-browser-agent --timeout 30 < tests/browser/test-reader-copy-md.js
+dev-browser-agent --timeout 40 < tests/browser/test-reader-addresses.js
+dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
+dev-browser-agent --timeout 30 < tests/browser/test-reader-signature-cleanup.js
+dev-browser-agent --timeout 60 < tests/browser/test-nextcloud-images.js
+dev-browser-agent --timeout 60 < tests/browser/test-unread-drafts.js
+dev-browser-agent --timeout 40 < tests/browser/test-list-metadata.js
+dev-browser-agent --timeout 25 < tests/browser/test-list-metadata-fallback.js
+dev-browser-agent --timeout 45 < tests/browser/test-desktop-scan.js
+dev-browser-agent --timeout 45 < tests/browser/test-mail-polish.js
+dev-browser-agent --timeout 45 < tests/browser/test-composer-actions.js
+dev-browser-agent --timeout 45 < tests/browser/test-elevation.js
+dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
+dev-browser-agent --timeout 45 < tests/browser/test-empty-state.js
+dev-browser-agent --timeout 50 < tests/browser/test-native-controls.js
+dev-browser-agent --timeout 50 < tests/browser/test-font-delivery.js
+dev-browser-agent --timeout 45 < tests/browser/test-selection-mode.js
+dev-browser-agent --timeout 35 < tests/browser/test-conversation-toggle.js
+dev-browser-agent --timeout 40 < tests/browser/test-unread-order.js
+dev-browser-agent --timeout 45 < tests/browser/test-left-panel-state.js
+dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
 ```
+
+`test-squire-next.js` first proves that the optional bundle registers without replacing the
+native default, then selects `Squire 2.4 (test)` through the native editor-name contract. It
+covers `Ctrl+I`, partial and cross-paragraph blockquotes, the SnappyMail style adapter and a
+representative HTML round trip. The selected setting affects newly created composers only.
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
 
@@ -112,8 +118,10 @@ and the 390 px layout. It also drives `createSendDelay` with an injected clock t
 confirm that a cancelled delay never sends and a completed one sends once. The
 fixture root is pinned to `data-themes="light"`, so the dark pass compares the
 glyph with the subject line's token rather than reading an absolute dark ratio.
-The notice's own phase transitions need the native compose view model and are not
-covered here; no message is sent.
+It additionally drives the real background-send success path with a native-shaped
+reply model: the source and its conversation row gain `\\answered`, the reader event
+is account/folder/UID scoped, and no eager list reload erases that immediate state.
+Transport remains mocked; no message is sent.
 
 `tests/scheduled-send.php` covers the `PiedWebScheduledSend` endpoint and the header it
 stamps, using the native message builder and header parser: the queue folder derived from the
@@ -152,5 +160,6 @@ received and Sent messages. It verifies late mounting, the newest message from
 either folder opening natively, one-click access to earlier messages, read-only
 searches, retry, account isolation, theme exit, narrow layout, one card border,
 native Close placement, the earliest-subject heading, open-subject typography,
-and conceal/reveal during delayed searches. It does not
-use an authenticated mailbox.
+conceal/reveal during delayed searches, and the successful-reply event that fetches,
+opens and scrolls to a new Sent copy while marking the feed row. It does not use an
+authenticated mailbox.
