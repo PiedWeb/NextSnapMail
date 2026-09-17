@@ -238,4 +238,17 @@ await p.evaluate(()=>{holdThreadSearch=false;releaseThreadSearch();});
 await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
 check('The native reader reappears after the conversation lookup',await p.evaluate(()=>
     getComputedStyle(document.querySelector('#messageItem')).display!=='none'));
+const requestsBeforeTrash=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{
+    const trash={...sourceRaw,folder:'Trash',uid:70,hash:'Trash-70',messageId:'<trash@example.test>',
+        references:'',inReplyTo:'',subject:'Message supprimé',dateTimestamp:1789000800,plain:'Dans la corbeille'};
+    readerVM.message(NativeDraftCollection.reviveFromJson([trash])[0]);
+});
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-active'));
+await p.waitForTimeout(250);
+check('A message opened from Trash stays in the single native reader with no conversation lookup',await p.evaluate(before=>
+    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before
+    &&document.querySelector('.pw-conversation-before').hidden
+    &&document.querySelector('.pw-conversation-after').hidden,requestsBeforeTrash));
 console.log(JSON.stringify({passed:checks.length}));

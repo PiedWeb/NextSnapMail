@@ -5,7 +5,8 @@
     const ids = value => String(value || '').match(/<[^<>\s]{1,255}>/g) || [];
     const normalize = value => String(value || '').toLowerCase();
     const itemKey = item => item?.folder && Number(item.uid) > 0 ? item.folder + '\u0000' + item.uid : '';
-    const active = () => document.documentElement.classList.contains('pw-theme') && !!rl.settings.get('useThreads');
+    const isInbox = folder => window.PiedWebUx?.inboxConversations?.isInbox(folder)
+        ?? String(folder || '').toUpperCase() === 'INBOX';
     const addresses = value => {
         const entries = value?.['@Collection'] || value || [];
         return Array.isArray(entries) ? entries.map(address => address.name || address.email).filter(Boolean).join(', ') : '';
@@ -74,6 +75,12 @@
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
         const current = () => vm.message?.();
         const currentKey = () => itemKey(current());
+        const active = () => {
+            const key = currentKey();
+            const folder = context && entries.some(entry => entry.key === key) ? context.folder : current()?.folder;
+            return document.documentElement.classList.contains('pw-theme')
+                && !!rl.settings.get('useThreads') && isInbox(folder);
+        };
         const valid = (version, ctx) => !disposed && version === generation && context === ctx
             && account() === ctx.account && active() && !!currentKey()
             && (currentKey() === ctx.originKey || entries.some(entry => entry.key === currentKey()));

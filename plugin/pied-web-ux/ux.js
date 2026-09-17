@@ -83,6 +83,7 @@
         if (vm.viewModelTemplateID === 'MailMessageList' && !dom.querySelector('.pw-threads')) {
             const toolbar = dom.querySelector('.btn-toolbar'), button = document.createElement('button');
             const error = document.createElement('span');
+            const inbox = () => window.PiedWebUx?.inboxConversations?.isInbox(vm.messageList?.()?.folder);
             button.type = 'button'; button.className = 'btn pw-threads onCheckedHide';
             error.className = 'pw-threads-error'; error.setAttribute('role', 'alert');
             const current = () => {
@@ -91,12 +92,15 @@
                     ? !!ko.dataFor(general).useThreads() : !!window.rl.settings.get('useThreads');
             };
             const update = () => {
+                const visible = inbox();
+                button.hidden = !visible; error.hidden = !visible;
                 button.textContent = t('Conversations', 'Conversations');
                 button.setAttribute('aria-pressed', String(current()));
                 button.title = current() ? t('Afficher les messages séparément', 'Show individual messages') : t('Grouper par conversation', 'Group by conversation');
             };
             update();
             button.addEventListener('click', () => {
+                if (!inbox()) return;
                 if (vm.composeInEdit?.()) {
                     error.textContent = t('Fermez le message en cours avant de changer de vue.', 'Close the current draft before changing views.');
                     return;
@@ -114,6 +118,7 @@
                 });
             });
             toolbar?.append(button, error);
+            vm.messageList?.subscribe?.(update);
             const footer = dom.querySelector('.messageList > .b-footer');
             const content = dom.querySelector('.messageList > .b-content');
             if (footer && content) {

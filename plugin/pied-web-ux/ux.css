@@ -2,6 +2,7 @@
 html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-threads, .pw-threads-error) {
     display: none !important;
 }
+#rl-app :is(.pw-threads, .pw-threads-error)[hidden] { display: none !important; }
 /* A non-modal notification, including above a newly opened composer. */
 #rl-app .pw-outgoing-notices {
     position: fixed;

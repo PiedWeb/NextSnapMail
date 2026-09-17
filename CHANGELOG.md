@@ -1,5 +1,19 @@
 # Releases
 
+## 1.8.4, 2026-09-17
+
+Conversations now belongs to the Inbox, rather than to every folder in the account.
+The control is visible only in `INBOX`. Trash, Sent, Drafts, Archive and custom folders
+always request and open individual messages, even when the saved Inbox preference is on.
+This removes the slow, broken thread assembly from Trash without changing the preference
+Robin uses in the Inbox.
+
+The boundary is enforced on both native request shapes SnappyMail 2.38.2 uses: ordinary
+POST parameters and cached base64url GET keys, for message lists and opened messages. The
+Pied Web reader stack has the same boundary. A Sent reply found while an Inbox conversation
+is already open remains part of that Inbox conversation; opening Sent directly does not
+start one.
+
 ## 1.8.3, 2026-09-17
 
 Two corrections from watching the feature run on the production mailbox.

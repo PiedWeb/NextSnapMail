@@ -11,7 +11,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Clear folder hierarchy, quieter secondary counters and a compact icon sidebar that stays collapsed after a reload. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop; a long touch does so on mobile, with no visible checkboxes.
 - Reply, Reply all, Mark unread, visible Unsubscribe and Messages/Conversations switching. The reader's native label menu sits as an icon between message details and the star.
-- In Conversations mode, the newest received or sent message opens in the native reader; earlier messages show a one-line text preview and stay one click away, without storing extra copies.
+- In Inbox Conversations mode, the newest received or sent message opens in the native reader; earlier messages show a one-line text preview and stay one click away, without storing extra copies. Trash and every other folder always show individual messages.
 - Selection of all filtered results across pages, with explicit deletion confirmation.
 - Swipe to delete and Delete-key handling for selected list messages.
 - Readable interleaved quotations and native message flag controls.
@@ -40,7 +40,7 @@ This does **not** implement a unified inbox or a new vacation responder. Nextclo
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.8.3**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.8.4**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

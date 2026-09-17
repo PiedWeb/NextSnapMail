@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.8.3',
+        VERSION = '1.8.4',
         RELEASE = '2026-09-17',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -17,6 +17,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('background-send.js');
         $this->addJs('scheduled-send.js');
         $this->addJs('filtered-selection.js');
+        $this->addJs('inbox-conversations.js');
         $this->addJs('ux.js');
         $this->addJs('studio.js');
         $this->addJs('message-flag.js');

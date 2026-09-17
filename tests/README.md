@@ -91,6 +91,9 @@ followed rows, late binding, live counts and native stylesheet replacement.
 
 `test-conversation-toggle.js` checks the actual bootstrap key, pressed styling and
 opposite setting request in desktop/mobile and light/dark fictional list fixtures.
+It also switches the list to Trash, where the control must disappear, and verifies
+that both POST and cached GET list/reader requests have their thread parameters
+removed while Inbox requests keep the saved preference.
 
 `test-send-now.js` builds the outgoing notice from the markup `background-send.js`
 ships, so a change to `render()` cannot leave it passing, and checks the Send now

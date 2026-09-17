@@ -16,6 +16,12 @@ headers, checks exact Message-ID tokens, follows reply chains, deduplicates
 folder/UID pairs, and sorts the combined set by date. Each search is limited to
 200 results, and following a Sent chain stops after 20 IDs.
 
+Since 1.8.4, Conversations is an Inbox-only preference. Its control is shown in
+`INBOX`; every list and reader request for Trash, Sent, Drafts, Archive and custom
+folders is forced back to individual messages, even when the saved Inbox
+preference is enabled. This also prevents the Pied Web cross-folder reader stack
+from starting outside the Inbox.
+
 The newest message, received or sent, opens in SnappyMail's **native reader**.
 Earlier messages appear as folded cards above it; clicking one opens that
 message natively and places the remaining cards around it. A button returns

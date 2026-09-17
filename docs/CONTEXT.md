@@ -43,6 +43,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   color tied to the button state, including mobile and dark mode. SnappyMail's
   bootstrap setting is `useThreads` (lowercase `u`); the saved server setting is
   `UseThreads`. The button must read the bootstrap spelling to show the real mode.
+- Since 1.8.4, that preference belongs to `INBOX` only. Hide its control elsewhere,
+  strip native thread parameters from list and reader requests outside `INBOX`, and
+  never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
+  a custom folder. An Inbox conversation may still contain its matching Sent replies.
 - Native IMAP threads are folder-scoped. Since 1.7.20, Conversations mode
   assembles the opened message's native folder thread with matching Sent replies
   from read-only header searches. The newest message, received or sent, opens
