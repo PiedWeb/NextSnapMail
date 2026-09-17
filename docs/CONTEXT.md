@@ -99,12 +99,21 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.
   All filtered pages use a confirmed, account/folder/filter-scoped UID snapshot.
 - The Undo Send window floats after closing compose, while mailbox use continues.
-  It delays browser submission; there is no recall after delivery or server scheduled send.
+  It delays browser submission; there is no recall after delivery.
   Since 1.7.53 the window is three seconds, held in one place as
   `PiedWebUx.sendDelaySeconds`, and a quiet send glyph beside Undo skips the rest of the
   countdown. It skips only the wait: the send still waits for the draft save, Undo stays
   available until the request leaves, and the glyph is hidden once the countdown is over.
   Closing the window during the countdown still sends nothing, and the draft is in Drafts.
+- Since 1.8.0 a message can be given a time instead of a countdown. The scheduled message is
+  stored, finished and prepared as a send, in a `Scheduled` folder beside the account's own
+  Drafts folder, carrying `X-Pied-Web-Send-At`; the companion Nextcloud app
+  `piedwebmailscheduler` hands it to the account's own SMTP server when due. The mailbox is
+  the queue: the message stays readable, searchable and movable, and cancelling it is a move
+  back to Drafts. Sending is at most once — a message is claimed with `$pwsending` before its
+  SMTP transaction and the claim is never released — so an interrupted pass reports instead
+  of repeating. The composer refuses to schedule when no sender has left a heartbeat in the
+  last thirty minutes. See `SCHEDULED_SEND.md`.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
 - Reader Copy as Markdown uses the displayed message body, expands quoted text in the copy,
   and flattens image-heavy contact signatures to short linked text. It leaves the message

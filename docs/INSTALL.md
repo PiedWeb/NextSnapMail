@@ -23,6 +23,24 @@ Target: an existing NextSnapMail installation using embedded SnappyMail 2.38.2. 
 
 The plugin and theme are intended to be installed together. Some composition extensions, such as the Markdown view and pending-operation guards, initialize independently of the theme. To disable every enhancement, disable the plugin as well as switching themes. Finish or cancel pending outgoing messages first.
 
+## Scheduled send
+
+The scheduled-send control in the composer only works with the companion Nextcloud app
+`piedwebmailscheduler`, which is what actually sends the messages. Without it, the composer
+refuses to schedule and says so; every other feature is unaffected.
+
+```sh
+# from integrations/scheduler/, extract piedwebmailscheduler/ into NEXTCLOUD/apps/
+php -d apc.enable_cli=1 occ app:enable piedwebmailscheduler
+php -d apc.enable_cli=1 occ piedweb:mail:send-scheduled --dry-run --force
+```
+
+It serves the mailboxes whose owner has already stored a NextSnapMail password in the app's
+personal settings, and only those. Nextcloud's own cron then carries one pass every five
+minutes; for minute precision, give the command its own crontab line. Installation, the
+interval setting and rollback are in [the app's README](../integrations/scheduler/README.md),
+and the behaviour contract is in [scheduled send](SCHEDULED_SEND.md).
+
 ## Verify without modifying the installation
 
 ```sh
@@ -49,6 +67,8 @@ The check reads versions, payload fingerprints and plugin activation, never acco
 
 ## Remove or restore
 
-Disable `pied-web-ux` while preserving the rest of the enabled plugin list, then select a native theme. The plugin/theme directories can be archived or removed afterwards. Restore a prior version by replacing these two directories from its backup and reloading; leave current account and domain settings intact.
+Disable `piedwebmailscheduler` first if it was installed (`occ app:disable piedwebmailscheduler`);
+already scheduled messages then stay in their folder, unsent and visible, until it runs again or
+the author moves them back to Drafts. Then disable `pied-web-ux` while preserving the rest of the enabled plugin list, and select a native theme. The plugin/theme directories can be archived or removed afterwards. Restore a prior version by replacing these two directories from its backup and reloading; leave current account and domain settings intact.
 
 The core unread-count patch has its own restoration process. This plugin does not apply or revert it automatically.

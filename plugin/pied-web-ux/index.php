@@ -4,8 +4,8 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.7.53',
-        RELEASE = '2026-09-16',
+        VERSION = '1.8.0',
+        RELEASE = '2026-09-17',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
         DESCRIPTION = 'Accessible message actions for the Pied Web theme, using native mail commands.';
@@ -15,6 +15,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addCss('ux.css');
         $this->addJs('send-delay.js');
         $this->addJs('background-send.js');
+        $this->addJs('scheduled-send.js');
         $this->addJs('filtered-selection.js');
         $this->addJs('ux.js');
         $this->addJs('studio.js');
@@ -39,6 +40,28 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
         $this->addJsonHook('PiedWebConversation', 'Conversation');
+        $this->addJsonHook('PiedWebScheduledSend', 'ScheduledSend');
+        $this->addHook('filter.save-message', 'FilterSaveMessage');
+    }
+
+    /* A message saved into the scheduled folder carries its due time, and nothing else
+     * carries one. An unstampable save fails here rather than resting unsent. */
+    public function FilterSaveMessage(\MailSo\Mime\Message $oMessage): void
+    {
+        require_once __DIR__ . '/ScheduledSend.php';
+        PiedWebScheduledSend::stamp(\RainLoop\Api::Actions(), $oMessage);
+    }
+
+    public function ScheduledSend(): array
+    {
+        require_once __DIR__ . '/ScheduledSend.php';
+        try {
+            $result = PiedWebScheduledSend::handle(\RainLoop\Api::Actions());
+        } catch (\Throwable $error) {
+            $known = ['scope', 'drafts', 'folder', 'time', 'missing', 'sending'];
+            $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'mail'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebScheduledSend', $result);
     }
 
     public function Conversation(): array

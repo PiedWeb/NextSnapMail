@@ -19,6 +19,8 @@ NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php ../integrations/scheduler/tests/sender.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
@@ -61,6 +63,7 @@ dev-browser --timeout 50 < tests/browser/test-font-delivery.js
 dev-browser --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser --timeout 35 < tests/browser/test-conversation-toggle.js
 dev-browser --timeout 45 < tests/browser/test-left-panel-state.js
+dev-browser --timeout 60 < tests/browser/test-scheduled-send.js
 ```
 
 The edge-case script continues on the image-check page created by the first script. Clipboard/file inputs are populated with generated image Files; OS dialogs and real mail transport are not tested. Cases cover compression, alpha/animation safeguards, resizing, undo, Markdown, serialization, upload replacement/failure/retry/removal and stale callbacks after changing draft.
@@ -100,6 +103,24 @@ fixture root is pinned to `data-themes="light"`, so the dark pass compares the
 glyph with the subject line's token rather than reading an absolute dark ratio.
 The notice's own phase transitions need the native compose view model and are not
 covered here; no message is sent.
+
+`tests/scheduled-send.php` covers the `PiedWebScheduledSend` endpoint and the header it
+stamps, using the native message builder and header parser: the queue folder derived from the
+account's own Drafts setting, the refusal to stamp anywhere else, unusable and out-of-range
+times, the UTC form written into the message, the note left for the sender and its heartbeat,
+the states read back from the folder, both cancel modes, and the refusal to cancel a message
+the sender has claimed. `../integrations/scheduler/tests/sender.php` covers the server-side
+pass with IMAP and SMTP simulated: claim before transaction, header surgery, recipients from
+To/Cc/Bcc, the Sent copy, the reply flag, retry, abandonment after a day, a send that could
+not be filed, and a server without custom keywords. Neither opens a mailbox or sends mail.
+
+`test-scheduled-send.js` mounts the composer control on the engine's own `PopupsCompose`
+header template, then checks its place beside Send, its accessible name, the panel it opens,
+the times offered, the free field's lower bound, 44 px targets, the resting and focused
+surfaces, the focus ring under the keyboard, Escape returning the focus, the UTC instant
+handed over once, the refusal of a past time, the control hidden when the mailbox cannot keep
+drafts, and the 390 px layout. The compose view model, the endpoint and the sender are
+simulated; the message rows and reader bar of the queue folder have no fixture yet.
 
 `test-left-panel-state.js` uses `?panel=1`, the only fixture page that keeps a stored
 sidebar choice. It checks the native default, storing a collapse and an expansion,

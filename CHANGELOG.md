@@ -1,5 +1,50 @@
 # Releases
 
+## 1.8.0, 2026-09-17
+
+A message can now be given a time instead of a countdown. **Programmer l'envoi** stands beside
+Send in the composer and opens a panel with the three times that are actually asked for — this
+evening, tomorrow morning, Monday morning — and a field for any other one. The composer then
+closes the way it does for an ordinary send, and the outgoing notice says when the message
+will leave, with an Annuler that puts it straight back in the composer.
+
+What makes this worth shipping is that the message leaves with the browser closed. The
+scheduled message is stored in a `Scheduled` folder beside the account's own Drafts folder,
+carrying one header, `X-Pied-Web-Send-At`, and a new Nextcloud app, `piedwebmailscheduler`,
+hands it to the account's own SMTP server when its time comes. That app serves only the
+mailboxes whose owner already asked NextSnapMail to remember the password: it stores no
+secret of its own and adds none to the server.
+
+The queue is the mailbox, not a table somewhere. A scheduled message can be read, searched and
+moved with native commands; its row shows the time it leaves; opening it offers **Remettre en
+brouillon**. What is stored is the finished message, prepared exactly as a send prepares it —
+signatures, encryption, attachments and Bcc included — because that is what the sender will
+hand over. The date a recipient reads is the moment it actually left.
+
+Sending is at most once, and says so when it cannot be. A message is claimed with the IMAP
+keyword `$pwsending` before its SMTP transaction, and the claim is never released: a pass
+interrupted anywhere leaves a message that later passes report rather than send again. A
+refused transaction releases the claim and is retried; a message still refused a day after its
+time is marked `$pwsendfailed` and left alone. A mailbox whose server refuses custom keywords
+is never sent from at all. Every one of those states is visible on the message itself.
+
+The composer refuses to schedule when nothing is listening. Each pass leaves a heartbeat, and
+the composer reads it before storing anything: no sender on this server, or none in the last
+thirty minutes, and the message stays open with the reason on screen. The alternative was a
+folder quietly filling with mail nobody would send.
+
+Header rewriting is surgery, not reserialisation. Every header the message keeps is copied
+byte for byte, so boundaries, encodings and signatures survive as the engine wrote them; only
+`Date` is replaced, and `Bcc`, `X-Draft-Info` and the two Pied Web headers are dropped from
+what leaves. The filed copy keeps the Bcc the author wrote, as the native send does.
+
+101 checks accompany this: 43 over the endpoint and the stamped header against the native
+message builder and header parser, 40 over the sender against the native header parser,
+sequence sets and stream helpers with IMAP and SMTP simulated, and 18 in the browser over the
+control and its panel, mounted on the engine's own composer header template. The due-time
+badges on the queue's rows and the bar above an open scheduled message have no fixture yet;
+`docs/SCHEDULED_SEND.md` says so.
+
 ## 1.7.53, 2026-09-16
 
 The undo window drops from five seconds to three, and the pending-send notice

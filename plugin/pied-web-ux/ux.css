@@ -480,3 +480,159 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 .pw-address-toast[data-place="below"] { transform:none; }
 .pw-address-toast[data-state="error"] { color:var(--color-error,#b3261e); border-color:currentColor; }
 @media(prefers-reduced-motion:reduce) { .pw-address-toast { transition:none; } }
+
+/* Scheduling sits beside Send as a quiet third action: one primary stays one primary.
+ * The panel is anchored to it, so the choice is made where it was asked for. */
+#rl-app .pw-schedule-wrap { position: relative; display: inline-block; vertical-align: top; }
+#rl-app .pw-schedule-wrap[hidden] { display: none; }
+#rl-app button.pw-schedule {
+    display: inline-flex;
+    align-items: center;
+    gap:var(--pw-space-2);
+    margin:0;
+    padding:0 var(--pw-space-3);
+    border: 0 !important;
+    border-radius: var(--pw-radius-md);
+    background: transparent;
+    color: var(--pw-grey-700);
+    font: inherit;
+    font-weight:var(--pw-weight-medium);
+    cursor: pointer;
+}
+#rl-app button.pw-schedule svg { width: 20px; height: 20px; }
+#rl-app button.pw-schedule:is(:hover, :focus-visible, [aria-expanded="true"]) {
+    background: var(--pw-grey-100);
+    color: var(--pw-grey-900);
+}
+#rl-app button.pw-schedule:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: 2px; }
+#rl-app .pw-schedule-panel {
+    position: absolute;
+    z-index: 30;
+    inset-block-start: calc(100% + var(--pw-space-2));
+    inset-inline-start: 0;
+    display: grid;
+    gap:var(--pw-space-3);
+    width: 300px;
+    max-width: calc(100vw - 24px);
+    padding:var(--pw-space-4);
+    border: 0;
+    border-radius: var(--pw-radius-lg);
+    background: var(--nc-color-main-background, #fff);
+    box-shadow: var(--pw-elevation-3);
+    color: var(--pw-grey-900);
+    font-size:var(--pw-text-sm);
+    line-height: var(--pw-leading-snug);
+    text-align: start;
+    white-space: normal;
+}
+#rl-app .pw-schedule-panel[hidden] { display: none; }
+#rl-app .pw-schedule-title { margin:0; font-weight:var(--pw-weight-strong); }
+#rl-app .pw-schedule-options { display: grid; gap:var(--pw-space-1); }
+#rl-app .pw-schedule-panel button {
+    height: auto;
+    min-height: 44px;
+    border: 0 !important;
+    border-radius: var(--pw-radius-md);
+    font: inherit;
+    cursor: pointer;
+}
+#rl-app button.pw-schedule-option {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap:var(--pw-space-3);
+    padding:var(--pw-space-2) var(--pw-space-3);
+    background: transparent;
+    color: inherit;
+    text-align: start;
+}
+#rl-app button.pw-schedule-option:is(:hover, :focus-visible) { background: var(--pw-grey-100); }
+#rl-app .pw-schedule-when { font-weight:var(--pw-weight-medium); }
+#rl-app .pw-schedule-detail { color: var(--pw-grey-600); font-size:var(--pw-text-xs); white-space: nowrap; }
+#rl-app .pw-schedule-custom { display: grid; gap:var(--pw-space-1); color: var(--pw-grey-700); font-size:var(--pw-text-xs); }
+#rl-app .pw-schedule-custom input {
+    width: 100%;
+    min-height: 44px;
+    box-sizing: border-box;
+    margin:0;
+    padding:var(--pw-space-2) var(--pw-space-3);
+    border: 1px solid var(--pw-grey-300);
+    border-radius: var(--pw-radius-md);
+    background: var(--nc-color-main-background, #fff);
+    color: var(--pw-grey-900);
+    font: inherit;
+    font-size:var(--pw-text-sm);
+}
+#rl-app .pw-schedule-actions { display: flex; justify-content: flex-end; gap:var(--pw-space-2); }
+#rl-app button.pw-schedule-cancel {
+    padding:var(--pw-space-2) var(--pw-space-3);
+    background: transparent;
+    color: var(--pw-grey-700);
+}
+#rl-app button.pw-schedule-cancel:is(:hover, :focus-visible) { background: var(--pw-grey-100); color: var(--pw-grey-900); }
+#rl-app button.pw-schedule-confirm {
+    padding:var(--pw-space-2) var(--pw-space-4);
+    background: var(--pw-primary-500);
+    color: var(--nc-color-primary-element-text, #fff);
+    font-weight:var(--pw-weight-medium);
+}
+#rl-app button.pw-schedule-confirm:is(:hover, :focus-visible) { background: var(--pw-primary-600, var(--nc-color-primary-element-hover)); }
+#rl-app .pw-schedule-panel button:disabled { opacity: .65; cursor: default; }
+#rl-app .pw-schedule-panel button:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: -2px; }
+#rl-app .pw-schedule-note { margin:0; color: var(--pw-grey-700); font-size:var(--pw-text-xs); }
+#rl-app .pw-schedule-note[hidden], #rl-app .pw-schedule-note:empty { display: none; }
+
+/* The scheduled folder says, on every row, when the message leaves. */
+#rl-app .pw-schedule-badge {
+    display: inline-block;
+    margin-inline-start:var(--pw-space-2);
+    padding:0 var(--pw-space-2);
+    border-radius: var(--pw-radius-pill);
+    background: var(--pw-primary-50);
+    color: var(--pw-primary-ink);
+    font-size:var(--pw-text-xs);
+    font-weight:var(--pw-weight-medium);
+    line-height: 20px;
+    white-space: nowrap;
+    vertical-align: baseline;
+}
+#rl-app .pw-schedule-badge[data-state="failed"] { background: var(--pw-danger-tint); color: var(--pw-danger); }
+#rl-app .pw-schedule-badge:is([data-state="sending"], [data-state="sent"], [data-state="unscheduled"]) {
+    background: var(--pw-grey-100);
+    color: var(--pw-grey-700);
+}
+#rl-app .pw-scheduled-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap:var(--pw-space-3);
+    margin-block-end:var(--pw-space-3);
+    padding:var(--pw-space-3) var(--pw-space-4);
+    border-radius: var(--pw-radius-lg);
+    background: var(--pw-primary-50);
+    color: var(--pw-grey-900);
+    font-size:var(--pw-text-sm);
+}
+#rl-app .pw-scheduled-bar[hidden] { display: none; }
+#rl-app .pw-scheduled-bar[data-state="failed"] { background: var(--pw-danger-tint); }
+#rl-app .pw-scheduled-text { margin:0; }
+#rl-app button.pw-scheduled-back {
+    height: auto;
+    min-height: 44px;
+    margin:0;
+    padding:var(--pw-space-2) var(--pw-space-3);
+    border: 0 !important;
+    border-radius: var(--pw-radius-md);
+    background: var(--nc-color-main-background, #fff);
+    color: var(--pw-grey-900);
+    font: inherit;
+    font-weight:var(--pw-weight-medium);
+    cursor: pointer;
+}
+#rl-app button.pw-scheduled-back:is(:hover, :focus-visible) { background: var(--pw-grey-100); }
+#rl-app button.pw-scheduled-back:disabled { opacity: .65; cursor: default; }
+#rl-app button.pw-scheduled-back:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: -2px; }
+@media (max-width: 600px) {
+    #rl-app .pw-schedule-panel { position: fixed; inset: auto 12px calc(12px + env(safe-area-inset-bottom)) 12px; width: auto; }
+}

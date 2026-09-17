@@ -20,6 +20,23 @@
     const draftFolder = () => rl.settings.get('DraftsFolder');
     const canSaveDraft = () => !!draftFolder() && draftFolder() !== '__UNUSE__';
     const proto = vm => Object.getPrototypeOf(vm);
+    // Plugin hooks answer through the native plugin dispatcher, not the message endpoint.
+    const hook = (params, timeout = 60000) => new Promise((resolve, reject) => rl.pluginRemoteRequest(
+        (code, data) => {
+            const value = data?.Result;
+            code || !value || value.error ? reject(new Error(value?.error || 'scheduled')) : resolve(value);
+        }, 'PiedWebScheduledSend', params, timeout));
+    const when = value => {
+        const date = new Date(value), lang = document.documentElement.lang || 'fr';
+        if (!Number.isFinite(date.getTime())) return '';
+        const time = date.toLocaleTimeString(lang, {hour:'2-digit', minute:'2-digit'});
+        const day = new Date(date); day.setHours(0,0,0,0);
+        const today = new Date(); today.setHours(0,0,0,0);
+        const days = Math.round((day - today) / 86400000);
+        if (days === 0) return t('aujourd’hui à ', 'today at ') + time;
+        if (days === 1) return t('demain à ', 'tomorrow at ') + time;
+        return date.toLocaleDateString(lang, {weekday:'long', day:'numeric', month:'long'}) + t(' à ', ' at ') + time;
+    };
 
     // Native Remote keeps one timeout controller per action. Serialize draft writes
     // (including autosave) so a newer save cannot take over an older save's timeout.
@@ -195,7 +212,9 @@
             now.setAttribute('aria-label', label); now.title = label;
             now.addEventListener('click', () => sendNow(job));
             job.node.querySelector('.pw-outgoing-action').addEventListener('click', () => {
-                if (['sent','copy-error'].includes(job.phase)) remove(job); else restore(job);
+                if (['sent','copy-error'].includes(job.phase)) remove(job);
+                else if (job.phase === 'scheduled') unschedule(job);
+                else restore(job);
             });
             ensureHost().append(job.node);
         }
@@ -203,7 +222,8 @@
             waiting:t('Envoi en attente', 'Send pending'), ready:t('Envoi en attente', 'Send pending'),
             sending:t('Envoi en cours…', 'Sending…'), sent:t('Message envoyé', 'Message sent'),
             cancelled:t('Envoi annulé', 'Send cancelled'), error:t('Envoi non confirmé', 'Send not confirmed'),
-            'copy-error':t('Envoyé, copie non enregistrée', 'Sent, but copy could not be saved')
+            'copy-error':t('Envoyé, copie non enregistrée', 'Sent, but copy could not be saved'),
+            scheduling:t('Programmation…', 'Scheduling…'), scheduled:t('Envoi programmé', 'Send scheduled')
         };
         const status = job.node.querySelector('.pw-outgoing-status');
         if (status.textContent !== messages[job.phase]) status.textContent = messages[job.phase];
@@ -211,12 +231,14 @@
         job.node.querySelector('.pw-outgoing-detail').textContent = job.detail || '';
         job.node.querySelector('.pw-outgoing-now').hidden = job.phase !== 'waiting';
         const button = job.node.querySelector('.pw-outgoing-action');
-        button.disabled = job.phase === 'sending';
-        button.textContent = ['waiting','ready'].includes(job.phase)
+        button.disabled = ['sending','scheduling'].includes(job.phase);
+        button.textContent = ['waiting','ready','scheduled'].includes(job.phase)
             ? t('Annuler', 'Undo') + (job.seconds ? ` (${job.seconds})` : '')
             : job.phase === 'sending' ? t('Envoi…', 'Sending…')
-                : ['sent','copy-error'].includes(job.phase) ? t('Fermer', 'Dismiss') : t('Reprendre', 'Resume');
-        button.setAttribute('aria-label', ['waiting','ready'].includes(job.phase) ? t('Annuler l’envoi', 'Undo send') : button.textContent);
+                : job.phase === 'scheduling' ? t('Programmation…', 'Scheduling…')
+                    : ['sent','copy-error'].includes(job.phase) ? t('Fermer', 'Dismiss') : t('Reprendre', 'Resume');
+        button.setAttribute('aria-label', ['waiting','ready'].includes(job.phase) ? t('Annuler l’envoi', 'Undo send')
+            : job.phase === 'scheduled' ? t('Annuler l’envoi programmé', 'Cancel the scheduled send') : button.textContent);
         placeHost();
     }
     function ensureHost() {
@@ -321,6 +343,86 @@
             state?.attachments.forEach(item => item.onDestroy?.());
         } finally { vm.sending(false); unlock(); preparing=false; }
     }
+    const reason = error => ({
+        drafts: t('Activez un dossier Brouillons pour programmer un envoi.', 'Enable a Drafts folder to schedule a send.'),
+        folder: t('Le dossier des envois programmés est indisponible.', 'The scheduled folder is unavailable.'),
+        time: t('Choisissez une date d’envoi à venir.', 'Choose a send time in the future.'),
+        sending: t('Le serveur a déjà pris ce message en charge.', 'The server already took this message.'),
+        missing: t('Ce message n’est plus dans les envois programmés.', 'This message is no longer scheduled.'),
+        sender: t('Aucun envoi programmé n’est actif sur ce serveur.', 'No scheduled sender is running on this server.')
+    })[String(error?.message || '')] || t('Programmation indisponible pour le moment.', 'Scheduling is unavailable right now.');
+    // What is stored is the finished message, not a draft of it: the server hands that exact
+    // copy to SMTP, so it is prepared the way a send prepares it, signatures and all.
+    async function schedule(vm, iso) {
+        if (!vm || preparing || restoring || !vm.modalVisible() || !vm.sendCommand.canExecute()) return false;
+        if (!(vm.to().trim() || vm.cc().trim() || vm.bcc().trim())) { vm.emptyToError(true); return false; }
+        if (vm.attachmentsInProcess().length) { vm.attachmentsInProcessError(true); vm.attachmentsArea(); return false; }
+        if (vm.attachmentsInError().length) { vm.attachmentsInErrorError(true); vm.attachmentsArea(); return false; }
+        preparing = true;
+        const unlock = lock(vm); vm.sending(true);
+        let state;
+        try {
+            const queue = await hook({operation:'folder'});
+            const folder = String(queue.folder || '');
+            if (!folder) throw new Error('folder');
+            // Park a message only where something is running that will come and take it.
+            if (!(Number(queue.sender) > 0) || Date.now() / 1000 - Number(queue.sender) > 1800) throw new Error('sender');
+            state = capture(vm);
+            const copy = shadow(vm, state);
+            const params = await proto(vm).getMessageRequestParams.call(copy, folder);
+            params.pwSendAt = iso;
+            if (!vm.modalVisible() || leaving) { state.attachments.forEach(item => item.onDestroy?.()); return false; }
+            const job = {id:++serial, state, copy, account:identity(), armoredDraft:'', phase:'scheduling',
+                seconds:0, persisted:true, durable:false, sendAt:iso, persist:Promise.resolve(), detail:when(iso)};
+            jobs.push(job); render(job);
+            vm.sending(false); unlock();
+            await hideComposer(vm);
+            store(job, params);
+            return true;
+        } catch (error) {
+            vm.sendError(true); vm.sendErrorDesc(reason(error));
+            state?.attachments.forEach(item => item.onDestroy?.());
+            return false;
+        } finally { vm.sending(false); unlock(); preparing = false; }
+    }
+    function store(job, params) {
+        // The same serialized queue as every other draft write: an autosave cannot overtake it.
+        rl.app.Remote.request('SaveMessage', (code, data) => {
+            const result = data?.Result;
+            if (!code && result?.folder && result.uid) {
+                job.phase = 'scheduled'; job.durable = true;
+                job.folder = result.folder; job.uid = result.uid; job.detail = when(job.sendAt);
+                // The stored copy replaced the draft it came from; a resume must not delete a third.
+                job.copy.draftsFolder(''); job.copy.draftUid(0);
+                job.noticeTimer = clock.later(() => remove(job), 8000);
+                listView?.reload?.();
+                api.scheduledChanged?.();
+            } else {
+                job.phase = 'error';
+                job.detail = t('Message non programmé. Reprenez-le pour réessayer.', 'The message was not scheduled. Resume it to try again.');
+            }
+            render(job);
+        }, params, 200000);
+    }
+    // Cancelling hands the message back to the composer, which is why the stored copy goes
+    // away instead of returning to Drafts: the content is on screen again, in one place.
+    async function unschedule(job) {
+        if (job.phase !== 'scheduled' || job.busy) return;
+        job.busy = true; clock.clear(job.noticeTimer);
+        job.detail = t('Annulation…', 'Cancelling…'); render(job);
+        try {
+            await hook({operation:'cancel', uid:job.uid, mode:'resume'});
+            job.busy = false; job.phase = 'cancelled'; job.durable = false; job.detail = '';
+            listView?.reload?.(); api.scheduledChanged?.();
+            await restore(job);
+        } catch (error) {
+            job.busy = false; job.detail = reason(error); render(job);
+            job.noticeTimer = clock.later(() => remove(job), 8000);
+        }
+    }
+    api.scheduleSend = iso => schedule(compose, iso);
+    api.formatSendAt = when;
+    api.canSchedule = () => canSaveDraft();
     addEventListener('rl-view-model.create', ({detail:vm}) => {
         if (vm.viewModelTemplateID === 'PopupsCompose' && !vm.pwBackgroundSend) {
             compose=vm; vm.pwBackgroundSend=true; serializeDraftWrites();
