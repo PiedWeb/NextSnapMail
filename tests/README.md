@@ -17,7 +17,7 @@ Use a separate source checkout of the NextSnapMail revision recorded in `release
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
-php tests/unread-order.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-order.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
@@ -47,8 +47,11 @@ dev-browser-agent --timeout 40 < tests/browser/test-image-edge-cases.js
 dev-browser-agent --timeout 35 < tests/browser/image-toolbar-regression.js
 dev-browser-agent --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-copy-md.js
+dev-browser-agent --timeout 30 < tests/browser/test-quote-readability.js
 dev-browser-agent --timeout 40 < tests/browser/test-reader-addresses.js
 dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
+dev-browser-agent --timeout 45 < tests/browser/test-inline-reply.js
+dev-browser-agent --timeout 30 < tests/browser/test-reply-priority.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser-agent --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser-agent --timeout 60 < tests/browser/test-unread-drafts.js
@@ -104,12 +107,12 @@ that both POST and cached GET list/reader requests have their thread parameters
 removed while Inbox requests keep the saved preference.
 
 `test-unread-order.js` keeps the Inbox Conversation and mixed-order controls active together,
-checks unread received rows oldest-first and read rows newest-first, and verifies true
-oldest-first Draft pagination. Its default transition leaves an automatically read row stable
-until the next list refresh; mode 2 pins only the open row, releases it when the reader moves
-away and keeps the newly opened row at its viewport position. It also covers the per-account
-choice in General settings, load/save calls, Inbox/search scope, failure feedback and mobile
-geometry. The fixture uses fictional rows and mocked preference/mail endpoints.
+checks complete first-page unread merging and later-page deduplication, treats a conversation
+with an unread member as unread, verifies oldest-first unread/read segmentation, moves a row
+between those segments when its read state changes, and verifies true oldest-first Draft
+pagination. It also covers the existing per-account read-transition setting, load/save calls,
+Inbox/search scope, failure feedback and the mobile control group. The fixture uses fictional
+rows and mocked preference/mail endpoints.
 
 `test-send-now.js` builds the outgoing notice from the markup `background-send.js`
 ships, so a change to `render()` cannot leave it passing, and checks the Send now
@@ -165,3 +168,19 @@ native Close placement, the earliest-subject heading, open-subject typography,
 conceal/reveal during delayed searches, and the successful-reply event that fetches,
 opens and scrolls to a new Sent copy while marking the feed row. It does not use an
 authenticated mailbox.
+
+`test-inline-reply.js` docks the native Reply and Reply all composer in a fictional
+active conversation, then promotes that exact editor DOM to its modal form. It checks
+recipient/editor visibility, the Expand control, locked duplicate compose actions,
+content and caret preservation, Forward remaining modal, narrow geometry and safe
+restoration when the Pied Web theme is left. No transport is opened and no mail is sent.
+
+`test-reply-priority.js` switches the same reader between a fictional group message and a
+direct message. It checks that the first/emphasized toolbar command and icon-labeled bottom
+primary follow the actual recipient count, that the native Reply/Reply all/Forward commands
+still run, and that the 390 px controls retain their touch targets without overflow.
+
+`test-quote-readability.js` covers the strict Outlook desktop and web header shapes that
+carry earlier messages without a blockquote. It checks native disclosure structure,
+manual state, the collapse preference, theme restoration and a ruled-note false positive,
+using fictional content only.

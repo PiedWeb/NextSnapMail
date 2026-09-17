@@ -3,8 +3,55 @@
 (() => {
     'use strict';
     const selector = 'details.sm-bq-switcher';
+    const outlookSelector = selector + '.pw-outlook-quote';
     const active = () => document.documentElement.classList.contains('pw-theme');
     const french = () => (document.documentElement.lang || 'fr').startsWith('fr');
+    const collapseEnabled = () => {
+        const value = window.rl?.settings?.get?.('CollapseBlockquotes');
+        return value == null || !!Number(value);
+    };
+
+    // Outlook desktop and web often leave earlier messages after a visual
+    // four-field mail header instead of using blockquote. SnappyMail cannot
+    // fold that history, so turn only this strict shape into its native details
+    // contract. Field names are deliberately not language-dependent.
+    const outlookHeader = node => {
+        if (node.tagName !== 'DIV' || node.closest('blockquote,' + selector)) return false;
+        const fields = [...node.querySelectorAll('b,strong')].filter(label =>
+            /[:\uff1a]\s*$/.test(label.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]+/g, ' ').trim())
+        );
+        if (fields.length < 4 || node.querySelectorAll('br').length < 3) return false;
+        const style = node.style;
+        const ruled = !!style.borderTopStyle && style.borderTopStyle !== 'none'
+            && !!style.borderTopWidth && style.borderTopWidth !== '0px';
+        const outlookClasses = [...(node.parentElement?.classList || [])].some(name =>
+            /^(?:msg-)?(?:WordSection|Mso)/i.test(name)
+        );
+        return ruled || outlookClasses || node.getAttribute('dir') === 'ltr';
+    };
+    const hasContent = node => node.nodeType === Node.ELEMENT_NODE
+        ? !node.matches('style,script,template') && !!node.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '')
+        : node.nodeType === Node.TEXT_NODE && !!node.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '');
+    const foldOutlookHistory = body => {
+        if (body.querySelector(outlookSelector)) return;
+        const marker = [...body.querySelectorAll('div')].find(outlookHeader);
+        if (!marker) return;
+        const trailing = [marker];
+        for (let node = marker.nextSibling; node; node = node.nextSibling) trailing.push(node);
+        if (!trailing.slice(1).some(hasContent) && marker.querySelectorAll('p,div,table').length < 2) return;
+        const details = document.createElement('details');
+        details.className = 'sm-bq-switcher pw-outlook-quote';
+        const summary = document.createElement('summary');
+        summary.textContent = '•••';
+        const quote = document.createElement('blockquote');
+        marker.before(details);
+        details.append(summary, quote);
+        trailing.forEach(node => quote.append(node));
+    };
+    const unfoldOutlookHistory = body => body.querySelectorAll(outlookSelector).forEach(details => {
+        const quote = details.querySelector(':scope > blockquote');
+        if (quote) details.replaceWith(...quote.childNodes);
+    });
 
     // Walk backwards once per body. A quote followed by non-quoted text at the
     // same quotation level belongs to an inline exchange. Nested history starts
@@ -51,6 +98,8 @@
         };
         const scan = () => {
             container.querySelectorAll('.b-text-part').forEach(body => {
+                if (active() && collapseEnabled()) foldOutlookHistory(body);
+                else unfoldOutlookHistory(body);
                 const quotes = [...body.querySelectorAll(selector)];
                 const inline = active() && quotes.some(node => !states.has(node)) ? inlineQuotes(body) : new Set();
                 quotes.forEach(node => {

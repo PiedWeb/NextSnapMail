@@ -262,7 +262,9 @@
     }
     function placeHost() {
         if (!host) return;
-        const dialogs = [...document.querySelectorAll('dialog[open]')].sort((a,b)=>(dialogOrder.get(a)||0)-(dialogOrder.get(b)||0));
+        const dialogs = [...document.querySelectorAll('dialog[open]')]
+            .filter(dialog => !dialog.classList.contains('pw-inline-reply'))
+            .sort((a,b)=>(dialogOrder.get(a)||0)-(dialogOrder.get(b)||0));
         const parent = dialogs.at(-1) || document.getElementById('rl-app') || document.body;
         if (!jobs.length) { if ((host.showPopover && host.matches(':popover-open'))) host.hidePopover(); host.hidden = true; return; }
         host.hidden = false;

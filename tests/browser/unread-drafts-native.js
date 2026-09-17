@@ -44,7 +44,7 @@ ko.isObservableArray=ko.isObservableArray|| (value=>ko.isObservable(value)&&!!va
             if (Object.hasOwn(params, 'enabled')) unreadOrderEnabled = !!Number(params.enabled);
             if (Object.hasOwn(params, 'behavior')) unreadOrderBehavior = Number(params.behavior);
             return setTimeout(() => callback(window.unreadOrderFailure ? 1 : 0,
-                {Result:window.unreadOrderFailure ? {error:'settings'} : {enabled:unreadOrderEnabled, behavior:unreadOrderBehavior}}), 20);
+                {Result:window.unreadOrderFailure ? {error:'settings'} : {enabled:unreadOrderEnabled,behavior:unreadOrderBehavior}}), 20);
         }
         draftRequests.push({action,...params,account:draftAccount});
         const snapshot = structuredClone(draftData), folderSnapshot = draftFolder;

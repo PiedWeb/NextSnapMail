@@ -13,7 +13,10 @@
         const stamp = Number(value(message?.dateTimestamp));
         return Number.isFinite(stamp) && stamp > 0 ? stamp : null;
     };
-    const unread = message => !!value(message?.isUnseen);
+    const unread = message => {
+        const thread = value(message?.threadUnseen);
+        return !!value(message?.isUnseen) || (Array.isArray(thread) && thread.length > 0);
+    };
     const messageKey = message => {
         const folder = String(value(message?.folder) || ''), uid = value(message?.uid);
         if (folder && uid !== undefined && uid !== null && uid !== '') return folder + '\u0000' + uid;
@@ -29,6 +32,54 @@
     let currentAccount = '', listView, button, group, error, sorting = false, frame = 0, pendingAnchor = null;
     let settingsSelect, settingsStatus, messageSubscriptions = [], readerSubscription;
     let activeMessageKey = '', heldMessageKey = '', heldIndex = -1, listScope = '';
+    let injectedScope = '', injectedUnread = new Set(), receivedGlobal = false;
+
+    const rawRows = collection => collection?.['@Collection'];
+    const rawKey = (message, folder) => String(message?.folder || folder || '') + '\u0000' + String(message?.uid || '');
+    const responseScope = result => {
+        const folder = result?.folder;
+        return JSON.stringify([
+            account(), folder?.name || '', folder?.etag || '', folder?.uidValidity || '',
+            folder?.uidNext || '', folder?.unreadEmails ?? '', null !== result?.totalThreads
+        ]);
+    };
+    const clearInjected = () => {
+        injectedScope = ''; injectedUnread = new Set(); receivedGlobal = false;
+    };
+    const mergeUnreadResponse = data => {
+        const result = data?.Result, folder = result?.folder, rows = rawRows(result);
+        if (!active() || !result || !Array.isArray(rows) || !isInbox(folder?.name)
+            || (result.search || '').trim() || Number(result.threadUid || 0)) return;
+        const offset = Number(result.offset || 0), extra = rawRows(data?.PiedWebUnreadOrder);
+        if (!offset) {
+            clearInjected();
+            if (!Array.isArray(extra)) return;
+            const keys = new Set(extra.map(message => rawKey(message, folder.name)));
+            result['@Collection'] = [...extra, ...rows.filter(message => !keys.has(rawKey(message, folder.name)))];
+            injectedUnread = keys;
+            injectedScope = responseScope(result);
+            receivedGlobal = true;
+        } else if (injectedUnread.size && injectedScope === responseScope(result)) {
+            result['@Collection'] = rows.filter(message => !injectedUnread.has(rawKey(message, folder.name)));
+        }
+    };
+
+    // Read the optional collection before SnappyMail revives the native response.
+    // Both collections came from the same MessageList request and become the same
+    // native MessageModel objects used by selection, flags, moves and the reader.
+    const remote = window.rl?.app?.Remote;
+    if (remote?.request && !remote.pwUnreadOrder) {
+        const nativeRequest = remote.request;
+        remote.request = function(action, callback, params, timeout, path) {
+            const wrapped = action === 'MessageList' && typeof callback === 'function'
+                ? function(...args) {
+                    if (!args[0]) mergeUnreadResponse(args[1]);
+                    return callback.apply(this, args);
+                } : callback;
+            return nativeRequest.call(this, action, wrapped, params, timeout, path);
+        };
+        remote.pwUnreadOrder = true;
+    }
 
     const baseFeed = list => {
         const collection = list?.();
@@ -72,16 +123,20 @@
     const watchMessages = list => {
         disposeMessageSubscriptions();
         (list?.() || []).forEach(message => {
+            const unreadChanged = () => {
+                if (behavior === 1) return;
+                const key = messageKey(message);
+                if (key && key === activeMessageKey) {
+                    heldMessageKey = key;
+                    heldIndex = (list?.() || []).indexOf(message);
+                }
+                schedule();
+            };
             if (message?.isUnseen?.subscribe) {
-                messageSubscriptions.push(message.isUnseen.subscribe(() => {
-                    if (behavior === 1) return;
-                    const key = messageKey(message);
-                    if (key && key === activeMessageKey) {
-                        heldMessageKey = key;
-                        heldIndex = (list?.() || []).indexOf(message);
-                    }
-                    schedule();
-                }));
+                messageSubscriptions.push(message.isUnseen.subscribe(unreadChanged));
+            }
+            if (message?.threadUnseen?.subscribe) {
+                messageSubscriptions.push(message.threadUnseen.subscribe(unreadChanged));
             }
             if (message?.dateTimestamp?.subscribe) {
                 messageSubscriptions.push(message.dateTimestamp.subscribe(() => schedule()));
@@ -146,8 +201,8 @@
         button.textContent = t('Non lus : anciens d’abord', 'Unread: oldest first');
         button.title = enabled
             ? t('Rétablir l’ordre natif des messages', 'Restore the native message order')
-            : t('Afficher les non-lus du plus ancien au plus récent, puis les lus du plus récent au plus ancien',
-                'Show unread messages oldest first, then read messages newest first');
+            : t('Rassembler tous les non-lus, du plus ancien au plus récent, puis afficher les lus du plus récent au plus ancien',
+                'Gather every unread message oldest first, then show read messages newest first');
         error.hidden = !visible || !error.textContent;
         const threads = group?.querySelector('.pw-threads');
         if (group) group.hidden = button.hidden && (!threads || threads.hidden);
@@ -183,6 +238,9 @@
                 if (settingsStatus) settingsStatus.textContent = t('Réglage indisponible. Réessayez.', 'Setting unavailable. Try again.');
             } else {
                 ready = true; enabled = state.enabled; behavior = state.behavior;
+                if (enabled && !receivedGlobal && baseFeed(listView?.messageList)) {
+                    listView?.messageList?.reload?.(true, true);
+                }
             }
             changed(true);
         });
@@ -197,7 +255,10 @@
                 error.textContent = t('Impossible d’enregistrer l’ordre des non-lus. Réessayez.', 'Could not save the unread order. Try again.');
             } else {
                 ready = true; enabled = saved.enabled; behavior = saved.behavior;
-                if (!enabled) { clearHeld(); listView?.reload?.(); }
+                clearInjected();
+                if (!enabled) clearHeld();
+                if (listView?.messageList?.reload) listView.messageList.reload(enabled, true);
+                else listView?.reload?.();
             }
             changed(true);
         });
@@ -288,7 +349,7 @@
             if (nextScope !== listScope || vm.messageList.loading?.()) {
                 listScope = nextScope; clearHeld();
             }
-            if (account() !== currentAccount) load();
+            if (account() !== currentAccount) { clearInjected(); load(); }
             else { update(); schedule(); }
         };
         const subscriptions = [vm.messageList, vm.messageList.loading, vm.messageList.page, vm.messageList.threadUid]
@@ -298,7 +359,8 @@
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             ++generation; cancelAnimationFrame(frame); frame = 0; theme.disconnect();
             pendingAnchor = null;
-            clearHeld(); disposeMessageSubscriptions(); subscriptions.forEach(subscription => subscription.dispose());
+            clearHeld(); clearInjected(); disposeMessageSubscriptions();
+            subscriptions.forEach(subscription => subscription.dispose());
         });
         update();
         if (!ready && !loading) load();

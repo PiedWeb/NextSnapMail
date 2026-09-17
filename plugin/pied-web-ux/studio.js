@@ -2,6 +2,28 @@
     'use strict';
     const fr = () => (document.documentElement.lang || 'fr').startsWith('fr');
     const icons = {'GLOBAL/CLOSE':'close','GLOBAL/TO_ARCHIVE':'archive','GLOBAL/TO_SPAM':'spam','GLOBAL/DELETE':'trash','GLOBAL/MORE':'more','GLOBAL/MOVE_TO':'folder','FOLDER_LIST/BUTTON_NEW_MESSAGE':'compose','MESSAGE_LIST/BUTTON_RELOAD':'refresh','MESSAGE_LIST/SORT':'sort','MESSAGE/BUTTON_REPLY':'reply','MESSAGE/BUTTON_REPLY_ALL':'reply-all','MESSAGE_LIST/MENU_UNSET_SEEN':'unread','GLOBAL/CONTACTS':'contacts'};
+    const email = value => String(ko.unwrap(value?.email) || value || '').trim().toLocaleLowerCase();
+    const addresses = value => {
+        value = ko.unwrap(value);
+        return Array.isArray(value) ? value : value ? [value] : [];
+    };
+    // Match the native Reply all recipient set, minus the active account. The
+    // preferred action changes only when Reply all would actually address more
+    // than one person, not merely because the message has From and To headers.
+    const preferReplyAll = message => {
+        if (!message) return false;
+        const own = new Set(['Email','mainEmail'].map(key => email(window.rl?.settings?.get?.(key))).filter(Boolean));
+        const account = document.getElementById('V-SystemDropDown');
+        const accountVM = account && ko.dataFor(account);
+        const activeEmail = email(ko.unwrap(accountVM?.accountEmail)
+            || account?.querySelector('.pw-account-label')?.title
+            || account?.querySelector('.accountPlace')?.title);
+        if (activeEmail) own.add(activeEmail);
+        const replyTo = addresses(message.replyTo);
+        const recipients = [...(replyTo.length ? replyTo : addresses(message.from)),
+            ...addresses(message.to), ...addresses(message.cc)];
+        return new Set(recipients.map(email).filter(value => value && !own.has(value))).size > 1;
+    };
     let title, readerVM;
     // Nextcloud shell integration is handled by app-shell.js for both embedding modes.
     const syncTitle = () => {
@@ -136,6 +158,20 @@
             const toolbar = dom.querySelector('.top-toolbar');
             const reply = toolbar?.querySelector('.pw-message-actions');
             if (reply) toolbar.prepend(reply);
+            vm.pwPreferReplyAll ||= ko.computed(() => preferReplyAll(vm.message?.()), null, {disposeWhenNodeIsRemoved:dom});
+            if (reply) {
+                const replyOne = reply.querySelector('.pw-reply');
+                const replyAll = reply.querySelector('.pw-reply-all');
+                const syncReplyPriority = () => {
+                    const all = vm.pwPreferReplyAll();
+                    reply.classList.toggle('pw-reply-all-preferred', all);
+                    replyOne?.classList.toggle('pw-preferred-reply', !all);
+                    replyAll?.classList.toggle('pw-preferred-reply', all);
+                    reply.prepend(all ? replyAll : replyOne);
+                };
+                vm.pwPreferReplyAll.subscribe(syncReplyPriority);
+                syncReplyPriority();
+            }
             const commands=document.createElement('div');commands.className='pw-reader-commands';commands.setAttribute('role','group');commands.setAttribute('aria-label',fr() ? 'Actions du message' : 'Message actions');
             const copyGroup=document.createElement('div');copyGroup.className='btn-group pw-copy-md-group';
             const copy=document.createElement('button');copy.type='button';copy.className='btn pw-copy-md';copy.dataset.pwIcon='copy-md';copy.textContent='MD';
@@ -217,7 +253,7 @@
             const body = dom.querySelector('.bodyText');
             if (body) {
                 const footer = document.createElement('div'); footer.className = 'pw-reading-actions';
-                footer.innerHTML = `<button type="button" class="btn pw-reading-reply" data-bind="command: replyCommand, visible: canBeRepliedOrForwarded">${fr() ? 'Répondre' : 'Reply'}</button><button type="button" class="btn" data-bind="command: forwardCommand, visible: canBeRepliedOrForwarded">${fr() ? 'Transférer' : 'Forward'}</button>`;
+                footer.innerHTML = `<button type="button" class="btn pw-reading-reply pw-reading-reply-all" data-pw-icon="reply-all" data-bind="command: replyAllCommand, visible: canBeRepliedOrForwarded() && pwPreferReplyAll()">${fr() ? 'Répondre à tous' : 'Reply all'}</button><button type="button" class="btn pw-reading-reply pw-reading-reply-one" data-pw-icon="reply" data-bind="command: replyCommand, visible: canBeRepliedOrForwarded() && !pwPreferReplyAll()">${fr() ? 'Répondre' : 'Reply'}</button><button type="button" class="btn pw-reading-forward" data-pw-icon="forward" data-bind="command: forwardCommand, visible: canBeRepliedOrForwarded">${fr() ? 'Transférer' : 'Forward'}</button>`;
                 body.after(footer);
                 ko.applyBindingAccessorsToNode(footer,{template:()=>({nodes:Array.from(footer.childNodes)})},vm);
             }

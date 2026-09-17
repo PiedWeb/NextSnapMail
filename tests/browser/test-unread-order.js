@@ -8,7 +8,7 @@ const check = (name, ok) => {
 };
 
 await page.setViewportSize({width: 1200, height: 900});
-await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1&threads=1&unreadOrder=1');
+await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1&threads=1&unreadOrder=1&unreadBehavior=2');
 await page.waitForFunction(() => document.querySelector('.pw-unread-order')?.getAttribute('aria-busy') === 'false');
 await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
 check('The two Inbox preferences are simultaneously active', await page.evaluate(() =>
@@ -24,8 +24,50 @@ check('Read received messages remain newest-first', await page.evaluate(() => {
         && read.every((message, index) => !index || read[index - 1].dateTimestamp() > message.dateTimestamp());
 }));
 check('The setting load is account-scoped and read-only', await page.evaluate(() =>
-    unreadOrderRequests.length === 1 && Object.keys(unreadOrderRequests[0]).length === 0
-    && PiedWebUx.unreadOrder.behavior() === 1));
+    unreadOrderRequests.length === 1 && Object.keys(unreadOrderRequests[0]).length === 0));
+check('The existing read-transition preference is preserved', await page.evaluate(() =>
+    document.querySelector('#pw-unread-order-read-behavior')?.value === '2'
+    && document.querySelectorAll('.pw-unread-order-setting').length === 1));
+
+await page.evaluate(() => listVM.messageList().find(message => message.uid === 4).threadUnseen([44]));
+await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,4,3,2,1,6,7,8,9,10');
+check('A conversation containing an unread member belongs to the unread segment', await page.evaluate(() =>
+    listVM.messageList().map(message => message.uid).join(',') === '5,4,3,2,1,6,7,8,9,10'));
+await page.evaluate(() => listVM.messageList().find(message => message.uid === 4).threadUnseen([]));
+await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
+
+await page.evaluate(() => {
+    readerVM.message(listVM.messageList().find(message => message.uid === 3));
+    listVM.messageList().find(message => message.uid === 3).isUnseen(false);
+});
+await page.waitForTimeout(80);
+check('The active row keeps its place until the reader leaves it', await page.evaluate(() =>
+    listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10'));
+await page.evaluate(() => readerVM.message(listVM.messageList().find(message => message.uid === 4)));
+await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,2,1,3,4,6,7,8,9,10');
+await page.evaluate(() => listVM.messageList().find(message => message.uid === 3).isUnseen(true));
+await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
+
+await page.evaluate(() => {
+    const raw = (uid, unseen = true) => ({folder:'INBOX',uid,flags:unseen ? [] : ['\\seen'],threadUnseen:[]});
+    fixtureMessageListResponse = {
+        Result:{'@Collection':[raw(101),raw(90,false),raw(80,false)],folder:{name:'INBOX',etag:'mailbox-1',uidValidity:7,uidNext:120,unreadEmails:3},offset:0,search:'',threadUid:0,totalThreads:12},
+        PiedWebUnreadOrder:{'@Collection':[raw(75),raw(88),raw(101)]}
+    };
+    rl.app.Remote.request('MessageList',(code,data) => { window.mergedUnreadResponse = data; },{folder:'INBOX'});
+});
+await page.waitForFunction(() => window.mergedUnreadResponse);
+check('The native first page receives every unread row exactly once', await page.evaluate(() =>
+    mergedUnreadResponse.Result['@Collection'].map(message => message.uid).join(',') === '75,88,101,90,80'));
+
+await page.evaluate(() => {
+    const raw = uid => ({folder:'INBOX',uid,flags:[],threadUnseen:[]});
+    fixtureMessageListResponse = {Result:{'@Collection':[raw(75),raw(70),raw(60)],folder:{name:'INBOX',etag:'mailbox-1',uidValidity:7,uidNext:120,unreadEmails:3},offset:20,search:'',threadUid:0,totalThreads:12}};
+    rl.app.Remote.request('MessageList',(code,data) => { window.deduplicatedSecondPage = data; },{folder:'INBOX'});
+});
+await page.waitForFunction(() => window.deduplicatedSecondPage);
+check('Unread rows gathered on page one are deduplicated from later pages', await page.evaluate(() =>
+    deduplicatedSecondPage.Result['@Collection'].map(message => message.uid).join(',') === '70,60'));
 
 await page.evaluate(() => listVM.messageList().find(message => message.uid === 3).isUnseen(false));
 await page.waitForTimeout(100);

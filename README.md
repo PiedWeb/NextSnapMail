@@ -10,11 +10,15 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 
 - Clear folder hierarchy, quieter secondary counters and a compact icon sidebar that stays collapsed after a reload. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop; a long touch does so on mobile, with no visible checkboxes.
-- Reply, Reply all, Mark unread, visible Unsubscribe and Messages/Conversations switching. The reader's native label menu sits as an icon between message details and the star.
+- Reply and Reply all compose inline at the bottom of an active Inbox conversation, with an
+  Expand control that keeps the same draft and cursor in the full composer. Multi-correspondent
+  messages put Reply all first in the reader and use it as the icon-labeled bottom action. Mark unread,
+  visible Unsubscribe and Messages/Conversations switching remain in the reader toolbar.
+  The reader's native label menu sits as an icon between message details and the star.
 - In Inbox Conversations mode, the newest received or sent message opens in the native reader; earlier messages show a one-line text preview and stay one click away, without storing extra copies. Trash and every other folder always show individual messages.
 - Selection of all filtered results across pages, with explicit deletion confirmation.
 - Swipe to delete and Delete-key handling for selected list messages.
-- Readable interleaved quotations and native message flag controls.
+- Readable interleaved quotations, folded Outlook histories and native message flag controls.
 - Floating three-second Undo Send while continuing to use the mailbox, with a send
   glyph that skips the rest of the countdown.
 - Scheduled send: a time chosen beside Send, the message kept in its own mailbox folder, and a
@@ -29,7 +33,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Browser-side compression for clipboard images and local, Nextcloud or restored image attachments.
 - Nextcloud files from the Image toolbar, compressed and inserted directly in the message body.
 - Genuinely unread drafts at the top of the Inbox feed, with one-click resume.
-- An Inbox-only mixed order that puts unread messages oldest-first and keeps read messages newest-first, independently of Conversations. A per-account choice keeps newly read rows stable until refresh by default, or reorders the open row only after it is left.
+- An Inbox-only mixed order that gathers every unread message on the first page, oldest-first,
+  then keeps read messages newest-first, independently of Conversations.
 
 The optional linked-account unread counter correction is a separate [upstream PR](https://github.com/oe79/NextSnapMail/pull/41) and [version-specific patch](patches/README.md).
 Selected UX enhancements are proposed for upstream integration in [NextSnapMail issue #46](https://github.com/oe79/NextSnapMail/issues/46). This public repository provides the prototype and validation history; the proposal asks the maintainer which focused changes to accept and does not claim the plugin can be merged as-is.
@@ -41,7 +46,7 @@ This does **not** implement a unified inbox or a new vacation responder. Nextclo
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.8.6.1**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.8.9**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).
@@ -53,7 +58,7 @@ python3 tools/check-install.py --nextcloud /path/to/nextcloud
 
 The plugin is stored in NextSnapMail's data directory, and the theme under Nextcloud's custom themes. Normal updates generally preserve those files. Preserved files do not guarantee compatibility with new DOM, editor or PHP APIs. The optional core patch is overwritten when the app is replaced.
 
-[Unread drafts](docs/UNREAD_DRAFTS.md) · [Unread order](docs/UNREAD_ORDER.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
+[Inline replies](docs/INLINE_REPLY.md) · [Unread drafts](docs/UNREAD_DRAFTS.md) · [Unread order](docs/UNREAD_ORDER.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
 
 ## Develop
 

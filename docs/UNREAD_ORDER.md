@@ -19,8 +19,12 @@ The choice has no effect when the mixed-order preference is off.
 
 When enabled in the ordinary `INBOX` feed:
 
-- unread received rows on the current native Inbox page come first, from oldest to newest;
-- read received rows follow, from newest to oldest;
+- every unread received row is gathered on the first Inbox page, from oldest to newest;
+- the native first page's read rows follow, from newest to oldest;
+- later pages omit unread rows already gathered on page one while retaining their native
+  read rows and pagination;
+- a conversation is in the unread segment when its root or one of its `threadUnseen`
+  members is unread;
 - the unread Drafts reminder query uses ascending date order, so its first page contains
   the genuinely oldest reminders instead of merely reversing the newest ten.
 
@@ -29,15 +33,24 @@ selection because Inbox and Drafts UIDs can collide and SnappyMail’s move/dele
 are scoped to one folder. Search results, an opened native thread, Sent, Drafts, Trash,
 Archive and custom folders keep their native order and do not show the control.
 
-SnappyMail still owns Inbox pagination. Received rows are rearranged only inside each page;
-the plugin does not issue an unbounded cross-page Inbox query. Disabling the preference asks
-the native list to reload, restoring the server’s current sort. Read/unread changes follow
-the selected transition mode without cloning message models, so selection, flags,
-conversation metadata and native commands keep their original objects.
+SnappyMail still owns Inbox pagination and total counts. The plugin enriches the first native
+`MessageList` response before SnappyMail revives it, so the gathered rows remain real native
+message models: selection, flags, conversation metadata, moves and the reader use their normal
+objects. The server hook reuses that request's authenticated IMAP connection, current sort and
+UID/thread caches. It performs a targeted `UNSEEN` search and fetches only unread headers; when
+the first native page already covers every unread UID, it does no supplementary query. Very
+large unread sets are fetched in native batches on the same connection. Failure of this optional
+step leaves the ordinary native page intact.
 
-`tests/unread-order.php` covers authenticated per-account persistence, the mode-1 fallback,
-atomic updates and input validation.
+Disabling the preference clears the gathered UID set and reloads the native list. Read/unread
+changes follow the account's **When a message becomes read** setting: either the row stays in
+place until refresh, or the active row stays pinned until the reader leaves it and is then
+reclassified without moving the next visible row. Search, thread detail and non-Inbox requests
+never run or merge the supplementary collection.
+
+`tests/unread-order.php` covers authenticated per-account persistence, input validation,
+first-page scope, the targeted query shape and the no-query fast path.
 `tests/unread-drafts.php` checks the matching IMAP sort direction. The fictional browser
-fixture checks Conversation coexistence, received and Draft ordering, read-state changes,
-both transition modes, viewport anchoring, settings placement, scope, failure feedback and
-mobile geometry. No real message is opened, moved or changed.
+fixture checks Conversation coexistence, complete native merging, later-page deduplication,
+conversation-member unread state, received and Draft ordering, read-state changes, scope,
+failure feedback and the mobile toolbar. No real message is opened, moved or changed.

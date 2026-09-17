@@ -48,14 +48,17 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
   a custom folder. An Inbox conversation may still contain its matching Sent replies.
 - Since 1.8.5, `INBOX` also has an independent per-account mixed-order preference.
-  When active in the ordinary feed, unread received rows on each native page are oldest-first,
-  followed by read rows newest-first; unread Draft reminders are queried oldest-first too.
-  Keep Draft rows outside native Inbox selection, keep native pagination, and leave searches,
-  opened threads and other folders in their native order. Since 1.8.6.1, the per-account
-  read-transition choice defaults to mode 1: a row that automatically becomes read stays
-  where it is until the list refreshes. Mode 2 holds only the open row, then reclassifies it
-  when the reader moves away while anchoring the newly opened row in the viewport. See
-  `UNREAD_ORDER.md`.
+  Since 1.8.9, the first page gathers every unread received row oldest-first, followed by
+  the first native page's read rows newest-first; later pages suppress gathered unread
+  duplicates without moving or dropping their native read rows. A conversation is unread
+  when its root or any `threadUnseen` member is unread. Enrich the existing `MessageList`
+  response so the supplementary `UNSEEN` read reuses its IMAP login and UID/thread caches;
+  do not add a second browser request. Unread Draft reminders are queried oldest-first too.
+  Keep Draft rows outside native Inbox selection, preserve native pagination, and leave
+  searches, opened threads and other folders in their native order. See `UNREAD_ORDER.md`.
+  Preserve the per-account read-transition choice introduced in the deployed 1.8.6.1:
+  either keep a newly read row in place until refresh, or hold the active row until the
+  reader leaves it and then restore the next row's scroll anchor before reclassifying.
 - Native IMAP threads are folder-scoped. Since 1.7.20, Conversations mode
   assembles the opened message's native folder thread with matching Sent replies
   from read-only header searches. The newest message, received or sent, opens
@@ -106,6 +109,17 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
+- Since 1.8.7, Reply and Reply all dock the one native composer at the bottom of an active
+  Inbox conversation. Keep `modalVisible` true and use the dialog's non-modal `show()` state;
+  a merely styled closed dialog is inert. Expand must promote that exact bound DOM with its
+  fields, attachments, editor selection and cursor intact. New, Forward, Draft and replies
+  outside the active conversation stay modal. On theme/conversation exit, promote the live
+  draft instead of concealing it. See `INLINE_REPLY.md`.
+- Since 1.8.8, prefer Reply all only when its native-shaped recipient set contains more than
+  one address after excluding the active account. Move that bound command first and tint it
+  in the reader toolbar; below the message, show one icon-labeled primary Reply or Reply all
+  action plus secondary Forward. A message change must recompute the choice without replacing
+  any native command. See `INLINE_REPLY.md`.
 - Since 1.7.18 the reader's native label dropdown is icon-only beside message info and the star. Its bound menu node is moved with a restoration marker; the separate label row is hidden only while the move succeeds. Rebuilt native rows discard stale controls, and theme exit restores the original placement. Since 1.7.19 the relocated menu explicitly keeps the 15 px regular menu typography; otherwise it inherits the 22 px bold message title.
 - Contacts navigates to Nextcloud Contacts. The redundant Calendar shortcut was removed;
   calendar invitation import uses the native integration.
@@ -144,6 +158,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   and its native actions unchanged. A brief checkmark or cross confirms the result on the
   button, with an accessible status announcement. See `COPY_MARKDOWN.md`.
 - Interleaved quotes stay open; trailing history can remain folded. Keep manual quote choices.
+  Outlook desktop and web may encode earlier messages as siblings after a visual four-field
+  mail header, without a `blockquote`. `quote-readability.js` recognizes only that strict
+  structure and wraps the trailing history in SnappyMail's native details/blockquote contract,
+  so the collapse preference, keyboard command, replies and printing keep their normal path.
 - Formatting has a compact main row and More options. Use the existing Lucide icon assets.
 - Since 1.8.6, the native editor color control keeps its built-in greys and custom-color
   choice, but its 17 suggestions use Tailwind 600 from orange through rose, followed by
@@ -199,6 +217,10 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.8.9 | Gather every unread Inbox row on page one through the existing native request, with cached IMAP work and later-page deduplication. |
+| 1.8.8 | Prefer Reply all for multi-correspondent messages in the reader toolbar and footer while keeping direct replies unchanged. |
+| 1.8.7 | Dock Reply/Reply all in the active conversation and expand the same native editor back to its popup without losing the draft or cursor. |
+| 1.8.6.1 | Add the account-scoped choice to keep a newly read row in place or reclassify it after leaving the message. |
 | 1.8.6 | Add an opt-in upstream Squire 2.4.9 editor, Tailwind 600 color suggestions and immediate feed/reader synchronization after a sent reply. |
 | 1.3 | Shell/list/reader redesign; 30 screenshot-only critique attempts. Final 8.2/10, best 8.3, stopped at requested cap; never claimed 9/10. |
 | 1.7.4 | Copy the open reader body as Markdown from the action bar, including collapsed quotes. |

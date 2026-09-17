@@ -1,23 +1,57 @@
 # Releases
 
+## 1.8.9, 2026-09-18
+
+**Unread: oldest first** now gathers the complete unread Inbox set on the first page,
+instead of reordering only the unread rows that happened to be present in the native page.
+Later pages remove those already gathered rows, so a message is not shown twice. In
+Conversations mode, a row also belongs to the unread segment when an earlier member of its
+thread is unread even if the newest/root message is read.
+
+The extra work stays inside the native `MessageList` request: it reuses the authenticated
+IMAP connection, native UID/thread caches and current sort, performs one targeted `UNSEEN`
+search, and fetches headers only for the unread results. If the first native page already
+covers every unread UID, no supplementary query runs. Search results, opened threads and
+folders outside `INBOX` remain untouched, and any optional-query failure falls back to the
+native page. The deployed 1.8.6.1 read-transition choice is preserved. Validation now has
+24 endpoint checks and 18 browser scenarios, including native merging, cross-page
+deduplication, unread conversation members and the existing transition setting.
+
+## 1.8.8, 2026-09-18
+
+Messages with several correspondents now put **Reply all** first in the reader toolbar and
+give it a quiet accent, making the safer group action the natural target. The action below
+the message changes from **Reply** to **Reply all** for the same recipient set, with a matching
+icon; direct messages retain **Reply**, and **Forward** remains secondary. These controls keep
+the native Reply, Reply all and Forward commands, including the inline composer behavior.
+
+The active account is excluded before deciding, so a normal sender and recipient do not count
+as a group. The choice updates when another message opens and preserves keyboard order, dark
+mode and 44 px mobile targets. Browser validation uses fictional direct and group messages and
+mocked commands; it does not send mail.
+
+## 1.8.7, 2026-09-18
+
+Reply and Reply all now open directly at the bottom of an active Inbox conversation.
+This is the native composer itself, docked as a non-modal card: recipients, editor,
+attachments, autosave, delayed and scheduled sending keep their existing contracts.
+An **Expand** control promotes the same DOM back to the full composer, retaining the
+draft and caret. Forward, new messages and replies outside the conversation view remain
+full popups. After sending, the existing conversation refresh opens and scrolls to the
+new Sent message.
+
+Outlook desktop and web histories now follow the same **Afficher la citation**
+disclosure as real blockquotes. Microsoft often emits a visual mail header and
+plain following siblings instead of semantic quoted markup; Pied Web recognizes
+only the strict multi-field header shape, then gives that trailing history the
+native SnappyMail details/blockquote contract. The collapse preference, manual
+open state, reply/forward cleanup and theme restoration remain native-compatible.
+
 ## 1.8.6.1, 2026-09-18
 
-The mixed Inbox order no longer makes an opened message disappear as soon as the
-automatic seen flag arrives. A per-account choice under **Settings → General → Message
-list** now controls that transition:
-
-1. **Keep its place until refresh** is the default. The row changes to read in place and
-   joins the read segment only when the native list next refreshes.
-2. **Reorder after leaving the message** holds only the open row. When another message is
-   opened or the reader closes, the previous row joins the read segment while the newly
-   opened row keeps its viewport position.
-
-Both choices apply only while **Unread: oldest first** is active; Conversation mode,
-Draft reminders, searches and other folders retain their existing boundaries. The new
-setting is validated and stored beside the order preference in the active account's local
-SnappyMail settings. Validation: 19 endpoint checks and 22 fictional browser scenarios,
-plus the Conversation, Draft, native-control, application-shell and reader-stack suites.
-No real message was opened or changed.
+General settings can keep a newly read row in place until refresh, or reclassify it only
+after the reader leaves that message. The account-scoped choice preserves the reader's
+scroll anchor and remains independent from the Conversations preference.
 
 ## 1.8.6, 2026-09-18
 

@@ -2,6 +2,102 @@
 html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-feed-settings, .pw-threads, .pw-threads-error, .pw-unread-order-error, .pw-unread-order-setting) {
     display: none !important;
 }
+#rl-app .pw-inline-reply-slot {
+    flex:0 0 auto;
+    max-width:var(--pw-measure,640px);
+    box-sizing:border-box;
+    margin:var(--pw-space-3) 0 var(--pw-space-6);
+    padding-inline:var(--pw-gutter,var(--pw-space-8));
+    font-family:var(--pw-font,system-ui,sans-serif);
+}
+#rl-app #V-PopupsCompose .pw-inline-expand { display:none; }
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply {
+    position:static;
+    inset:auto;
+    display:flex!important;
+    width:100%;
+    box-sizing:border-box;
+    height:auto;
+    max-width:none;
+    max-height:none;
+    margin:0;
+    overflow:visible;
+    resize:none;
+    opacity:1;
+    border:1px solid var(--pw-line,var(--nc-color-border,#d5dedc));
+    border-radius:var(--pw-radius-lg,8px);
+    background:var(--pw-paper,var(--nc-color-main-background,#fff));
+    box-shadow:var(--pw-elevation-1,0 1px 3px rgb(0 0 0 / .14));
+    color:var(--nc-color-main-text,#202827);
+    transition:opacity .2s ease-out,box-shadow .15s ease-out;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply > header {
+    padding:var(--pw-space-2) var(--pw-space-3);
+    border-bottom:1px solid var(--pw-line,var(--nc-color-border,#d5dedc));
+    background:transparent;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply > header .saved-text,
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply > header .minimize-custom { display:none!important; }
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:var(--pw-space-1);
+    min-width:36px;
+    min-height:32px;
+    height:32px;
+    box-sizing:border-box;
+    padding:0 var(--pw-space-2);
+    border:0!important;
+    border-radius:var(--pw-radius-md,6px);
+    background:transparent!important;
+    color:var(--pw-grey-700,var(--nc-color-text-maxcontrast,#526360));
+    font:var(--pw-weight-medium,500) var(--pw-text-xs,12px)/1 var(--pw-font,system-ui,sans-serif);
+    cursor:pointer;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand:is(:hover,:focus-visible) {
+    background:var(--pw-selected,var(--nc-color-background-hover,#edf3f2))!important;
+    color:var(--nc-color-main-text,#202827);
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand:focus-visible {
+    outline:2px solid var(--nc-color-primary-element,#087c75);
+    outline-offset:2px;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand svg {
+    width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+html.pw-theme #rl-app #V-MailMessageView:has(#V-PopupsCompose.pw-inline-reply) .pw-reading-actions { display:none!important; }
+html.pw-theme #rl-app #V-MailMessageView:has(#V-PopupsCompose.pw-inline-reply) [aria-disabled="true"] {
+    opacity:.45;cursor:default;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .modal-body {
+    height:auto;
+    max-height:none;
+    overflow:visible;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .b-header { padding:var(--pw-space-2) var(--pw-space-3); }
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .b-header tr:first-child,
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .b-header tr:last-child { display:none; }
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .tabs {
+    height:auto;
+    max-height:none;
+    overflow:visible;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.textAreaParent,.attachmentAreaParent) {
+    height:min(34dvh,280px);
+    min-height:190px;
+}
+html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.squire-wysiwyg,.squire-plain) {
+    min-height:160px;
+    box-sizing:border-box;
+}
+@media(max-width:799px) {
+    #rl-app .pw-inline-reply-slot { max-width:none; margin:var(--pw-space-2) var(--pw-space-3) var(--pw-space-4); padding:0; }
+    html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.textAreaParent,.attachmentAreaParent) { height:min(38dvh,260px); }
+}
+@media(max-width:479px) {
+    html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand > span { display:none; }
+}
 #rl-app :is(.pw-feed-settings, .pw-threads, .pw-threads-error, .pw-unread-order-error)[hidden] { display: none !important; }
 /* A non-modal notification, including above a newly opened composer. */
 #rl-app .pw-outgoing-notices {

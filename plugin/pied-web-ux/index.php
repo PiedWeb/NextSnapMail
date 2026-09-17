@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.8.6.1',
+        VERSION = '1.8.9',
         RELEASE = '2026-09-18',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -39,6 +39,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('unread-drafts.js');
         $this->addJs('list-metadata.js');
         $this->addJs('conversation-thread.js');
+        $this->addJs('inline-reply.js');
         $this->addJs('app-shell.js');
         $this->addJs('left-panel-state.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
@@ -47,7 +48,18 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJsonHook('PiedWebUnreadOrder', 'UnreadOrder');
         $this->addJsonHook('PiedWebConversation', 'Conversation');
         $this->addJsonHook('PiedWebScheduledSend', 'ScheduledSend');
+        $this->addHook('json.after-MessageList', 'AfterMessageList');
         $this->addHook('filter.save-message', 'FilterSaveMessage');
+    }
+
+    public function AfterMessageList(array &$response): void
+    {
+        require_once __DIR__ . '/UnreadOrder.php';
+        try {
+            PiedWebUnreadOrder::augmentMessageList(\RainLoop\Api::Actions(), $response);
+        } catch (\Throwable $error) {
+            // An optional ordering preference must never break the native Inbox.
+        }
     }
 
     /* A message saved into the scheduled folder carries its due time, and nothing else
