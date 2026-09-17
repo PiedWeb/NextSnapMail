@@ -219,7 +219,9 @@
             if (!active() || !uid || !message.folder || !candidate(message.folder)) { bar.hidden = true; return; }
             const token = ++shown;
             let entry = entries.get(uid);
-            if (!entry || message.folder !== folder) { await load(false); entry = entries.get(uid); }
+            // Opening a message is deliberate and rare: an unknown one is worth a fresh answer
+            // rather than a cooled-down one that would leave the bar out of the reader.
+            if (!entry || message.folder !== folder) { await load(!entry); entry = entries.get(uid); }
             if (token !== shown || message.folder !== folder) { bar.hidden = true; return; }
             if (!entry) { bar.hidden = true; return; }
             bar.hidden = false;

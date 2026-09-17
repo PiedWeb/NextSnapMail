@@ -100,16 +100,16 @@ native `getMessageRequestParams`, so crypto, attachment serialisation and draft 
 follow the engine. The sender rewrites headers by copying every kept line byte for byte,
 so boundaries, encodings and signatures survive exactly as the engine wrote them.
 
-- `tests/scheduled-send.php`: 43 checks over the endpoint, the stamped header, the note for
+- `tests/scheduled-send.php`: 45 checks over the endpoint, the stamped header, the note for
   the sender and its heartbeat, with the native message builder and header parser, and
   mocked IMAP.
-- `integrations/scheduler/tests/sender.php`: 40 checks over folder resolution, claim order,
+- `integrations/scheduler/tests/sender.php`: 41 checks over folder resolution, claim order,
   header rewriting, recipients, filing, retry and abandonment, with mocked IMAP and SMTP.
-- `tests/browser/test-scheduled-send.js`: 18 checks over the composer control and its panel,
+- `tests/browser/test-scheduled-send.js`: 19 checks over the composer control and its panel,
   mounted on the engine's own composer header template.
 
-No message was sent and no mailbox was opened for any of these checks. Two parts are not
-covered and have not yet run against a real mailbox: the due-time badges on the message rows
-of the queue folder, and the bar shown when one of those messages is open. Both read the
-`list` operation, which the PHP checks do cover; their rendering is unverified until this
-release is exercised in an authenticated mailbox.
+No message was sent and no mailbox was opened for any of these checks. Two parts have no
+fixture — the due-time badges on the queue's message rows and the bar above an open scheduled
+message — and were instead read on the production mailbox during the
+[deployment of 2026-09-17](deployments/scheduled-send-2026-09-17.md), which also sent one real
+message end to end. They stay uncovered by the automated checks.

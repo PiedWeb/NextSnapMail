@@ -146,6 +146,21 @@ namespace {
     $check(str_contains($raw, PiedWebScheduledSend::HEADER . ': 2027-03-14T07:30:00Z'),
         'The stored time is the author’s instant, written once in UTC');
     $check(!str_contains($raw, PiedWebScheduledSend::DSN), 'No delivery receipt is claimed unless one was asked for');
+    // What the composer actually hands over is `new Date(...).toISOString()`: an instant with
+    // milliseconds. Refusing that shape refuses every schedule the interface can make.
+    $when = time() + 7200;
+    $message = new \MailSo\Mime\Message;
+    $actions->params = ['pwSendAt' => gmdate('Y-m-d\TH:i:s', $when) . '.000Z', 'saveFolder' => 'INBOX.Scheduled'];
+    $plugin->FilterSaveMessage($message);
+    $check(str_contains((string) stream_get_contents($message->ToStream()),
+        PiedWebScheduledSend::HEADER . ': ' . gmdate('Y-m-d\TH:i:s\Z', $when)),
+        'A browser instant with milliseconds is accepted and stored to the second');
+    $message = new \MailSo\Mime\Message;
+    $actions->params = ['pwSendAt' => gmdate('Y-m-d\TH:i:s', $when) . '.123456Z', 'saveFolder' => 'INBOX.Scheduled'];
+    $plugin->FilterSaveMessage($message);
+    $check(str_contains((string) stream_get_contents($message->ToStream()),
+        PiedWebScheduledSend::HEADER . ': ' . gmdate('Y-m-d\TH:i:s\Z', $when)), 'A finer fraction is truncated, not refused');
+    $actions->params = ['pwSendAt' => '2027-03-14T08:30:00+01:00', 'saveFolder' => 'INBOX.Scheduled'];
     $message = new \MailSo\Mime\Message;
     $actions->params['dsn'] = 1;
     $plugin->FilterSaveMessage($message);

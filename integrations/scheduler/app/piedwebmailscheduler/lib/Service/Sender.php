@@ -105,7 +105,8 @@ class Sender {
             $flags = \array_map('\strtolower', (array) $response->GetFetchValue(FetchType::FLAGS));
             $raw = \trim((new HeaderCollection($response->GetHeaderFieldsValue()))->ValueByName(self::HEADER));
             $due = null;
-            if ($raw !== '' && \preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$/D', $raw)) {
+            // The plugin writes whole seconds; a fractional instant from anywhere else still reads.
+            if ($raw !== '' && \preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$/D', $raw)) {
                 try { $due = (new \DateTimeImmutable($raw))->getTimestamp(); } catch (\Throwable $error) { $due = null; }
             }
             $entries[] = ['uid' => $uid, 'due' => $due, 'flags' => $flags,

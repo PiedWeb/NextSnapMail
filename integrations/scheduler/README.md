@@ -1,6 +1,6 @@
 # Pied Web scheduled mail sender
 
-Independent Nextcloud app `piedwebmailscheduler`, version 1.0.0. It sends the messages the
+Independent Nextcloud app `piedwebmailscheduler`, version 1.0.3. It sends the messages the
 Mail plugin scheduled, at the time they were scheduled for, whether or not a browser is open.
 
 ## What it does, and what it refuses to do

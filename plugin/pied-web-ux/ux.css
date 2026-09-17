@@ -485,7 +485,10 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
  * The panel is anchored to it, so the choice is made where it was asked for. */
 #rl-app .pw-schedule-wrap { position: relative; display: inline-block; vertical-align: top; }
 #rl-app .pw-schedule-wrap[hidden] { display: none; }
-#rl-app button.pw-schedule {
+/* The preserved Nextcloud control sheet fills and borders `#rl-app button.btn` with
+ * !important, and this control carries `btn` to keep the header's own metrics. Naming the
+ * composer outranks that sheet instead of fighting it with a second !important. */
+#rl-app #V-PopupsCompose button.pw-schedule {
     display: inline-flex;
     align-items: center;
     gap:var(--pw-space-2);
@@ -499,12 +502,12 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
     font-weight:var(--pw-weight-medium);
     cursor: pointer;
 }
-#rl-app button.pw-schedule svg { width: 20px; height: 20px; }
-#rl-app button.pw-schedule:is(:hover, :focus-visible, [aria-expanded="true"]) {
+#rl-app #V-PopupsCompose button.pw-schedule svg { width: 20px; height: 20px; }
+#rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visible, [aria-expanded="true"]) {
     background: var(--pw-grey-100);
     color: var(--pw-grey-900);
 }
-#rl-app button.pw-schedule:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: 2px; }
+#rl-app #V-PopupsCompose button.pw-schedule:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: 2px; }
 #rl-app .pw-schedule-panel {
     position: absolute;
     z-index: 30;

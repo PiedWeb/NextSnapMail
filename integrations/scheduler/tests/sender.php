@@ -263,6 +263,12 @@ $check($imap->journal->at('smtp data') < $imap->journal->at('flag INBOX.Schedule
     && $imap->journal->at('append INBOX.Envoyes') < $imap->journal->at('delete INBOX.Scheduled 7'),
     'Sent, marked, filed, removed, in that order');
 
+// A due time written with a fraction of a second is still a due time.
+[$imap] = $world([9 => ['flags' => [], 'raw' => $message('2026-09-18T06:00:00.250Z')]]);
+$smtp = new Smtp($imap->journal);
+$report = $run($imap, $smtp, $now);
+$check($report['sent'] === 1 && $smtp->trace[0] === 'from', 'A fractional instant in the header is read as due');
+
 // Held messages are the sender's own residue and are never sent again.
 foreach (['$pwsending', '$pwsent', '$pwsendfailed'] as $flag) {
     [$imap] = $world([7 => ['flags' => [$flag], 'raw' => $message($due)]]);

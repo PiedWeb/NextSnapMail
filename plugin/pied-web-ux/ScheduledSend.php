@@ -87,9 +87,11 @@ final class PiedWebScheduledSend
         return isset($known['at']) ? (int) $known['at'] : 0;
     }
 
+    /* An instant, as a browser writes one: `toISOString()` carries milliseconds, and refusing
+     * them refuses every schedule the composer makes. Only the second is kept. */
     public static function parse(string $raw): int
     {
-        if (!\preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?(Z|[+-]\d{2}:\d{2})$/D', $raw)) {
+        if (!\preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2}(\.\d{1,9})?)?(Z|[+-]\d{2}:\d{2})$/D', $raw)) {
             throw new \RuntimeException('time');
         }
         try { $when = new \DateTimeImmutable($raw); } catch (\Throwable $error) { throw new \RuntimeException('time'); }

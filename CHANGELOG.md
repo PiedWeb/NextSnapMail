@@ -1,5 +1,44 @@
 # Releases
 
+## 1.8.3, 2026-09-17
+
+Two corrections from watching the feature run on the production mailbox.
+
+Opening a scheduled message now asks the server for its due time when that message is not
+already known, instead of accepting a cooled-down answer. The read cooldown exists to keep the
+message list cheap; a reader that opens once should not inherit it and show no bar.
+
+The sender stops writing a suppressed `unlink` warning into the Nextcloud log every time it
+finds an empty queue and no note to remove. Nextcloud logs suppressed warnings anyway, and an
+empty queue is the normal case — this was three hundred lines a day of nothing.
+
+## 1.8.2, 2026-09-17
+
+Scheduling works. 1.8.0 and 1.8.1 refused every schedule the interface could make: the composer
+hands over `new Date(...).toISOString()`, which carries milliseconds, and the header stamp
+accepted an instant only without them. The message stayed open and the notice said it had not
+been scheduled — correct behaviour for a refusal, but the refusal itself was wrong.
+
+The two sides had never met. The PHP checks fed hand-written instants and the browser check
+asserted the millisecond form the composer produces; each passed against its own idea of the
+format. Both now use the shape the composer actually sends, on both sides of the boundary, and
+the sender reads a fractional instant too, so a message stamped by anything else still leaves.
+The stored header is unchanged: whole seconds, in UTC.
+
+Found by scheduling a real message on the production mailbox after deploying 1.8.1, which is
+the only place the two sides meet.
+
+## 1.8.1, 2026-09-17
+
+The scheduling control drops the Nextcloud button border and grey fill it was wearing in
+production. It carries the native `btn` class to keep the composer header's metrics, and the
+preserved Nextcloud control sheet fills and borders `#rl-app button.btn` with `!important` and
+one class more than the rule that was meant to override it. Naming the composer in the selector
+outranks that sheet, which is what the theme's own composer rules already do.
+
+The browser check now measures that control's own border and surface, not only the panel's.
+The fixture reproduced the defect before the fix, which is why it is a check and not a note.
+
 ## 1.8.0, 2026-09-17
 
 A message can now be given a time instead of a countdown. **Programmer l'envoi** stands beside

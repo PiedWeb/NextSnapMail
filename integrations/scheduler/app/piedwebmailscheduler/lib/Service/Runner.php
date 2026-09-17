@@ -34,8 +34,11 @@ final class Runner {
         foreach ($mailboxes as $key => $mailbox) {
             if ($only !== '' && 0 !== \strcasecmp($only, $mailbox['email'])) continue;
             $hash = \hash('sha256', $key);
+            // Nextcloud refuses an application key longer than 64 characters, and the note's
+            // file name is already a full digest. Half of it names the timestamp.
+            $poll = 'poll-' . \substr($hash, 0, 32);
             $hint = $this->readHint($hash);
-            $last = (int) $this->config->getAppValue(self::APP_ID, 'poll-' . $hash, '0');
+            $last = (int) $this->config->getAppValue(self::APP_ID, $poll, '0');
             if (!$force && $now - $last < $interval && !($hint !== null && $hint <= $now)) {
                 $results[$key] = ['skipped' => true, 'next' => $hint];
                 continue;
@@ -45,13 +48,13 @@ final class Runner {
             } catch (\Throwable $error) {
                 // An unreachable or misconfigured mailbox waits for the next interval like any
                 // other, instead of being logged into again on every pass.
-                $dryRun || $this->config->setAppValue(self::APP_ID, 'poll-' . $hash, (string) $now);
+                $dryRun || $this->config->setAppValue(self::APP_ID, $poll, (string) $now);
                 $this->logger->warning('Scheduled mail: mailbox unavailable', ['exception' => $error]);
                 $results[$key] = ['error' => $error->getMessage()];
                 continue;
             }
             if (!$dryRun) {
-                $this->config->setAppValue(self::APP_ID, 'poll-' . $hash, (string) $now);
+                $this->config->setAppValue(self::APP_ID, $poll, (string) $now);
                 $this->writeHint($hash, $report['next'], $now);
             }
             $results[$key] = $report;
@@ -89,7 +92,8 @@ final class Runner {
         // The browser may have scheduled something earlier while this pass was running.
         $known = $this->readHint($hash);
         if ($known !== null && $known > $now && ($next === null || $known < $next)) return;
-        if ($next === null) { @\unlink($file); return; }
+        // Nextcloud logs a suppressed warning all the same, and an empty queue is normal.
+        if ($next === null) { \is_file($file) && @\unlink($file); return; }
         if (!\is_dir($base) && !@\mkdir($base, 0700, true) && !\is_dir($base)) return;
         @\file_put_contents($file, (string) \json_encode(['due' => $next]), LOCK_EX);
     }

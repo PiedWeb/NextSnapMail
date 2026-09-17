@@ -4,7 +4,7 @@
   <name>Pied Web scheduled mail sender</name>
   <summary>Sends the messages NextSnapMail scheduled, without a browser</summary>
   <description>Reads the Scheduled folder of each mailbox whose NextSnapMail credentials are stored in Nextcloud, and hands every message that is due to the account's own SMTP server. It claims a message before sending it, so an interrupted run reports instead of sending twice. No message, recipient or credential is stored by this app.</description>
-  <version>1.0.0</version>
+  <version>1.0.3</version>
   <licence>AGPL-3.0-or-later</licence>
   <author>Robin Delattre</author>
   <namespace>PiedWebMailScheduler</namespace>
