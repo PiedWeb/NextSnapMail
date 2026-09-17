@@ -51,7 +51,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   When active in the ordinary feed, unread received rows on each native page are oldest-first,
   followed by read rows newest-first; unread Draft reminders are queried oldest-first too.
   Keep Draft rows outside native Inbox selection, keep native pagination, and leave searches,
-  opened threads and other folders in their native order. See `UNREAD_ORDER.md`.
+  opened threads and other folders in their native order. Since 1.8.6.1, the per-account
+  read-transition choice defaults to mode 1: a row that automatically becomes read stays
+  where it is until the list refreshes. Mode 2 holds only the open row, then reclassifies it
+  when the reader moves away while anchoring the newly opened row in the viewport. See
+  `UNREAD_ORDER.md`.
 - Native IMAP threads are folder-scoped. Since 1.7.20, Conversations mode
   assembles the opened message's native folder thread with matching Sent replies
   from read-only header searches. The newest message, received or sent, opens

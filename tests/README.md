@@ -104,10 +104,12 @@ that both POST and cached GET list/reader requests have their thread parameters
 removed while Inbox requests keep the saved preference.
 
 `test-unread-order.js` keeps the Inbox Conversation and mixed-order controls active together,
-checks unread received rows oldest-first and read rows newest-first, moves a row between those
-segments when its read state changes, and verifies true oldest-first Draft pagination. It also
-covers per-account load/save calls, Inbox/search scope, failure feedback and the mobile control
-group. The fixture uses fictional rows and mocked preference/mail endpoints.
+checks unread received rows oldest-first and read rows newest-first, and verifies true
+oldest-first Draft pagination. Its default transition leaves an automatically read row stable
+until the next list refresh; mode 2 pins only the open row, releases it when the reader moves
+away and keeps the newly opened row at its viewport position. It also covers the per-account
+choice in General settings, load/save calls, Inbox/search scope, failure feedback and mobile
+geometry. The fixture uses fictional rows and mocked preference/mail endpoints.
 
 `test-send-now.js` builds the outgoing notice from the markup `background-send.js`
 ships, so a change to `render()` cannot leave it passing, and checks the Send now

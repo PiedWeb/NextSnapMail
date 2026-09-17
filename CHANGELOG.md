@@ -1,5 +1,24 @@
 # Releases
 
+## 1.8.6.1, 2026-09-18
+
+The mixed Inbox order no longer makes an opened message disappear as soon as the
+automatic seen flag arrives. A per-account choice under **Settings → General → Message
+list** now controls that transition:
+
+1. **Keep its place until refresh** is the default. The row changes to read in place and
+   joins the read segment only when the native list next refreshes.
+2. **Reorder after leaving the message** holds only the open row. When another message is
+   opened or the reader closes, the previous row joins the read segment while the newly
+   opened row keeps its viewport position.
+
+Both choices apply only while **Unread: oldest first** is active; Conversation mode,
+Draft reminders, searches and other folders retain their existing boundaries. The new
+setting is validated and stored beside the order preference in the active account's local
+SnappyMail settings. Validation: 19 endpoint checks and 22 fictional browser scenarios,
+plus the Conversation, Draft, native-control, application-shell and reader-stack suites.
+No real message was opened or changed.
+
 ## 1.8.6, 2026-09-18
 
 General settings now offer **Squire 2.4 (test)** beside the native **Squire** editor.

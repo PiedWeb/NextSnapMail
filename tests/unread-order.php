@@ -26,23 +26,41 @@ namespace {
     $n = 0; $check = function($ok, $label) use (&$n) { if (!$ok) throw new \RuntimeException($label); ++$n; echo "PASS $label\n"; };
 
     $_SERVER['REQUEST_METHOD'] = 'POST';
-    $check($plugin->UnreadOrder() === ['enabled'=>false] && $settings->saves === 0,
-        'The per-account preference defaults off and a read does not write settings');
+    $check($plugin->UnreadOrder() === ['enabled'=>false, 'behavior'=>1] && $settings->saves === 0,
+        'The per-account order defaults off, stability defaults to mode 1, and a read does not write settings');
     $actions->params = ['enabled'=>'1'];
-    $check($plugin->UnreadOrder() === ['enabled'=>true] && $settings->saves === 1
+    $check($plugin->UnreadOrder() === ['enabled'=>true, 'behavior'=>1] && $settings->saves === 1
         && $settings->values['PiedWebUnreadOldestFirst'] === true,
         'Enabling persists the boolean in the active account local settings');
     $actions->params = [];
-    $check($plugin->UnreadOrder() === ['enabled'=>true] && $settings->saves === 1,
+    $check($plugin->UnreadOrder() === ['enabled'=>true, 'behavior'=>1] && $settings->saves === 1,
         'The saved state is returned on the next load');
     $actions->params = ['enabled'=>0];
-    $check($plugin->UnreadOrder() === ['enabled'=>false] && $settings->saves === 2,
+    $check($plugin->UnreadOrder() === ['enabled'=>false, 'behavior'=>1] && $settings->saves === 2,
         'Disabling persists and returns the resulting state');
     foreach (['yes', 2, -1, null] as $invalid) {
         $before = $settings->saves; $actions->params = ['enabled'=>$invalid];
         $check(isset($plugin->UnreadOrder()['error']) && $settings->saves === $before,
             'Invalid state is rejected without a settings write');
     }
+    $actions->params = ['behavior'=>'2'];
+    $check($plugin->UnreadOrder() === ['enabled'=>false, 'behavior'=>2] && $settings->saves === 3
+        && $settings->values['PiedWebUnreadOrderReadBehavior'] === 2,
+        'Mode 2 is stored as a per-account integer');
+    $actions->params = [];
+    $check($plugin->UnreadOrder() === ['enabled'=>false, 'behavior'=>2] && $settings->saves === 3,
+        'The saved read-transition behavior is returned on load');
+    foreach ([0, 3, 'stable', null] as $invalid) {
+        $before = $settings->saves; $actions->params = ['behavior'=>$invalid];
+        $check(isset($plugin->UnreadOrder()['error']) && $settings->saves === $before,
+            'Invalid read-transition behavior is rejected without a settings write');
+    }
+    $actions->params = ['enabled'=>1, 'behavior'=>1];
+    $check($plugin->UnreadOrder() === ['enabled'=>true, 'behavior'=>1] && $settings->saves === 4,
+        'A combined valid update is saved atomically once');
+    $settings->values['PiedWebUnreadOrderReadBehavior'] = 9; $actions->params = [];
+    $check($plugin->UnreadOrder() === ['enabled'=>true, 'behavior'=>1] && $settings->saves === 4,
+        'An unknown stored behavior safely falls back to mode 1');
     $settings->saveResult = false; $actions->params = ['enabled'=>1];
     $check(isset($plugin->UnreadOrder()['error']), 'A failed settings write is reported');
     $settings->saveResult = true; $actions->account = null; $actions->params = [];

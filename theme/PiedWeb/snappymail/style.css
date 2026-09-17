@@ -5137,6 +5137,22 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   font-size:var(--pw-text-xs);
   color:var(--pw-danger);
 }
+html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
+#rl-app #V-Settings-General .pw-unread-order-setting select {
+  width:min(100%, 360px);
+  max-width:100%;
+}
+#rl-app #V-Settings-General .pw-unread-order-setting-help,
+#rl-app #V-Settings-General .pw-unread-order-setting-status {
+  display:block;
+  max-width:52ch;
+  margin-top:var(--pw-space-1);
+  font-size:var(--pw-text-xs);
+  line-height:1.5;
+}
+#rl-app #V-Settings-General .pw-unread-order-setting-help { color:var(--pw-muted); }
+#rl-app #V-Settings-General .pw-unread-order-setting-status { color:var(--pw-danger); }
+#rl-app #V-Settings-General .pw-unread-order-setting-status:empty { display:none; }
 @media(prefers-color-scheme:dark) {
   #rl-app #V-MailMessageList button.pw-unread-order[aria-pressed="true"] { color:var(--pw-primary-ink); }
 }
