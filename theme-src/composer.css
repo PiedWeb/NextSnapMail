@@ -3,8 +3,9 @@
  * Send, Save and Delete used to read as the same grey pill, except Delete,
  * which was a solid red square and therefore the loudest element in the window
  * — for a secondary, destructive action. The pyramid is restored: one obvious
- * primary, one clear but quiet secondary, and a discreet destructive action
- * that only turns red under the pointer. Every native command is untouched.
+ * primary, one clear but quiet alternative, and discreet tertiary actions.
+ * Destructive intent only turns red under the pointer. Every native command
+ * is untouched.
  */
 #rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete),
 #rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane) {
@@ -23,18 +24,30 @@
   color: var(--nc-color-primary-element-text);
 }
 
-/* Secondary: clear, never prominent. */
-#rl-app #V-PopupsCompose > header > a.btn.button-save {
-  border-color: var(--pw-grey-300) !important;
+/* Secondary: scheduling is the only alternative completion path. */
+html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule {
+  border: 1px solid var(--pw-grey-300) !important;
   background-color: transparent;
   color: var(--pw-grey-800);
+}
+html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visible, [aria-expanded="true"]) {
+  border-color: var(--pw-grey-400) !important;
+  background-color: var(--pw-grey-100);
+  color: var(--pw-grey-900);
+}
+
+/* Tertiary: saving is available without competing with message delivery. */
+#rl-app #V-PopupsCompose > header > a.btn.button-save {
+  border-color: transparent !important;
+  background-color: transparent;
+  color: var(--pw-grey-700);
 }
 #rl-app #V-PopupsCompose > header > a.btn.button-save:is(:hover, :focus-visible, :active) {
   background-color: var(--pw-grey-100);
   color: var(--pw-grey-900);
 }
 
-/* Tertiary and destructive: discoverable, unobtrusive, red only on approach. */
+/* Destructive: discoverable, unobtrusive, red only on approach. */
 #rl-app #V-PopupsCompose > header > a.btn.button-delete {
   border-color: transparent !important;
   background-color: transparent;

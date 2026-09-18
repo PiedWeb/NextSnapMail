@@ -29,9 +29,9 @@ const read=()=>p.evaluate(()=>{
 const state=await read();
 check('Send is the only filled action in the composer header',
  state.sendLum<0.35 && state.send.color==='rgb(255, 255, 255)' && state.send.border==='rgba(0, 0, 0, 0)');
-check('Save is an outlined secondary, not a second filled button',
- state.save.bg==='rgba(0, 0, 0, 0)' && parseFloat(state.save.borderWidth)>0
- && state.save.border!=='rgba(0, 0, 0, 0)' && state.save.color!==state.send.color);
+check('Save is a tertiary ghost action, not a second completion button',
+ state.save.bg==='rgba(0, 0, 0, 0)' && state.save.border==='rgba(0, 0, 0, 0)'
+ && state.save.color!==state.send.color);
 check('Discard is a quiet ghost control at rest, never a red block',
  state.discard.bg==='rgba(0, 0, 0, 0)' && state.discard.border==='rgba(0, 0, 0, 0)'
  && state.discard.color!=='rgb(255, 255, 255)');

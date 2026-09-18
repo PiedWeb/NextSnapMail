@@ -56,11 +56,11 @@ check('It is named in French for the pointer and for assistive technology',await
 }));
 check('Nothing is open before it is asked for',await p.evaluate(()=>
  document.querySelector('.pw-schedule-panel').hidden));
-// The preserved Nextcloud control sheet draws an !important border and a filled surface on
-// `#rl-app button.btn`, which this control carries to keep the header's metrics.
-check('It keeps neither the Nextcloud button border nor its filled surface',await p.evaluate(()=>{
+// Scheduling is the only alternative completion path: outlined, but never filled like Send.
+check('It is an outlined secondary action with no filled surface',await p.evaluate(()=>{
  const style=getComputedStyle(document.querySelector('button.pw-schedule'));
- return ['Top','Right','Bottom','Left'].every(side=>parseFloat(style['border'+side+'Width'])===0)
+ return ['Top','Right','Bottom','Left'].every(side=>parseFloat(style['border'+side+'Width'])===1)
+  &&style.borderTopColor!=='rgba(0, 0, 0, 0)'
   &&/rgba\(0, 0, 0, 0\)|transparent/.test(style.backgroundColor);
 }));
 
