@@ -1,5 +1,17 @@
 # Releases
 
+## 1.8.14, 2026-09-18
+
+The **Cc** and **Cci** controls now sit directly below the **To** input, aligned to its right
+edge as quiet grey text. Each control disappears as soon as its corresponding native field is
+open, and returns if that field is closed from the existing advanced-fields menu. Hover adds a
+subtle underline, keyboard focus remains explicit and touch layouts retain a 44 px target.
+
+The native Cc/Bcc observables, inputs and advanced-fields menu are unchanged. Only their distant
+duplicates in the composer header are hidden while Pied Web is active; leaving the theme restores
+the native header unchanged. Fictional browser coverage checks placement, conditional visibility,
+focus transfer, hover/focus treatment, narrow-screen containment and theme restoration.
+
 ## 1.8.13, 2026-09-18
 
 Starting multi-selection from the reading pane now keeps the open message in the checked

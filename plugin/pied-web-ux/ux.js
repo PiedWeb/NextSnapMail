@@ -12,6 +12,37 @@
         el.title = window.rl.i18n(el.dataset.label);
         el.setAttribute('aria-label', el.title);
     });
+    const mountRecipientShortcuts = (dom, vm) => {
+        if (dom.querySelector('.pw-recipient-shortcuts') || !vm.showCc || !vm.showBcc) return;
+        const toLabel = dom.querySelector('.b-header label[data-i18n="GLOBAL/TO"]');
+        const toCell = toLabel?.closest('tr')?.lastElementChild;
+        if (!toCell) return;
+        const group = document.createElement('div');
+        group.className = 'pw-recipient-shortcuts';
+        group.setAttribute('role', 'group');
+        group.setAttribute('aria-label', t('Autres destinataires', 'Other recipients'));
+        const add = (field, observable, rowSelector, label) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'pw-recipient-shortcut';
+            button.dataset.field = field;
+            button.textContent = window.rl.i18n(label);
+            button.addEventListener('click', () => {
+                observable(true);
+                requestAnimationFrame(() => dom.querySelector(rowSelector + ' input')?.focus());
+            });
+            const update = () => {
+                button.hidden = !!observable();
+                group.hidden = [...group.children].every(node => node.hidden);
+            };
+            observable.subscribe(update);
+            group.append(button);
+            update();
+        };
+        add('cc', vm.showCc, '.cc-row', 'GLOBAL/CC');
+        add('bcc', vm.showBcc, '.bcc-row', 'GLOBAL/BCC');
+        toCell.append(group);
+    };
     const syncTheme = () => {
         document.documentElement.classList.toggle('pw-theme',
             (themeStyle?.dataset.name || window.rl.settings.get('Theme')) === 'PiedWeb@nextcloud');
@@ -46,6 +77,7 @@
                 discard.title = window.rl.i18n('GLOBAL/DELETE');
                 discard.setAttribute('aria-label', discard.title);
             }
+            mountRecipientShortcuts(dom, vm);
         }
         if (vm.viewModelTemplateID === 'SystemDropDown' && !dom.classList.contains('pw-account-ready')) {
             dom.classList.add('pw-account-ready');

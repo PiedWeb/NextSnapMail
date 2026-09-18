@@ -5011,6 +5011,56 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   outline-offset: 2px;
 }
 
+/* Cc and Bcc belong to the recipient decision, not to the global action bar.
+ * Keep the native fields and observables; only replace the distant duplicate
+ * links with quiet, right-aligned shortcuts immediately below To. */
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/CC"],
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/BCC"] {
+  display: none !important;
+}
+html:not(.pw-theme) #rl-app #V-PopupsCompose .pw-recipient-shortcuts,
+#rl-app #V-PopupsCompose .pw-recipient-shortcuts[hidden],
+#rl-app #V-PopupsCompose .pw-recipient-shortcut[hidden] {
+  display: none !important;
+}
+#rl-app #V-PopupsCompose .pw-recipient-shortcuts {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pw-space-3);
+  margin-block-start: var(--pw-space-1);
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut {
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 1px;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0;
+  background: transparent;
+  color: var(--pw-grey-600);
+  font: inherit;
+  font-size: var(--pw-text-xs);
+  line-height: var(--pw-leading-snug);
+  cursor: pointer;
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut:is(:hover, :active) {
+  border-bottom-color: currentColor !important;
+  color: var(--pw-grey-800);
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+  color: var(--pw-grey-800);
+}
+@media (pointer: coarse) {
+  #rl-app #V-PopupsCompose button.pw-recipient-shortcut {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
 /* Empty states.
  *
  * An empty mailbox, an empty trash and a search with no result all fell back to

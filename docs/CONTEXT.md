@@ -126,6 +126,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   action plus secondary Forward. A message change must recompute the choice without replacing
   any native command. See `INLINE_REPLY.md`.
 - Since 1.7.18 the reader's native label dropdown is icon-only beside message info and the star. Its bound menu node is moved with a restoration marker; the separate label row is hidden only while the move succeeds. Rebuilt native rows discard stale controls, and theme exit restores the original placement. Since 1.7.19 the relocated menu explicitly keeps the 15 px regular menu typography; otherwise it inherits the 22 px bold message title.
+- Since 1.8.14, Cc and Bcc are offered as quiet text immediately below the To input, aligned
+  to its end edge. Each shortcut disappears when its native field is open and focuses that
+  field when chosen. Preserve the native observables, inputs and advanced-fields menu; the
+  original header links return unchanged when Pied Web is not active.
 - Contacts navigates to Nextcloud Contacts. The redundant Calendar shortcut was removed;
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.

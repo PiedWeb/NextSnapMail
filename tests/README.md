@@ -60,6 +60,7 @@ dev-browser-agent --timeout 25 < tests/browser/test-list-metadata-fallback.js
 dev-browser-agent --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser-agent --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-actions.js
+dev-browser-agent --timeout 45 < tests/browser/test-composer-recipients.js
 dev-browser-agent --timeout 45 < tests/browser/test-elevation.js
 dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
 dev-browser-agent --timeout 45 < tests/browser/test-empty-state.js
