@@ -5011,6 +5011,66 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
   outline-offset: 2px;
 }
 
+/* Composer fields share one visual measure while retaining their native jobs.
+ * SnappyMail reserves 2em on From even when there is no identity picker, and
+ * the Nextcloud theme gives recipient lists an extra-tall single-line state.
+ * Keep every resting field at 36px; recipient lists may still grow when their
+ * chips genuinely wrap. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td {
+  position: relative;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td > input[type="text"],
+html.pw-theme #rl-app #V-PopupsCompose .b-header td > .emailaddresses {
+  box-sizing: border-box;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td > input[type="text"] {
+  width: 100% !important;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td:has(#identity-toggle) > input[type="text"] {
+  padding-inline-end: 44px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td > .dropdown:has(#identity-toggle) {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 2px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header #identity-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses {
+  min-height: 36px;
+  max-height: 72px;
+  padding: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li {
+  margin-block: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input {
+  flex: 1 1 18em;
+  min-width: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  min-width: 0;
+  max-width: 100%;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li[draggable] {
+  min-height: 28px;
+  margin: 2px;
+}
+
 /* Cc and Bcc belong to the recipient decision, not to the global action bar.
  * Keep the native fields and observables; only replace the distant duplicate
  * links with quiet, right-aligned shortcuts immediately below To. */

@@ -14,6 +14,14 @@ await p.evaluate(async()=>{
  dialog.querySelectorAll('[data-i18n]').forEach(node=>{
   const key=node.dataset.i18n;if(!key.startsWith('['))node.textContent=rl.i18n(key);
  });
+ dialog.querySelectorAll('.b-header tr').forEach(row=>{
+  const key=row.querySelector('label[data-i18n]')?.dataset.i18n;
+  if(!['GLOBAL/TO','GLOBAL/CC','GLOBAL/BCC','GLOBAL/REPLY_TO'].includes(key))return;
+  const input=row.querySelector('input[type="text"]');if(!input)return;
+  const box=document.createElement('ul');box.className='emailaddresses';
+  const item=document.createElement('li');item.className='emailaddresses-input';
+  input.replaceWith(box);item.append(input);box.append(item);
+ });
  const vm={viewModelTemplateID:'PopupsCompose',viewModelDom:dialog,
   showCc:ko.observable(false),showBcc:ko.observable(false)};
  for(const [selector,observable] of [['.cc-row',vm.showCc],['.bcc-row',vm.showBcc]]){
@@ -25,6 +33,26 @@ await p.evaluate(async()=>{
  window.recipientCompose=vm;
 });
 await p.waitForSelector('.pw-recipient-shortcuts');
+
+check('From, To and Subject have the same single-line width and height',await p.evaluate(()=>{
+ const rows=[...document.querySelectorAll('#V-PopupsCompose .b-header tr')];
+ const from=rows.find(row=>row.querySelector('[data-i18n="GLOBAL/FROM"]'))?.querySelector(':scope > td:last-child > input');
+ const to=document.querySelector('.pw-recipient-shortcuts').parentElement.querySelector('.emailaddresses');
+ const subject=rows.find(row=>row.querySelector('[data-i18n="GLOBAL/SUBJECT"]'))?.querySelector('input');
+ const boxes=[from,to,subject].map(node=>node.getBoundingClientRect());
+ return boxes.every(box=>Math.abs(box.width-boxes[0].width)<.5&&Math.abs(box.height-boxes[0].height)<.5)
+  &&boxes.every(box=>Math.abs(box.right-boxes[0].right)<.5)&&Math.abs(boxes[0].height-36)<.5;
+}));
+check('A single recipient stays one line while wrapped recipients can grow',await p.evaluate(()=>{
+ const box=document.querySelector('.pw-recipient-shortcuts').parentElement.querySelector('.emailaddresses');
+ const input=box.querySelector('.emailaddresses-input');const added=[];
+ const add=label=>{const li=document.createElement('li');li.draggable=true;li.textContent=label;box.insertBefore(li,input);added.push(li);};
+ const empty=box.getBoundingClientRect().height;add('Destinataire test');
+ const single=box.getBoundingClientRect().height;
+ for(let index=0;index<20;index++)add('Destinataire '+(index+2));
+ const wrapped=box.getBoundingClientRect().height;added.forEach(node=>node.remove());
+ return empty===36&&single===empty&&wrapped>single&&wrapped<=72;
+}));
 
 check('Cc and Cci sit together below the To input, aligned to the recipient column end',await p.evaluate(()=>{
  const group=document.querySelector('.pw-recipient-shortcuts');
@@ -68,8 +96,8 @@ check('Closing one optional field makes its nearby shortcut available again',awa
  return !group.hidden&&!group.querySelector('[data-field="cc"]').hidden
   &&group.querySelector('[data-field="bcc"]').hidden;
 }));
-await p.locator('.pw-recipient-shortcuts').locator('xpath=preceding-sibling::input[1]').focus();
-await p.locator('.pw-recipient-shortcuts').locator('xpath=preceding-sibling::input[1]').press('Tab');
+await p.locator('.pw-recipient-shortcuts').locator('xpath=preceding-sibling::*[1]//input').focus();
+await p.locator('.pw-recipient-shortcuts').locator('xpath=preceding-sibling::*[1]//input').press('Tab');
 check('Keyboard focus remains plainly visible',await p.evaluate(()=>{
  const style=getComputedStyle(document.activeElement);
  return document.activeElement.matches('.pw-recipient-shortcut:focus-visible')
