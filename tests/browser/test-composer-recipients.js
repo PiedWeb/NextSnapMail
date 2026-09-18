@@ -65,11 +65,20 @@ check('Cc and Cci sit together below the To input, aligned to the recipient colu
 check('The distant native header duplicates are hidden while Pied Web is active',await p.evaluate(()=>
  [...document.querySelectorAll('#V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/CC"],#V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/BCC"]')]
   .every(node=>getComputedStyle(node).display==='none')));
-check('Recipient shortcuts are quiet grey text with no resting underline',await p.evaluate(()=>{
+check('Recipient shortcuts are readable quiet text with no resting underline',await p.evaluate(()=>{
  const button=document.querySelector('.pw-recipient-shortcut');const style=getComputedStyle(button);
  const input=getComputedStyle(document.querySelector('.pw-recipient-shortcuts').parentElement.querySelector('input'));
  return style.backgroundColor==='rgba(0, 0, 0, 0)'&&style.borderBottomColor==='rgba(0, 0, 0, 0)'
-  &&style.color!==input.color&&parseFloat(style.fontSize)<=12;
+  &&style.color!==input.color&&parseFloat(style.fontSize)===14;
+}));
+check('Every field label uses the same readable secondary type',await p.evaluate(()=>{
+ const rows=[...document.querySelectorAll('#V-PopupsCompose .b-header tr')].filter(row=>!row.hidden);
+ const labels=rows.map(row=>row.firstElementChild).filter(Boolean);
+ const input=getComputedStyle(document.querySelector('#V-PopupsCompose .b-header input'));
+ return labels.length>=3&&labels.every(label=>{
+  const style=getComputedStyle(label);
+  return parseFloat(style.fontSize)===14&&style.color!==input.color&&parseInt(style.fontWeight,10)>=500;
+ });
 }));
 await p.locator('.pw-recipient-shortcut[data-field="cc"]').hover();
 check('Hover adds the requested discreet underline',await p.evaluate(()=>{

@@ -164,6 +164,20 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li[draggable]
   margin: 2px;
 }
 
+/* Labels are supporting information: readable at the shared small-text step,
+ * quieter than entered content, and consistent whether native markup uses a
+ * label element or text directly in the cell. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header tr > td:first-child {
+  color: var(--pw-grey-700);
+  font-size: var(--pw-text-sm);
+  font-weight: var(--pw-weight-medium);
+  line-height: var(--pw-leading-snug);
+  white-space: nowrap;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .error-to {
+  color: var(--pw-danger);
+}
+
 /* Cc and Bcc belong to the recipient decision, not to the global action bar.
  * Keep the native fields and observables; only replace the distant duplicate
  * links with quiet, right-aligned shortcuts immediately below To. */
@@ -194,7 +208,7 @@ html:not(.pw-theme) #rl-app #V-PopupsCompose .pw-recipient-shortcuts,
   background: transparent;
   color: var(--pw-grey-600);
   font: inherit;
-  font-size: var(--pw-text-xs);
+  font-size: var(--pw-text-sm);
   line-height: var(--pw-leading-snug);
   cursor: pointer;
 }
