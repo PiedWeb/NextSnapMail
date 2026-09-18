@@ -164,6 +164,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   mail header, without a `blockquote`. `quote-readability.js` recognizes only that strict
   structure and wraps the trailing history in SnappyMail's native details/blockquote contract,
   so the collapse preference, keyboard command, replies and printing keep their normal path.
+  Since 1.8.11, require real visible content before that header: an Outlook-shaped header at
+  the start belongs to the message being read and must never hide the whole mail. Hidden
+  preheaders and tracking markup do not satisfy that guard.
 - Formatting has a compact main row and More options. Use the existing Lucide icon assets.
 - Since 1.8.6, the native editor color control keeps its built-in greys and custom-color
   choice, but its 17 suggestions use Tailwind 600 from orange through rose, followed by
@@ -219,6 +222,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.8.11 | Keep a whole Outlook-shaped message visible when its four-field header starts the body. |
 | 1.8.10 | Keep visibly unread roots together before read-root conversations that still contain an unread member. |
 | 1.8.9 | Gather every unread Inbox row on page one through the existing native request, with cached IMAP work and later-page deduplication. |
 | 1.8.8 | Prefer Reply all for multi-correspondent messages in the reader toolbar and footer while keeping direct replies unchanged. |

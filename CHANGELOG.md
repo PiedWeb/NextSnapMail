@@ -1,5 +1,17 @@
 # Releases
 
+## 1.8.11, 2026-09-18
+
+Outlook-style history is folded only when the message has real visible content before the
+four-field mail header. A message that starts with such a header now stays entirely visible,
+because that header can belong to the message being read rather than to quoted history. Hidden
+preheaders and tracking markup do not count as a current answer and can no longer make the whole
+mail disappear behind **Afficher la citation**.
+
+The existing strict Outlook desktop/web recognition, native disclosure structure, collapse
+preference, manual open state and reply/forward cleanup remain unchanged. Fictional browser
+coverage now includes the whole-message false positive and a hidden-preheader variant.
+
 ## 1.8.10, 2026-09-18
 
 **Unread: oldest first** now keeps the rows whose visible/root message is unread in one

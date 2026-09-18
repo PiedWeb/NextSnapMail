@@ -87,6 +87,23 @@ await page.waitForTimeout(30);
 check('The user setting can leave Outlook history expanded',await page.evaluate(() =>
     !quoteFixtures[4].querySelector('.pw-outlook-quote')
 ));
+await page.evaluate(()=>mountQuoteFixture('<div class="msg-WordSection1">'
+    +'<div style="border-top:1pt solid #ddd"><b>From:</b> A<br><b>Sent:</b> B<br><b>To:</b> C<br><b>Subject:</b> D</div>'
+    +'<p>This is the message to read.</p></div>'));
+await page.waitForTimeout(30);
+check('An Outlook-shaped header at the start never hides the whole message',await page.evaluate(()=>{
+    const fixture=quoteFixtures[5];
+    return !fixture.querySelector('.pw-outlook-quote')
+        && fixture.textContent.includes('This is the message to read.');
+}));
+await page.evaluate(()=>mountQuoteFixture('<div class="msg-WordSection1">'
+    +'<span hidden>hidden preheader</span><img aria-hidden="true" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="">'
+    +'<div style="border-top:1pt solid #ddd"><b>From:</b> A<br><b>Sent:</b> B<br><b>To:</b> C<br><b>Subject:</b> D</div>'
+    +'<p>Visible message</p></div>'));
+await page.waitForTimeout(30);
+check('Hidden preheaders do not justify collapsing the visible message',await page.evaluate(() =>
+    !quoteFixtures[6].querySelector('.pw-outlook-quote')
+));
 await page.evaluate(()=>{
     quoteFixtures[4].remove();
     quoteCollapse=1;

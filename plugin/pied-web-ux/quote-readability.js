@@ -29,13 +29,30 @@
         );
         return ruled || outlookClasses || node.getAttribute('dir') === 'ltr';
     };
-    const hasContent = node => node.nodeType === Node.ELEMENT_NODE
-        ? !node.matches('style,script,template') && !!node.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '')
-        : node.nodeType === Node.TEXT_NODE && !!node.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '');
+    const hasContent = node => {
+        if (node.nodeType === Node.TEXT_NODE) {
+            return !!node.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]/g, '');
+        }
+        if (node.nodeType !== Node.ELEMENT_NODE || node.matches('style,script,template')
+            || node.hidden || node.getAttribute('aria-hidden') === 'true'
+            || node.style.display === 'none' || node.style.visibility === 'hidden') return false;
+        if (node.matches('img,svg,video,audio,canvas,object')) return true;
+        return [...node.childNodes].some(hasContent);
+    };
+    const hasContentBefore = (body, marker) => {
+        // An Outlook-shaped header at the start can be the message itself, not
+        // quoted history. Never hide the whole mail behind a disclosure.
+        for (let branch = marker; branch && branch !== body; branch = branch.parentNode) {
+            for (let sibling = branch.previousSibling; sibling; sibling = sibling.previousSibling) {
+                if (hasContent(sibling)) return true;
+            }
+        }
+        return false;
+    };
     const foldOutlookHistory = body => {
         if (body.querySelector(outlookSelector)) return;
         const marker = [...body.querySelectorAll('div')].find(outlookHeader);
-        if (!marker) return;
+        if (!marker || !hasContentBefore(body, marker)) return;
         const trailing = [marker];
         for (let node = marker.nextSibling; node; node = node.nextSibling) trailing.push(node);
         if (!trailing.slice(1).some(hasContent) && marker.querySelectorAll('p,div,table').length < 2) return;
