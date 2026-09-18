@@ -26,6 +26,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   so on mobile. Further row taps toggle checked state. A count, Done button and Escape exit
   keep the mode explicit. Scroll movement cancels long touch, and swipe deletion is disabled
   while selection is active. Native checkboxes remain the fallback if the script is absent.
+  Since 1.8.13, starting desktop selection from an open reading pane first carries the active
+  message into the checked group, matching SnappyMail's native Ctrl/Command+click contract,
+  then adds the clicked row. Mobile long touch still starts with only the held row.
 - Since 1.7.16 desktop rows at 1200 px and wider hide relative times; day headings
   still mark the timeline and the opened message retains its full date. The row border
   directly before a day heading is transparent to avoid a double separator. Mobile

@@ -443,6 +443,14 @@ listVM.listGrouped=ko.observable(false);
 
 const demoRowForMessage=new Map(demoMessages.map((message,index)=>[message,demoRows[index]]));
 Object.assign(demoMessages,{folder:fixtureFolder,search:''});messageList(demoMessages);
+listVM.selector={
+ selectedItem:ko.observable(demoMessages[0]),focusedItem:ko.observable(demoMessages[0]),
+ unselect(){this.selectedItem(null);this.focusedItem(null);}
+};
+demoRows.forEach((row,index)=>row.addEventListener('click',event=>{
+ if(event.defaultPrevented||event.target.closest('a,button,input,textarea,select,.messageCheckbox,.flagParent,.threads-len'))return;
+ listVM.selector.focusedItem(demoMessages[index]);listVM.selector.selectedItem(demoMessages[index]);
+}));
 // The page carries static native-shaped rows; mirror Knockout's foreach DOM moves when the store is reordered.
 messageList.subscribe(items=>{const container=document.querySelector('.fixture-list');items.forEach(message=>{const row=demoRowForMessage.get(message);if(row)container.append(row);});});
 window.fixtureSeenActions=[];

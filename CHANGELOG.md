@@ -1,5 +1,17 @@
 # Releases
 
+## 1.8.13, 2026-09-18
+
+Starting multi-selection from the reading pane now keeps the open message in the checked
+group and adds the Ctrl/Command-clicked row. Previously the Pied Web capture handler bypassed
+SnappyMail's native step that carries the active message into selection, so only the newly
+clicked row received grouped actions.
+
+The change remains limited to desktop Ctrl/Command+click. Later plain clicks still toggle one
+row, and mobile long touch still starts a fresh selection with the held row. The fictional
+browser fixture now models an actual active selector and verifies the two-message entry state,
+selection count, subsequent toggles and grouped command targets.
+
 ## 1.8.12, 2026-09-18
 
 Outlook forwarding now keeps the author's current note and signature visible, then folds the

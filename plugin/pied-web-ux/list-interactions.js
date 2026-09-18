@@ -41,6 +41,15 @@
             message.checked(!wasChecked);
             syncSelection();
         };
+        const startSelection=message=>{
+            // Match SnappyMail's native Ctrl/Cmd+click contract: when another
+            // message is open, carry it into the checked group before adding
+            // the newly clicked row.
+            const opened=vm.selector?.selectedItem?.();
+            if (opened!==message && opened?.folder===list().folder && list().includes(opened)
+                && typeof opened.checked==='function' && !ko.unwrap(opened.checked)) opened.checked(true);
+            toggleMessage(message);
+        };
         const listedRow=target=>{
             const row=target.closest('.messageListItem');
             if (!row || !dom.contains(row)) return null;
@@ -159,7 +168,7 @@
             const start=(event.ctrlKey||event.metaKey) && !event.shiftKey;
             if (!start && (!selectedCount() || event.shiftKey)) return;
             event.preventDefault();event.stopImmediatePropagation();
-            toggleMessage(entry.message);
+            start && !selectedCount() ? startSelection(entry.message) : toggleMessage(entry.message);
         },true);
         dom.addEventListener('dblclick',event=>{
             if (selectedCount() && event.target instanceof Element && listedRow(event.target)) {

@@ -12,13 +12,13 @@ check('No checkbox or selection banner appears at rest',await p.evaluate(()=>{
 await p.locator('.messageListItem .senderParent').nth(2).click();
 check('Ordinary click keeps the native open behavior',await p.evaluate(()=>fixtureRowOpens.join(',')==='3'&&demoMessages.every(m=>!m.checked())));
 await p.evaluate(()=>demoRows[0].querySelector('.senderParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
-check('Ctrl-click enters selection without opening a message',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages.filter(m=>m.checked()).length===1&&document.querySelector('.pw-selection-count').textContent==='1 message sélectionné'&&fixtureRowOpens.join(',')==='3'));
+check('Ctrl-click keeps the open message and adds the clicked message to selection',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages[2].checked()&&demoMessages.filter(m=>m.checked()).length===2&&document.querySelector('.pw-selection-count').textContent==='2 messages sélectionnés'&&fixtureRowOpens.join(',')==='3'));
 await p.locator('.messageListItem .senderParent').nth(1).click();
-check('Further plain clicks add messages to the selection',await p.evaluate(()=>demoMessages[0].checked()&&demoMessages[1].checked()&&document.querySelector('.pw-selection-count').textContent==='2 messages sélectionnés'&&fixtureRowOpens.join(',')==='3'));
+check('Further plain clicks add messages to the selection',await p.evaluate(()=>demoMessages.slice(0,3).every(m=>m.checked())&&demoMessages.filter(m=>m.checked()).length===3&&document.querySelector('.pw-selection-count').textContent==='3 messages sélectionnés'&&fixtureRowOpens.join(',')==='3'));
 await p.locator('.messageListItem .senderParent').first().click();
-check('Tapping a selected row removes only that message',await p.evaluate(()=>!demoMessages[0].checked()&&demoMessages[1].checked()&&fixtureRowOpens.join(',')==='3'));
+check('Tapping a selected row removes only that message',await p.evaluate(()=>!demoMessages[0].checked()&&demoMessages[1].checked()&&demoMessages[2].checked()&&fixtureRowOpens.join(',')==='3'));
 await p.locator('.pw-read-toggle').first().click();
-check('The read-status dot remains independent in selection mode',await p.evaluate(()=>fixtureSeenActions.length===1&&demoMessages[1].checked()&&!demoMessages[0].checked()));
+check('The read-status dot remains independent in selection mode',await p.evaluate(()=>fixtureSeenActions.length===1&&demoMessages[1].checked()&&demoMessages[2].checked()&&!demoMessages[0].checked()));
 await p.locator('.pw-selection-finish').click();
 check('Done clears checked state and returns to normal mode',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));
 await p.evaluate(()=>demoRows[0].querySelector('.subjectParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));

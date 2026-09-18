@@ -1,6 +1,6 @@
 # Message selection without visible checkboxes
 
-Pied Web 1.7.15 uses SnappyMail 2.38.2's existing `message.checked()` state for grouped mail actions. On desktop, Ctrl+click or Command+click on a row enters selection. On mobile, holding a row for 550 ms does the same. Once at least one message is checked, a normal row click or tap toggles another message rather than opening it. The selection bar shows the count and a Done button; Escape also clears the selection. A normal click or short tap outside selection still opens the message.
+Pied Web uses SnappyMail 2.38.2's existing `message.checked()` state for grouped mail actions. On desktop, Ctrl+click or Command+click on a row enters selection. If another message is already open in the reading pane, that active message is carried into the checked group before the clicked row is added. On mobile, holding a row for 550 ms starts a new selection with that row. Once at least one message is checked, a normal row click or tap toggles another message rather than opening it. The selection bar shows the count and a Done button; Escape also clears the selection. A normal click or short tap outside selection still opens the message.
 
 The read-state dot, star and conversation-count controls keep their own native actions. Checked rows remain visually distinct. Moving a touch to scroll cancels the hold timer. Swipe deletion is available only outside selection mode, so a gesture cannot unexpectedly delete one row while selecting several. A release click after a long hold is suppressed.
 

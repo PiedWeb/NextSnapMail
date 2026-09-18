@@ -153,6 +153,11 @@ restoration after reload at the 72 px rail width, the mobile drawer left alone i
 directions, the return over the 800 px breakpoint and an application-driven expansion
 that is neither stored nor undone.
 
+`test-selection-mode.js` opens one fictional message before entering desktop selection.
+It verifies that Ctrl/Cmd+click carries that active row into the checked group and adds the
+clicked row, then covers further toggles, grouped commands, Done/Escape, touch hold, scroll
+cancellation, native-control independence and the checkbox fallback. No mailbox is opened.
+
 `test-reader-addresses.js` uses the reader fixture's native-shaped recipient rows,
 expanded details table and a copy of the mailto interception that the native reader of
 SnappyMail 2.38.2 performs. It checks the linked address lines, composing with and
