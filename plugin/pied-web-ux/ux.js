@@ -41,6 +41,43 @@
         row.dataset.pwUtilitiesObserved = 'true';
         new MutationObserver(enhance).observe(row, {childList: true, subtree: true});
     };
+    const mountComposeTabs = dom => {
+        const tabs = dom.querySelector('.tabs');
+        if (!tabs || tabs.dataset.pwTabsMounted) return;
+        tabs.dataset.pwTabsMounted = 'true';
+        tabs.classList.add('pw-compose-tabs');
+        const labels = () => [...tabs.querySelectorAll(':scope > label[role="tab"]')];
+        const inputFor = label => tabs.querySelector(`#${label.htmlFor}`);
+        const visible = label => !label.hidden && getComputedStyle(label).display !== 'none';
+        const update = () => {
+            const items = labels(), available = items.filter(visible);
+            tabs.classList.toggle('pw-mailvelope-hidden', !available.some(label => label.htmlFor === 'tab-mailvelope'));
+            let activeLabel = items.find(label => inputFor(label)?.checked && visible(label)) || available[0];
+            items.forEach(label => {
+                const selected = label === activeLabel;
+                label.setAttribute('aria-selected', String(selected));
+                label.tabIndex = selected ? 0 : -1;
+            });
+        };
+        tabs.querySelectorAll(':scope > input[type="radio"]').forEach(input => input.addEventListener('change', update));
+        tabs.addEventListener('keydown', event => {
+            const current = event.target.closest('label[role="tab"]');
+            if (!current || !tabs.contains(current)) return;
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault(); current.click(); update(); return;
+            }
+            if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+            const items = labels().filter(visible); if (!items.length) return;
+            let index = items.indexOf(current);
+            if (event.key === 'Home') index = 0;
+            else if (event.key === 'End') index = items.length - 1;
+            else index = (index + (event.key === 'ArrowRight' ? 1 : -1) + items.length) % items.length;
+            event.preventDefault(); items[index].click(); items[index].focus(); update();
+        });
+        const mailvelope = tabs.querySelector('label[for="tab-mailvelope"]');
+        if (mailvelope) new MutationObserver(update).observe(mailvelope, {attributes: true, attributeFilter: ['class', 'hidden', 'style']});
+        requestAnimationFrame(update);
+    };
     const mountRecipientShortcuts = (dom, vm) => {
         if (dom.querySelector('.pw-recipient-shortcuts') || !vm.showCc || !vm.showBcc) return;
         const toLabel = dom.querySelector('.b-header label[data-i18n="GLOBAL/TO"]');
@@ -114,6 +151,7 @@
             makeButtonLike(dom.querySelector('header .minimize-custom'), window.rl.i18n('COMPOSE/BUTTON_MINIMIZE'));
             makeButtonLike(dom.querySelector('header .close'), window.rl.i18n('GLOBAL/CANCEL'));
             mountComposeUtilities(dom);
+            mountComposeTabs(dom);
             mountRecipientShortcuts(dom, vm);
         }
         if (vm.viewModelTemplateID === 'SystemDropDown' && !dom.classList.contains('pw-account-ready')) {
