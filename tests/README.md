@@ -184,5 +184,7 @@ still run, and that the 390 px controls retain their touch targets without overf
 `test-quote-readability.js` covers the strict Outlook desktop and web header shapes that
 carry earlier messages without a blockquote. It checks native disclosure structure,
 manual state, the collapse preference, theme restoration, a ruled-note false positive and
-the guard that keeps a whole message visible when its Outlook-shaped header comes first,
+the guard that keeps a whole message visible when its Outlook-shaped header comes first. It
+also checks the Outlook forwarding shape with a broad `dir="ltr"` wrapper and a ruled inner
+header, where the current note stays visible and only the forwarded message is folded,
 using fictional content only.

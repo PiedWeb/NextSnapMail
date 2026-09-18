@@ -1,5 +1,20 @@
 # Releases
 
+## 1.8.12, 2026-09-18
+
+Outlook forwarding now keeps the author's current note and signature visible, then folds the
+forwarded message from its real **From / Sent / To / Subject** header. The 1.8.11 whole-message
+guard was correct but exposed a broader detector flaw: a `dir="ltr"` mail wrapper inherited the
+four bold labels and every line break from all its descendants, so it was rejected as an unsafe
+all-or-nothing fold before the actual inner header was considered.
+
+Header fields and line breaks must now belong to the candidate `div` itself rather than a nested
+mail section. The horizontal rule Outlook puts immediately before a forwarded header is accepted
+as the same visual boundary as the existing top-border, WordSection and Outlook-web shapes. This
+preserves the current text, leaves the separator visible and puts only the forwarded history
+behind the native quote disclosure. The production message used to diagnose the structure was
+not copied into the fixture; its regression uses fictional content.
+
 ## 1.8.11, 2026-09-18
 
 Outlook-style history is folded only when the message has real visible content before the

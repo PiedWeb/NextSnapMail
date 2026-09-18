@@ -18,16 +18,19 @@
     const outlookHeader = node => {
         if (node.tagName !== 'DIV' || node.closest('blockquote,' + selector)) return false;
         const fields = [...node.querySelectorAll('b,strong')].filter(label =>
-            /[:\uff1a]\s*$/.test(label.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]+/g, ' ').trim())
+            label.closest('div') === node
+            && /[:\uff1a]\s*$/.test(label.textContent.replace(/[\s\u00a0\u200b-\u200d\ufeff]+/g, ' ').trim())
         );
-        if (fields.length < 4 || node.querySelectorAll('br').length < 3) return false;
+        const breaks = [...node.querySelectorAll('br')].filter(br => br.closest('div') === node);
+        if (fields.length < 4 || breaks.length < 3) return false;
         const style = node.style;
         const ruled = !!style.borderTopStyle && style.borderTopStyle !== 'none'
             && !!style.borderTopWidth && style.borderTopWidth !== '0px';
+        const precededByRule = node.previousElementSibling?.tagName === 'HR';
         const outlookClasses = [...(node.parentElement?.classList || [])].some(name =>
             /^(?:msg-)?(?:WordSection|Mso)/i.test(name)
         );
-        return ruled || outlookClasses || node.getAttribute('dir') === 'ltr';
+        return ruled || precededByRule || outlookClasses || node.getAttribute('dir') === 'ltr';
     };
     const hasContent = node => {
         if (node.nodeType === Node.TEXT_NODE) {

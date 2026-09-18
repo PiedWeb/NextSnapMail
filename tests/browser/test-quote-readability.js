@@ -104,6 +104,20 @@ await page.waitForTimeout(30);
 check('Hidden preheaders do not justify collapsing the visible message',await page.evaluate(() =>
     !quoteFixtures[6].querySelector('.pw-outlook-quote')
 ));
+await page.evaluate(()=>mountQuoteFixture('<div class="mail-body" dir="ltr">'
+    +'<p>Current forwarding note and signature</p><hr>'
+    +'<div><b>From:</b> A<br><b>Sent:</b> B<br><b>To:</b> C<br><b>Subject:</b> D</div>'
+    +'<p>Forwarded Outlook message</p></div>'));
+await page.waitForTimeout(30);
+check('A broad mail wrapper yields to the ruled Outlook header inside it',await page.evaluate(()=>{
+    const fixture=quoteFixtures[7];
+    const wrapper=fixture.querySelector('.mail-body');
+    const details=wrapper.querySelector(':scope > details.pw-outlook-quote');
+    return !!details && !details.open && details.previousElementSibling?.tagName==='HR'
+        && wrapper.firstElementChild?.textContent==='Current forwarding note and signature'
+        && !details.querySelector('blockquote').textContent.includes('Current forwarding note')
+        && details.querySelector('blockquote').textContent.includes('Forwarded Outlook message');
+}));
 await page.evaluate(()=>{
     quoteFixtures[4].remove();
     quoteCollapse=1;
