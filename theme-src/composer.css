@@ -94,6 +94,14 @@ html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.b
   outline: 2px solid var(--pw-primary-500);
   outline-offset: 2px;
 }
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .minimize-custom::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: var(--pw-radius-pill);
+  background: currentColor;
+}
 @media (pointer: coarse) {
   html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a.btn,
   html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn,

@@ -71,6 +71,11 @@ check('Header utilities share a quiet 36 px square target',utilities.every(contr
  control.width===36&&control.height===36&&control.bg==='rgba(0, 0, 0, 0)'));
 check('Contacts, options, minimize and close are named keyboard controls',utilities.every(control=>
  control.label&&control.role==='button'&&control.tabIndex===0));
+check('Minimize keeps an explicit visible glyph inside its normalized target',await p.evaluate(()=>{
+ const style=getComputedStyle(document.querySelector('#V-PopupsCompose header .minimize-custom'),'::before');
+ return style.content==='""'&&parseFloat(style.width)===14&&parseFloat(style.height)===2
+  &&style.backgroundColor!=='rgba(0, 0, 0, 0)';
+}));
 check('Space activates a native link promoted to a keyboard control',await p.evaluate(()=>{
  const control=document.querySelector('#V-PopupsCompose header .minimize-custom');let clicks=0;
  control.addEventListener('click',()=>clicks++,{once:true});control.focus();
