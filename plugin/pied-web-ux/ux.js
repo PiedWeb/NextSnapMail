@@ -12,6 +12,21 @@
         el.title = window.rl.i18n(el.dataset.label);
         el.setAttribute('aria-label', el.title);
     });
+    const makeButtonLike = (node, label) => {
+        if (!node) return;
+        node.title ||= label;
+        node.setAttribute('aria-label', node.title);
+        node.setAttribute('role', 'button');
+        node.tabIndex = 0;
+        if (node.dataset.pwKeyboardControl) return;
+        node.dataset.pwKeyboardControl = 'true';
+        node.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                node.click();
+            }
+        });
+    };
     const mountRecipientShortcuts = (dom, vm) => {
         if (dom.querySelector('.pw-recipient-shortcuts') || !vm.showCc || !vm.showBcc) return;
         const toLabel = dom.querySelector('.b-header label[data-i18n="GLOBAL/TO"]');
@@ -77,6 +92,13 @@
                 discard.title = window.rl.i18n('GLOBAL/DELETE');
                 discard.setAttribute('aria-label', discard.title);
             }
+            const contacts = dom.querySelector('header .pull-right > a[data-i18n*="GLOBAL/CONTACTS"]');
+            const options = dom.querySelector('header .pull-right > .dropdown > .dropdown-toggle');
+            makeButtonLike(contacts, window.rl.i18n('GLOBAL/CONTACTS'));
+            makeButtonLike(options, t('Options du message', 'Message options'));
+            options?.setAttribute('aria-haspopup', 'menu');
+            makeButtonLike(dom.querySelector('header .minimize-custom'), window.rl.i18n('COMPOSE/BUTTON_MINIMIZE'));
+            makeButtonLike(dom.querySelector('header .close'), window.rl.i18n('GLOBAL/CANCEL'));
             mountRecipientShortcuts(dom, vm);
         }
         if (vm.viewModelTemplateID === 'SystemDropDown' && !dom.classList.contains('pw-account-ready')) {

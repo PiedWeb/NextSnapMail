@@ -5024,6 +5024,47 @@ html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visi
   outline-offset: 2px;
 }
 
+/* Window and message controls form one quiet utility cluster. Native links are
+ * promoted to real keyboard targets without changing their commands. */
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a.btn,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(.minimize-custom, .close) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent !important;
+  border-radius: var(--pw-radius-md);
+  background: transparent !important;
+  color: var(--pw-grey-600);
+  line-height: 1;
+  text-decoration: none;
+}
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(a.btn, .minimize-custom, .close):is(:hover, :focus-visible),
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn:is(:hover, :focus-visible) {
+  background: var(--pw-grey-100) !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(a.btn, .minimize-custom, .close):focus-visible,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a.btn,
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn,
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(.minimize-custom, .close) {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
 /* Composer fields share one visual measure while retaining their native jobs.
  * SnappyMail reserves 2em on From even when there is no identity picker, and
  * the Nextcloud theme gives recipient lists an extra-tall single-line state.

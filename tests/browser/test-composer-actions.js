@@ -54,4 +54,27 @@ const native=await p.evaluate(()=>{
   discard:header.querySelector('a.btn.button-delete').textContent.trim()};});
 check('Native commands, markup and glyph are untouched',
  native.send && native.save && native.discard==='🗑');
+
+const utilities=await p.evaluate(()=>{
+ const nodes=[
+  document.querySelector('#V-PopupsCompose header .pull-right > a[data-i18n*="GLOBAL/CONTACTS"]'),
+  document.querySelector('#V-PopupsCompose header .pull-right > .dropdown > .dropdown-toggle'),
+  document.querySelector('#V-PopupsCompose header .minimize-custom'),
+  document.querySelector('#V-PopupsCompose header .close')
+ ];
+ return nodes.map(node=>{const box=node.getBoundingClientRect(),style=getComputedStyle(node);return {
+  width:box.width,height:box.height,label:node.getAttribute('aria-label'),role:node.getAttribute('role'),
+  tabIndex:node.tabIndex,bg:style.backgroundColor,color:style.color
+ };});
+});
+check('Header utilities share a quiet 36 px square target',utilities.every(control=>
+ control.width===36&&control.height===36&&control.bg==='rgba(0, 0, 0, 0)'));
+check('Contacts, options, minimize and close are named keyboard controls',utilities.every(control=>
+ control.label&&control.role==='button'&&control.tabIndex===0));
+check('Space activates a native link promoted to a keyboard control',await p.evaluate(()=>{
+ const control=document.querySelector('#V-PopupsCompose header .minimize-custom');let clicks=0;
+ control.addEventListener('click',()=>clicks++,{once:true});control.focus();
+ control.dispatchEvent(new KeyboardEvent('keydown',{key:' ',bubbles:true,cancelable:true}));
+ return clicks===1;
+}));
 console.log(JSON.stringify({passed:checks.length,checks}));
