@@ -8,7 +8,7 @@ use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
 use Psr\Log\LoggerInterface;
 
-/* Nextcloud's own cron carries this by default, which is one pass every five minutes.
+/* Nextcloud's own cron carries scheduled sends and reminders in one mailbox pass.
  * A mailbox that needs the minute it was promised gets the occ command on its own line
  * in crontab; the two use the same pass and the same claim, so they cannot collide. */
 final class SendDueJob extends TimedJob {
@@ -27,7 +27,7 @@ final class SendDueJob extends TimedJob {
         try {
             $this->runner->run($this->time->getTime());
         } catch (\Throwable $error) {
-            $this->logger->warning('Scheduled mail pass failed', ['exception' => $error]);
+            $this->logger->warning('Mail scheduler pass failed', ['exception' => $error]);
         }
     }
 }

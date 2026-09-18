@@ -1,6 +1,6 @@
 # Releases
 
-## 1.8.15, 2026-09-18
+## 1.8.17, 2026-09-18
 
 The composer now gives **From**, **To**, **Cc**, **Bcc**, **Reply-To** and **Subject** the
 same 36 px single-line height and the same right edge. SnappyMail's reserved identity-picker
@@ -25,6 +25,20 @@ Composer tabs now divide the available width between the modes that are actually
 hidden Mailvelope mode leaves no empty third. Selection uses a single accent line, tab arrows work
 from the keyboard, narrow labels remain on one 44 px line and every panel spans the same width.
 The editor itself rests on a one-pixel hairline and reserves the primary accent and ring for focus.
+
+Inbox messages can now be given a reminder time from the reader or the existing
+multi-selection bar. **This evening**, **Tomorrow morning**, **In one week** and a free local
+date cover the usual triage choices. The message moves, read, to a visible `Reminders` IMAP
+folder; at the chosen time the companion app returns it to Inbox unread, where the existing
+unread-first flow makes it prominent again. The folder shows the reminder date, and an open
+message can be rescheduled or returned immediately.
+
+The mailbox remains the only message store. The time is an IMAP keyword, the server process
+copies no subject, address or body, and a failed move restores the previous safe state. A stale
+worker heartbeat or an IMAP server without custom keywords refuses the operation before hiding
+mail. The scheduler app advances to 1.1.0 and shares its existing minute runner with scheduled
+send. Endpoint, worker and fictional browser coverage exercise bulk/thread UIDs, time bounds,
+failure rollback, keyboard focus, responsive geometry and wake-up as unread.
 
 ## 1.8.14, 2026-09-18
 

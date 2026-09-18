@@ -168,6 +168,15 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   SMTP transaction and the claim is never released — so an interrupted pass reports instead
   of repeating. The composer refuses to schedule when no sender has left a heartbeat in the
   last thirty minutes. See `SCHEDULED_SEND.md`.
+- Since 1.8.17 an Inbox message or selected group can be deferred with **Me le rappeler**.
+  It is marked read, stamped with one `$pwremind-<base36 epoch>` IMAP keyword and moved to a
+  visible `Reminders` folder beside Drafts. The same companion runner removes the keyword,
+  marks the message unread and moves it to `INBOX` when due. Never keep a second reminder
+  database or copy message metadata outside IMAP. Refuse the operation before moving when the
+  worker heartbeat is stale or custom keywords are unsupported. A move failure must restore
+  the former unread state; a wake failure must leave the message read and stamped in Reminders.
+  The reader and list expose reschedule and immediate return, and conversation actions include
+  every native thread UID once. See `REMINDERS.md`.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
 - Since 1.8.6, General settings offer upstream `Squire 2.4 (test)` beside native `Squire`.
   Native Squire remains the default. The per-account choice is read only when a composer is

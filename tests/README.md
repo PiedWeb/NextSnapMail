@@ -21,7 +21,9 @@ NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-order.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/reminders.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php ../integrations/scheduler/tests/sender.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php ../integrations/scheduler/tests/reminders.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
@@ -71,6 +73,7 @@ dev-browser-agent --timeout 35 < tests/browser/test-conversation-toggle.js
 dev-browser-agent --timeout 40 < tests/browser/test-unread-order.js
 dev-browser-agent --timeout 45 < tests/browser/test-left-panel-state.js
 dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
+dev-browser-agent --timeout 90 < tests/browser/test-reminders.js
 ```
 
 `test-squire-next.js` first proves that the optional bundle registers without replacing the
@@ -147,6 +150,12 @@ surfaces, the focus ring under the keyboard, Escape returning the focus, the UTC
 handed over once, the refusal of a past time, the control hidden when the mailbox cannot keep
 drafts, and the 390 px layout. The compose view model, the endpoint and the sender are
 simulated; the message rows and reader bar of the queue folder have no fixture yet.
+
+`tests/reminders.php`, `../integrations/scheduler/tests/reminders.php` and
+`test-reminders.js` cover the timed-reminder path without opening a mailbox: IMAP keyword and
+folder operations, safe rollback, due wake-up as unread, list/reader controls, thread-aware bulk
+selection, worker errors, keyboard focus and responsive geometry. All message data is fictional
+and browser transport is mocked.
 
 `test-left-panel-state.js` uses `?panel=1`, the only fixture page that keeps a stored
 sidebar choice. It checks the native default, storing a collapse and an expansion,

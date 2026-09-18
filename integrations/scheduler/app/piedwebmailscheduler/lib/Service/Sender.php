@@ -10,7 +10,7 @@ use MailSo\Mime\HeaderCollection;
 use Psr\Log\LoggerInterface;
 use SnappyMail\SensitiveString;
 
-/* Hands the messages the browser scheduled to the account's own SMTP server.
+/* Sends scheduled messages and wakes mail reminders from the account's own IMAP queues.
  *
  * The mailbox is the queue. A message is claimed with an IMAP keyword before its SMTP
  * transaction and the claim is never taken back, so a run interrupted anywhere leaves a
@@ -24,6 +24,8 @@ class Sender {
     public const SENDING = '$pwsending';
     public const SENT = '$pwsent';
     public const FAILED = '$pwsendfailed';
+    public const REMINDER_LEAF = 'Reminders';
+    public const REMINDER_PREFIX = '$pwremind-';
     /* A message the server still refuses a day after its time will not leave on its own. */
     private const GIVE_UP = 86400;
     /* Headers a stored message carries that a sent message must not. */
@@ -31,10 +33,11 @@ class Sender {
 
     public function __construct(private LoggerInterface $logger) {}
 
-    /** @return array{sent:int,failed:int,held:int,pending:int,next:?int,notes:string[]} */
+    /** @return array{sent:int,failed:int,held:int,pending:int,reminded:int,reminderPending:int,next:?int,notes:string[]} */
     public function mailbox(string $email, SensitiveString $password, int $now, bool $dryRun = false): array
     {
-        $report = ['sent' => 0, 'failed' => 0, 'held' => 0, 'pending' => 0, 'next' => null, 'notes' => []];
+        $report = ['sent' => 0, 'failed' => 0, 'held' => 0, 'pending' => 0,
+            'reminded' => 0, 'reminderPending' => 0, 'next' => null, 'notes' => []];
         $actions = \RainLoop\Api::Actions();
         $account = $this->account($actions, $email, $password);
         $imap = $actions->ImapClient();
@@ -42,17 +45,34 @@ class Sender {
         try {
             $settings = $actions->SettingsProvider(true)->Load($account);
             $folder = $this->folder($imap, $settings);
-            if (!isset($imap->FolderStatusList($folder, '')[$folder])) return $report;
-            foreach ($this->scan($imap, $folder) as $entry) {
-                if ($entry['held']) { ++$report['held']; continue; }
-                if ($entry['due'] === null) { $report['notes'][] = 'uid ' . $entry['uid'] . ': no send time'; continue; }
-                if ($entry['due'] > $now) {
-                    ++$report['pending'];
-                    $report['next'] = $report['next'] === null ? $entry['due'] : \min($report['next'], $entry['due']);
-                    continue;
+            if (isset($imap->FolderStatusList($folder, '')[$folder])) {
+                foreach ($this->scan($imap, $folder) as $entry) {
+                    if ($entry['held']) { ++$report['held']; continue; }
+                    if ($entry['due'] === null) { $report['notes'][] = 'uid ' . $entry['uid'] . ': no send time'; continue; }
+                    if ($entry['due'] > $now) {
+                        ++$report['pending'];
+                        $report['next'] = $report['next'] === null ? $entry['due'] : \min($report['next'], $entry['due']);
+                        continue;
+                    }
+                    if ($dryRun) { ++$report['pending']; continue; }
+                    $this->deliver($actions, $account, $imap, $settings, $folder, $entry, $now, $report);
                 }
-                if ($dryRun) { ++$report['pending']; continue; }
-                $this->deliver($actions, $account, $imap, $settings, $folder, $entry, $now, $report);
+            }
+            $reminders = $this->reminderFolder($imap, $settings);
+            if (isset($imap->FolderStatusList($reminders, '')[$reminders])) {
+                foreach ($this->scanReminders($imap, $reminders) as $entry) {
+                    if ($entry['due'] === null) {
+                        $report['notes'][] = 'reminder uid ' . $entry['uid'] . ': no reminder time';
+                        continue;
+                    }
+                    if ($entry['due'] > $now) {
+                        ++$report['reminderPending'];
+                        $report['next'] = $report['next'] === null ? $entry['due'] : \min($report['next'], $entry['due']);
+                        continue;
+                    }
+                    if ($dryRun) { ++$report['reminderPending']; continue; }
+                    $this->wakeReminder($actions->MailClient(), $imap, $reminders, $entry, $now, $report);
+                }
             }
         } finally {
             try { $imap->Disconnect(); } catch (\Throwable $error) {}
@@ -74,13 +94,23 @@ class Sender {
     /* The same rule the browser uses: a sibling of the account's own Drafts folder. */
     public function folder($imap, $settings): string
     {
+        return $this->siblingFolder($imap, $settings, self::LEAF);
+    }
+
+    public function reminderFolder($imap, $settings): string
+    {
+        return $this->siblingFolder($imap, $settings, self::REMINDER_LEAF);
+    }
+
+    private function siblingFolder($imap, $settings, string $leaf): string
+    {
         $drafts = (string) $settings->GetConf('DraftsFolder', '');
         if (!$drafts || $drafts === '__UNUSE__' || \strcasecmp($drafts, 'INBOX') === 0) {
             throw new \RuntimeException('no Drafts folder is configured');
         }
         $delimiter = (string) ($imap->FolderHierarchyDelimiter($drafts) ?? '');
         $cut = $delimiter === '' ? false : \strrpos($drafts, $delimiter);
-        $name = $cut === false ? self::LEAF : \substr($drafts, 0, $cut) . $delimiter . self::LEAF;
+        $name = $cut === false ? $leaf : \substr($drafts, 0, $cut) . $delimiter . $leaf;
         if (\strcasecmp($name, 'INBOX') === 0) throw new \RuntimeException('refusing INBOX as a queue');
         foreach (['DraftsFolder', 'SentFolder', 'TrashFolder', 'SpamFolder', 'ArchiveFolder'] as $conf) {
             if (\strcasecmp($name, (string) $settings->GetConf($conf, '')) === 0) {
@@ -88,6 +118,54 @@ class Sender {
             }
         }
         return $name;
+    }
+
+    /** @return array<int, array{uid:int,due:?int,flags:string[]}> */
+    private function scanReminders($imap, string $folder): array
+    {
+        $imap->FolderExamine($folder);
+        $uids = $imap->MessageSearch('UNDELETED', true);
+        if (!$uids) return [];
+        \sort($uids);
+        $entries = [];
+        $items = [FetchType::UID, FetchType::FLAGS];
+        foreach ($imap->Fetch($items, \implode(',', $uids), true) as $response) {
+            $uid = (int) $response->GetFetchValue(FetchType::UID);
+            if (!$uid) continue;
+            $flags = \array_map('strtolower', (array) $response->GetFetchValue(FetchType::FLAGS));
+            $times = [];
+            foreach ($flags as $flag) {
+                if (!\preg_match('/^\\$pwremind-([0-9a-z]+)$/Di', $flag, $match)) continue;
+                $when = (int) \base_convert($match[1], 36, 10);
+                if ($when > 0) $times[] = $when;
+            }
+            $entries[] = ['uid' => $uid, 'due' => $times ? \min($times) : null, 'flags' => $flags];
+        }
+        return $entries;
+    }
+
+    private function wakeReminder($client, $imap, string $folder, array $entry, int $now, array &$report): void
+    {
+        $range = new SequenceSet([$entry['uid']]);
+        $flags = \array_values(\array_filter($entry['flags'],
+            static fn($flag) => \str_starts_with(\strtolower((string) $flag), self::REMINDER_PREFIX)));
+        try {
+            $client->MessageSetFlag($folder, $range, MessageFlag::SEEN, false, false);
+            foreach ($flags as $flag) $client->MessageSetFlag($folder, $range, $flag, false, true);
+            $imap->MessageMove($folder, 'INBOX', $range);
+            ++$report['reminded'];
+        } catch (\Throwable $error) {
+            try { $client->MessageSetFlag($folder, $range, MessageFlag::SEEN, true, true); }
+            catch (\Throwable $ignored) {}
+            foreach ($flags as $flag) {
+                try { $client->MessageSetFlag($folder, $range, $flag, true, true); } catch (\Throwable $ignored) {}
+            }
+            ++$report['reminderPending'];
+            $retry = $now + 60;
+            $report['next'] = $report['next'] === null ? $retry : \min($report['next'], $retry);
+            $report['notes'][] = 'reminder uid ' . $entry['uid'] . ': not restored (' . $error->getMessage() . ')';
+            $this->logger->warning('Mail reminder not restored', ['exception' => $error]);
+        }
     }
 
     /** @return array<int, array{uid:int,due:?int,held:bool,flags:string[]}> */

@@ -15,9 +15,9 @@ final class SendDue extends Command {
     protected function configure(): void
     {
         $this->setName('piedweb:mail:send-scheduled')
-            ->setDescription('Send the scheduled messages that are due')
+            ->setDescription('Send due scheduled messages and wake due mail reminders')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Open every mailbox, ignoring the poll interval')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what is due without sending anything')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Report what is due without changing mail')
             ->addOption('mailbox', null, InputOption::VALUE_REQUIRED, 'Only this mail address', '');
     }
 
@@ -38,7 +38,8 @@ final class SendDue extends Command {
             }
             $next = $report['next'] ? \date('c', $report['next']) : 'none';
             $output->writeln("<info>{$email}</info>: sent {$report['sent']}, pending {$report['pending']}, "
-                . "held {$report['held']}, abandoned {$report['failed']}, next {$next}");
+                . "held {$report['held']}, abandoned {$report['failed']}, reminders {$report['reminded']}, "
+                . "reminder pending {$report['reminderPending']}, next {$next}");
             foreach ($report['notes'] as $note) $output->writeln('  ' . $note);
             $failed = $failed || $report['failed'] > 0;
         }

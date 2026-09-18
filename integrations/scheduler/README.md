@@ -1,7 +1,7 @@
-# Pied Web scheduled mail sender
+# Pied Web mail scheduler
 
-Independent Nextcloud app `piedwebmailscheduler`, version 1.0.3. It sends the messages the
-Mail plugin scheduled, at the time they were scheduled for, whether or not a browser is open.
+Independent Nextcloud app `piedwebmailscheduler`, version 1.1.0. It sends outgoing messages and
+wakes mail reminders at their scheduled times, whether or not a browser is open.
 
 ## What it does, and what it refuses to do
 
@@ -27,6 +27,11 @@ Failures are kept where the author can see them. A refused transaction releases 
 the next pass retries; a message still refused a day after its time is marked `$pwsendfailed`
 and stops being attempted. Both states are shown in the Mail interface, on the message itself.
 
+A reminder is an ordinary message in the sibling `Reminders` folder. Its due time is the custom
+IMAP keyword `$pwremind-<base36 epoch>`. When due, the app removes that keyword and `\\Seen`, then
+moves the message to `INBOX`. A failed move restores the keyword and read state for the next
+pass. The app reads no subject or body to wake reminders and keeps no reminder database.
+
 ## Credentials
 
 It serves the mailboxes whose owner has already asked NextSnapMail to remember the password, in
@@ -44,8 +49,8 @@ php -d apc.enable_cli=1 occ app:enable piedwebmailscheduler
 php -d apc.enable_cli=1 occ piedweb:mail:send-scheduled --dry-run --force
 ```
 
-The dry run reports what is due per mailbox and sends nothing. With the app enabled, Nextcloud's
-own cron carries the pass, which is one check every five minutes.
+The dry run reports what is due per mailbox and changes nothing. With the app enabled,
+Nextcloud's own cron carries the pass, which is one check every five minutes.
 
 For a message to leave within the minute it was promised, give the command its own crontab line:
 
@@ -68,10 +73,10 @@ php -d apc.enable_cli=1 occ config:app:set piedwebmailscheduler interval --value
 php -d apc.enable_cli=1 occ app:disable piedwebmailscheduler
 ```
 
-Scheduled messages then stay in their folder, unsent and visible, until the app is enabled again
-or the author moves them back to Drafts from the Mail interface. Nothing else changes: the app
-owns no data, no table and no file of its own beyond one poll timestamp per mailbox in
-`oc_appconfig`.
+Scheduled messages and reminders then stay in their visible folders until the app is enabled
+again or the author returns them from the Mail interface. Nothing else changes: the app owns no
+message data or table, only one poll timestamp per mailbox in `oc_appconfig`; the shared hint and
+heartbeat files contain timestamps and an account-key digest.
 
 After installing, add this app's files to `scripts/audit-live.py` in the parent repository so the
 read-only audit tracks them like the other companion apps.
@@ -80,8 +85,9 @@ read-only audit tracks them like the other companion apps.
 
 ```sh
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/sender.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/reminders.php
 ```
 
-Forty checks over folder resolution, the claim order, header rewriting, recipients, filing,
-retry and abandonment, using the native MailSo header parser, sequence sets and stream helpers.
-IMAP and SMTP transport are simulated: the checks open no mailbox and send no message.
+The checks cover folder resolution, claim order, header rewriting, recipients, filing, retry,
+abandonment and reminder wake-up/rollback, using native MailSo parsing and sequence sets. IMAP
+and SMTP transport are simulated: the checks open no mailbox and send no message.

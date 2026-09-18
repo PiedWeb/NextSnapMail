@@ -736,3 +736,109 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 @media (max-width: 600px) {
     #rl-app .pw-schedule-panel { position: fixed; inset: auto 12px calc(12px + env(safe-area-inset-bottom)) 12px; width: auto; }
 }
+
+/* Mail reminders reuse the scheduler's quiet clock vocabulary. The choice stays next to
+ * the message that opened it, and the mailbox remains the only source of message data. */
+#rl-app #V-MailMessageList .pw-selection-remind {
+    display:inline-flex; align-items:center; justify-content:center; flex:0 0 36px;
+    width:36px; height:36px; min-height:36px; margin:0; padding:0;
+    border:0!important; border-radius:var(--pw-radius-md); background:transparent;
+    color:var(--pw-grey-800); cursor:pointer;
+}
+#rl-app #V-MailMessageList .pw-selection-remind[hidden] { display:none; }
+#rl-app #V-MailMessageList .pw-selection-remind svg { width:20px; height:20px; }
+#rl-app #V-MailMessageList .pw-selection-remind:is(:hover,[aria-expanded="true"]) { background:var(--pw-primary-100); }
+#rl-app #V-MailMessageList .pw-selection-remind:focus-visible {
+    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+}
+#rl-app #V-MailMessageView .pw-remind-message[hidden] { display:none!important; }
+#rl-app #V-MailMessageView .pw-remind-message svg { width:20px; height:20px; pointer-events:none; }
+
+#rl-app .pw-reminder-panel {
+    position:fixed; z-index:2210; display:grid; gap:var(--pw-space-3);
+    width:320px; max-width:calc(100vw - 24px); box-sizing:border-box;
+    padding:var(--pw-space-4); border:0; border-radius:var(--pw-radius-lg);
+    background:var(--nc-color-main-background,#fdfefe); color:var(--pw-grey-900);
+    box-shadow:var(--pw-elevation-3); font-size:var(--pw-text-sm);
+    line-height:var(--pw-leading-snug); text-align:start;
+}
+#rl-app .pw-reminder-title { margin:0; font-weight:var(--pw-weight-strong); }
+#rl-app .pw-reminder-options { display:grid; gap:var(--pw-space-1); }
+#rl-app .pw-reminder-panel button {
+    height:auto; min-height:44px; border:0!important; border-radius:var(--pw-radius-md);
+    font:inherit; cursor:pointer;
+}
+#rl-app .pw-reminder-option {
+    display:flex; align-items:baseline; justify-content:space-between; gap:var(--pw-space-3);
+    padding:var(--pw-space-2) var(--pw-space-3); background:transparent; color:inherit; text-align:start;
+}
+#rl-app .pw-reminder-option:is(:hover,:focus-visible) { background:var(--pw-grey-100); }
+#rl-app .pw-reminder-when { font-weight:var(--pw-weight-medium); }
+#rl-app .pw-reminder-detail { color:var(--pw-grey-600); font-size:var(--pw-text-xs); white-space:nowrap; }
+#rl-app .pw-reminder-custom { display:grid; gap:var(--pw-space-1); color:var(--pw-grey-700); font-size:var(--pw-text-xs); }
+#rl-app .pw-reminder-custom input {
+    width:100%; min-height:44px; box-sizing:border-box; margin:0;
+    padding:var(--pw-space-2) var(--pw-space-3); border:1px solid var(--pw-grey-300);
+    border-radius:var(--pw-radius-md); background:var(--nc-color-main-background,#fdfefe);
+    color:var(--pw-grey-900); font:inherit; font-size:var(--pw-text-sm);
+}
+#rl-app .pw-reminder-actions { display:flex; justify-content:flex-end; gap:var(--pw-space-2); }
+#rl-app .pw-reminder-cancel { padding:var(--pw-space-2) var(--pw-space-3); background:transparent; color:var(--pw-grey-700); }
+#rl-app .pw-reminder-cancel:is(:hover,:focus-visible) { background:var(--pw-grey-100); color:var(--pw-grey-900); }
+#rl-app .pw-reminder-confirm {
+    padding:var(--pw-space-2) var(--pw-space-4); background:var(--pw-primary-500);
+    color:var(--nc-color-primary-element-text,#fff); font-weight:var(--pw-weight-medium);
+}
+#rl-app .pw-reminder-confirm:is(:hover,:focus-visible) { background:var(--pw-primary-600,var(--nc-color-primary-element-hover)); }
+#rl-app .pw-reminder-panel button:disabled, #rl-app .pw-reminder-panel input:disabled { opacity:.65; cursor:default; }
+#rl-app .pw-reminder-panel :is(button,input):focus-visible {
+    outline:2px solid var(--pw-primary-500,currentColor); outline-offset:-2px;
+}
+#rl-app .pw-reminder-note { margin:0; color:var(--pw-grey-700); font-size:var(--pw-text-xs); }
+#rl-app .pw-reminder-note:empty { display:none; }
+
+#rl-app .pw-reminder-badge {
+    display:inline-block; margin-inline-start:var(--pw-space-2); padding:0 var(--pw-space-2);
+    border-radius:var(--pw-radius-pill); background:var(--pw-primary-50); color:var(--pw-primary-ink);
+    font-size:var(--pw-text-xs); font-weight:var(--pw-weight-medium); line-height:20px;
+    white-space:nowrap; vertical-align:baseline;
+}
+#rl-app .pw-reminder-badge:is([data-state="due"],[data-state="unscheduled"]) {
+    background:var(--pw-grey-100); color:var(--pw-grey-700);
+}
+#rl-app .pw-reminder-bar {
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between;
+    gap:var(--pw-space-3); margin-block-end:var(--pw-space-3); padding:var(--pw-space-3) var(--pw-space-4);
+    border-radius:var(--pw-radius-lg); background:var(--pw-primary-50); color:var(--pw-grey-900);
+    font-size:var(--pw-text-sm);
+}
+#rl-app .pw-reminder-bar[hidden] { display:none; }
+#rl-app .pw-reminder-bar[data-state="due"] { background:var(--pw-primary-100); }
+#rl-app .pw-reminder-text { margin:0; }
+#rl-app .pw-reminder-wake {
+    height:auto; min-height:44px; margin:0; padding:var(--pw-space-2) var(--pw-space-3);
+    border:0!important; border-radius:var(--pw-radius-md); background:var(--nc-color-main-background,#fdfefe);
+    color:var(--pw-grey-900); font:inherit; font-weight:var(--pw-weight-medium); cursor:pointer;
+}
+#rl-app .pw-reminder-wake:is(:hover,:focus-visible) { background:var(--pw-grey-100); }
+#rl-app .pw-reminder-wake:disabled { opacity:.65; cursor:default; }
+#rl-app .pw-reminder-wake:focus-visible { outline:2px solid var(--pw-primary-500,currentColor); outline-offset:-2px; }
+.pw-reminder-toast {
+    position:fixed; z-index:2220; inset:auto 20px 20px auto; max-width:min(420px,calc(100vw - 24px));
+    box-sizing:border-box; padding:var(--pw-space-3) var(--pw-space-4); border:0;
+    border-radius:var(--pw-radius-lg); background:var(--nc-color-main-background,#fdfefe);
+    color:var(--nc-color-main-text,#202124); box-shadow:var(--pw-elevation-3);
+    font:var(--pw-weight-medium) var(--pw-text-sm)/1.4 var(--pw-font,system-ui,sans-serif);
+    pointer-events:none;
+}
+.pw-reminder-toast:empty { display:none; }
+@media(max-width:799px) {
+    #rl-app #V-MailMessageList .pw-selection-remind { width:44px; height:44px; min-height:44px; flex-basis:44px; }
+}
+@media(max-width:600px) {
+    #rl-app .pw-reminder-panel {
+        inset:auto 12px calc(12px + env(safe-area-inset-bottom)) 12px!important;
+        width:auto; max-height:calc(100dvh - 24px); overflow:auto;
+    }
+    .pw-reminder-toast { inset:auto 12px calc(12px + env(safe-area-inset-bottom)) 12px; max-width:none; }
+}

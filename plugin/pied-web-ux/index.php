@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.8.15',
+        VERSION = '1.8.17',
         RELEASE = '2026-09-18',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -42,12 +42,14 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('inline-reply.js');
         $this->addJs('app-shell.js');
         $this->addJs('left-panel-state.js');
+        $this->addJs('reminders.js');
         $this->addJsonHook('PiedWebFilteredSelection', 'FilteredSelection');
         $this->addJsonHook('PiedWebAttachmentImage', 'AttachmentImage');
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
         $this->addJsonHook('PiedWebUnreadOrder', 'UnreadOrder');
         $this->addJsonHook('PiedWebConversation', 'Conversation');
         $this->addJsonHook('PiedWebScheduledSend', 'ScheduledSend');
+        $this->addJsonHook('PiedWebReminders', 'Reminders');
         $this->addHook('json.after-MessageList', 'AfterMessageList');
         $this->addHook('filter.save-message', 'FilterSaveMessage');
     }
@@ -80,6 +82,18 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
             $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'mail'];
         }
         return $this->Manager()->JsonResponseHelper('PiedWebScheduledSend', $result);
+    }
+
+    public function Reminders(): array
+    {
+        require_once __DIR__ . '/Reminders.php';
+        try {
+            $result = PiedWebReminders::handle(\RainLoop\Api::Actions());
+        } catch (\Throwable $error) {
+            $known = ['scope', 'drafts', 'folder', 'time', 'missing', 'keyword', 'move', 'sender'];
+            $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'mail'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebReminders', $result);
     }
 
     public function Conversation(): array

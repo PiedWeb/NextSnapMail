@@ -1,19 +1,19 @@
 {
-  "version": "1.0.3",
+  "version": "1.1.0",
   "app": "piedwebmailscheduler",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.11",
-    "plugin": "1.8.3"
+    "plugin": "1.8.17"
   },
   "files": {
     "LICENSE": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
-    "appinfo/info.xml": "ae3253d32b012407d87c9b7c78846242f80961de24f5e6549597d827f62b25dd",
+    "appinfo/info.xml": "a2f7feb764f03e6046d31d24622f648bb58d7200039183ff49da3df389252b10",
     "lib/AppInfo/Application.php": "6c131538d0794fa665bef6ffb49ba4485c2f00cb259a3721e3c6d036c5ad94f7",
-    "lib/BackgroundJob/SendDueJob.php": "ddb3fc305863b66f2e403cbf5d644db86f6051672c54e6d7392df23cd13d629c",
-    "lib/Command/SendDue.php": "17e1ccda8f9dd180a2b5d3dcec6cd3709936104b835b4f03797f91c03002b301",
+    "lib/BackgroundJob/SendDueJob.php": "e7049a8fff5508213ddb81854d5922e94884841a675e0963c1280a43c6ec755b",
+    "lib/Command/SendDue.php": "09723973d0ef8cd92d23c7a5f1528984bba8dcd4b6a4a7c431ca135a067d1a40",
     "lib/Service/Mailboxes.php": "7838643d478b0a9fb3dcca9998dafccffe816d7d348c4073136a14e838e381cb",
-    "lib/Service/Runner.php": "d1f54c9f80d7d443bdc8f25c00f8368a71ff11b0558893b2fe3b86fffd430139",
-    "lib/Service/Sender.php": "461cda45719a54e0aa48a195846cb0ae7016097e5f8c1c328d3dd0dbef223d8f"
+    "lib/Service/Runner.php": "45e8f8e0c23b1904345e9545ba7dea745497ec2422dbc32767038f7d4d4b302d",
+    "lib/Service/Sender.php": "0a7b91d08127b98bbdf5b94198288548910f325571c49ceaae6bc6bdf2cfa510"
   }
 }

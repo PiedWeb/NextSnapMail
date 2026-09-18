@@ -1,6 +1,6 @@
 # Pied Web for NextSnapMail
 
-A responsive theme and companion plugin for NextSnapMail inside Nextcloud. Clearer folders and message actions, Markdown composition, image controls, a floating three-second Undo Send you can also cut short, and a scheduled send that leaves with the browser closed.
+A responsive theme and companion plugin for NextSnapMail inside Nextcloud. Clearer folders and message actions, timed reminders, Markdown composition, image controls, a floating three-second Undo Send you can also cut short, and a scheduled send that leaves with the browser closed.
 
 Independent customization, not an official NextSnapMail or Nextcloud release.
 
@@ -21,6 +21,9 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Readable interleaved quotations, folded Outlook histories and native message flag controls.
 - Floating three-second Undo Send while continuing to use the mailbox, with a send
   glyph that skips the rest of the countdown.
+- Timed mail reminders from one message or a selection: the message waits, read, in a visible
+  IMAP folder and returns to Inbox unread at the chosen time, even with the browser closed.
+  See [mail reminders](docs/REMINDERS.md).
 - Scheduled send: a time chosen beside Send, the message kept in its own mailbox folder, and a
   [companion Nextcloud app](integrations/scheduler/README.md) that hands it to SMTP at that time,
   at most once, browser open or not. See [scheduled send](docs/SCHEDULED_SEND.md).
@@ -47,7 +50,7 @@ This does **not** implement a unified inbox or a new vacation responder. Nextclo
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.8.14**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.8.17**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).
@@ -59,7 +62,7 @@ python3 tools/check-install.py --nextcloud /path/to/nextcloud
 
 The plugin is stored in NextSnapMail's data directory, and the theme under Nextcloud's custom themes. Normal updates generally preserve those files. Preserved files do not guarantee compatibility with new DOM, editor or PHP APIs. The optional core patch is overwritten when the app is replaced.
 
-[Inline replies](docs/INLINE_REPLY.md) · [Unread drafts](docs/UNREAD_DRAFTS.md) · [Unread order](docs/UNREAD_ORDER.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
+[Inline replies](docs/INLINE_REPLY.md) · [Mail reminders](docs/REMINDERS.md) · [Unread drafts](docs/UNREAD_DRAFTS.md) · [Unread order](docs/UNREAD_ORDER.md) · [Header addresses](docs/READER_ADDRESSES.md) · [Image usage and limits](docs/IMAGES.md) · [Maintenance memory](docs/MAINTENANCE.md) · [Product decisions](docs/CONTEXT.md)
 
 ## Develop
 

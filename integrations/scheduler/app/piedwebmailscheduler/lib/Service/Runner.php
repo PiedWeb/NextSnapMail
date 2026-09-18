@@ -10,8 +10,8 @@ use Psr\Log\LoggerInterface;
  *
  * Opening a mailbox costs a login, so a mailbox is opened when its poll interval has
  * elapsed or when something is known to be due before then. The note that says so is
- * written by the browser when it schedules a message and by this pass when it finishes:
- * losing it delays a send to the next interval, it never drops one. */
+ * written by the browser when it schedules a send or reminder and by this pass when it
+ * finishes: losing it delays work to the next interval, it never drops it. */
 final class Runner {
     public const APP_ID = 'piedwebmailscheduler';
     private const DEFAULT_INTERVAL = 300;
@@ -49,7 +49,7 @@ final class Runner {
                 // An unreachable or misconfigured mailbox waits for the next interval like any
                 // other, instead of being logged into again on every pass.
                 $dryRun || $this->config->setAppValue(self::APP_ID, $poll, (string) $now);
-                $this->logger->warning('Scheduled mail: mailbox unavailable', ['exception' => $error]);
+                $this->logger->warning('Mail scheduler: mailbox unavailable', ['exception' => $error]);
                 $results[$key] = ['error' => $error->getMessage()];
                 continue;
             }

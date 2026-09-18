@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
   <id>piedwebmailscheduler</id>
-  <name>Pied Web scheduled mail sender</name>
-  <summary>Sends the messages NextSnapMail scheduled, without a browser</summary>
-  <description>Reads the Scheduled folder of each mailbox whose NextSnapMail credentials are stored in Nextcloud, and hands every message that is due to the account's own SMTP server. It claims a message before sending it, so an interrupted run reports instead of sending twice. No message, recipient or credential is stored by this app.</description>
-  <version>1.0.3</version>
+  <name>Pied Web mail scheduler</name>
+  <summary>Sends scheduled mail and wakes due reminders without a browser</summary>
+  <description>Reads the Scheduled and Reminders folders of each mailbox whose NextSnapMail credentials are stored in Nextcloud. It sends due outgoing messages at most once and moves due reminders back to Inbox as unread. No message, recipient or credential is stored by this app.</description>
+  <version>1.1.0</version>
   <licence>AGPL-3.0-or-later</licence>
   <author>Robin Delattre</author>
   <namespace>PiedWebMailScheduler</namespace>
