@@ -77,4 +77,34 @@ check('Space activates a native link promoted to a keyboard control',await p.eva
  control.dispatchEvent(new KeyboardEvent('keydown',{key:' ',bubbles:true,cancelable:true}));
  return clicks===1;
 }));
+await p.evaluate(()=>{
+ const dialog=document.querySelector('#V-PopupsCompose');
+ const body=document.createElement('div');body.className='b-header';
+ body.innerHTML='<table></table><div style="display:flex"><div class="btn-group" style="flex-grow:1"></div>'
+  +'<div class="btn-group"><a class="btn fontastic" data-i18n="[title]CRYPTO/SIGN">✍</a>'
+  +'<a class="btn fontastic" data-i18n="[title]CRYPTO/ENCRYPT">🔒</a></div>'
+  +'<div class="btn-group"><a class="btn fontastic" id="composeUploadButton" data-i18n="[title]COMPOSE/ATTACH_FILES">⁺📎</a></div></div>';
+ dialog.append(body);
+ dispatchEvent(new CustomEvent('rl-view-model',{detail:{viewModelTemplateID:'PopupsCompose',viewModelDom:dialog}}));
+});
+await p.waitForSelector('#V-PopupsCompose .pw-compose-utilities');
+const composeUtilities=await p.evaluate(()=>[...document.querySelectorAll('#V-PopupsCompose .pw-compose-utilities a.btn')]
+ .map(node=>{const box=node.getBoundingClientRect(),style=getComputedStyle(node);return {
+  width:box.width,height:box.height,label:node.getAttribute('aria-label'),tabIndex:node.tabIndex,
+  bg:style.backgroundColor,border:style.borderTopColor
+ };}));
+check('Security and attachment utilities are quiet 36 px controls',composeUtilities.length>=3&&composeUtilities.every(control=>
+ control.width===36&&control.height===36&&control.bg==='rgba(0, 0, 0, 0)'
+ &&control.border==='rgba(0, 0, 0, 0)'));
+check('Every composer utility has a keyboard target and accessible name',composeUtilities.every(control=>
+ control.label&&control.tabIndex===0));
+await p.evaluate(()=>{
+ const group=document.querySelector('#V-PopupsCompose .pw-compose-utilities .btn-group:last-child');
+ const late=document.createElement('a');late.className='btn fontastic';late.title='Joindre depuis Nextcloud';
+ group.append(late);window.lateComposeUtility=late;
+});
+await p.waitForFunction(()=>window.lateComposeUtility?.getAttribute('aria-label'));
+check('A utility injected after the native composer is enhanced too',await p.evaluate(()=>
+ window.lateComposeUtility.getAttribute('aria-label')==='Joindre depuis Nextcloud'
+ &&window.lateComposeUtility.tabIndex===0));
 console.log(JSON.stringify({passed:checks.length,checks}));

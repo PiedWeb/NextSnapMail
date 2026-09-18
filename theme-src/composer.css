@@ -178,6 +178,59 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header .error-to {
   color: var(--pw-danger);
 }
 
+/* Signing, encryption and attachment choices support writing; they are not a
+ * second action bar. Keep them compact and borderless until interaction, while
+ * preserving a visible selected state for security toggles. */
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities {
+  align-items: center;
+  gap: var(--pw-space-1);
+  min-height: 36px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities > .btn-group {
+  display: flex;
+  gap: var(--pw-space-1);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--pw-radius-md);
+  background: transparent !important;
+  color: var(--pw-grey-600);
+  line-height: 1;
+  text-decoration: none;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn:is(:hover, :focus-visible) {
+  background: var(--pw-grey-100) !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn.btn-success {
+  background: var(--pw-primary-100) !important;
+  color: var(--pw-primary-ink);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities,
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+    min-height: 44px;
+  }
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
 /* Cc and Bcc belong to the recipient decision, not to the global action bar.
  * Keep the native fields and observables; only replace the distant duplicate
  * links with quiet, right-aligned shortcuts immediately below To. */

@@ -27,6 +27,20 @@
             }
         });
     };
+    const mountComposeUtilities = dom => {
+        const row = dom.querySelector('.b-header > table + div');
+        if (!row) return;
+        row.classList.add('pw-compose-utilities');
+        const enhance = () => row.querySelectorAll('a.btn').forEach(node => {
+            const key = (node.dataset.i18n || '').replace(/^\[title\]/, '');
+            const label = node.title || (key && window.rl.i18n(key)) || t('Action du message', 'Message action');
+            makeButtonLike(node, label);
+        });
+        enhance();
+        if (row.dataset.pwUtilitiesObserved) return;
+        row.dataset.pwUtilitiesObserved = 'true';
+        new MutationObserver(enhance).observe(row, {childList: true, subtree: true});
+    };
     const mountRecipientShortcuts = (dom, vm) => {
         if (dom.querySelector('.pw-recipient-shortcuts') || !vm.showCc || !vm.showBcc) return;
         const toLabel = dom.querySelector('.b-header label[data-i18n="GLOBAL/TO"]');
@@ -99,6 +113,7 @@
             options?.setAttribute('aria-haspopup', 'menu');
             makeButtonLike(dom.querySelector('header .minimize-custom'), window.rl.i18n('COMPOSE/BUTTON_MINIMIZE'));
             makeButtonLike(dom.querySelector('header .close'), window.rl.i18n('GLOBAL/CANCEL'));
+            mountComposeUtilities(dom);
             mountRecipientShortcuts(dom, vm);
         }
         if (vm.viewModelTemplateID === 'SystemDropDown' && !dom.classList.contains('pw-account-ready')) {
