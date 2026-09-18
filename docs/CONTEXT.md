@@ -130,6 +130,18 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   to its end edge. Each shortcut disappears when its native field is open and focuses that
   field when chosen. Preserve the native observables, inputs and advanced-fields menu; the
   original header links return unchanged when Pied Web is not active.
+- The composer's From, recipient and Subject controls share a 36 px single-line height and one
+  right edge. Override SnappyMail's unconditional From reservation without removing the native
+  identity picker, and keep recipient lists auto-growing up to two lines rather than assigning
+  them a fixed height. Their inner input must be allowed to shrink on narrow screens.
+- Keep one filled composer action: Send. Schedule is the outlined alternative completion path;
+  Save and Discard are tertiary, with destructive colour appearing only on approach. Header and
+  message utilities share 36 px targets (44 px for coarse pointers), accessible names, visible
+  focus and keyboard activation without replacing their native commands.
+- Composer tabs use two equal columns when Mailvelope is hidden and three when it is available;
+  panels always span the complete grid. Keep a 44 px non-wrapping tab row, arrow-key navigation
+  and one accent line for selection. The Squire editor rests on a one-pixel neutral border and
+  receives the primary border plus soft ring only on focus.
 - Contacts navigates to Nextcloud Contacts. The redundant Calendar shortcut was removed;
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.

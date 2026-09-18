@@ -1,5 +1,31 @@
 # Releases
 
+## 1.8.15, 2026-09-18
+
+The composer now gives **From**, **To**, **Cc**, **Bcc**, **Reply-To** and **Subject** the
+same 36 px single-line height and the same right edge. SnappyMail's reserved identity-picker
+space no longer shortens **From** when the picker is absent; when it is present, the picker
+sits inside the full-width field without covering its text.
+
+Recipient fields remain flexible rather than fixed-height: an empty field or one address stays
+on one line, while multiple address chips may still wrap to a second line. Browser coverage uses
+the native recipient-list shape and checks equal geometry, real wrapping, narrow screens and the
+existing nearby Cc/Cci controls.
+
+The action hierarchy now leaves **Send** as the only filled action, presents **Schedule** as its
+outlined alternative and keeps **Save** and **Discard** quiet until interaction. Contacts, message
+options, minimize and close share one 36 px utility measure (44 px on touch), have accessible names
+and work from the keyboard; minimize keeps an explicit visible glyph instead of an empty target.
+
+Field labels and nearby Cc/Cci shortcuts use the readable 14 px secondary-text step. Signing,
+encryption and attachment controls lose their permanent grey blocks, retain a visible selected
+state and also gain names and keyboard targets, including controls inserted later by Nextcloud.
+
+Composer tabs now divide the available width between the modes that are actually visible, so a
+hidden Mailvelope mode leaves no empty third. Selection uses a single accent line, tab arrows work
+from the keyboard, narrow labels remain on one 44 px line and every panel spans the same width.
+The editor itself rests on a one-pixel hairline and reserves the primary accent and ring for focus.
+
 ## 1.8.14, 2026-09-18
 
 The **Cc** and **Cci** controls now sit directly below the **To** input, aligned to its right
