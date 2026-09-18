@@ -284,6 +284,23 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > .tab-content {
   border-top-color: var(--pw-line);
 }
 
+/* The editor is the largest surface in the composer. A dark two-pixel frame
+ * makes it dominate even before writing; use a hairline at rest and reserve
+ * the accent plus a soft ring for actual focus. */
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain) {
+  box-sizing: border-box;
+  border: 1px solid var(--pw-grey-300);
+  transition: border-color 120ms ease, outline-color 120ms ease;
+}
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):hover {
+  border-color: var(--pw-grey-400);
+}
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):focus {
+  border-color: var(--pw-primary-500);
+  outline: 2px solid var(--pw-ring-soft);
+  outline-offset: 1px;
+}
+
 /* Cc and Bcc belong to the recipient decision, not to the global action bar.
  * Keep the native fields and observables; only replace the distant duplicate
  * links with quiet, right-aligned shortcuts immediately below To. */

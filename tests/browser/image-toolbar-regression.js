@@ -6,6 +6,18 @@ const select=()=>p.evaluate(()=>{htmlEditor.setHtml('<div>Texte sélectionné</d
 check('All 26 native controls retained once',await p.evaluate(()=>{const a=[...document.querySelectorAll('.squire-toolbar [data-action]')].map(n=>n.dataset.action);return a.length===26&&new Set(a).size===26;}));
 check('Main toolbar has no horizontal overflow',await p.evaluate(()=>{const n=document.querySelector('.squire-toolbar');return n.scrollWidth<=n.clientWidth+1;}));
 check('Every native control has an accessible name',await p.evaluate(()=>[...document.querySelectorAll('.squire-toolbar [data-action]')].every(n=>n.getAttribute('aria-label')?.trim())));
+await p.locator('#V-PopupsCompose > header > a.btn').first().focus();
+const editorRest=await p.evaluate(()=>{const s=getComputedStyle(edit.wysiwyg);return {width:s.borderTopWidth,color:s.borderTopColor};});
+check('Editor rests on a single quiet hairline',parseFloat(editorRest.width)===1);
+await p.locator('.squire-wysiwyg').hover();
+const editorHover=await p.evaluate(()=>{const s=getComputedStyle(edit.wysiwyg);return {width:s.borderTopWidth,color:s.borderTopColor};});
+check('Editor hover keeps the one-pixel geometry',parseFloat(editorHover.width)===1);
+await p.locator('.squire-wysiwyg').focus();
+const editorFocus=await p.evaluate(()=>{const s=getComputedStyle(edit.wysiwyg);return {
+ width:s.borderTopWidth,color:s.borderTopColor,outlineWidth:s.outlineWidth,outlineStyle:s.outlineStyle
+};});
+check('Editor reserves the accent and visible ring for focus',parseFloat(editorFocus.width)===1
+ &&editorFocus.color!==editorRest.color&&parseFloat(editorFocus.outlineWidth)===2&&editorFocus.outlineStyle==='solid');
 check('Color suggestions use Tailwind 600',await p.evaluate(expected=>[...document.querySelectorAll('#squire-colors option')].map(n=>n.value).join(',')===expected,expectedPalette));
 await select();await p.click('[data-action=bold]');check('Native Bold acts on the selected text',await p.evaluate(()=>edit.wysiwyg.querySelector('b,strong')?.textContent==='Texte sélectionné'));
 await p.click('[data-action=undo]');check('Native Undo removes applied bold',await p.evaluate(()=>!edit.wysiwyg.querySelector('b,strong')));
