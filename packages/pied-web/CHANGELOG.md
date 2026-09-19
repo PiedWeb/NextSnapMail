@@ -12,6 +12,9 @@ older clients only. Core PHP/JavaScript regressions exercise independent tabs, m
 fallback, raw and upload paths, URL canonicalization and rejected contexts. The fictional Feed
 browser test verifies cross-account navigation without the native switch endpoint.
 
+Production activation and the two-tab browser validation are recorded in
+[`docs/deployments/1.9.3-account-url-context.md`](docs/deployments/1.9.3-account-url-context.md).
+
 ## 1.9.2, 2026-09-19
 
 The collapsed 72 px folder rail now distinguishes custom folders with compact two-character
