@@ -1,0 +1,27 @@
+{
+  "release": "1.7.5",
+  "previous_release": "1.7.4",
+  "deployed_utc": "2026-09-13T13:56:29Z",
+  "tested": {
+    "nextcloud": "34.0.4",
+    "nextsnapmail": "0.1.11",
+    "snappymail": "2.38.2"
+  },
+  "changed_payload_files": 2,
+  "installed_payload_files": 34,
+  "installation_checks_passed": 39,
+  "plugin_cache_hash_cli": "f3f957eaf3af6505f57c6eaf0c061366",
+  "web_php_before_invalidation": "1.7.4",
+  "web_php_after_invalidation": "1.7.5",
+  "web_activation": "verified_authenticated_browser",
+  "authenticated_button_and_signature_cleanup": true,
+  "signature_fixture_checks": 6,
+  "reader_copy_fixture_checks": 7,
+  "compose_markdown_fixture_checks": 25,
+  "installation_diagnostic_tests": 5,
+  "real_messages_opened_or_modified": 0,
+  "temporary_maintenance_plugin_removed": true,
+  "configuration_restored_exactly": true,
+  "backup_relative_to_host_home": "nextsnapmail-backups/pied-web-ux-v1.7.5-20260913T135423Z",
+  "rollback_script": "rollback.py"
+}

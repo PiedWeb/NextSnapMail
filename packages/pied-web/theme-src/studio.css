@@ -1,0 +1,872 @@
+/* Pied Web, composition and interaction system. */
+#rl-app {color: var(--nc-color-main-text);background: var(--pw-paper);}
+#rl-app :is(input,button,select,textarea), #rl-app .messageListItem { font-family: inherit; }
+#rl-app #rl-left {background: var(--pw-rail);border-inline-end: 1px solid var(--pw-line);box-sizing: border-box;}
+#rl-app .b-folders { background: transparent; }
+#rl-app .b-folders .b-toolbar { display:flex; gap:var(--pw-space-2); padding:var(--pw-space-6) var(--pw-space-4); min-height:80px; box-sizing:border-box; }
+#rl-app .b-folders .b-toolbar .buttonCompose {display:flex;align-items:center;justify-content:center;gap:var(--pw-space-3);flex:1;height:44px;min-height:44px;padding:0 var(--pw-space-3);color:var(--nc-color-primary-element-text);background:var(--nc-color-primary-element);border:0!important;font:var(--pw-weight-strong) var(--pw-text-sm)/1.2 inherit;}
+#rl-app .b-folders .b-toolbar .buttonContacts { flex:0 0 36px; }
+#rl-app .b-folders .buttonComposeText { white-space:nowrap; }
+#rl-app .b-folders .b-content { padding:var(--pw-space-2) var(--pw-space-3); }
+#rl-app .b-folders li a.selectable {height:40px;line-height:40px!important;padding-inline:var(--pw-space-3) 48px;border:0;border-radius:6px;font-weight:var(--pw-weight-regular);margin:var(--pw-space-0-5) 0;}
+#rl-app .b-folders li a.selectable[data-unread] { font-weight:var(--pw-weight-regular); }
+#rl-app .b-folders li a.selectable.selected { background:var(--pw-selected); color:var(--nc-color-primary-element); font-weight:var(--pw-weight-strong); }
+#rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before {margin-inline-end:var(--pw-space-3);vertical-align:-4px;}
+#rl-app .b-folders .b-folders-system a[data-unread]::after,#rl-app .b-folders .b-folders-user a[data-unread]:not(.system)::after { background:transparent; color:var(--pw-muted); min-width:0; padding:0; font-size:var(--pw-text-xs); font-weight:var(--pw-weight-medium); }
+#rl-app .b-folders .b-folders-system a.selected[data-unread]::after { color:var(--nc-color-primary-element); font-weight:var(--pw-weight-strong); }
+#rl-app .b-folders hr { margin:var(--pw-space-4) var(--pw-space-3); border-color:var(--pw-line); }
+#rl-app #V-MailFolderList .b-footer { display:flex; justify-content:space-between; gap:var(--pw-space-2); padding:var(--pw-space-3); border-top:1px solid var(--pw-line); }
+#rl-app #V-MailFolderList .b-footer .btn {border:0!important;}
+#rl-app #V-MailMessageList { position:relative; }
+#rl-app #V-MailMessageList > .btn-toolbar {gap:var(--pw-space-0-5);border:0;background:transparent;border-radius:0;margin:0;}
+#rl-app .pw-list-title { margin:0; padding:var(--pw-space-4) var(--pw-space-6) var(--pw-space-2); font-size:var(--pw-text-xl); font-weight:var(--pw-weight-strong); line-height:1.4; letter-spacing:var(--pw-tracking-tight); }
+#rl-app #V-MailMessageList .pw-threads { min-height:36px; height:36px; padding:0 var(--pw-space-3); border:0!important; border-radius:6px; background:var(--pw-rail); font-size:var(--pw-text-xs); margin-inline-start:auto; }
+#rl-app .messageList,#rl-app .messageView { border:0; border-radius:0; box-shadow:none; background:var(--pw-paper); }
+#rl-app #V-MailMessageList .messageList { margin:0; border-inline-end:1px solid var(--pw-line); }
+#rl-app #V-MailMessageList .messageList .second-toolbar {padding:var(--pw-space-2) var(--pw-space-4) var(--pw-space-4);height:auto;border-bottom:1px solid var(--pw-line);gap:var(--pw-space-2);}
+#rl-app .messageList .checkboxCheckAll { margin:0 var(--pw-space-0-5) 0 0; flex:0 0 20px; }
+#rl-app .messageList .btn.buttonMoreSearch { width:28px; min-width:28px; margin:0; padding:0; border:0!important; color:var(--pw-muted); font-size:var(--pw-text-xs); }
+#rl-app .messageList .search-input-wrp { flex:1; min-width:0; }
+#rl-app .messageList .inputSearch {width:100%;height:36px;min-height:36px;padding:0 var(--pw-space-3);border:1px solid var(--pw-line);border-radius:7px;color:var(--nc-color-main-text);font-size:var(--pw-text-sm);box-shadow:none;}
+#rl-app .messageList .inputSearch:focus { border-color:var(--nc-color-primary-element); outline:2px solid var(--pw-ring-soft); }
+#rl-app .messageList .b-content { padding:0; }
+#rl-app .messageListItem {margin:0;padding:var(--pw-space-4) var(--pw-space-4) var(--pw-space-4) var(--pw-space-4);box-sizing:border-box;border:0!important;font-size:var(--pw-text-sm);background:transparent;}
+#rl-app .messageListItem.selected,#rl-app .messageListItem.selected:hover { background:var(--pw-selected)!important; }
+#rl-app .messageListItem .messageCheckbox { flex:0 0 26px; margin:0; }
+#rl-app .messageListItem .checkboxMessage { color:var(--pw-muted); font-size:var(--pw-text-lg); }
+#rl-app .messageListItem .senderParent {font-weight:var(--pw-weight-regular);}
+#rl-app .messageListItem .subjectParent {font-weight:var(--pw-weight-regular);}
+
+#rl-app .messageListItem time {font-family:inherit;min-width:42px;text-align:end;}
+#rl-app .messageListItem .flagParent { color:var(--pw-grey-400); }
+@media (pointer:fine) { #rl-app .messageListItem:not(:hover):not(:focus-within):not(.msgflag-\5c flagged) .flagParent:not(.flagOn) { opacity:0; } }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding:var(--pw-space-4) var(--pw-space-6); min-height:80px; gap:var(--pw-space-1); box-sizing:border-box; border-bottom:1px solid var(--pw-line); }
+
+#rl-app #V-MailMessageView.pw-enhanced > .messageView { margin:0; }
+#rl-app .messageView .messageItemHeader { border:0; border-radius:0; padding:var(--pw-space-6) var(--pw-space-8) 0; }
+#rl-app .messageView .messageItemHeader .subjectParent {font-family:inherit;gap:var(--pw-space-3);align-items:start;}
+#rl-app .messageView .messageItemHeader .subject { margin:0; font-size:inherit; }
+#rl-app .messageView .messageItemHeader .infoParent { order:2; font-size:var(--pw-text-md); }
+#rl-app .messageView .messageItemHeader .flagParent { order:3; font-size:18px; }
+#rl-app .messageView .messageItemHeader .informationShort { margin:var(--pw-space-4) 0 0; font-size:var(--pw-text-sm); line-height:1.5; color:var(--pw-muted); }
+#rl-app .messageView .messageItemHeader .informationShort a { text-decoration:none; }
+#rl-app #messageItem > .messageItemHeader {border-bottom:1px solid var(--pw-line);}
+#rl-app #messageItem > .messageItemHeader .informationShort { margin:0; font-size:var(--pw-text-xs); }
+#rl-app #messageItem > .messageItemHeader .date { float:right; font-size:var(--pw-text-xs); color:var(--pw-muted); }
+#rl-app #messageItem { height:auto; overflow:visible; flex:1; }
+#rl-app .bodyText { padding:var(--pw-space-8) var(--pw-space-8); box-sizing:border-box; }
+#rl-app .pw-message-extras { margin:var(--pw-space-3) var(--pw-space-8) 0; }
+#rl-app #V-SystemDropDown #top-system-dropdown-id { height:36px; min-height:36px; font-size:var(--pw-text-xs); padding:var(--pw-space-1) var(--pw-space-2); gap:var(--pw-space-2); background:transparent; border:0!important; }
+#rl-app #V-SystemDropDown .pw-account-label { font-weight:var(--pw-weight-medium); }
+#rl-app #V-SystemDropDown.pw-docked-account { max-width:210px; }
+#rl-app #V-SystemDropDown.pw-docked-account .btn-toolbar { height:36px; }
+#rl-app [data-pw-icon].btn { position:relative; display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; min-height:36px; min-width:36px; padding:0; border:0!important; background:transparent; border-radius:6px; font-size:0!important; color:var(--pw-muted); }
+#rl-app [data-pw-icon].btn > :not(.buttonComposeText) { display:none; }
+#rl-app [data-pw-icon].btn::before {content:'';display:block;background:currentColor;mask:var(--pw-icon) center/contain no-repeat;}
+#rl-app [data-pw-icon].btn:hover { background:var(--pw-rail); color:var(--nc-color-main-text); }
+#rl-app [data-pw-icon].btn:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
+#rl-app .b-folders .buttonCompose[data-pw-icon] { color:var(--nc-color-primary-element-text); background:var(--nc-color-primary-element); width:auto; }
+#rl-app .b-folders .buttonCompose[data-pw-icon] .buttonComposeText { font:600 13px/1.2 system-ui; }
+#rl-app .b-folders .b-toolbar .buttonContacts[data-pw-icon] { color:var(--pw-muted); }
+@media (min-width:800px) {
+ #rl-app .pw-list-title { flex:0 0 auto; }
+ html.sm-msgView-side #rl-app #V-MailMessageList .messageList { min-width:320px; width:31vw; }
+ html.rl-left-panel-disabled #rl-app .b-folders .b-toolbar { min-height:80px; }
+ html.rl-left-panel-disabled #rl-app .b-folders li a.selectable { font-size:0; padding:0; }
+ html.rl-left-panel-disabled #rl-app .b-folders li a.selectable::after { font-size:var(--pw-text-xs); }
+}
+@media (max-width:799px) {
+ 
+ 
+ #rl-app .pw-list-title { padding:var(--pw-space-3) var(--pw-space-4) var(--pw-space-2); font-size:var(--pw-text-xl); }
+ #rl-app #V-MailMessageList > .btn-toolbar {flex-wrap:nowrap;gap:var(--pw-space-0-5);}
+ #rl-app #V-MailMessageList > .btn-toolbar .btn-group { margin:0; flex:0 0 auto; }
+ #rl-app #V-MailMessageList .pw-threads { height:40px; min-height:40px; padding:0 var(--pw-space-2); font-size:var(--pw-text-xs); }
+ #rl-app [data-pw-icon].btn { width:40px; height:40px; min-width:40px; min-height:40px; }
+ #rl-app .messageList .inputSearch { font-size:var(--pw-text-sm); height:40px; }
+ 
+ #rl-app .messageListItem .senderParent { font-size:var(--pw-text-sm); }
+ 
+ #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding:var(--pw-space-2) var(--pw-space-3); min-height:48px; }
+ #rl-app .messageView .messageItemHeader { padding:var(--pw-space-6) var(--pw-space-6) 0; }
+ #rl-app .bodyText { padding:var(--pw-space-6) var(--pw-space-6); }
+ #rl-app .messageView .messageItemHeader .subjectParent { font-size:var(--pw-text-2xl); }
+ #rl-app #messageItem > .messageItemHeader .date { float:none; display:block; margin-bottom:var(--pw-space-1); }
+ #rl-app .pw-message-extras { margin-inline:var(--pw-space-6); }
+}
+@media print { #rl-app .pw-list-title { display:none; } }
+#rl-app [data-pw-icon="close"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M6%206l12%2012M6%2018%2018%206%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="archive"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%208h16v13H4zM3%203h18v5H3zM9%2012h6%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="spam"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m12%203%2010%2018H2zM12%209v5m0%203v.1%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="trash"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h18M9%206V3h6v3M5%206l1%2015h12l1-15M10%2010v7m4-7v7%22%2F%3E%3C%2Fsvg%3E"); }
+
+#rl-app [data-pw-icon="folder"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h6l2%203h10v12H3z%22%2F%3E%3C%2Fsvg%3E"); }
+
+#rl-app [data-pw-icon="refresh"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%208a8%208%200%201%200%20.3%207M20%203v5h-5%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="sort"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%204v16l-4-4M8%2020l4-4M15%205h6M15%2010h4%22%2F%3E%3C%2Fsvg%3E"); }
+
+#rl-app [data-pw-icon="reply-all"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%206-5%206%205%206m6-12-5%206%205%206M7%2012h7a7%207%200%200%201%207%207%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="unread"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h18v14H3zM3%206l9%207%209-7%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="contacts"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M5%203h15v18H5zM2%207h4M2%2012h4M2%2017h4M9%2017c0-4%207-4%207%200M12.5%206a2.5%202.5%200%201%200%200%205%202.5%202.5%200%200%200%200-5%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="menu"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%206h16M4%2012h16M4%2018h16%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="previous"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m15%205-7%207%207%207%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app [data-pw-icon="next"] { --pw-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m9%205%207%207-7%207%22%2F%3E%3C%2Fsvg%3E"); }
+/* Iteration 3: one header rhythm; controls follow the current selection. */
+#rl-app .messageList, #rl-app .messageView, #rl-app .b-folders { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; }
+#rl-app #V-MailMessageList > .btn-toolbar { min-height:80px; box-sizing:border-box; padding:var(--pw-space-4) var(--pw-space-4); align-items:center; flex-wrap:nowrap; }
+#rl-app #V-MailMessageList > .btn-toolbar:not(.hasChecked) .onCheckedShow { display:none!important; }
+#rl-app #V-MailMessageList > .btn-toolbar.hasChecked .pw-list-title { display:none; }
+#rl-app #V-MailMessageList .pw-list-title {font:var(--pw-weight-strong) var(--pw-text-lg)/1.3 system-ui;padding:0;margin:0 auto 0 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;}
+#rl-app #V-MailMessageList .pw-threads { flex:0 0 auto; margin:0; }
+#rl-app #V-MailMessageList > .btn-toolbar > [data-pw-icon].btn { flex:0 0 30px; min-width:30px; width:30px; }
+#rl-app #V-MailMessageList > .btn-toolbar > .btn-group { flex:0 0 auto; margin:0; }
+#rl-app #V-MailMessageList > .btn-toolbar .btn-group [data-pw-icon].btn { min-width:30px; width:30px; }
+#rl-app #V-MailMessageList .messageList .second-toolbar {padding-block:var(--pw-space-1) var(--pw-space-3);}
+#rl-app #V-MailMessageList .messageList .b-content { padding:0; }
+
+#rl-app .messageListItem.selected { border-color:var(--pw-line)!important; }
+
+#rl-app #V-MailMessageView [data-pw-icon].btn { border:0!important; background:transparent; border-radius:6px; }
+
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {padding-inline-start:var(--pw-space-2);}
+#rl-app #V-MailFolderList .b-footer {align-items:center;flex-wrap:nowrap;}
+#rl-app #V-MailFolderList .b-footer .btn-group { display:flex; margin:0; gap:var(--pw-space-1); }
+#rl-app #V-MailFolderList .b-footer .btn { display:inline-flex!important; align-items:center; justify-content:center; width:36px!important; height:36px; padding:0!important; min-width:36px; background:transparent!important; font-size:var(--pw-text-lg); }
+#rl-app #V-MailFolderList .b-footer .btn::after { display:none; }
+#rl-app .b-folders .b-folders-system a:is([data-icon="⚠"],[data-icon="🗑"])[data-unread]::after {background:transparent;}
+#rl-app .b-folders .b-folders-user a > .e-collapsed-sign { inset-inline-start:0; width:10px; font-size:10px; }
+#rl-app *::-webkit-resizer { background:transparent; }
+@media (max-width:799px) {
+ #rl-app #rl-right { padding-top:52px; }
+ #rl-app #V-SystemDropDown { top:9px; right:8px; max-width:174px; }
+ #rl-app #V-SystemDropDown #top-system-dropdown-id { font-size:var(--pw-text-xs); }
+ #rl-app #V-MailMessageList .pw-list-title { position:absolute; left:16px; top:16px; max-width:calc(100% - 195px); font-size:var(--pw-text-lg); white-space:nowrap; }
+ #rl-app #V-MailMessageList > .btn-toolbar { position:static; min-height:44px; padding:0 var(--pw-space-3) var(--pw-space-1); }
+ #rl-app #V-MailMessageList > .btn-toolbar > [data-pw-icon].btn { flex:0 0 40px; min-width:40px; width:40px; }
+ #rl-app #V-MailMessageList > .btn-toolbar .btn-group [data-pw-icon].btn { min-width:40px; width:40px; }
+ #rl-app #V-MailMessageList .pw-threads { margin-inline-start:auto; }
+ #rl-app #V-MailMessageList > .btn-toolbar .buttonCompose { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); }
+ #rl-app #V-MailMessageList .messageList .second-toolbar { padding:var(--pw-space-1) var(--pw-space-3) var(--pw-space-3); }
+ #rl-app #V-MailMessageList:not(:has(> .btn-toolbar.hasChecked)) .messageListItem .messageCheckbox { display:none; }
+ #rl-app .messageListItem { padding:var(--pw-space-4) var(--pw-space-4); min-height:80px; }
+ #rl-app .messageListItem .subjectParent { font-size:var(--pw-text-sm); }
+ #rl-app .messageListItem .flagParent { display:none; }
+ #rl-app .messageListItem.msgflag-\5c flagged .flagParent { display:block; }
+}
+#rl-app #rl-left { width:264px; overflow:hidden; }
+#rl-app #V-MailFolderList .b-folders { display:flex; flex-direction:column; height:100%; box-sizing:border-box; }
+#rl-app #V-MailFolderList .b-content { flex:1 1 auto; min-height:0; height:auto; box-sizing:border-box; overflow:auto; }
+#rl-app #V-MailFolderList :is(.b-toolbar,.b-footer) { flex:0 0 auto; box-sizing:border-box!important; }
+#rl-app #V-MailFolderList .b-toolbar .buttonCompose { box-sizing:border-box!important; }
+#rl-app #V-MailFolderList .b-folders li a.selectable { padding-inline:var(--pw-space-2) var(--pw-space-8); }
+#rl-app #V-MailFolderList .b-footer.btn-toolbar .btn-group.hide-on-panel-disabled { flex-direction:row; align-items:center; height:36px; }
+#rl-app #V-MailMessageList .pw-list-title { text-align:start; }
+#rl-app #V-MailMessageList > .btn-toolbar .buttonCompose.btn[data-pw-icon]:not(.btn-warning) { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); }
+@media(max-width:799px) { #rl-app #V-MailMessageList .pw-list-title { top:-36px; } }
+/* Iteration 4: native mobile composition and a continuous application canvas. */
+#rl-app .pw-mobile-header, #rl-app .pw-mobile-folder-label { display:none; }
+#rl-app #V-MailMessageList button.pw-threads {border-radius:6px;height:32px;min-height:32px;}
+#rl-app #V-MailMessageView .messageItemHeader .date { float:none; display:inline; margin:0; }
+#rl-app #V-MailMessageView #messageItem > .messageItemHeader > div:first-child { display:flex; flex-direction:row-reverse; justify-content:flex-end; align-items:center; gap:var(--pw-space-4); flex-wrap:wrap; }
+
+#rl-app #V-MailMessageView .top-toolbar .btn[data-pw-icon="close"] { margin-inline-end:var(--pw-space-2); }
+#rl-app .messageListItem .messageCheckbox { flex-basis:24px; }
+#rl-app .messageListItem .checkboxMessage, #rl-app .checkboxCheckAll { font-size:0!important; position:relative; }
+#rl-app .messageListItem .checkboxMessage { display:block; width:16px; height:16px; line-height:0; }
+#rl-app .messageListItem .checkboxMessage::before, #rl-app .checkboxCheckAll::before {content:'';display:block;box-sizing:border-box;border:1px solid var(--pw-grey-500);border-radius:3px;}
+#rl-app .messageListItem.checked .checkboxMessage::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
+#rl-app .messageListItem.checked .checkboxMessage::after { content:''; position:absolute; box-sizing:border-box; left:4px; top:4px; width:8px; height:5px; border:solid var(--nc-color-primary-element-text); border-width:0 0 2px 2px; transform:rotate(-45deg); }
+#rl-app #V-MailMessageList:has(.btn-toolbar.hasChecked) .checkboxCheckAll::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
+#rl-app * { scrollbar-width:thin; scrollbar-color:var(--pw-scrollbar) transparent; }
+@media(max-width:799px) {
+ #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) { padding-top:0; flex-direction:column; }
+ #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header {display:flex;align-items:center;flex:0 0 68px;padding:0 var(--pw-space-3);box-sizing:border-box;}
+ #rl-app .pw-mobile-header > .btn { width:44px; height:44px; min-width:44px; min-height:44px; flex:0 0 44px; }
+ #rl-app .pw-mobile-header > .btn[data-pw-icon="compose"] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-radius:8px; }
+ #rl-app .pw-mobile-identity { flex:1; min-width:0; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown {position:static;margin:0;padding:0;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar {padding:0;margin:0;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {display:flex;align-items:flex-start;flex-direction:column;gap:var(--pw-space-0-5);border-radius:0;}
+ #rl-app .pw-mobile-identity #top-system-dropdown-id::after { position:absolute; right:2px; bottom:12px; font-size:10px; }
+ #rl-app .pw-mobile-identity #top-system-dropdown-id > i:not(.icon-spinner) { display:none; }
+ #rl-app .pw-mobile-identity .pw-mobile-folder-label {display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--pw-weight-strong) var(--pw-text-lg)/1.3 system-ui;}
+ #rl-app #V-MailMessageList { height:auto; flex:1 1 auto; min-height:0; }
+ #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved:not(.hasChecked), #rl-app #V-MailMessageList .pw-list-title { display:none; }
+ #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved.hasChecked { min-height:48px; }
+ #rl-app #V-MailMessageList .messageList { min-width:0; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar {padding:0 var(--pw-space-3) var(--pw-space-3);}
+ #rl-app #V-MailMessageList .messageList .second-toolbar .btn-group { display:inline-flex; flex:0 0 auto; margin:0; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar [data-pw-icon].btn { min-width:30px; width:30px; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar .buttonMoreSearch { min-width:24px; width:24px; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar .dropdown-menu { left:auto; right:0; max-width:calc(100vw - 24px); }
+ #rl-app #V-MailMessageList .messageList .inputSearch { height:36px; min-height:36px; font-size:var(--pw-text-sm); }
+ #rl-app #V-MailMessageList button.pw-threads {min-width:30px;width:30px;height:40px;border:0!important;background:transparent;}
+ #rl-app #V-MailMessageList button.pw-threads::before { content:''; display:inline-block; width:18px; height:18px; background:var(--pw-muted); mask:var(--pw-conversations-icon) center/contain no-repeat; }
+ #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); }
+ 
+ #rl-app .messageListItem .senderParent {line-height:1.5;}
+ 
+ 
+ #rl-app .pw-mobile-header > .btn:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
+}
+html.rl-fullscreen #rl-app .pw-mobile-header { display:none!important; }
+
+#rl-app { --pw-conversations-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%203h14v11H8l-5%204zM8%2018h9l4%203V8h-2%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app .messageList .checkboxCheckAll { font-size:0!important; display:flex; align-items:center; justify-content:center; }
+#rl-app .pw-mobile-header > button.btn[data-pw-icon] { min-height:44px; height:44px; width:44px; padding:0; background:transparent; }
+#rl-app .pw-mobile-header > button.btn[data-pw-icon="compose"] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); }
+#rl-app [data-pw-icon].btn::before { flex:0 0 19px; min-width:19px; }
+/* Iteration 5: account in navigation, deliberate action groups and reading rhythm. */
+
+#rl-app [data-pw-icon="more"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='5' cy='12' r='1.6'/%3E%3Ccircle cx='12' cy='12' r='1.6'/%3E%3Ccircle cx='19' cy='12' r='1.6'/%3E%3C/svg%3E"); }
+#rl-app .pw-mobile-refresh { display:none; }
+#rl-app .pw-desktop-identity { display:none; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {border-inline-start:0;border-inline-end:1px solid var(--pw-line);}
+#rl-app #V-MailMessageView .pw-reply[data-pw-icon] { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-radius:6px; }
+#rl-app #V-MailMessageView .top-toolbar .pw-reader-menu .btn::after { display:none; }
+#rl-app #V-MailMessageView .top-toolbar .pw-reader-menu { position:relative; }
+#rl-app .pw-reading-actions {display:flex;padding:var(--pw-space-1) var(--pw-space-8) var(--pw-space-8);}
+#rl-app .pw-reading-actions .btn { min-height:36px; height:36px; padding:0 var(--pw-space-4); border:1px solid var(--pw-line)!important; background:var(--pw-paper); border-radius:6px; font:var(--pw-weight-medium) var(--pw-text-sm)/1.2 system-ui; }
+#rl-app .pw-reading-actions .pw-reading-reply { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); border-color:var(--nc-color-primary-element)!important; }
+#rl-app .messageView .messageItemHeader .subjectParent {line-height:1.35;}
+
+#rl-app .messageListItem .subjectParent {line-height:1.5;}
+
+@media(min-width:800px) {
+ #rl-app #rl-left {overflow:visible;}
+ #rl-app .pw-desktop-identity { display:flex; align-items:center; padding:0 var(--pw-space-4); flex:0 0 64px; min-width:0; }
+ #rl-app .pw-desktop-identity #V-SystemDropDown { max-width:100%; margin:0; width:100%; }
+ #rl-app .pw-desktop-identity #V-SystemDropDown .btn-toolbar { margin:0; }
+ #rl-app .pw-desktop-identity #top-system-dropdown-id { font-size:var(--pw-text-sm); height:44px; min-height:44px; padding:0; width:100%; }
+ #rl-app .pw-desktop-identity #top-system-dropdown-id > i:not(.icon-spinner) { display:none; }
+ #rl-app .pw-desktop-identity #top-system-dropdown-id::after { margin-inline-start:auto; }
+ #rl-app .pw-desktop-identity .dropdown-menu { left:0; right:auto; min-width:230px; }
+ #rl-app #V-MailFolderList .b-toolbar {padding:var(--pw-space-1) var(--pw-space-4) var(--pw-space-6);}
+ #rl-app #V-MailFolderList .b-toolbar .buttonCompose { height:44px; }
+ 
+ #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline:var(--pw-space-8); }
+ html.sm-msgView-side #rl-app #V-MailMessageView .top-toolbar [data-pw-icon="close"], #rl-app #V-MailMessageView:has(.pw-reader-menu) .top-toolbar [data-pw-icon="spam"] { display:none; }
+ 
+ #rl-app .b-folders .b-content { padding-top:0; }
+ html.rl-left-panel-disabled #rl-app .pw-desktop-identity { display:none; }
+ html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-toolbar { padding-block:var(--pw-space-4); min-height:80px; }
+}
+@media(max-width:799px) {
+ #rl-app .pw-mobile-refresh { display:list-item; }
+ 
+ 
+ 
+ 
+ #rl-app .pw-reading-actions { padding-inline:var(--pw-space-6); }
+ #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { padding-inline-end:var(--pw-space-1); margin-inline-end:0; }
+}
+#rl-app #V-MailMessageView .pw-reading-actions > button.btn.pw-reading-reply { background:var(--nc-color-primary-element); color:var(--nc-color-primary-element-text); }
+#rl-app #V-MailMessageView .pw-reading-actions > button.btn { background:var(--pw-paper); font-size:var(--pw-text-sm); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar:has(.pw-reader-menu) [data-pw-icon="spam"] { display:none!important; }
+@media(min-width:800px) {
+ html.sm-msgView-side #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has([data-pw-icon="close"]) { display:none; }
+ #rl-app #V-MailFolderList .b-toolbar .buttonCompose { width:100%; min-width:0; flex:1 1 auto; }
+ /* Native edge drag handles remain available; remove the redundant CSS corner grip. */
+ html:not(.rl-left-panel-disabled) #rl-app #rl-left, html.sm-msgView-side #rl-app #V-MailMessageList .messageList { resize:none; }
+}
+/* Iteration 6: fewer competing controls, denser rows, clearer reading states. */
+#rl-app #V-MailMessageList .pw-sort-in-menu { display:none!important; }
+#rl-app #V-MailMessageList .second-toolbar .btn-group { display:inline-flex; margin:0; flex:0 0 auto; }
+#rl-app .pw-menu-heading { padding:var(--pw-space-3) var(--pw-space-4) var(--pw-space-1); font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 system-ui; text-transform:uppercase; letter-spacing:var(--pw-tracking-caps); color:var(--pw-muted); border-top:1px solid var(--pw-line); }
+#rl-app #V-MailMessageList .second-toolbar .dropdown-menu { max-height:65vh; overflow:auto; right:0; left:auto; }
+#rl-app .messageListItem {padding-block:var(--pw-space-2);}
+#rl-app .messageListItem time {opacity:1;}
+#rl-app .messageListItem.unseen time::before { content:''; display:inline-block; width:5px; height:5px; border-radius:50%; background:var(--nc-color-primary-element); margin-inline-end:var(--pw-space-2); vertical-align:2px; }
+
+@media(min-width:800px) {
+ #rl-app #rl-left { width:232px; }
+ #rl-app .b-folders li a.selectable { font-size:var(--pw-text-sm); }
+ #rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before { margin-inline-end:var(--pw-space-3); }
+ 
+ 
+ 
+}
+@media(max-width:799px) {
+ 
+ #rl-app #rl-right > .pw-mobile-header > button.btn { border:0!important; border-radius:8px; }
+ #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="menu"] { margin-inline-start:-6px; }
+ #rl-app #V-MailMessageList .messageList .second-toolbar { gap:var(--pw-space-2); padding-inline:var(--pw-space-4); }
+ #rl-app #V-MailMessageList .messageList .second-toolbar .btn-group [data-pw-icon].btn { width:36px; min-width:36px; }
+ #rl-app #V-MailMessageList .messageList .inputSearch { background:var(--pw-rail); }
+ 
+ 
+ #rl-app .messageListItem .subjectParent { line-height:1.45; }
+}
+/* Iteration 7: aligned navigation bands and integrated search. */
+#rl-app [data-pw-icon="filter"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M3 6h6m6 0h6M3 18h12m4 0h2'/%3E%3Ccircle cx='12' cy='6' r='3'/%3E%3Ccircle cx='16' cy='18' r='3'/%3E%3C/svg%3E"); }
+#rl-app #V-MailMessageList .messageList .search-input-wrp { position:relative; }
+#rl-app #V-MailMessageList .messageList .search-input-wrp .buttonMoreSearch.btn { position:absolute; right:2px; top:0; height:36px; width:34px; min-width:34px; background:transparent; }
+#rl-app #V-MailMessageList .messageList .search-input-wrp .buttonMoreSearch::before { width:16px; height:16px; flex-basis:16px; min-width:16px; }
+#rl-app #V-MailMessageList .messageList .inputSearch { padding-inline-end:62px; }
+#rl-app #V-MailMessageList .messageList .closeSearch { right:36px; }
+#rl-app #V-MailMessageList button.pw-threads { display:inline-flex; align-items:center; gap:var(--pw-space-2); color:var(--pw-muted); border:0!important; padding:0 var(--pw-space-2); font-size:var(--pw-text-xs); background:transparent; }
+#rl-app #V-MailMessageList button.pw-threads::before { content:''; display:block; width:16px; height:16px; background:currentColor; mask:var(--pw-conversations-icon) center/contain no-repeat; }
+#rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
+#rl-app .pw-folder-section {color:var(--pw-muted);font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 system-ui;padding:var(--pw-space-6) var(--pw-space-2) var(--pw-space-2);margin:0;}
+#rl-app .b-folders hr { display:none; }
+#rl-app .b-folders .b-folders-user { background:transparent; border:0; }
+
+#rl-app .messageListItem { border-bottom-color:var(--pw-grey-100)!important; }
+
+#rl-app .messageListItem .checkboxMessage::before,#rl-app .checkboxCheckAll::before { width:16px; height:16px; }
+#rl-app .messageView .messageItemHeader .subjectParent .infoParent { color:var(--pw-muted); }
+#rl-app .messageView .messageItemHeader .subjectParent .flagParent { color:var(--pw-muted); }
+@media(min-width:800px) {
+ #rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { min-height:56px; padding-block:var(--pw-space-2); }
+ #rl-app .pw-desktop-identity { flex-basis:56px; }
+ #rl-app #V-MailFolderList .b-toolbar { min-height:56px; padding-block:var(--pw-space-0-5) var(--pw-space-3); }
+ #rl-app #V-MailMessageList .messageList .second-toolbar { min-height:56px; padding-block:var(--pw-space-1) var(--pw-space-3); }
+ #rl-app #V-MailMessageList > .btn-toolbar { gap:var(--pw-space-1); }
+ #rl-app #V-MailMessageList .pw-list-title { font-size:var(--pw-text-lg); }
+ html.rl-left-panel-disabled #rl-app .pw-folder-section { display:none; }
+ #rl-app .messageView .messageItemHeader { padding-top:var(--pw-space-8); }
+}
+@media(max-width:799px) {
+ 
+ 
+ #rl-app #V-MailMessageList .messageList .second-toolbar {padding-block:0 var(--pw-space-2);}
+ #rl-app #V-MailMessageList button.pw-threads { font-size:0; padding:0; justify-content:center; }
+ #rl-app .messageListItem .senderParent { font-size:var(--pw-text-sm); }
+ #rl-app .messageListItem .subjectParent { padding-inline-end:0; }
+}
+
+/* Consistent native header and footer pictograms. */
+#rl-app { --pw-info-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M12%2010v7m0-10v.2%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app { --pw-star-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app { --pw-settings-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolygon%20points%3D%2219.727%2C9.929%2021.925%2C10.781%2021.925%2C13.219%2019.727%2C14.071%2017.657%2C17.657%2017.657%2C17.657%2018.018%2C19.986%2015.907%2C21.205%2014.071%2C19.727%209.929%2C19.727%209.929%2C19.727%208.093%2C21.205%205.982%2C19.986%206.343%2C17.657%204.273%2C14.071%204.273%2C14.071%202.075%2C13.219%202.075%2C10.781%204.273%2C9.929%206.343%2C6.343%206.343%2C6.343%205.982%2C4.014%208.093%2C2.795%209.929%2C4.273%2014.071%2C4.273%2014.071%2C4.273%2015.907%2C2.795%2018.018%2C4.014%2017.657%2C6.343%2019.727%2C9.929%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E"); }
+#rl-app { --pw-add-folder-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%205h6l2%203h10v12H3Z%20M9%2014h6m-3-3v6%22%2F%3E%3C%2Fsvg%3E"); }
+/* Iteration 8: remove legacy sizing artifacts; finish the native controls. */
+#rl-app #V-MailMessageList .messageList .second-toolbar { box-sizing:border-box; min-height:52px; }
+#rl-app .messageListItem :is(.flagParent,.attachmentParent,.threads-len) { height:20px; min-height:0; line-height:20px; font-size:15px; }
+
+#rl-app .messageView .messageItemHeader .informationShort .from { color:var(--nc-color-main-text); font-size:var(--pw-text-sm); font-weight:var(--pw-weight-strong); }
+#rl-app .messageView .messageItemHeader .informationShort .from a { color:var(--pw-muted); font-size:var(--pw-text-xs); font-weight:var(--pw-weight-regular); }
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) {font-size:0;flex:0 0 28px;display:flex;justify-content:center;align-items:center;}
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent)::before {content:'';display:block;background:currentColor;mask:var(--pw-info-icon) center/contain no-repeat;}
+#rl-app #V-MailMessageView .messageItemHeader .flagParent::before { mask-image:var(--pw-star-icon); }
+#rl-app #V-MailMessageView .messageItemHeader .flagParent.flagOn { color:var(--nc-color-primary-element); }
+#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] {border-radius:6px;}
+#rl-app #V-MailFolderList .b-footer .btn:is(.icon-folder-add,[data-i18n="[title]SETTINGS_LABELS/FOLDERS"],.toggleLeft) { font-size:0; }
+#rl-app #V-MailFolderList .b-footer .btn:is(.icon-folder-add,[data-i18n="[title]SETTINGS_LABELS/FOLDERS"])::before { content:''; width:20px; height:20px; background:currentColor; mask:var(--pw-add-folder-icon) center/contain no-repeat; }
+#rl-app #V-MailFolderList .b-footer .btn[data-i18n="[title]SETTINGS_LABELS/FOLDERS"]::before { mask-image:var(--pw-settings-icon); }
+#rl-app .buttonMoreSearch[data-pw-icon="filter"] { color:var(--pw-muted); opacity:1; }
+@media(max-width:799px) {
+ 
+ #rl-app #V-MailMessageList .messageList .second-toolbar { min-height:44px; }
+ 
+ #rl-app .pw-mobile-identity #top-system-dropdown-id::after { display:none; }
+ #rl-app .pw-mobile-identity .pw-account-label::after { content:'⌄'; flex:0 0 12px; margin-inline-start:var(--pw-space-2); text-align:center; line-height:1; font-size:13px; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { padding-right:0; }
+}
+/* Iteration 9: mobile inbox first; richer sender identity in the reading pane. */
+
+#rl-app .pw-from { display:flex; flex-wrap:wrap; gap:var(--pw-space-3); }
+#rl-app .pw-native-from { display:none; }
+#rl-app .pw-sender { display:inline-flex; align-items:center; gap:var(--pw-space-3); }
+#rl-app .pw-sender-initial {align-items:center;justify-content:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;color:var(--pw-muted);font:var(--pw-weight-medium) var(--pw-text-sm)/1 system-ui;}
+#rl-app .pw-sender-name { display:block; color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-sm)/1.4 system-ui; }
+#rl-app .pw-sender-address {font:var(--pw-text-xs)/1.4 system-ui;color:var(--pw-muted);}
+#rl-app .bodyText {width:100%;}
+
+#rl-app #messageItem > .messageItemHeader > div:first-child { gap:var(--pw-space-3); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { border-radius:6px!important; }
+
+#rl-app [data-pw-icon="search"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round'%3E%3Ccircle cx='10.5' cy='10.5' r='6.5'/%3E%3Cpath d='m16 16 5 5'/%3E%3C/svg%3E"); }
+html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem :is(.flagParent,.attachmentParent,.threads-len) { height:20px; min-height:0; line-height:20px; font-size:15px; }
+@media(max-width:799px) {
+ #rl-app #V-MailMessageList:not(.pw-search-open):not(.pw-search-active):not(:has(> .btn-toolbar.hasChecked)) .messageList > .second-toolbar { display:none; }
+ #rl-app #rl-right > .pw-mobile-header {border-bottom:1px solid var(--pw-line);}
+ #rl-app #rl-right > .pw-mobile-header > button.btn { width:32px; min-width:32px; height:44px; flex:0 0 32px; }
+ #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="compose"] { width:40px; min-width:40px; flex-basis:40px; height:40px; min-height:40px; }
+ #rl-app #rl-right > .pw-mobile-header > button.pw-threads { padding:0; font-size:0; background:transparent; }
+ #rl-app .pw-mobile-header > button.pw-threads::before { content:''; display:block; width:18px; height:18px; background:var(--pw-muted); mask:var(--pw-conversations-icon) center/contain no-repeat; }
+ #rl-app .pw-mobile-header > button.pw-threads[aria-pressed="true"] { background:var(--pw-selected); color:var(--nc-color-primary-element); }
+ #rl-app #rl-right.message-selected > .pw-mobile-header :is(.pw-search-toggle,.pw-threads) { display:none; }
+ 
+ 
+ #rl-app .pw-mobile-header .pw-account-label::after { flex-basis:8px; margin-inline-start:var(--pw-space-1); }
+}
+/* Iteration 10: native date groups create a scanning rhythm. */
+#rl-app .pw-day-label, #rl-app .messageList .groupLabel {padding:var(--pw-space-2) var(--pw-space-4) var(--pw-space-2);box-sizing:border-box;color:var(--pw-muted);font:var(--pw-weight-strong) var(--pw-text-xs)/1.4 system-ui;border-bottom:1px solid var(--pw-line);}
+
+#rl-app .messageListItem time { font-weight:var(--pw-weight-regular); }
+
+#rl-app .b-folders .b-toolbar .buttonCompose { border-radius:6px; }
+#rl-app .b-folders li a.selectable.selected { border-radius:5px; }
+@media(max-width:799px) {
+ #rl-app #rl-right > .pw-mobile-header > button.pw-threads { display:flex; align-items:center; justify-content:center; }
+ #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="compose"] { border-radius:6px; }
+ 
+ 
+ #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline:var(--pw-space-4); background:var(--pw-rail); }
+}
+/* Iteration 11: one self-hosted type system, clearer content hierarchy. */
+#rl-app { --pw-font:'Pied Web UI',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif; font-family:var(--pw-font); }
+#rl-app :is(.b-folders,.messageList,.messageView,.messageListItem,.pw-list-title,.pw-mobile-folder-label,.pw-day-label,.pw-folder-section,.pw-sender-name,.pw-sender-address,.pw-account-label) { font-family:var(--pw-font)!important; }
+#rl-app .messageListItem :is(.senderParent,.subjectParent,time),#rl-app .messageView .messageItemHeader :is(.subjectParent,.subject,.informationShort,.date),#rl-app button.pw-threads,#rl-app .pw-reading-actions button.btn,#rl-app .buttonComposeText { font-family:var(--pw-font)!important; }
+#rl-app .messageListItem .senderParent {line-height:1.35;}
+
+#rl-app .messageListItem:not(.unseen) .subjectParent { color:var(--pw-grey-800); }
+#rl-app .messageListItem time {font-variant-numeric:tabular-nums;}
+
+#rl-app #V-MailMessageList .pw-list-title { font-size:var(--pw-text-xl); font-weight:var(--pw-weight-strong); letter-spacing:var(--pw-tracking-tight); }
+#rl-app .pw-folder-section,#rl-app .pw-day-label,#rl-app .messageList .groupLabel { font-size:var(--pw-text-xs); font-weight:var(--pw-weight-strong); letter-spacing:var(--pw-tracking-caps); }
+#rl-app #V-MailFolderList .buttonComposeText { font-size:var(--pw-text-sm); font-weight:var(--pw-weight-strong); }
+
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn {width:36px;min-width:36px;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions { gap:var(--pw-space-1); }
+
+@media(max-width:799px){
+ #rl-app .pw-mobile-identity .pw-mobile-folder-label { font-size:var(--pw-text-lg); font-weight:var(--pw-weight-strong); letter-spacing:var(--pw-tracking-tight); }
+ #rl-app .messageListItem { padding-block:var(--pw-space-3); }
+ #rl-app .messageListItem .subjectParent { font-size:var(--pw-text-sm); }
+}
+/* Iteration 12: calmer surfaces and a folder-led mobile header. */
+
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {letter-spacing:0;text-transform:none;border:0;background:var(--pw-paper);}
+#rl-app .pw-day-label::first-letter,#rl-app .messageList .groupLabel::first-letter { text-transform:uppercase; }
+#rl-app .pw-day-label:first-child { padding-top:var(--pw-space-3); min-height:32px; }
+#rl-app .messageListItem { border-bottom:0!important; }
+html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { grid-template-rows:20px auto; align-content:center; row-gap:var(--pw-space-0-5); }
+
+#rl-app .pw-sender-initial { border:0; background:var(--pw-rail); }
+#rl-app .messageList .inputSearch { background:var(--pw-paper); }
+
+@media(max-width:799px) {
+ #rl-app #rl-right:not(.message-selected) > .pw-mobile-header > .btn:first-child { display:none; }
+ 
+ #rl-app .pw-mobile-identity {display:flex;}
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label {display:flex;align-items:center;justify-content:flex-start;gap:var(--pw-space-2);width:auto;margin:0;padding:0;border:0!important;border-radius:0;font:var(--pw-weight-strong) var(--pw-text-lg)/1.4 var(--pw-font);letter-spacing:var(--pw-tracking-tight);color:var(--nc-color-main-text);background:transparent;}
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label::after { content:'⌄'; font:400 13px/1 var(--pw-font); color:var(--pw-muted); }
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {padding:0;}
+ 
+ #rl-app .pw-mobile-header .pw-account-label::after { display:none; }
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
+ 
+ 
+}
+/* Iteration 13: deliberate density and contextual folder actions. */
+
+html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padding:0; }
+#rl-app .messageListItem { min-height:60px; margin-inline:var(--pw-space-2); width:auto; border-radius:5px; }
+#rl-app .pw-folder-section { display:flex; align-items:center; justify-content:space-between; padding-block:var(--pw-space-4) var(--pw-space-1); }
+#rl-app .pw-folder-section h2 { font:inherit; letter-spacing:inherit; text-transform:inherit; margin:0; }
+#rl-app .pw-folder-actions { display:flex; gap:0; }
+#rl-app .pw-folder-actions .btn[data-pw-icon] { width:28px; height:28px; min-height:28px; min-width:28px; }
+#rl-app [data-pw-icon="add-folder"] { --pw-icon:var(--pw-add-folder-icon); }
+#rl-app [data-pw-icon="settings"] { --pw-icon:var(--pw-settings-icon); }
+#rl-app #V-MailFolderList .b-footer { flex-direction:row-reverse; height:48px; min-height:48px; }
+#rl-app #V-MailFolderList .b-footer .buttonContacts.btn { width:auto!important; gap:var(--pw-space-2); padding-inline:var(--pw-space-1)!important; }
+#rl-app #V-MailFolderList .b-footer .buttonContacts .pw-contacts-label { display:block!important; font:var(--pw-weight-medium) var(--pw-text-sm)/1 var(--pw-font); }
+#rl-app .messageView .messageItemHeader .informationShort:has(.pw-from) { display:flex; align-items:center; gap:var(--pw-space-2); }
+#rl-app .messageView .messageItemHeader .pw-from { flex:1; min-width:0; }
+@media(min-width:800px){
+ #rl-app .b-folders li a.selectable { height:34px; line-height:34px!important; }
+ 
+ #rl-app .messageListItem { padding-inline-start:var(--pw-space-4); }
+}
+@media(max-width:799px){
+ #rl-app .messageListItem { min-height:64px; padding:var(--pw-space-3) var(--pw-space-4); }
+ #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline-start:var(--pw-space-6); }
+ #rl-app .b-folders li a.selectable { min-height:44px; line-height:44px!important; }
+}
+/* Iteration 14: quieter Nextcloud chrome and precise desktop density. */
+#rl-app #V-MailMessageList .messageListItem { min-height:60px; padding:var(--pw-space-2) var(--pw-space-4); }
+#rl-app .b-folders .b-folders-user a:has(.e-collapsed-sign:not(.icon-none))::before { visibility:hidden; }
+#rl-app .b-folders .b-folders-user a > .e-collapsed-sign:not(.icon-none) { display:flex; align-items:center; justify-content:center; inset-inline-start:8px; width:19px; height:100%; font-size:0; }
+#rl-app .b-folders .b-folders-user a > .e-collapsed-sign:not(.icon-none)::before { content:''; display:block; width:13px; height:13px; background:currentColor; mask:var(--pw-icon) center/contain no-repeat; --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); }
+#rl-app .b-folders .b-folders-user a > .e-collapsed-sign.icon-right-mini::before { transform:rotate(-90deg); }
+#rl-app .b-folders .b-folders-user a > .e-collapsed-sign:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:0; border-radius:4px; }
+@media(min-width:800px){}
+@media(max-width:799px){#rl-app #V-MailMessageList .messageListItem { min-height:64px; padding:var(--pw-space-3) var(--pw-space-4); }}
+/* Iteration 15: consistent optical weight and shorter action distances. */
+
+#rl-app .messageListItem .subjectParent { font-size:var(--pw-text-sm); }
+
+#rl-app .messageListItem .senderParent { font-size:var(--pw-text-sm); }
+
+#rl-app .pw-reading-actions { padding-top:0; }
+#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon] { background:transparent; color:var(--pw-muted); }
+#rl-app #V-MailMessageView .top-toolbar .pw-reply[data-pw-icon]:hover { background:var(--pw-selected); color:var(--nc-color-primary-element); }
+#rl-app [data-pw-icon="reply"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m8 5-5 5 5 5M3 10h10a7 7 0 0 1 7 7v3'/%3E%3C/svg%3E"); }
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) { opacity:1; color:var(--pw-muted); }
+@media(max-width:799px){
+ 
+ #rl-app #V-MailMessageList .messageListItem .subjectParent { font-size:var(--pw-text-sm); }
+}
+/* Iteration 16: explicitly scoped mail search, separate from Nextcloud search. */
+#rl-app #V-MailMessageList .messageListItem .messageCheckbox { padding:0; flex:0 0 24px; margin:0; }
+#rl-app #V-MailMessageList .messageListItem > div + div { padding:0!important; }
+#rl-app .b-folders .b-folders-system a:is([data-icon="⚠"],[data-icon="🗑"])[data-unread]::after { color:var(--pw-grey-500); font-size:var(--pw-text-xs); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions { border:1px solid var(--pw-line); border-radius:6px; padding:0; margin-inline-end:var(--pw-space-2); gap:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions > .btn { width:36px; min-width:36px; height:34px; min-height:34px; }
+@media(min-width:800px){
+ 
+ #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-inline-start:48px; }
+}
+@media(max-width:799px){
+ #rl-app #rl-right > .pw-mobile-header {padding-inline:var(--pw-space-3);}
+ 
+ 
+ #rl-app .pw-mobile-identity #V-SystemDropDown {flex:0 1 auto;}
+ 
+ 
+ 
+ #rl-app #V-MailMessageList .messageList > .second-toolbar {min-height:44px;padding:0 var(--pw-space-3) var(--pw-space-2);}
+ #rl-app #V-MailMessageList .messageList > .second-toolbar button.pw-threads { display:flex; align-items:center; justify-content:center; margin:0; }
+ #rl-app #V-MailMessageList .messageList > .second-toolbar .inputSearch { font-size:var(--pw-text-sm); }
+ #rl-app .pw-day-label,#rl-app .messageList .groupLabel { padding-block:var(--pw-space-3) var(--pw-space-2); min-height:30px; }
+}
+
+/* Iteration 17: one control language and a compact reading hierarchy. */
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group {margin-inline-end:0;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group > .btn { height:34px; min-height:34px; }
+
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {display:flex;align-items:center;gap:var(--pw-space-3);}
+#rl-app .pw-day-label::after,#rl-app .messageList .groupLabel::after { content:''; height:1px; flex:1; background:var(--pw-grey-100); }
+#rl-app .pw-folder-section { text-transform:none; font-size:var(--pw-text-xs); letter-spacing:0; }
+
+#rl-app .messageView .messageItemHeader .informationShort { margin-top:var(--pw-space-3); }
+
+#rl-app .bodyText { padding-top:var(--pw-space-6); }
+@media(min-width:800px){}
+
+/* Iteration 18: a single mobile mail header, with search on demand. */
+
+#rl-app .messageListItem .subjectParent { letter-spacing:0; }
+#rl-app .pw-mobile-select { display:none; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group {border:0;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { background:transparent; }
+@media(min-width:800px){html.sm-msgView-side #rl-app #V-MailMessageList .messageList { width:33vw; }}
+@media(max-width:799px){
+ #rl-app #rl-right > .pw-mobile-header { flex-basis:64px!important; gap:var(--pw-space-1); }
+ #rl-app .pw-mobile-identity { flex-direction:column; align-items:flex-start; justify-content:center; gap:0; }
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label {flex:0 0 26px;}
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id {justify-content:flex-start;}
+ 
+ #rl-app #rl-right > .pw-mobile-header > .pw-search-toggle {display:flex;font:var(--pw-weight-medium) var(--pw-text-xs)/1 var(--pw-font)!important;flex:0 0 56px;}
+ #rl-app .pw-mobile-header > .pw-search-toggle::before { display:none; }
+ #rl-app .pw-mobile-header > .btn-group { margin:0; flex:0 0 32px; }
+ #rl-app .pw-mobile-header > .btn-group > .btn { width:32px; min-width:32px; }
+ #rl-app #V-MailMessageList .messageList > .second-toolbar { display:none!important; }
+ #rl-app #V-MailMessageList:is(.pw-search-open,.pw-search-active,:has(.btn-toolbar.hasChecked)) .messageList > .second-toolbar { display:flex!important; padding-top:var(--pw-space-1); }
+ #rl-app .pw-mobile-select { display:block; }
+ #rl-app #V-MailMessageList .checkboxCheckAll[aria-checked="true"]::after { content:''; position:absolute; width:8px; height:4px; border:solid var(--nc-color-primary-element-text); border-width:0 0 2px 2px; transform:rotate(-45deg); margin-top:-2px; }
+ #rl-app #V-MailMessageList .checkboxCheckAll[aria-checked="mixed"]::after { content:''; position:absolute; width:8px; height:2px; background:var(--nc-color-primary-element-text); }
+}
+
+/* Iteration 19: a continuous workspace toolbar and distinct mobile actions. */
+
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group { background:transparent; border-radius:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group {border-inline-start:1px solid var(--pw-line);padding-inline-start:var(--pw-space-2);}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu {border:0;padding:0;}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) {border:0;}
+#rl-app #V-MailMessageList button.pw-threads::before,#rl-app .pw-mobile-header > button.pw-threads::before { width:18px; height:18px; }
+#rl-app [data-pw-icon="compose"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4H4v16h16v-8M9 15l1-5L19 1l4 4-9 9-5 1zm8-12 4 4'/%3E%3C/svg%3E"); }
+@media(max-width:799px){
+ #rl-app #rl-right > .pw-mobile-header { background:var(--pw-rail); }
+ #rl-app #rl-right > .pw-mobile-header > .pw-search-toggle { border:1px solid var(--pw-line)!important; border-radius:6px; width:66px; min-width:66px; flex-basis:66px; height:34px; min-height:34px; background:var(--pw-paper); margin-inline-end:var(--pw-space-1); }
+ #rl-app .pw-mobile-identity button.pw-mobile-folder-label { font-size:var(--pw-text-xl); height:28px; min-height:28px; flex-basis:28px; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { font-size:var(--pw-text-xs); height:24px; min-height:24px; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { height:24px; }
+}
+
+/* Iteration 20: remove inherited control collisions and align pane boundaries. */
+#rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { min-height:56px!important; height:56px; margin:0!important; padding-block:0!important; align-items:center; border-bottom:1px solid var(--pw-line); }
+#rl-app #V-MailMessageList > .btn-toolbar [data-pw-icon].btn,#rl-app #V-MailMessageList > .btn-toolbar .pw-threads { background:transparent!important; }
+#rl-app #V-MailMessageList > .btn-toolbar .pw-threads[aria-pressed="true"] { background:var(--pw-primary-200)!important; }
+#rl-app .pw-desktop-identity { min-height:56px; box-sizing:border-box; border-bottom:1px solid var(--pw-line); }
+#rl-app .b-folders .b-toolbar { padding-block:var(--pw-space-3); }
+@media(max-width:799px){
+ 
+ #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle {border-radius:6px;flex:0 0 66px;margin-inline-end:var(--pw-space-1);}
+ #rl-app #V-MailMessageList > .btn-toolbar.pw-mobile-tools-moved:not(.hasChecked) { height:0; min-height:0!important; border:0; }
+ 
+ #rl-app .pw-mobile-identity #V-SystemDropDown { max-width:100%; }
+}
+
+/* Iteration 21: mail identity above, list controls beside the date. */
+#rl-app #V-MailMessageList > .btn-toolbar,#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { background:var(--pw-paper); }
+#rl-app .messageView .messageItemHeader .subjectParent { font-size:var(--pw-text-2xl); font-weight:var(--pw-weight-strong); letter-spacing:var(--pw-tracking-tight); }
+#rl-app .pw-sender-initial { display:none; }
+#rl-app .pw-sender > span:last-child {display:flex;align-items:baseline;}
+#rl-app .pw-sender-address { display:inline; }
+#rl-app #messageItem > .messageItemHeader { padding-inline-start:var(--pw-space-8); }
+
+#rl-app .pw-mobile-list-tools { display:none; }
+@media(max-width:799px){
+ #rl-app #rl-right:has(#V-MailMessageList:not([hidden]),#V-MailMessageView:not([hidden])) > .pw-mobile-header { background:var(--pw-paper); padding-inline:var(--pw-space-4); gap:var(--pw-space-3); }
+ #rl-app .pw-mobile-list-tools { display:flex; gap:var(--pw-space-2); align-items:center; order:2; margin-inline-start:auto; }
+ 
+ #rl-app .pw-day-label:has(.pw-mobile-list-tools)::after { order:1; }
+ #rl-app .pw-mobile-list-tools > .btn-group { margin:0; }
+ #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads {display:inline-flex;align-items:center;width:auto;min-width:0;padding:0 var(--pw-space-1);height:32px;min-height:32px;gap:var(--pw-space-2);}
+ #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads::before { width:16px; height:16px; }
+ #rl-app .pw-mobile-list-tools .btn-group > .btn { width:32px; min-width:32px; height:32px; min-height:32px; }
+ #rl-app #V-MailMessageList.pw-tools-fallback .messageList > .second-toolbar { display:flex!important; }
+ #rl-app .pw-sender > span:last-child {flex-direction:column;}
+ #rl-app #messageItem > .messageItemHeader { padding-inline-start:var(--pw-space-6); }
+}
+
+/* Iteration 22: compact metadata and a measured icon scale. */
+
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent) { min-width:28px; width:28px; min-height:28px; height:28px; margin:0; padding:0; line-height:1; }
+
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent)::before { width:16px; height:16px; }
+#rl-app [data-pw-icon].btn::before { width:18px; height:18px; }
+#rl-app .b-folders .b-folders-system a[data-icon]::before,#rl-app .b-folders .b-folders-user a:not(.system)::before { width:18px; height:18px; min-width:18px; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions { background:var(--pw-selected); border-radius:6px; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-message-actions .btn { color:var(--nc-color-primary-element); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { border:0; }
+
+#rl-app .pw-account-label { min-width:0; max-width:100%; }
+#rl-app .pw-account-local { min-width:0; overflow:hidden; text-overflow:ellipsis; }
+@media(max-width:799px){
+ #rl-app .pw-mobile-identity #V-SystemDropDown .btn-toolbar { min-width:0; }
+ #rl-app .pw-mobile-identity #V-SystemDropDown #top-system-dropdown-id { max-width:100%; width:100%; }
+}
+
+/* Iteration 23: subject-first scanning and even section spacing. */
+#rl-app .messageListItem .senderParent { color:var(--pw-grey-700); }
+#rl-app .messageListItem time {color:var(--pw-grey-600);}
+#rl-app .messageListItem.unseen .subjectParent { font-weight:var(--pw-weight-strong); }
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel {min-height:28px;padding-block:var(--pw-space-2) var(--pw-space-1);}
+#rl-app .messageView .messageItemHeader { padding-top:var(--pw-space-6); }
+#rl-app .messageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:var(--pw-space-3); }
+#rl-app #messageItem > .messageItemHeader { padding-bottom:var(--pw-space-3); }
+#rl-app .pw-reading-actions { gap:var(--pw-space-3); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group { margin:0; padding:0; gap:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group + .btn-group { margin-inline-start:var(--pw-space-3); padding:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .pw-reader-menu { margin-inline-start:var(--pw-space-1); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar > .btn-group:has(.buttonDown) { margin-inline-start:auto; }
+@media(max-width:799px){
+ #rl-app .pw-day-label:has(.pw-mobile-list-tools) { min-height:36px; padding-block:var(--pw-space-0-5); }
+ #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-threads { font-size:var(--pw-text-xs); font-weight:var(--pw-weight-medium); }
+ #rl-app .pw-mobile-list-tools .dropdown-menu { position:fixed; left:auto; right:12px; top:150px; max-width:calc(100vw - 24px); max-height:calc(100dvh - 166px); }
+ #rl-app .messageListItem time { font-size:var(--pw-text-xs); }
+}
+
+/* Iteration 24: one desktop mail toolbar. */
+@media(min-width:800px){
+ #rl-app #V-MailMessageList.pw-single-toolbar .pw-list-title { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
+ #rl-app #V-MailMessageList.pw-single-toolbar > .btn-toolbar { padding-inline:var(--pw-space-4); gap:var(--pw-space-1); }
+ #rl-app #V-MailMessageList.pw-single-toolbar > .btn-toolbar > .second-toolbar { display:flex; flex:1; min-width:0; height:56px; align-items:center; gap:var(--pw-space-2); padding:0; border:0; }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .search-input-wrp { flex:1; min-width:0; }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .inputSearch { width:100%; height:34px; padding:0 var(--pw-space-8) 0 var(--pw-space-3); background:var(--pw-paper); font-size:var(--pw-text-xs); }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .checkboxCheckAll { flex:0 0 18px; }
+ #rl-app #V-MailMessageList.pw-single-toolbar button.pw-threads { width:32px; min-width:32px; padding:0; font-size:0; justify-content:center; }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .btn-group .btn { width:30px; min-width:30px; }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .buttonMoreSearch { position:absolute; right:0; top:0; height:34px; width:28px; min-width:28px; }
+ #rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .search-input-wrp { position:relative; }
+}
+#rl-app .messageListItem.selected { box-shadow:inset 0 0 0 1px var(--pw-ring-soft); }
+
+/* Iteration 25: native touch selection and a consistent search control. */
+#rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .inputSearch { border:1px solid var(--pw-line); border-radius:6px; box-shadow:none; }
+#rl-app #V-MailMessageList.pw-single-toolbar .second-toolbar .inputSearch:focus { border-color:var(--nc-color-primary-element); outline:2px solid var(--pw-ring-soft); }
+#rl-app .pw-folder-actions .btn[data-pw-icon] { color:var(--pw-grey-500); }
+#rl-app .pw-folder-actions .btn[data-pw-icon]:hover { color:var(--nc-color-main-text); }
+@media(max-width:799px){
+ #rl-app #V-MailMessageList .messageListItem { margin-inline:0; padding-inline:var(--pw-space-6); border-radius:0; }
+ #rl-app #V-MailMessageList .messageListItem.selected { box-shadow:none; }
+ #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle { width:40px; min-width:40px; flex-basis:40px; height:40px; min-height:40px; margin:0; padding:0; border:0!important; background:transparent; font-size:0!important; }
+ #rl-app .pw-mobile-header > button.btn.pw-search-toggle::before { display:block; width:18px; height:18px; }
+ #rl-app .pw-mobile-header > button.btn.pw-search-toggle[aria-expanded="true"] { color:var(--nc-color-primary-element); background:var(--pw-selected); }
+}
+
+/* Iteration 26: one coherent message action group. */
+#rl-app .pw-reader-commands {display:flex;align-items:center;border:1px solid var(--pw-line);border-radius:6px;height:34px;padding:0 var(--pw-space-0-5);}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group { display:flex; align-items:center; gap:0; margin:0; padding:0; border:0; background:transparent; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group > .btn { width:34px; min-width:34px; height:32px; min-height:32px; border-radius:4px; background:transparent; color:var(--pw-muted); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions { border-inline-end:1px solid var(--pw-line); margin-inline-end:var(--pw-space-1); padding-inline-end:var(--pw-space-1); border-radius:0; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-reply { color:var(--nc-color-primary-element); }
+#rl-app [data-pw-icon="copy-md"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='8' y='8' width='12' height='13' rx='1.5'/%3E%3Cpath d='M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2'/%3E%3C/svg%3E"); }
+#rl-app #V-MailMessageView .pw-copy-md[disabled] { opacity:.4; cursor:default; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-copy-md[data-state="copied"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m5 12 4 4L19 6'/%3E%3C/svg%3E"); color:var(--nc-color-primary-element-text); background:var(--nc-color-primary-element); }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-copy-md[data-state="error"] { --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E"); color:var(--color-error,var(--nc-color-main-text)); background:color-mix(in oklch,var(--color-error,var(--nc-color-main-text)) 12%,var(--pw-paper)); }
+#rl-app #V-MailMessageView .pw-copy-md[data-state="copied"]::before { animation:pw-copy-confirm .18s cubic-bezier(.22,1,.36,1) both; }
+#rl-app #V-MailMessageView .pw-copy-md:not([disabled]):active { transform:scale(.94); }
+@keyframes pw-copy-confirm { from { opacity:.55; transform:scale(.75); } to { opacity:1; transform:scale(1); } }
+@media(prefers-reduced-motion:reduce){
+ #rl-app #V-MailMessageView .pw-copy-md[data-state="copied"]::before { animation:none; }
+ #rl-app #V-MailMessageView .pw-copy-md:not([disabled]):active { transform:none; }
+}
+#rl-app .pw-copy-md-status { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+
+#rl-app #messageItem > .messageItemHeader { padding-top:var(--pw-space-0-5); }
+#rl-app .pw-sender-name { font-weight:var(--pw-weight-medium); }
+#rl-app .pw-sender > span:last-child { gap:var(--pw-space-3); }
+#rl-app #V-MailMessageList .messageListItem .messageCheckbox { flex-basis:22px; }
+@media(max-width:799px){
+ #rl-app .pw-sender > span:last-child { gap:var(--pw-space-0-5); }
+ #rl-app .pw-reader-commands { max-width:100%; }
+}
+
+/* Iteration 27: a more focused reading measure and denser desktop list. */
+#rl-app .bodyText { max-width:576px; padding-bottom:var(--pw-space-1); }
+#rl-app .pw-day-label,#rl-app .messageList .groupLabel { font-size:var(--pw-text-xs); font-weight:var(--pw-weight-medium); }
+#rl-app .messageListItem time { font-size:var(--pw-text-xs); }
+#rl-app .messageListItem .checkboxMessage::before,#rl-app .checkboxCheckAll::before { border-color:var(--pw-grey-500); }
+@media(min-width:800px){
+ #rl-app #V-MailMessageList .messageListItem { min-height:58px; padding-block:var(--pw-space-2); }
+ html.sm-msgView-side #rl-app .messageListItem > div + div { row-gap:var(--pw-space-0-5); }
+}
+
+/* Iteration 28: mobile search belongs to the mailbox header. */
+#rl-app .pw-sender-address,#rl-app #messageItem > .messageItemHeader { color:var(--pw-muted); }
+#rl-app #V-MailMessageView .messageItemHeader .informationShort:has(.pw-from) { margin-top:var(--pw-space-2); }
+@media(max-width:799px){
+ #rl-app #rl-right > .pw-mobile-header > button.btn.pw-search-toggle { display:none; }
+ #rl-app .pw-mobile-header > .search-input-wrp {display:flex;position:relative;align-items:center;min-width:110px;}
+ #rl-app .pw-mobile-header > .search-input-wrp input {box-sizing:border-box;width:100%;border:1px solid var(--pw-line);border-radius:6px;box-shadow:none;padding:0 var(--pw-space-8) 0 var(--pw-space-3);font:var(--pw-weight-regular) var(--pw-text-xs)/1.2 var(--pw-font);background:var(--pw-paper);color:var(--nc-color-main-text);}
+ #rl-app .pw-mobile-header > .search-input-wrp .buttonMoreSearch {position:absolute;right:0;top:0;width:28px;min-width:28px;}
+ #rl-app #rl-right.message-selected > .pw-mobile-header > .search-input-wrp { display:none; }
+ #rl-app .pw-mobile-header > .search-input-wrp input:focus { border-color:var(--nc-color-primary-element); outline:2px solid var(--pw-ring-soft); }
+ #rl-app #V-MailMessageList .messageListItem.selected { background:var(--pw-primary-100)!important; }
+}
+
+/* Iteration 29: clearer navigation and touch/keyboard finishing. */
+#rl-app .b-folders li a.selectable { font-size:var(--pw-text-sm); }
+#rl-app .b-folders li a.selected { background:var(--pw-primary-100); }
+#rl-app .messageListItem.selected { background:var(--pw-primary-100)!important; }
+#rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent):focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; border-radius:4px; }
+#rl-app .checkboxCheckAll:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; border-radius:4px; }
+@media(max-width:799px){
+ #rl-app .pw-mobile-header > .search-input-wrp input { font-size:var(--pw-text-md); height:40px; min-height:40px; }
+ #rl-app .pw-mobile-header > .search-input-wrp input::placeholder { font-size:var(--pw-text-xs); }
+ #rl-app .pw-mobile-header > .search-input-wrp .buttonMoreSearch { height:40px; min-height:40px; }
+ #rl-app #V-MailMessageView .top-toolbar [data-pw-icon="close"] { display:none!important; }
+ #rl-app .pw-folder-actions .btn[data-pw-icon] { min-width:40px; min-height:44px; }
+}
+
+/* Iteration 30: assured row selection and final optical alignment. */
+#rl-app #V-MailMessageList .messageListItem.selected { box-shadow:none; }
+#rl-app .pw-reader-commands { border-color:transparent; background:transparent; }
+#rl-app [data-pw-icon="filter"].btn::before { width:16px; height:16px; }
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline:var(--pw-space-8); }
+#rl-app .checkboxCheckAll[aria-checked="true"]::after { content:''; position:absolute; width:8px; height:4px; border:solid var(--nc-color-primary-element-text); border-width:0 0 2px 2px; transform:rotate(-45deg); margin-top:-2px; }
+#rl-app .checkboxCheckAll[aria-checked="mixed"]::after { content:''; position:absolute; width:8px; height:2px; background:var(--nc-color-primary-element-text); }
+@media(max-width:799px){
+ #rl-app .pw-mobile-header .pw-mobile-identity { min-width:90px; }
+ #rl-app .pw-mobile-header > .search-input-wrp { flex:0 1 152px; width:152px; }
+ #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar { padding-inline:var(--pw-space-3); }
+ #rl-app #V-MailMessageView .top-toolbar > .btn-group:has([data-pw-icon="close"]) { display:none; }
+}
+/* Validation fix: medium-width windows need one readable content pane. */
+@media(min-width:800px) and (max-width:1099px){
+ html.sm-msgView-side #rl-app #V-MailMessageList,html.sm-msgView-side #rl-app #V-MailMessageView { flex:1 1 auto!important; width:100%!important; min-width:0; }
+ html.sm-msgView-side #rl-app #rl-right.message-selected #V-MailMessageList { display:none!important; }
+ html.sm-msgView-side #rl-app #rl-right:not(.message-selected) #V-MailMessageView { display:none!important; }
+ html.sm-msgView-side #rl-app #V-MailMessageList .messageList { min-width:0; width:100%; }
+ html.sm-msgView-side #rl-app #V-MailMessageView .top-toolbar > .btn-group:has([data-pw-icon="close"]) { display:flex!important; order:-1; }
+ html.sm-msgView-side #rl-app #V-MailMessageView .top-toolbar [data-pw-icon="close"] { display:inline-flex!important; }
+}
+/* Validation fix: selected text needs a lighter ink on dark surfaces. */
+@media(prefers-color-scheme:dark){
+ #rl-app .b-folders li a.selectable.selected,
+ #rl-app .b-folders .b-folders-system a.selected[data-unread]::after,
+ #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands .pw-reply,
+ #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"] {
+  color:var(--pw-primary-ink);
+ }
+}
+
+/* The conversation icon uses the button's pressed-state ink in every toolbar layout. */
+#rl-app #V-MailMessageList button.pw-threads::before,
+#rl-app #rl-right > .pw-mobile-header button.pw-threads::before { background:currentColor; }
+#rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"],
+#rl-app #rl-right > .pw-mobile-header button.pw-threads[aria-pressed="true"] {
+ color:var(--nc-color-primary-element);
+ background:var(--pw-primary-200)!important;
+ box-shadow:inset 0 0 0 1px var(--pw-ring-strong);
+}
+@media(prefers-color-scheme:dark){
+ #rl-app #V-MailMessageList button.pw-threads[aria-pressed="true"],
+ #rl-app #rl-right > .pw-mobile-header button.pw-threads[aria-pressed="true"] {
+  color:var(--pw-primary-ink);
+ }
+}
+
+/* Keep the docked account menu above the neighbouring mail panes. */
+@media(min-width:800px) {
+ #rl-app #rl-left:has(#V-SystemDropDown .dropdown.show) { z-index:150; overflow:visible; }
+}
+#rl-app #V-SystemDropDown .dropdown-menu { width:max-content; min-width:min(260px,calc(100vw - 24px)); max-width:min(420px,calc(100vw - 24px)); }
+/* The account menu sits inside .b-folders, but its links are not folder rows. */
+#rl-app #V-SystemDropDown .dropdown-menu li { white-space:normal; }
+#rl-app #V-SystemDropDown .dropdown-menu a {
+ border:0; color:var(--dropdown-menu-color,var(--nc-color-main-text)); background:var(--dropdown-menu-bg-color,var(--pw-paper));
+ font-style:normal; font-weight:var(--pw-weight-regular); line-height:1.5; min-height:36px; padding:var(--pw-space-2) var(--pw-space-3);
+ box-sizing:border-box; cursor:pointer; white-space:normal; overflow-wrap:anywhere;
+}
+#rl-app #V-SystemDropDown .dropdown-menu li:not(.disabled) > a:is(:hover,:focus-visible) {
+ background:var(--pw-selected); color:var(--nc-color-main-text);
+}
+@media(min-width:800px) {
+ html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders { padding-inline:0; }
+ html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders li a.selectable {
+  display:flex; align-items:center; justify-content:center; position:relative;
+  height:56px; min-height:56px; padding:0; padding-inline:0; text-indent:0; font-size:0;
+ }
+ html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders li a.selectable::before {
+  position:absolute; inset-inline-start:50%; inset-inline-end:auto; top:24px;
+  width:23px; height:23px; min-width:23px; margin:0; transform:translate(-50%,-50%); visibility:visible;
+ }
+ html.rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders li a.selectable[data-unread]::after {
+  inset-inline-start:auto; inset-inline-end:4px; top:auto; bottom:3px; transform:none;
+  min-width:0; margin:0; padding:0; font-size:var(--pw-text-xs); line-height:14px; font-variant-numeric:tabular-nums;
+ }
+ [dir="rtl"].rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders li a.selectable::before { transform:translate(50%,-50%); }
+}
+@media(max-width:799px) {
+ #rl-app #V-SystemDropDown .dropdown-menu {
+  position:fixed; inset-inline:12px; top:var(--pw-account-menu-top,72px);
+  width:auto; min-width:0; max-width:none; box-sizing:border-box;
+  max-height:calc(100dvh - var(--pw-account-menu-top,72px) - 12px);
+ }
+ #rl-app #V-SystemDropDown .dropdown-menu a { min-height:44px; }
+}
+@media(pointer:coarse) {
+ #rl-app #V-SystemDropDown .dropdown-menu a { min-height:44px; }
+}
+
+/* Keep the native label menu beside message info and follow controls. */
+html.pw-theme #rl-app #V-MailMessageView .messageTags.pw-tags-in-header { display:none!important; }
+html.pw-theme #rl-app #V-MailMessageView .informationShort:has(.pw-reader-tags) { overflow:visible; }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags {
+ display:flex!important; align-items:center; justify-content:center; order:2;
+ position:relative; flex:0 0 44px; width:44px; height:44px; margin:0;
+ font:var(--pw-weight-regular) var(--pw-text-sm)/1.45 var(--pw-font);
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id {
+ display:flex; align-items:center; justify-content:center;
+ box-sizing:border-box; width:44px; min-width:44px; height:44px; min-height:44px;
+ padding:0; border:0; border-radius:6px; background:transparent;
+ color:var(--pw-muted); font-size:0; line-height:1;
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id::before {
+ content:''; display:block; width:18px; height:18px; background:currentColor;
+ mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 13.5 12.5 21 3 11.5V3h8.5L21 12.5a1.4 1.4 0 0 1-1 1Z'/%3E%3Ccircle cx='7.5' cy='7.5' r='1'/%3E%3C/svg%3E") center/contain no-repeat;
+}
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id::after { display:none; }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:hover,
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags.show > #tags-dropdown-id { color:var(--nc-color-main-text); background:var(--pw-rail); }
+html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
+
+/* Reader header addresses: a click writes a new message, Ctrl/Cmd+click copies. */
+html.pw-theme #rl-app #V-MailMessageView .pw-native-addresses { display:none; }
+#rl-app #V-MailMessageView .pw-addresses a.pw-address { color:inherit; }
+#rl-app #V-MailMessageView a.pw-address {
+ padding:0; border-radius:3px; text-decoration:none; overflow-wrap:anywhere; cursor:pointer;
+}
+#rl-app #V-MailMessageView a.pw-address:hover {
+ color:var(--nc-color-primary-element); text-decoration:underline; text-underline-offset:3px;
+}
+#rl-app #V-MailMessageView a.pw-address:focus-visible {
+ outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+}

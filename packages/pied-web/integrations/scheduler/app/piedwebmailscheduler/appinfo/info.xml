@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+  <id>piedwebmailscheduler</id>
+  <name>Pied Web mail scheduler</name>
+  <summary>Sends scheduled mail and wakes due reminders without a browser</summary>
+  <description>Reads the Scheduled and Reminders folders of each mailbox whose NextSnapMail credentials are stored in Nextcloud. It sends due outgoing messages at most once and moves due reminders back to Inbox as unread. No message, recipient or credential is stored by this app.</description>
+  <version>1.1.0</version>
+  <licence>AGPL-3.0-or-later</licence>
+  <author>Robin Delattre</author>
+  <namespace>PiedWebMailScheduler</namespace>
+  <category>tools</category>
+  <dependencies>
+    <nextcloud min-version="34" max-version="34"/>
+  </dependencies>
+  <background-jobs>
+    <job>OCA\PiedWebMailScheduler\BackgroundJob\SendDueJob</job>
+  </background-jobs>
+  <commands>
+    <command>OCA\PiedWebMailScheduler\Command\SendDue</command>
+  </commands>
+</info>

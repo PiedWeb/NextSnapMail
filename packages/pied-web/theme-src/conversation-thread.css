@@ -1,0 +1,74 @@
+/* Read-only message choices surround SnappyMail's native expanded reader. */
+@media(min-width:800px) {
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar > .btn-group:has(.buttonClose) {
+  display:flex!important; order:1; margin-inline-start:var(--pw-space-1);
+ }
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar > .pw-docked-account { order:2; }
+ #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar .buttonClose[data-pw-icon="close"] {
+  display:inline-flex!important;
+ }
+}
+#rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent > .close {
+ display:none!important;
+}
+#rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent {
+ font-size:var(--pw-text-sm); line-height:1.4; letter-spacing:0;
+}
+#rl-app #V-MailMessageView .b-message.pw-conversation-pending > .messageItemHeader,
+#rl-app #V-MailMessageView .b-message.pw-conversation-pending > #messageItem {
+ display:none!important;
+}
+#rl-app #V-MailMessageView .pw-conversation-before,
+#rl-app #V-MailMessageView .pw-conversation-after {
+ flex:0 0 auto; margin:0 var(--pw-space-6) var(--pw-space-4); font-family:var(--pw-font);
+}
+#rl-app #V-MailMessageView .pw-conversation-before { margin-bottom:var(--pw-space-1); }
+#rl-app #V-MailMessageView .pw-conversation-before[hidden],
+#rl-app #V-MailMessageView .pw-conversation-after[hidden],
+#rl-app #V-MailMessageView .pw-conversation-before > h2[hidden],
+#rl-app #V-MailMessageView .pw-conversation-before > button[hidden] { display:none; }
+#rl-app #V-MailMessageView .pw-conversation-before h2 {
+ margin:0 0 var(--pw-space-2); padding:var(--pw-space-3) var(--pw-space-2); border-top:1px solid var(--pw-line);
+ color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-xl)/1.35 var(--pw-font);
+}
+#rl-app #V-MailMessageView .pw-conversation-before > button {
+ margin:0 var(--pw-space-2) var(--pw-space-3); padding:var(--pw-space-1) var(--pw-space-2); min-height:36px;
+ border:1px solid var(--pw-line); border-radius:6px; background:var(--pw-paper);
+ color:var(--nc-color-primary-element); font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
+}
+#rl-app #V-MailMessageView .pw-conversation-before > button:focus-visible,
+#rl-app #V-MailMessageView .pw-conversation-card-toggle:focus-visible {
+ outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+}
+#rl-app #V-MailMessageView .pw-conversation-before > p {
+ margin:0 var(--pw-space-2) var(--pw-space-3); color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font);
+}
+#rl-app #V-MailMessageView .pw-conversation-before > p:empty { display:none; }
+#rl-app #V-MailMessageView .pw-conversation-card {
+ border:1px solid var(--pw-line); border-radius:8px; margin:0 0 var(--pw-space-3);
+ background:var(--pw-paper); overflow:hidden;
+}
+#rl-app #V-MailMessageView .pw-conversation-card:last-child { margin-bottom:0; }
+#rl-app #V-MailMessageView .pw-conversation-card-toggle {
+ display:grid; grid-template-columns:minmax(0,1fr) auto; gap:var(--pw-space-0-5) var(--pw-space-4);
+ width:100%; height:auto!important; min-height:80px; padding:var(--pw-space-3) var(--pw-space-4);
+ border:0!important; border-radius:0; box-shadow:none!important; background:transparent;
+ color:var(--nc-color-main-text); font:inherit; text-align:start; cursor:pointer;
+}
+#rl-app #V-MailMessageView .pw-conversation-card-toggle:hover { background:var(--pw-selected); }
+#rl-app #V-MailMessageView .pw-conversation-card-toggle strong { grid-column:1; font-size:var(--pw-text-sm); font-weight:var(--pw-weight-strong); }
+#rl-app #V-MailMessageView .pw-conversation-card-recipient {
+ grid-column:1; grid-row:2; color:var(--pw-muted); font-size:var(--pw-text-xs);
+ overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+#rl-app #V-MailMessageView .pw-conversation-card-toggle time {
+ grid-column:2; grid-row:1; color:var(--pw-muted); font-size:var(--pw-text-xs); white-space:nowrap;
+}
+#rl-app #V-MailMessageView .pw-conversation-card-summary {
+ grid-column:1 / -1; color:var(--pw-muted); font-size:var(--pw-text-xs);
+ overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+@media(max-width:799px) {
+ #rl-app #V-MailMessageView .pw-conversation-before,
+ #rl-app #V-MailMessageView .pw-conversation-after { margin-inline:var(--pw-space-3); }
+}

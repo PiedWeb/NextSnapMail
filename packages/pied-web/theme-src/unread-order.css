@@ -1,0 +1,99 @@
+/* The Inbox feed has two independent, cumulative preferences. */
+#rl-app {
+  --pw-unread-order-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M8 6h12M8 12h8M8 18h4M4 4v16m0 0-2-2m2 2 2-2'/%3E%3C/svg%3E");
+}
+#rl-app #V-MailMessageList .pw-feed-settings {
+  display:inline-flex;
+  align-items:center;
+  gap:var(--pw-space-1);
+  flex:0 0 auto;
+  margin-inline-start:auto;
+}
+#rl-app #V-MailMessageList .pw-feed-settings[hidden],
+#rl-app #V-MailMessageList .pw-unread-order[hidden],
+#rl-app .pw-unread-order-error[hidden] { display:none!important; }
+#rl-app #V-MailMessageList button.pw-unread-order {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:var(--pw-space-2);
+  min-height:32px;
+  height:32px;
+  margin:0;
+  padding:0 var(--pw-space-2);
+  border:0!important;
+  border-radius:6px;
+  background:transparent;
+  color:var(--pw-muted);
+  font:var(--pw-weight-medium) var(--pw-text-xs)/1 var(--pw-font);
+  white-space:nowrap;
+}
+#rl-app #V-MailMessageList button.pw-unread-order::before {
+  content:'';
+  display:block;
+  flex:0 0 18px;
+  width:18px;
+  height:18px;
+  background:currentColor;
+  mask:var(--pw-unread-order-icon) center/contain no-repeat;
+}
+#rl-app #V-MailMessageList button.pw-unread-order:is(:hover,:focus-visible) {
+  background:var(--pw-grey-100);
+  color:var(--nc-color-main-text);
+}
+#rl-app #V-MailMessageList button.pw-unread-order:focus-visible {
+  outline:2px solid var(--nc-color-primary-element);
+  outline-offset:2px;
+}
+#rl-app #V-MailMessageList button.pw-unread-order[aria-pressed="true"] {
+  color:var(--nc-color-primary-element);
+  background:var(--pw-primary-200)!important;
+  box-shadow:inset 0 0 0 1px var(--pw-ring-strong);
+}
+#rl-app #V-MailMessageList button.pw-unread-order:disabled { cursor:progress; }
+#rl-app .pw-unread-order-error {
+  font-size:var(--pw-text-xs);
+  color:var(--pw-danger);
+}
+html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
+#rl-app #V-Settings-General .pw-unread-order-setting select {
+  width:min(100%, 360px);
+  max-width:100%;
+}
+#rl-app #V-Settings-General .pw-unread-order-setting-help,
+#rl-app #V-Settings-General .pw-unread-order-setting-status {
+  display:block;
+  max-width:52ch;
+  margin-top:var(--pw-space-1);
+  font-size:var(--pw-text-xs);
+  line-height:1.5;
+}
+#rl-app #V-Settings-General .pw-unread-order-setting-help { color:var(--pw-muted); }
+#rl-app #V-Settings-General .pw-unread-order-setting-status { color:var(--pw-danger); }
+#rl-app #V-Settings-General .pw-unread-order-setting-status:empty { display:none; }
+@media(prefers-color-scheme:dark) {
+  #rl-app #V-MailMessageList button.pw-unread-order[aria-pressed="true"] { color:var(--pw-primary-ink); }
+}
+@media(min-width:800px) {
+  #rl-app #V-MailMessageList.pw-single-toolbar .pw-feed-settings { margin-inline-start:0; }
+  #rl-app #V-MailMessageList.pw-single-toolbar button.pw-unread-order {
+    width:32px;
+    min-width:32px;
+    padding:0;
+    font-size:0;
+  }
+}
+@media(max-width:799px) {
+  #rl-app #V-MailMessageList .pw-mobile-list-tools .pw-feed-settings {
+    gap:var(--pw-space-1);
+    margin:0;
+  }
+  #rl-app #V-MailMessageList .pw-mobile-list-tools button.pw-unread-order {
+    width:32px;
+    min-width:32px;
+    height:32px;
+    min-height:32px;
+    padding:0;
+    font-size:0;
+  }
+}

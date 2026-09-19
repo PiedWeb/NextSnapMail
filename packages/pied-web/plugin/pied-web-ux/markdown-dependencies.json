@@ -1,0 +1,23 @@
+[
+  {
+    "name": "marked",
+    "version": "18.0.12",
+    "entry": "lib/marked.umd.js",
+    "tar_sha256": "50f7134d0f110b3db6137ac269e6a45a79b3f8cf2b902c363f4c7dd5e2afece7",
+    "source_sha256": "fa0cfbf0181339312eaa3709b577ad698fc21a9baa42d580a3fd1f267b19b4a8"
+  },
+  {
+    "name": "dompurify",
+    "version": "3.4.15",
+    "entry": "dist/purify.min.js",
+    "tar_sha256": "4f5d49223fa056790019d990e5e4207166a86ac13d9ec8c73d828c63d75b34b5",
+    "source_sha256": "f263b05369e050fa175d4ecb9c9358eb4253602d510297adfb31df48b2f1c4d5"
+  },
+  {
+    "name": "turndown-plugin-gfm",
+    "version": "1.0.2",
+    "entry": "lib/turndown-plugin-gfm.browser.cjs.js",
+    "tar_sha256": "6ec83633b3b6b92305f9b1f079c70cf210605ef7a084a2c80ccb4499029962ae",
+    "source_sha256": "ce153dc4c15be918bf656de7a78817b4758af121a8b5d1420b6cd5479f5c2ded"
+  }
+]

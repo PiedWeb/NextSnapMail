@@ -1,0 +1,41 @@
+{
+  "release": "1.7.2",
+  "deployed_utc": "2026-09-12T19:12:36Z",
+  "tested": {
+    "nextcloud": "34.0.3",
+    "nextsnapmail": "0.1.10",
+    "snappymail": "2.38.2"
+  },
+  "previous_release": "1.7.1",
+  "plugin_cache_hash": "9f80cfdf9b2ca0999c06105c07fd0a3e",
+  "theme_sha256": "7274806e48ad717acb695653ea77e4aa40ff2d11317068847cad54145667ab94",
+  "backup_relative_to_host_home": "nextsnapmail-backups/pied-web-ux-v1.7.2-20260912T191236Z",
+  "rollback_script": "rollback.py",
+  "installed_payload_files": 33,
+  "all_file_version_activation_and_core_patch_checks_match": true,
+  "native_runtime_js_css_compilation": "passed",
+  "browser_authenticated_live_session": false,
+  "metadata_browser_scenarios": 15,
+  "theme_only_and_late_init_scenarios": 5,
+  "postdeploy_compiled_css_scenarios": 5,
+  "installation_diagnostic_tests": 5,
+  "real_mail_operations": 0,
+  "previous_live_session_mismatch_root_cause": "unconfirmed",
+  "web_activation_followup": {
+    "date": "2026-09-12",
+    "url": "https://nc.robin-d.fr/apps/nextsnapmail/",
+    "previous_web_version": "1.6.4",
+    "web_version_after_targeted_invalidation": "1.7.2",
+    "sapi": "litespeed",
+    "opcache_validate_timestamps": false,
+    "web_plugins_hash": "9e35e4c379f4c903fc91fda40528b7c4",
+    "configuration_restored_exactly": true,
+    "temporary_plugin_removed": true,
+    "actual_inbox_metadata_version": "1.7.2",
+    "actual_counter_border_width_px": 0,
+    "unread_drafts_module_mounted": true,
+    "all_payload_checks_still_match": true,
+    "runtime_payload_changed": false,
+    "record": "1.7.2-web-runtime-repair.md"
+  }
+}

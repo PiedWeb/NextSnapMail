@@ -1,0 +1,6 @@
+# Preserve upstream patch context and third-party legal notices byte for byte.
+patches/*.patch -whitespace
+plugin/pied-web-ux/markdown-licenses.txt -whitespace
+
+plugin/pied-web-ux/*vendor*.js linguist-vendored
+theme/PiedWeb/snappymail/style.css linguist-generated

@@ -1,0 +1,360 @@
+/* Composer actions.
+ *
+ * Send, Save and Delete used to read as the same grey pill, except Delete,
+ * which was a solid red square and therefore the loudest element in the window
+ * — for a secondary, destructive action. The pyramid is restored: one obvious
+ * primary, one clear but quiet alternative, and discreet tertiary actions.
+ * Destructive intent only turns red under the pointer. Every native command
+ * is untouched.
+ */
+#rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete),
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane) {
+  border-radius: var(--pw-radius-md);
+  font-weight: var(--pw-weight-medium);
+}
+
+/* Primary: the one action the composer exists for. */
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane) {
+  border-color: transparent !important;
+  background-color: var(--pw-primary-500);
+  color: var(--nc-color-primary-element-text);
+}
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):is(:hover, :focus-visible, :active) {
+  background-color: var(--pw-primary-600, var(--nc-color-primary-element-hover));
+  color: var(--nc-color-primary-element-text);
+}
+
+/* Secondary: scheduling is the only alternative completion path. */
+html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule {
+  border: 1px solid var(--pw-grey-300) !important;
+  background-color: transparent;
+  color: var(--pw-grey-800);
+}
+html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visible, [aria-expanded="true"]) {
+  border-color: var(--pw-grey-400) !important;
+  background-color: var(--pw-grey-100);
+  color: var(--pw-grey-900);
+}
+
+/* Tertiary: saving is available without competing with message delivery. */
+#rl-app #V-PopupsCompose > header > a.btn.button-save {
+  border-color: transparent !important;
+  background-color: transparent;
+  color: var(--pw-grey-700);
+}
+#rl-app #V-PopupsCompose > header > a.btn.button-save:is(:hover, :focus-visible, :active) {
+  background-color: var(--pw-grey-100);
+  color: var(--pw-grey-900);
+}
+
+/* Destructive: discoverable, unobtrusive, red only on approach. */
+#rl-app #V-PopupsCompose > header > a.btn.button-delete {
+  border-color: transparent !important;
+  background-color: transparent;
+  color: var(--pw-grey-600);
+}
+#rl-app #V-PopupsCompose > header > a.btn.button-delete:is(:hover, :focus-visible, :active) {
+  background-color: var(--pw-danger-tint);
+  color: var(--pw-danger);
+}
+#rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete):focus-visible,
+#rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+}
+
+/* Window and message controls form one quiet utility cluster. Native links are
+ * promoted to real keyboard targets without changing their commands. */
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a.btn,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(.minimize-custom, .close) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid transparent !important;
+  border-radius: var(--pw-radius-md);
+  background: transparent !important;
+  color: var(--pw-grey-600);
+  line-height: 1;
+  text-decoration: none;
+}
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(a.btn, .minimize-custom, .close):is(:hover, :focus-visible),
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn:is(:hover, :focus-visible) {
+  background: var(--pw-grey-100) !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(a.btn, .minimize-custom, .close):focus-visible,
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+}
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .minimize-custom::before {
+  content: "";
+  display: block;
+  width: 14px;
+  height: 2px;
+  border-radius: var(--pw-radius-pill);
+  background: currentColor;
+}
+@media (pointer: coarse) {
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a.btn,
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn,
+  html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(.minimize-custom, .close) {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+/* Composer fields share one visual measure while retaining their native jobs.
+ * SnappyMail reserves 2em on From even when there is no identity picker, and
+ * the Nextcloud theme gives recipient lists an extra-tall single-line state.
+ * Keep every resting field at 36px; recipient lists may still grow when their
+ * chips genuinely wrap. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td {
+  position: relative;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td > input[type="text"],
+html.pw-theme #rl-app #V-PopupsCompose .b-header td > .emailaddresses {
+  box-sizing: border-box;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td > input[type="text"] {
+  width: 100% !important;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td:has(#identity-toggle) > input[type="text"] {
+  padding-inline-end: 44px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td[data-i18n="GLOBAL/FROM"] + td > .dropdown:has(#identity-toggle) {
+  position: absolute;
+  inset-inline-end: 0;
+  top: 2px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 36px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header #identity-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses {
+  min-height: 36px;
+  max-height: 72px;
+  padding: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li {
+  margin-block: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input {
+  flex: 1 1 18em;
+  min-width: 0;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type="text"] {
+  box-sizing: border-box;
+  width: 100%;
+  height: 32px;
+  min-width: 0;
+  max-width: 100%;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li[draggable] {
+  min-height: 28px;
+  margin: 2px;
+}
+
+/* Labels are supporting information: readable at the shared small-text step,
+ * quieter than entered content, and consistent whether native markup uses a
+ * label element or text directly in the cell. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header tr > td:first-child {
+  color: var(--pw-grey-700);
+  font-size: var(--pw-text-sm);
+  font-weight: var(--pw-weight-medium);
+  line-height: var(--pw-leading-snug);
+  white-space: nowrap;
+}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .error-to {
+  color: var(--pw-danger);
+}
+
+/* Signing, encryption and attachment choices support writing; they are not a
+ * second action bar. Keep them compact and borderless until interaction, while
+ * preserving a visible selected state for security toggles. */
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities {
+  align-items: center;
+  gap: var(--pw-space-1);
+  min-height: 36px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities > .btn-group {
+  display: flex;
+  gap: var(--pw-space-1);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  margin: 0;
+  padding: 0 !important;
+  border: 1px solid transparent !important;
+  border-radius: var(--pw-radius-md);
+  background: transparent !important;
+  color: var(--pw-grey-600);
+  line-height: 1;
+  text-decoration: none;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn:is(:hover, :focus-visible) {
+  background: var(--pw-grey-100) !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn.btn-success {
+  background: var(--pw-primary-100) !important;
+  color: var(--pw-primary-ink);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+}
+@media (pointer: coarse) {
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities,
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+    min-height: 44px;
+  }
+  html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+  }
+}
+
+/* Composer tabs are a mode switch, not three boxed panels. The grid follows
+ * the modes that actually exist, so a hidden Mailvelope tab leaves no empty
+ * third. A single ink line carries selection without another framed surface. */
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs.pw-mailvelope-hidden {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pw-space-2);
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0 !important;
+  padding: var(--pw-space-2) var(--pw-space-3);
+  overflow: hidden;
+  border: 0 !important;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0;
+  background: transparent !important;
+  color: var(--pw-grey-600);
+  font-size: var(--pw-text-sm);
+  font-weight: var(--pw-weight-medium);
+  line-height: var(--pw-leading-snug);
+  white-space: nowrap;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"] > span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"]:is(:hover, :focus-visible) {
+  background: var(--pw-grey-50) !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > input:checked + label[role="tab"] {
+  border-bottom-color: var(--pw-primary-500) !important;
+  background: transparent !important;
+  color: var(--pw-grey-900);
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"]:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: -3px;
+}
+html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > .tab-content {
+  grid-column: 1 / -1 !important;
+  border-top-color: var(--pw-line);
+}
+
+/* The editor is the largest surface in the composer. A dark two-pixel frame
+ * makes it dominate even before writing; use a hairline at rest and reserve
+ * the accent plus a soft ring for actual focus. */
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain) {
+  box-sizing: border-box;
+  border: 1px solid var(--pw-grey-300);
+  transition: border-color 120ms ease, outline-color 120ms ease;
+}
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):hover {
+  border-color: var(--pw-grey-400);
+}
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):focus {
+  border-color: var(--pw-primary-500);
+  outline: 2px solid var(--pw-ring-soft);
+  outline-offset: 1px;
+}
+
+/* Cc and Bcc belong to the recipient decision, not to the global action bar.
+ * Keep the native fields and observables; only replace the distant duplicate
+ * links with quiet, right-aligned shortcuts immediately below To. */
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/CC"],
+html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > a[data-i18n="GLOBAL/BCC"] {
+  display: none !important;
+}
+html:not(.pw-theme) #rl-app #V-PopupsCompose .pw-recipient-shortcuts,
+#rl-app #V-PopupsCompose .pw-recipient-shortcuts[hidden],
+#rl-app #V-PopupsCompose .pw-recipient-shortcut[hidden] {
+  display: none !important;
+}
+#rl-app #V-PopupsCompose .pw-recipient-shortcuts {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--pw-space-3);
+  margin-block-start: var(--pw-space-1);
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut {
+  height: auto;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0 1px;
+  border: 0 !important;
+  border-bottom: 1px solid transparent !important;
+  border-radius: 0;
+  background: transparent;
+  color: var(--pw-grey-600);
+  font: inherit;
+  font-size: var(--pw-text-sm);
+  line-height: var(--pw-leading-snug);
+  cursor: pointer;
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut:is(:hover, :active) {
+  border-bottom-color: currentColor !important;
+  color: var(--pw-grey-800);
+}
+#rl-app #V-PopupsCompose button.pw-recipient-shortcut:focus-visible {
+  outline: 2px solid var(--pw-primary-500);
+  outline-offset: 2px;
+  color: var(--pw-grey-800);
+}
+@media (pointer: coarse) {
+  #rl-app #V-PopupsCompose button.pw-recipient-shortcut {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}

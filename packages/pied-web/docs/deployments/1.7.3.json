@@ -1,0 +1,67 @@
+{
+  "release": "1.7.3",
+  "deployed_utc": "2026-09-12T20:02:25Z",
+  "previous_release": "1.7.2",
+  "tested": {
+    "nextcloud": "34.0.3",
+    "nextsnapmail": "0.1.10",
+    "snappymail": "2.38.2"
+  },
+  "plugin_cache_hash_cli": "519488cb17ad6c667ac699e0dd78e137",
+  "web_activation": "verified_authenticated_browser",
+  "backup_relative_to_host_home": "nextsnapmail-backups/pied-web-ux-v1.7.3-20260912T200225Z",
+  "rollback_script": "rollback.py",
+  "installed_payload_files": 34,
+  "installation_checks_passed": 39,
+  "shell_browser_scenarios": 18,
+  "metadata_browser_scenarios": 15,
+  "installation_diagnostic_tests": 5,
+  "authenticated_desktop_preview": true,
+  "authenticated_postdeployment_verification": true,
+  "mail_mutations": 0,
+  "web_activation_verified_utc": "2026-09-12T20:45:16Z",
+  "web_version_before_activation": "1.7.2",
+  "web_version_after_activation": "1.7.3",
+  "plugin_cache_hash_web": "5b0908a45dfa8c4d420fb0d4ba9b2a7c",
+  "temporary_maintenance_plugin_removed": true,
+  "configuration_restored_exactly": true,
+  "authenticated_desktop_verification": true,
+  "authenticated_mobile_verification": true,
+  "native_application_links": 15,
+  "web_geometry": {
+    "desktop": {
+      "viewport": [
+        1832,
+        996
+      ],
+      "content_origin": [
+        0,
+        0
+      ],
+      "header_size": [
+        0,
+        0
+      ],
+      "launcher_size": [
+        44,
+        44
+      ]
+    },
+    "mobile": {
+      "viewport": [
+        390,
+        844
+      ],
+      "content_origin": [
+        0,
+        0
+      ],
+      "header_size": [
+        0,
+        0
+      ],
+      "mail_header_height": 64,
+      "scroll_width": 390
+    }
+  }
+}

@@ -1,0 +1,77 @@
+const page = await browser.getPage('nextsnapmail-conversation-toggle');
+page.setDefaultTimeout(10000);
+const checks = [];
+const check = (name, ok) => {
+    if (!ok) throw new Error(name);
+    checks.push(name);
+    console.log('PASS ' + name);
+};
+
+for (const {enabled, width, scheme} of [
+    {enabled: false, width: 1200, scheme: 'light'},
+    {enabled: true, width: 1200, scheme: 'light'},
+    {enabled: false, width: 390, scheme: 'light'},
+    {enabled: true, width: 390, scheme: 'dark'},
+]) {
+    await page.setViewportSize({width, height: 844});
+    await page.emulateMedia({colorScheme: scheme});
+    await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?drafts=1&mode=list&side=1&shell=1&threads=' + Number(enabled));
+    await page.waitForSelector('#V-MailMessageList button.pw-threads');
+    const state = await page.evaluate(() => {
+        const button = document.querySelector('#V-MailMessageList button.pw-threads');
+        const style = getComputedStyle(button);
+        return {
+            pressed: button.getAttribute('aria-pressed'),
+            title: button.title,
+            background: style.backgroundColor,
+            color: style.color,
+            icon: getComputedStyle(button, '::before').backgroundColor,
+            outline: style.boxShadow,
+        };
+    });
+    const label = `${width}px ${scheme} ${enabled ? 'on' : 'off'}`;
+    check(label + ' reflects the native setting', state.pressed === String(enabled));
+    check(label + ' explains the next action', enabled
+        ? state.title === 'Afficher les messages séparément'
+        : state.title === 'Grouper par conversation');
+    check(label + ' has the matching visual state', enabled
+        ? state.background !== 'rgba(0, 0, 0, 0)' && state.outline !== 'none' && state.icon === state.color
+        : state.background === 'rgba(0, 0, 0, 0)' && state.outline === 'none');
+    await page.locator('#V-MailMessageList button.pw-threads').click();
+    check(label + ' sends the opposite setting', await page.evaluate(expected => {
+        const call = actionCalls.at(-1);
+        return Array.isArray(call) && call[0] === 'UseThreads' && call[1] === expected;
+    }, !enabled));
+}
+
+await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?drafts=1&mode=list&side=1&shell=1&threads=1');
+await page.waitForSelector('#V-MailMessageList button.pw-threads', {state:'attached'});
+await page.evaluate(()=>{listVM.messageList().folder='Trash';listVM.messageList.valueHasMutated();});
+check('The Conversations control is absent from Trash', await page.evaluate(() =>
+    document.querySelector('#V-MailMessageList button.pw-threads').hidden
+    &&getComputedStyle(document.querySelector('#V-MailMessageList button.pw-threads')).display==='none'));
+check('POST list requests remove thread mode outside Inbox', await page.evaluate(() => {
+    rl.app.Remote.request('MessageList',null,{folder:'Trash',useThreads:1,threadAlgorithm:'REFERENCES',threadUid:42});
+    const call=actionCalls.at(-1),requestParams=call?.[2];
+    return call?.[0]==='request'&&call[1]==='MessageList'&&requestParams.folder==='Trash'
+        &&requestParams.threadUid===0&&!('useThreads' in requestParams)&&!('threadAlgorithm' in requestParams);
+}));
+check('Inbox list requests keep the saved conversation preference', await page.evaluate(() => {
+    rl.app.Remote.request('MessageList',null,{folder:'INBOX',useThreads:1,threadAlgorithm:'REFERENCES',threadUid:42});
+    const requestParams=actionCalls.at(-1)?.[2];
+    return requestParams?.folder==='INBOX'&&requestParams.useThreads===1&&requestParams.threadUid===42;
+}));
+check('Cached GET list and reader requests are unthreaded outside Inbox', await page.evaluate(() => {
+    const encode=value=>btoa(unescape(encodeURIComponent(JSON.stringify(value))))
+        .replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+    const decode=value=>JSON.parse(decodeURIComponent(escape(atob(value.replace(/-/g,'+').replace(/_/g,'/')
+        +'='.repeat((4-value.length%4)%4)))));
+    rl.app.Remote.request('MessageList',null,{},60000,'MessageList/0/'+encode({folder:'Trash',useThreads:1,threadAlgorithm:'REFERENCES',threadUid:42}));
+    const list=decode(actionCalls.at(-1)[3].split('/').at(-1));
+    rl.app.Remote.request('Message',null,{},30000,'Message/0/'+encode(['Trash',77,1,'fixture-A']));
+    const message=decode(actionCalls.at(-1)[3].split('/').at(-1));
+    return list.folder==='Trash'&&list.threadUid===0&&!('useThreads' in list)
+        &&!('threadAlgorithm' in list)&&message[0]==='Trash'&&message[2]===0;
+}));
+
+console.log(JSON.stringify({passed: checks.length}));

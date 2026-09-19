@@ -1,0 +1,126 @@
+/* Reader surface.
+ *
+ * Rules that belong to reading a message rather than to the list or the
+ * composer. Everything here is scoped to the message view.
+ */
+
+/* Sender images carry their own background. When it matches the reader's, a
+ * logo or a signature picture loses its shape and bleeds into the page. A
+ * semi-transparent inner edge gives it back without a border that would clash
+ * with the image's own colours. Tracking pixels are too small to show it. */
+#rl-app #V-MailMessageView .bodyText img {
+  outline: 1px solid rgb(0 0 0 / .07);
+  outline-offset: -1px;
+}
+@media (prefers-color-scheme: dark) {
+  :not([data-themes~="light"]) #rl-app #V-MailMessageView .bodyText img {
+    outline-color: rgb(255 255 255 / .09);
+  }
+}
+[data-themes~="dark"] #rl-app #V-MailMessageView .bodyText img {
+  outline-color: rgb(255 255 255 / .09);
+}
+
+/* One reading measure.
+ *
+ * The body was capped at 640 px while the header, the attachment block and the
+ * reply row still ran the full width of the pane — so their rules crossed 1 120 px
+ * under a 568 px column and drew attention to the empty half instead of absorbing
+ * it. Every block of the reading column now stops where the text stops, and the
+ * margin to its right is simply left alone.
+ */
+#rl-app #V-MailMessageView {
+  --pw-measure: 640px;   /* border box: 576 px of text between two gutters */
+  --pw-gutter: var(--pw-space-8);
+}
+
+/* Reply follows the recipient set. In a group conversation Reply all moves to
+ * the first keyboard position and receives a quiet tint in the top toolbar;
+ * the action under the message remains the only filled primary. */
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions > .btn.pw-preferred-reply {
+  color:var(--pw-primary-ink,var(--nc-color-primary-element))!important;
+  background:var(--pw-primary-100,color-mix(in oklch,var(--nc-color-primary-element) 13%,var(--nc-color-main-background)))!important;
+  box-shadow:inset 0 0 0 1px var(--pw-ring-soft,color-mix(in oklch,var(--nc-color-primary-element) 20%,transparent));
+}
+#rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions > .btn:not(.pw-preferred-reply) {
+  color:var(--pw-grey-500,var(--nc-color-text-maxcontrast,var(--nc-color-main-text)))!important;
+  background:transparent!important;
+  box-shadow:none;
+}
+#rl-app #V-MailMessageView .pw-reading-actions > .btn[data-pw-icon] {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:var(--pw-space-2);
+  width:auto;
+  min-width:0;
+  height:40px;
+  min-height:40px;
+  padding-inline:var(--pw-space-4);
+  border:1px solid var(--pw-line,var(--nc-color-border))!important;
+  font:var(--pw-weight-medium) var(--pw-text-sm)/1.2 var(--pw-font)!important;
+}
+#rl-app #V-MailMessageView .pw-reading-actions > .pw-reading-reply[data-pw-icon] {
+  color:var(--nc-color-primary-element-text);
+  background:var(--nc-color-primary-element);
+  border-color:var(--nc-color-primary-element)!important;
+}
+#rl-app #V-MailMessageView .pw-reading-actions > .pw-reading-forward[data-pw-icon] {
+  color:var(--pw-grey-700,var(--nc-color-text-maxcontrast,var(--nc-color-main-text)));
+  background:var(--pw-paper,var(--nc-color-main-background));
+}
+#rl-app [data-pw-icon="forward"] {
+  --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m16 5 5 5-5 5M21 10H11a7 7 0 0 0-7 7v3'/%3E%3C/svg%3E");
+}
+@media (max-width: 799px), (pointer: coarse) {
+  #rl-app #V-MailMessageView .pw-reading-actions > .btn[data-pw-icon] {
+    height:44px;
+    min-height:44px;
+  }
+}
+@media (min-width: 800px) {
+  #rl-app #V-MailMessageView :is(
+    #messageItem > .messageItemHeader,
+    .b-message > .messageItemHeader,
+    .bodyText,
+    .pw-message-extras,
+    #messageItem .attachmentsPlace,
+    .pw-reading-actions,
+    .pw-conversation-before,
+    .pw-conversation-after
+  ) {
+    max-width: var(--pw-measure);
+    box-sizing: border-box;
+    margin-inline:0;
+    padding-inline:var(--pw-gutter);
+  }
+}
+
+/* Reader toolbar.
+ *
+ * Eight icon buttons of identical weight, separated by a rule, read as one
+ * undifferentiated wall. Icons cover a lot of surface, so they need less
+ * contrast than the text around them, not more; and groups are told apart by
+ * the space around them rather than by another line.
+ */
+@media (min-width: 800px) {
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar [data-pw-icon].btn:not(.pw-reply) {
+    color: var(--pw-grey-500);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar [data-pw-icon].btn:not(.pw-reply):is(:hover, :focus-visible) {
+    color: var(--pw-grey-900);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands {
+    gap:var(--pw-space-3);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .btn-group {
+    gap:var(--pw-space-0-5);
+  }
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-reader-commands > .pw-message-actions,
+  #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .pw-message-actions {
+    border: 0;
+    padding-inline:0;
+    margin-inline-end:0;
+    background: transparent;
+  }
+}

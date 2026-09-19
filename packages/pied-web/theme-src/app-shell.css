@@ -1,0 +1,40 @@
+/* One mail surface with a native app launcher; reserve space rather than moving Vue nodes. */
+html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
+@media(min-width:800px) {
+ html.pw-mail-shell #rl-app .pw-desktop-identity {padding-inline:56px var(--pw-space-3);min-height:56px;flex-basis:56px;box-sizing:border-box;}
+ html.pw-mail-shell #rl-app #V-SettingsMenu > .b-toolbar {padding-inline-start:56px;min-height:56px;}
+ html.pw-mail-shell.rl-left-panel-disabled #rl-app .pw-desktop-identity {padding:0;}
+ html.pw-mail-shell.rl-left-panel-disabled #rl-app #V-MailFolderList .b-folders {padding-top:56px;}
+}
+@media(max-width:799px) {
+ html.pw-mail-shell #rl-app #rl-right:has(#V-MailMessageList) > .pw-mobile-header {padding-inline:60px var(--pw-space-3);gap:var(--pw-space-1);}
+ html.pw-mail-shell #rl-app #rl-right > .pw-mobile-header > .pw-mobile-identity {flex:1;min-width:0;}
+ html.pw-mail-shell #rl-app .pw-mobile-identity #V-SystemDropDown {min-width:0;max-width:100%;}
+ html.pw-mail-shell #rl-app #rl-right > .pw-mobile-header > button.pw-search-toggle {display:flex;}
+ html.pw-mail-shell #rl-app #rl-right > .pw-mobile-header > button.pw-search-toggle::before {display:block;}
+ html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .search-input-wrp {display:flex;flex:1;min-width:0;position:relative;}
+ html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .inputSearch {width:100%;font-size:var(--pw-text-md);height:40px;min-height:40px;padding-inline-end:var(--pw-space-8);}
+ html.pw-mail-shell #rl-app #V-MailMessageList .messageList > .second-toolbar .buttonMoreSearch {position:absolute;inset-inline-end:0;top:0;}
+ html.pw-mail-shell #rl-app #V-MailFolderList .pw-desktop-identity {display:block;height:64px;min-height:64px;}
+ html.pw-mail-shell #rl-app #V-SettingsMenu > .b-toolbar {padding-inline-start:60px;min-height:64px;}
+}
+/* The checkbox occupies the full row height, with its glyph centered like the star. */
+#rl-app #rl-right #V-MailMessageList .messageListItem .messageCheckbox {
+ display:flex;align-items:center;align-self:stretch;justify-content:flex-start;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem .checkboxMessage {display:flex;align-items:center;justify-content:center;width:18px;height:32px;}
+#rl-app #rl-right #V-MailMessageList .messageListItem .checkboxMessage::before {width:16px;height:16px;}
+#rl-app #rl-right #V-MailMessageList .messageListItem.checked .checkboxMessage::after {left:5px;top:12px;}
+/* Checked messages are the action target, while selected is the message currently open. */
+#rl-app {--pw-checked-surface:var(--pw-primary-200);}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.checked:hover) {
+ background:var(--pw-checked-surface)!important;
+ box-shadow:inset 0 0 0 1px var(--pw-ring-strong)!important;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.selected,.selected:hover):not(.checked) {
+ background:var(--pw-primary-100)!important;
+ box-shadow:inset 0 0 0 1px var(--pw-ring-soft)!important;
+}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.selected) .senderParent {color:var(--nc-color-main-text);}
+
+@media(max-width:360px){html.pw-mail-shell #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-row:1 / -1;}}

@@ -1,0 +1,15 @@
+{
+  "name": "browser-image-compression",
+  "version": "2.0.2",
+  "source": "https://github.com/Donaldcwl/browser-image-compression/tree/v2.0.2",
+  "sha256": "c6713a21756570af4c230f706faac4f0187845928bd14fd5910210d1cdc6fb87",
+  "reference": "Pushword/packages/admin/src/Resources/assets/admin.multiUpload.js",
+  "options": {
+    "maxSizeMB": 1.8,
+    "maxWidthOrHeight": 1980,
+    "initialQuality": 0.85,
+    "preserveExif": false,
+    "useWebWorker": false
+  },
+  "worker": "Disabled: bundled local code only; no runtime CDN requests."
+}

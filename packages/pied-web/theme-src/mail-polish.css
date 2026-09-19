@@ -1,0 +1,186 @@
+/* Desktop reader and list refinements. The established phone layout is untouched. */
+@media (min-width: 1200px) {
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
+    grid-template-columns:minmax(0,1fr) 32px max-content;
+    grid-template-rows:minmax(24px,auto) minmax(24px,auto);
+    column-gap:var(--pw-space-2);
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .senderParent {
+    grid-area:1/1/2/3;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
+    grid-area:1/3; justify-self:center; align-self:center;
+    min-width:24px; height:24px; min-height:24px;
+    padding-inline:var(--pw-space-2); line-height:1; text-align:center;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent {
+    grid-area:2/1;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
+    grid-area:2/2; align-self:center;
+  }
+  html.sm-msgView-side #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {
+    grid-area:2/3; justify-self:end; align-self:center;
+    width:24px; height:32px;
+  }
+  #rl-app #V-MailMessageList .messageListItem .attachmentParent i[class*="icon-"] {
+    display:inline-flex; align-items:center; justify-content:center;
+    width:20px; height:20px; font-size:17px; line-height:1;
+  }
+  #rl-app #V-MailMessageList .messageListItem .attachmentParent i:is(.icon-attachment,.icon-file-text) {
+    font-size:0;
+  }
+  #rl-app #V-MailMessageList .messageListItem .attachmentParent i:is(.icon-attachment,.icon-file-text)::before {
+    content:''; display:block; width:17px; height:17px;
+    background:currentColor;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m20.5 11.5-8.7 8.7a5 5 0 0 1-7.1-7.1l9.4-9.4a3.5 3.5 0 0 1 5 5l-9.5 9.5a2 2 0 0 1-2.8-2.8l8.6-8.6'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  #rl-app #V-MailMessageList button.pw-threads {
+    display:inline-flex; align-items:center; justify-content:center;
+    padding:0!important; line-height:0;
+  }
+  #rl-app #V-MailMessageList button.pw-threads::before {
+    flex:0 0 18px; margin:0!important;
+    transform:translate(1px,-.5px);
+  }
+  #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc {
+    display:flex; align-items:center; gap:var(--pw-space-2);
+    width:max-content; max-width:calc(100% - 24px); min-height:36px;
+    box-sizing:border-box; margin:var(--pw-space-2) var(--pw-space-3) var(--pw-space-3); padding:var(--pw-space-2) var(--pw-space-3);
+    border:0; border-radius:6px; background:transparent;
+    color:var(--nc-color-primary-element); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
+    text-shadow:none; cursor:pointer;
+  }
+  #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc::before {
+    content:''; display:block; flex:0 0 16px; width:16px; height:16px;
+    background:currentColor;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m15 18-6-6 6-6'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc:is(:hover,:focus-visible) {
+    background:var(--pw-selected);
+  }
+  #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc:focus-visible {
+    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+  }
+}
+
+@media (min-width: 800px) {
+  #rl-app #V-MailMessageView .b-message:not(.pw-conversation-active) > .messageItemHeader .subjectParent {
+    font-size:var(--pw-text-lg); line-height:1.3; letter-spacing:var(--pw-tracking-tight);
+  }
+  #rl-app #V-MailMessageView .b-message > .messageItemHeader .informationShort:has(.pw-from) {
+    margin-top:0; font-size:var(--pw-text-sm); line-height:1.35;
+  }
+  #rl-app #V-MailMessageView .b-message > .messageItemHeader :is(.pw-sender-name,.pw-sender-address) {
+    font-size:var(--pw-text-sm); line-height:1.35;
+  }
+  #rl-app #V-MailMessageView #messageItem > .messageItemHeader :is(.informationShort,.date) {
+    font-size:var(--pw-text-sm); line-height:1.4;
+  }
+  #rl-app #V-MailMessageView .pw-reading-actions {
+    margin:var(--pw-space-6) var(--pw-space-8) 0; padding:var(--pw-space-4) 0 var(--pw-space-8);
+    border-top:1px solid var(--pw-line);
+  }
+  #rl-app #V-MailMessageView .pw-conversation-card:hover,
+  #rl-app #V-MailMessageView .pw-conversation-card:focus-within {
+    background:var(--pw-selected);
+  }
+  #rl-app #V-MailMessageView .pw-conversation-card-summary[hidden] { display:none; }
+  #rl-app #V-MailMessageView .pw-conversation-card-summary {
+    display:block; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+  }
+  #rl-app #V-MailMessageView .pw-message-extras {
+    margin:var(--pw-space-2) var(--pw-space-8) var(--pw-space-3); gap:0;
+  }
+  #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar {
+    min-height:32px; padding:var(--pw-space-1) var(--pw-space-2); gap:var(--pw-space-2);
+    border:0!important; border-radius:6px; background:transparent;
+    color:var(--nc-color-primary-element); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
+  }
+  #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar::before {
+    content:''; display:block; flex:0 0 16px; width:16px; height:16px;
+    background:currentColor;
+    mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='5' width='18' height='16' rx='2'/%3E%3Cpath d='M7 3v4m10-4v4M3 10h18m-13 5h3'/%3E%3C/svg%3E") center/contain no-repeat;
+  }
+  #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar:is(:hover,:focus-visible) {
+    background:var(--pw-selected);
+  }
+  #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar:focus-visible {
+    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace {
+    margin:var(--pw-space-3) var(--pw-space-8) var(--pw-space-6); padding:var(--pw-space-4) 0 var(--pw-space-4); top:auto;
+    border-top:1px solid var(--pw-line); background:transparent;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace > summary {
+    width:max-content; max-width:100%; margin:0 0 var(--pw-space-3);
+    color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-sm)/1.35 var(--pw-font);
+    cursor:pointer;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentList {
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),280px));
+    gap:var(--pw-space-3); margin:0; padding:0; list-style:none;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentList > .attachmentItem {
+    display:grid; grid-template-columns:52px minmax(0,1fr); align-items:center;
+    width:auto; min-width:0; height:72px; min-height:72px; box-sizing:border-box;
+    margin:0; padding:0; border:1px solid var(--pw-line); border-radius:8px;
+    background:var(--pw-paper); box-shadow:none;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentList > .attachmentItem:is(:hover,:focus-within) {
+    border-color:var(--nc-color-primary-element); background:var(--pw-selected);
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentIcon {
+    position:relative; grid-column:1; width:52px; height:70px;
+    display:flex; align-items:center; justify-content:center;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentIcon .iconMain {
+    position:static; width:30px; height:30px; padding:0; font-size:25px;
+    color:var(--pw-muted); filter:none; mix-blend-mode:normal;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentNameParent {
+    grid-column:2; min-width:0; margin:0; padding:var(--pw-space-2) var(--pw-space-3) var(--pw-space-2) var(--pw-space-1);
+    border:0; color:var(--nc-color-main-text); font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentName {
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentItem .attachmentSize {
+    margin-top:var(--pw-space-1); color:var(--pw-muted); font-size:var(--pw-text-xs); opacity:1;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace .controls-handle {
+    display:none!important;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace .attachmentsControls {
+    display:none!important;
+    align-items:center; width:max-content; max-width:100%; min-height:32px;
+    margin:var(--pw-space-3) 0 0; padding:0; border:0; background:transparent;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace:has(
+    > .controls-handle:not([style*="display: none"])
+  ):has(
+    > .attachmentList > .attachmentItem:nth-child(2),
+    > .attachmentListSimple > .attachmentItem:nth-child(2)
+  ) .attachmentsControls {
+    display:flex!important;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsPlace:has(
+    > .controls-handle:not([style*="display: none"])
+  ):has(
+    > .attachmentList > .attachmentItem:nth-child(2),
+    > .attachmentListSimple > .attachmentItem:nth-child(2)
+  ):not(.selection-mode) .checkboxAttachment {
+    display:block;
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsControls > span {
+    display:inline-flex; align-items:center; gap:var(--pw-space-2); min-height:32px; box-sizing:border-box;
+    padding:var(--pw-space-1) var(--pw-space-2); border-radius:6px; color:var(--nc-color-primary-element);
+    font:var(--pw-weight-medium) var(--pw-text-sm)/1.3 var(--pw-font);
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsControls > span:is(:hover,:focus-within) {
+    background:var(--pw-selected);
+  }
+  #rl-app #V-MailMessageView #messageItem .attachmentsControls .g-ui-link {
+    color:inherit; text-decoration:none;
+  }
+}

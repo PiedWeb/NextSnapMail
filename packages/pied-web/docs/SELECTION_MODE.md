@@ -1,0 +1,9 @@
+# Message selection without visible checkboxes
+
+Pied Web uses SnappyMail 2.38.2's existing `message.checked()` state for grouped mail actions. On desktop, Ctrl+click or Command+click on a row enters selection. If another message is already open in the reading pane, that active message is carried into the checked group before the clicked row is added. On mobile, holding a row for 550 ms starts a new selection with that row. Once at least one message is checked, a normal row click or tap toggles another message rather than opening it. The selection bar shows the count and a Done button; Escape also clears the selection. A normal click or short tap outside selection still opens the message.
+
+The read-state dot, star and conversation-count controls keep their own native actions. Checked rows remain visually distinct. Moving a touch to scroll cancels the hold timer. Swipe deletion is available only outside selection mode, so a gesture cannot unexpectedly delete one row while selecting several. A release click after a long hold is suppressed.
+
+Only messages in the active native list and folder can enter this selection. Inbox reminders for Drafts and virtual Sent replies stay outside it. The CSS hides native checkbox glyphs only after `list-interactions.js` mounts and sets its version marker; if that script fails or the theme is exited, SnappyMail's original checkboxes remain available. No persistent account setting is changed.
+
+Fictional browser checks exercise the native checked-state boundary, action targets, touch hold, scroll cancellation, Done/Escape, theme fallback, 320/390 px layout and dark mode. An authenticated production check must verify the loaded plugin bundle and DOM after deployment because LiteSpeed may retain an old PHP cache key.

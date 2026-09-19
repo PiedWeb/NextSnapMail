@@ -1,0 +1,201 @@
+[
+  {
+    "name": "Installed web version",
+    "ok": true,
+    "evidence": "1.0.1"
+  },
+  {
+    "name": "Desktop full viewport, no surrounding frame",
+    "ok": true,
+    "evidence": {
+      "x": 0,
+      "y": 0,
+      "width": 1440,
+      "height": 900,
+      "top": 0,
+      "right": 1440,
+      "bottom": 900,
+      "left": 0
+    }
+  },
+  {
+    "name": "Grid immediately before filter, centered and clickable",
+    "ok": true,
+    "evidence": {
+      "launcher": {
+        "x": 8,
+        "y": 8,
+        "width": 44,
+        "height": 44,
+        "top": 8,
+        "right": 52,
+        "bottom": 52,
+        "left": 8
+      },
+      "filter": {
+        "x": 58,
+        "y": 15,
+        "width": 232,
+        "height": 30,
+        "top": 15,
+        "right": 290,
+        "bottom": 45,
+        "left": 58
+      }
+    }
+  },
+  {
+    "name": "Desktop native menu opens with Enter",
+    "ok": true,
+    "evidence": {
+      "count": 14,
+      "files": true,
+      "expanded": "true",
+      "fits": true
+    }
+  },
+  {
+    "name": "Desktop Escape restores launcher focus",
+    "ok": true
+  },
+  {
+    "name": "Collapsed desktop retains native drawer access",
+    "ok": true
+  },
+  {
+    "name": "390px full viewport, responsive grid, no extra toolbar",
+    "ok": true,
+    "evidence": {
+      "content": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844,
+        "top": 0,
+        "right": 390,
+        "bottom": 844,
+        "left": 0
+      },
+      "grid": {
+        "x": 1,
+        "y": 1,
+        "width": 373,
+        "height": 37.5,
+        "top": 1,
+        "right": 374,
+        "bottom": 38.5,
+        "left": 1
+      },
+      "scrollWidth": 390
+    }
+  },
+  {
+    "name": "390px drawer keeps grid beside filter on opaque background",
+    "ok": true,
+    "evidence": {
+      "launcher": {
+        "x": 8,
+        "y": 8,
+        "width": 44,
+        "height": 44,
+        "top": 8,
+        "right": 52,
+        "bottom": 52,
+        "left": 8
+      },
+      "filter": {
+        "x": 58,
+        "y": 15,
+        "width": 231,
+        "height": 30,
+        "top": 15,
+        "right": 289,
+        "bottom": 45,
+        "left": 58
+      },
+      "background": "rgb(255, 255, 255)"
+    }
+  },
+  {
+    "name": "390px native menu opens with Enter",
+    "ok": true,
+    "evidence": {
+      "count": 14,
+      "files": true,
+      "expanded": "true",
+      "fits": true
+    }
+  },
+  {
+    "name": "390px Escape restores launcher focus",
+    "ok": true
+  },
+  {
+    "name": "320px full viewport, responsive grid, no extra toolbar",
+    "ok": true,
+    "evidence": {
+      "content": {
+        "x": 0,
+        "y": 0,
+        "width": 320,
+        "height": 844,
+        "top": 0,
+        "right": 320,
+        "bottom": 844,
+        "left": 0
+      },
+      "grid": {
+        "x": 1,
+        "y": 1,
+        "width": 303,
+        "height": 37.5,
+        "top": 1,
+        "right": 304,
+        "bottom": 38.5,
+        "left": 1
+      },
+      "scrollWidth": 320
+    }
+  },
+  {
+    "name": "320px drawer keeps grid beside filter on opaque background",
+    "ok": true,
+    "evidence": {
+      "launcher": {
+        "x": 8,
+        "y": 8,
+        "width": 44,
+        "height": 44,
+        "top": 8,
+        "right": 52,
+        "bottom": 52,
+        "left": 8
+      },
+      "filter": {
+        "x": 58,
+        "y": 15,
+        "width": 205,
+        "height": 30,
+        "top": 15,
+        "right": 263,
+        "bottom": 45,
+        "left": 58
+      },
+      "background": "rgb(255, 255, 255)"
+    }
+  },
+  {
+    "name": "320px native menu opens with Enter",
+    "ok": true,
+    "evidence": {
+      "count": 14,
+      "files": true,
+      "expanded": "true",
+      "fits": true
+    }
+  },
+  {
+    "name": "320px Escape restores launcher focus",
+    "ok": true
+  }
+]
