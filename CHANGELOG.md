@@ -1,5 +1,18 @@
 # Releases
 
+## 1.9.1, 2026-09-19
+
+Sending an edited unread Draft now removes its reminder as soon as the send succeeds. Closing
+the composer could start a Drafts refresh while Undo Send was still saving its durable copy;
+that older response could then redraw the already-sent Draft until the minute poll. The send
+success event now invalidates both the in-flight response and the rendered account-Feed reminder
+before querying the authoritative Drafts state again. An open **All accounts** Feed also refreshes
+after the same success signal.
+
+The browser regressions hold the early refresh open, remove the fictional server-side Draft,
+deliver send success, and prove that neither an account Feed nor the global Feed keeps it. No
+transport or mailbox is used.
+
 ## 1.9.0, 2026-09-19
 
 The unread-Drafts and mixed-order workflow now lives in a dedicated **Feed / Flux** for each

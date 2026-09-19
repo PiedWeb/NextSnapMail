@@ -116,6 +116,17 @@ check('Multi-account settings expose the global default and inclusion control', 
         && globalRow?.hidden === false;
 }));
 
+await page.evaluate(() => {
+    window.globalRequestsBeforeSentDraft = feedRequests.filter(request => request.operation === 'global').length;
+    feedGlobalItems = feedGlobalItems.filter(item => item._pwKind !== 'draft');
+    dispatchEvent(new CustomEvent('pw-message-sent', {detail:{account:'fixture-A',folder:'',uid:0,flag:''}}));
+});
+await page.waitForFunction(() => ![...document.querySelectorAll('.pw-global-row')]
+    .some(row => row.textContent.includes('Réponse en attente')));
+check('A successful send refreshes a global Feed that still showed its draft', await page.evaluate(() =>
+    feedRequests.filter(request => request.operation === 'global').length > globalRequestsBeforeSentDraft
+    && document.querySelectorAll('.pw-global-row').length === 3));
+
 await page.setViewportSize({width:390, height:844});
 check('The global feed remains inside the mobile viewport with touch-sized rows', await page.evaluate(() =>
     document.documentElement.scrollWidth <= innerWidth

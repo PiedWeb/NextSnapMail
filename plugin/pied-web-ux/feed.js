@@ -475,5 +475,8 @@
         if (!settingsReady && !settingsLoading) loadSettings();
     });
     addEventListener('pw-unread-order-changed', () => { if (globalFeed()) renderGlobal(true); });
+    // Background Send emits this only after the server has removed its durable
+    // draft. Refresh a global Feed that may still be showing the earlier copy.
+    addEventListener('pw-message-sent', () => { if (globalFeed()) renderGlobal(true); });
     queueMicrotask(() => { mountSettings(); if (!settingsReady && !settingsLoading) loadSettings(); });
 })();
