@@ -1,5 +1,5 @@
 <?php
-class PiedWebRuntimeMaintenanceV6Plugin extends \RainLoop\Plugins\AbstractPlugin {
+class PiedWebRuntimeMaintenanceV7Plugin extends \RainLoop\Plugins\AbstractPlugin {
     const NAME = 'Temporary Pied Web runtime check', VERSION = '1.1.0', REQUIRED = '2.38.2';
     public function Init(): void { $this->addJsonHook('PiedWebRuntimeCheck', 'Check'); }
     public function Check(): array {
@@ -8,7 +8,18 @@ class PiedWebRuntimeMaintenanceV6Plugin extends \RainLoop\Plugins\AbstractPlugin
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST' || !$actions->getAccountFromToken() || !$user || !\OC_User::isAdminUser($user->getUID())) throw new \RuntimeException('Forbidden');
         $root = APP_PLUGINS_PATH . 'pied-web-ux/';
         $out = ['version' => PiedWebUxPlugin::VERSION, 'validate_timestamps' => ini_get('opcache.validate_timestamps'), 'revalidate_freq' => ini_get('opcache.revalidate_freq'), 'sapi' => PHP_SAPI];
-        foreach (['index.php', 'UnreadDrafts.php', 'FilteredSelection.php', 'AttachmentImage.php', 'Reminders.php'] as $file) {
+        foreach ([
+            'index.php',
+            'AttachmentImage.php',
+            'Conversation.php',
+            'Feed.php',
+            'FilteredSelection.php',
+            'FolderOrder.php',
+            'Reminders.php',
+            'ScheduledSend.php',
+            'UnreadDrafts.php',
+            'UnreadOrder.php',
+        ] as $file) {
             $out['files'][$file] = ['cached' => function_exists('opcache_is_script_cached') && opcache_is_script_cached($root . $file)];
             if ($actions->GetActionParam('invalidate', '') === '1') $out['files'][$file]['invalidated'] = function_exists('opcache_invalidate') && opcache_invalidate($root . $file, true);
         }

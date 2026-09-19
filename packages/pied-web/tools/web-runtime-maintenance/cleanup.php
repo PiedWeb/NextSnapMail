@@ -6,7 +6,7 @@ $_ENV['SNAPPYMAIL_INCLUDE_AS_API']='1';
 require '/home/robindfr/nextcloud/apps/nextsnapmail/app/snappymail/v/2.38.2/include.php';
 $config=\RainLoop\Api::Config();
 $file=APP_PRIVATE_DATA.'configs/application.ini';
-$plugin='pied-web-runtime-maintenance-v6';
+$plugin='pied-web-runtime-maintenance-v7';
 $concurrent=hash_file('sha256',$file)!==trim(file_get_contents(__DIR__.'/application.ini.after.sha256'));
 $before=parse_ini_file(__DIR__.'/application.ini.before',true,INI_SCANNER_RAW);
 $enabled=$concurrent ? $config->Get('plugins','enabled_list','') : $before['plugins']['enabled_list'];

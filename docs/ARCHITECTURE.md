@@ -24,7 +24,9 @@ dans `apps/nextsnapmail`, puis consommé par Pied Web.
 - `packages/pied-web` conserve l’historique de sa branche `main` jusqu’à
   `b4305f1`, puis un commit séparé capture le travail local 1.9.2 qui n’était pas
   encore publié au moment de la migration.
-- Les anciens dépôts ne sont ni effacés ni réécrits.
+- Les dépôts GitHub historiques ne sont ni effacés ni réécrits. Leurs clones
+  locaux redondants ont été retirés après vérification de l'import et publication
+  du monorepo ; ils restent récupérables depuis leurs remotes et la corbeille locale.
 
 ## Synchronisation de NextSnapMail
 

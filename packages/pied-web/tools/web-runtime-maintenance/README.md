@@ -8,7 +8,7 @@ cleanup.php and configuration backups outside the web root.
 The repair was exercised through an existing authenticated Nextcloud administrator
 session on 2026-09-12. The native plugin JSON dispatcher checks CSRF. The additional
 hook requires POST, an authenticated mail account and a Nextcloud administrator.
-It only inspects/invalidates five fixed PHP files of `pied-web-ux`; it accepts no path.
+It only inspects/invalidates the fixed PHP payload of `pied-web-ux`; it accepts no path.
 It does not reset all OPcache, create credentials, alter mail or change host PHP settings.
 The temporary directory carries a version suffix because LiteSpeed can retain the helper's own
 deleted PHP path in OPcache. Bump that suffix whenever this helper changes; otherwise a future

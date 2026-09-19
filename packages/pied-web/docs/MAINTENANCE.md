@@ -3,8 +3,9 @@
 The canonical working copy is now
 `~/localhost/Nextcloud/PiedWeb-NextSnapMail/packages/pied-web`, published from
 the `PiedWeb/NextSnapMail` monorepo. The former
-`RobinDev/nextsnapmail-pied-web` repository remains a historical release source
-and an optional reviewed subtree export. It was created private and made public
+`RobinDev/nextsnapmail-pied-web` repository remains a historical remote release
+source and an optional reviewed subtree export; its redundant local clone was
+removed after the monorepo migration. It was created private and made public
 after a repository and release-asset audit. Source, documentation, checks and
 releases live together; private runtime configuration lives only on the server.
 

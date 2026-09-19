@@ -14,6 +14,9 @@ Expanding the sidebar restores the untouched native hierarchy. PHP coverage vali
 input and storage failures; the fictional browser fixture covers monograms, names, normal clicks,
 pointer and keyboard reordering, reload persistence, live counts, selection and expansion.
 
+Production activation from the canonical monorepo is recorded in
+[`docs/deployments/1.9.2-monorepo-production.md`](docs/deployments/1.9.2-monorepo-production.md).
+
 ## 1.9.1, 2026-09-19
 
 Sending an edited unread Draft now removes its reminder as soon as the send succeeds. Closing
