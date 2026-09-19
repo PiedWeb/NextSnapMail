@@ -38,6 +38,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - A dedicated working Feed for each account, separate from the restored native Inbox. With
   several accounts, **All accounts** adds an account-labelled overview and becomes the default;
   with one account, that global entry does not exist and the sole account Feed opens directly.
+- Account selection lives in the opaque NextSnapMail URL, so separate browser tabs retain
+  separate linked mailboxes. Global Feed navigation changes only the current tab.
 - Genuinely unread drafts at the top of the account Feed, with one-click resume.
 - A Feed-only mixed order that gathers every unread message on the first page, keeps visibly
   unread roots together, then conversations with an older unread member, and finally read

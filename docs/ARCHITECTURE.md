@@ -64,6 +64,7 @@ composants ciblés hors de la racine Web, installer les fichiers de version en
 dernier et vérifier le runtime authentifié. LiteSpeed peut continuer à exécuter
 un ancien PHP malgré des fichiers corrects sur disque.
 
-Le futur contexte de compte par onglet sera le premier changement conçu
-directement dans cette architecture : résolution serveur dans l’app, état
-d’onglet côté client et tests croisés pour les opérations destructrices.
+Depuis NextSnapMail 0.1.12, le contexte de compte par onglet est conçu
+directement dans cette architecture : identifiant opaque dans l’URL, résolution
+serveur par requête et tests croisés. Le cookie de compte additionnel ne sert
+plus qu’aux anciens clients qui n’envoient aucun contexte explicite.

@@ -223,10 +223,36 @@
 	const
 		BASE = doc.location.pathname.replace(/\/+$/,'') + '/',
 		HASH_PREFIX = '#/',
+		ACCOUNT_CONTEXT_PATTERN = /^[a-f0-9]{40}$/i,
 
 		adminPath = () => rl.adminArea() && !SettingsAdmin('host'),
 
-		prefix = () => BASE + '?' + (adminPath() ? SettingsAdmin('path') : '');
+		prefix = () => BASE + '?' + (adminPath() ? SettingsAdmin('path') : ''),
+
+		accountContext = () => {
+			const value = new URLSearchParams(doc.location.search).get('account') || '';
+			return !rl.adminArea() && ACCOUNT_CONTEXT_PATTERN.test(value) ? value.toLowerCase() : (rl.adminArea() ? '0' : 'main');
+		},
+
+		syncAccountContext = value => {
+			if (!rl.adminArea() && ACCOUNT_CONTEXT_PATTERN.test(value || '')) {
+				const url = new URL(doc.location.href);
+				if (url.searchParams.get('account') !== value.toLowerCase()) {
+					url.searchParams.set('account', value.toLowerCase());
+				history.replaceState(history.state, '', url.href);
+				}
+			}
+		},
+
+		switchAccountContext = value => {
+			if (ACCOUNT_CONTEXT_PATTERN.test(value || '')) {
+				const url = new URL(doc.location.href);
+				url.searchParams.set('account', value.toLowerCase());
+				doc.location.assign(url.href);
+				return true;
+			}
+			return false;
+		};
 
 	const SUB_QUERY_PREFIX = '&q[]=',
 
@@ -249,7 +275,7 @@
 		 */
 		serverRequestRaw = (type, hash) =>
 			BASE + '?/Raw/' + SUB_QUERY_PREFIX + '/'
-			+ '0/' // Settings.get('accountHash') ?
+			+ accountContext() + '/'
 			+ (type
 				? type + '/' + (hash ? SUB_QUERY_PREFIX + '/' + hash : '')
 				: ''),
@@ -271,7 +297,7 @@
 		 * @param {string} type
 		 * @returns {string}
 		 */
-		serverRequest = type => prefix() + '/' + type + '/' + SUB_QUERY_PREFIX + '/0/',
+		serverRequest = type => prefix() + '/' + type + '/' + SUB_QUERY_PREFIX + '/' + accountContext() + '/',
 
 		// Is '?/Css/0/Admin' needed?
 		cssLink = theme => BASE + '?/Css/0/User/-/' + encodeURI(theme) + '/-/' + Date.now() + '/Hash/-/Json/',
@@ -8743,14 +8769,16 @@ body > * {
 	class AccountModel extends AbstractModel {
 		/**
 		 * @param {string} email
-		 * @param {boolean=} canBeDelete = true
-		 * @param {number=} count = 0
+		 * @param {string} name
+		 * @param {boolean=} isAdditional
+		 * @param {string=} accountHash
 		 */
-		constructor(email, name, isAdditional = true) {
+		constructor(email, name, isAdditional = true, accountHash = '') {
 			super();
 
 			this.name = name;
 			this.email = email;
+			this.accountHash = accountHash;
 
 			this.displayName = name ? name + ' <' + email + '>' : email;
 
@@ -9036,10 +9064,10 @@ body > * {
 			if (!iError) {
 				let items = oData.Result.Accounts;
 				AccountUserStore(isArray(items)
-					? items.map(oValue => new AccountModel(oValue.email, oValue.name))
+					? items.map(oValue => new AccountModel(oValue.email, oValue.name, true, oValue.accountHash))
 					: []
 				);
-				AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'), '', false));
+				AccountUserStore.unshift(new AccountModel(SettingsGet('mainEmail'), '', false, SettingsGet('mainAccountHash')));
 				refreshAccountUnreadCounts();
 
 				items = oData.Result.Identities;
@@ -11178,35 +11206,13 @@ body > * {
 		accountClick(account, event) {
 			let email = account?.email;
 			if (email && 0 === event.button && AccountUserStore.email() != email) {
-				AccountUserStore.loading(true);
 				stopEvent(event);
-				Remote.request('AccountSwitch',
-					(iError/*, oData*/) => {
-						if (iError) {
-							AccountUserStore.loading(false);
-							alert('Account error: ' + getNotification(iError).replace('%EMAIL%', email));
-							if (account.isAdditional()) {
-								showScreenPopup(AccountPopupView, [account]);
-							}
-						} else {
-	/*						// Not working yet
-							forEachObjectEntry(oData.Result, (key, value) => rl.settings.set(key, value));
-	//						MessageUserStore.message();
-	//						MessageUserStore.purgeCache();
-							MessagelistUserStore([]);
-	//						FolderUserStore.folderList([]);
-							loadFolders(value => {
-								if (value) {
-	//								4. Change to INBOX = reload MessageList
-	//								MessagelistUserStore.setMessageList();
-								}
-							});
-							AccountUserStore.loading(false);
-	*/
-							rl.route.reload();
-						}
-					}, {Email:email}
-				);
+				if (!switchAccountContext(account.accountHash)) {
+					alert('Account error: ' + getNotification(Notifications.AccountDoesNotExist).replace('%EMAIL%', email));
+					if (account.isAdditional()) {
+						showScreenPopup(AccountPopupView, [account]);
+					}
+				}
 			}
 			return true;
 		}
@@ -16516,6 +16522,7 @@ body > * {
 				NotificationUserStore.enabled(!!SettingsGet('DesktopNotifications'));
 
 				AccountUserStore.email(SettingsGet('Email'));
+				syncAccountContext(SettingsGet('accountHash'));
 
 				SettingsUserStore.init();
 				ContactUserStore.init();

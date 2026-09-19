@@ -1,3 +1,19 @@
+## 0.1.12 – 2026-09-19
+
+### Added
+
+- Scope the selected main or linked mail account to an opaque `account` URL
+  parameter so different browser tabs can keep different mailboxes open.
+- Carry that account context through AppData, JSON, upload and raw-resource
+  requests, including attachment and message-source links.
+
+### Changed
+
+- Keep the historical shared account cookie only as a compatibility fallback
+  for clients that do not send an explicit URL context.
+- Reject an unknown explicit account context instead of silently applying an
+  operation to the browser-wide cookie account.
+
 ## 0.1.11 – 2026-09-12
 
 ### Added

@@ -19,7 +19,7 @@
     let settingsReady = false, settingsLoading = false, settingsGeneration = 0;
     let listView, folderView, systemView, globalSection, globalStatus, globalRows, globalRefresh;
     let feedLink, feedItem, globalLink, globalItem, nativeInbox, accountSubscription, accountCount = 1;
-    let globalGeneration = 0, globalLoading = false, globalItems = [], globalAccounts = [];
+    let globalGeneration = 0, globalLoading = false, globalReloadPending = false, globalItems = [], globalAccounts = [];
 
     const currentEmail = () => String(value(systemView?.accountEmail) || window.rl?.settings?.get?.('Email') || '');
     const currentFolder = () => String(value(listView?.messageList)?.folder || value(folderView?.currentFolder)?.fullName || '');
@@ -203,8 +203,16 @@
 
     const pending = item => ({
         email:String(item._pwAccountEmail || ''), folder:String(item.folder || ''),
-        uid:Number(item.uid || 0), kind:String(item._pwKind || 'message')
+        uid:Number(item.uid || 0), kind:String(item._pwKind || 'message'),
+        accountHash:String(item._pwAccountHash || '')
     });
+    const switchAccountContext = accountHash => {
+        if (!/^[a-f0-9]{40}$/i.test(accountHash)) return false;
+        const url = new URL(location.href);
+        url.searchParams.set('account', accountHash.toLowerCase());
+        location.assign(url.href);
+        return true;
+    };
     const nativeMessageHref = item => {
         const base = nativeInbox?.href || location.href;
         const url = new URL(base, location.href);
@@ -243,12 +251,10 @@
             return;
         }
         globalStatus.textContent = t('Ouverture de ', 'Opening ') + accountText(item) + '…';
-        window.rl.app.Remote.request('AccountSwitch', code => {
-            if (code) {
-                setSession(pendingKey, null);
-                globalStatus.textContent = t('Impossible d’ouvrir ce compte.', 'Could not open this account.');
-            } else location.reload();
-        }, {Email:target.email});
+        if (!switchAccountContext(target.accountHash)) {
+            setSession(pendingKey, null);
+            globalStatus.textContent = t('Impossible d’ouvrir ce compte.', 'Could not open this account.');
+        }
     };
 
     const createGlobalRow = item => {
@@ -294,21 +300,29 @@
         globalRefresh.disabled = globalLoading;
         globalRefresh.setAttribute('aria-busy', String(globalLoading));
     };
-    const loadGlobal = () => {
-        if (!globalFeed() || globalLoading) return;
+    const loadGlobal = (force = false) => {
+        if (!globalFeed()) return;
+        if (globalLoading) {
+            if (force) globalReloadPending = true;
+            return;
+        }
         const version = ++globalGeneration;
         globalLoading = true; paintGlobal();
         requestPlugin({operation:'global'}, (failure, result) => {
             if (version !== globalGeneration) return;
             globalLoading = false;
+            const reload = globalReloadPending;
+            globalReloadPending = false;
             if (failure || !Array.isArray(result?.items) || !Array.isArray(result?.accounts)) {
                 globalStatus.textContent = t('Le flux global est indisponible. Réessayez.', 'The global feed is unavailable. Try again.');
                 globalRefresh.disabled = false;
+                if (reload) loadGlobal();
                 return;
             }
             globalItems = result.items;
             globalAccounts = result.accounts;
             paintGlobal();
+            if (reload) loadGlobal();
         });
     };
     const mountGlobal = vm => {
@@ -335,7 +349,7 @@
         updateNavigation();
         if (!globalSection) return;
         globalSection.hidden = !globalFeed();
-        if (!globalSection.hidden && (force || (!globalItems.length && !globalLoading))) loadGlobal();
+        if (!globalSection.hidden && (force || (!globalItems.length && !globalLoading))) loadGlobal(force);
     }
 
     const updateAccountCount = () => {

@@ -210,12 +210,14 @@ trait Accounts
 	public function getAccountData(Account $oAccount): array
 	{
 		$oConfig = $this->Config();
+		$oMainAccount = $this->getMainAccountFromToken();
 		$minRefreshInterval = (int) $oConfig->Get('webmail', 'min_refresh_interval', 5);
 		$aResult = [
 //			'Email' => IDN::emailToUtf8($oAccount->Email()),
 			'Email' => $oAccount->Email(),
 			'accountHash' => $oAccount->Hash(),
-			'mainEmail' => \RainLoop\Api::Actions()->getMainAccountFromToken()->Email(),
+			'mainEmail' => $oMainAccount->Email(),
+			'mainAccountHash' => $oMainAccount->Hash(),
 			'contactsAllowed' => $this->AddressBookProvider($oAccount)->IsActive(),
 			'HideUnsubscribed' => false,
 			'useThreads' => (bool) $oConfig->Get('defaults', 'mail_use_threads', false),
@@ -342,16 +344,25 @@ trait Accounts
 	 */
 	public function DoAccountsAndIdentities(): array
 	{
+		$oMainAccount = $this->getMainAccountFromToken();
 		// https://github.com/the-djmaze/snappymail/issues/571
 		return $this->DefaultResponse(array(
 			'Accounts' => \array_values(\array_map(function($value){
-					return [
-						'email' => IDN::emailToUtf8($value['email'] ?? $value[1]),
-						'name' => $value['name'] ?? ''
-					];
-				},
-				$this->GetAccounts($this->getMainAccountFromToken())
-			)),
+				$aResult = [
+					'email' => IDN::emailToUtf8($value['email'] ?? ($value[1] ?? '')),
+					'name' => $value['name'] ?? '',
+					'accountHash' => ''
+				];
+				try {
+					$oAccount = AdditionalAccount::NewInstanceFromTokenArray($this, $value, false);
+					if ($oAccount) {
+						$aResult['email'] = IDN::emailToUtf8($oAccount->Email());
+						$aResult['accountHash'] = $oAccount->Hash();
+					}
+				} catch (\Throwable $e) {
+				}
+				return $aResult;
+			}, $this->GetAccounts($oMainAccount))),
 			'Identities' => $this->GetIdentities($this->getAccountFromToken())
 		));
 	}

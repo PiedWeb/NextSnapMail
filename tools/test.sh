@@ -4,8 +4,10 @@ set -euo pipefail
 repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
 cd "$repo_root/apps/nextsnapmail"
+php tests/account-url-context.php
 php tests/account-unread-counts.php
 php tests/account-unread-count-setting.php
+node --test tests/account-url-context.mjs
 node tests/account-unread-counts.mjs
 
 cd "$repo_root/packages/pied-web"

@@ -1,5 +1,17 @@
 # Releases
 
+## 1.9.3, 2026-09-19
+
+Account selection is now local to each browser tab through the opaque account context in the
+NextSnapMail URL. Opening a global Feed row from another account navigates to that account URL
+before opening the source message; it no longer changes the browser-wide native account cookie.
+
+The core sends the same context on AppData, JSON, upload and raw-resource requests and fails
+closed when an explicit account hash is unknown. The previous cookie route remains available to
+older clients only. Core PHP/JavaScript regressions exercise independent tabs, main-account
+fallback, raw and upload paths, URL canonicalization and rejected contexts. The fictional Feed
+browser test verifies cross-account navigation without the native switch endpoint.
+
 ## 1.9.2, 2026-09-19
 
 The collapsed 72 px folder rail now distinguishes custom folders with compact two-character

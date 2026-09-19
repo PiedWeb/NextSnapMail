@@ -119,7 +119,7 @@ check('Multi-account settings expose the global default and inclusion control', 
 await page.evaluate(() => {
     window.globalRequestsBeforeSentDraft = feedRequests.filter(request => request.operation === 'global').length;
     feedGlobalItems = feedGlobalItems.filter(item => item._pwKind !== 'draft');
-    dispatchEvent(new CustomEvent('pw-message-sent', {detail:{account:'fixture-A',folder:'',uid:0,flag:''}}));
+    dispatchEvent(new CustomEvent('pw-message-sent', {detail:{account:'a'.repeat(40),folder:'',uid:0,flag:''}}));
 });
 await page.waitForFunction(() => ![...document.querySelectorAll('.pw-global-row')]
     .some(row => row.textContent.includes('Réponse en attente')));
@@ -137,14 +137,17 @@ check('The global feed remains inside the mobile viewport with touch-sized rows'
 
 await page.setViewportSize({width:1200, height:900});
 await page.locator('.pw-global-row').filter({hasText:'Message professionnel'}).click();
-await page.waitForFunction(() => systemVM.accountEmail() === 'hello@example.test'
+await page.waitForFunction(() => window.systemVM && window.PiedWebUx?.feed
+    && systemVM.accountEmail() === 'hello@example.test'
     && PiedWebUx.feed.mode() === 'feed'
     && location.hash.includes('/mailbox/INBOX/m301'));
 check('Opening another account switches safely before navigating to its source message', await page.evaluate(() =>
     systemVM.accountEmail() === 'hello@example.test'
+    && new URLSearchParams(location.search).get('account') === 'b'.repeat(40)
     && sessionStorage.getItem('pw-mail-feed-open') === null
-    && sessionStorage.getItem('pw-mail-view:hello@example.test') === 'feed'
-    && location.hash === '#/mailbox/INBOX/m301'));
+    && sessionStorage.getItem('pw-mail-view:' + 'b'.repeat(40)) === 'feed'
+    && location.hash === '#/mailbox/INBOX/m301'
+    && !actionCalls.some(call => Array.isArray(call) && call[1] === 'AccountSwitch')));
 check('Cross-account opening has no runtime error', await page.evaluate(() => fixtureErrors.length === 0));
 
 console.log(JSON.stringify({passed:checks.length, checks}, null, 2));

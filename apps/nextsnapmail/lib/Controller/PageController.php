@@ -20,10 +20,12 @@ class PageController extends Controller
 		$navigationManager = \OC::$server->get(\OCP\INavigationManager::class);
 
 		$bAdmin = false;
-		if (!empty($_SERVER['QUERY_STRING'])) {
+		$sQueryString = (string) ($_SERVER['QUERY_STRING'] ?? '');
+		if ('' !== $sQueryString) {
 			SnappyMailHelper::loadApp();
-			$bAdmin = \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin') == $_SERVER['QUERY_STRING'];
-			if (!$bAdmin) {
+			$bAdmin = \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin') == $sQueryString;
+			$bShellQuery = !\array_diff(\array_keys($_GET), ['account', 'target']);
+			if (!$bAdmin && !$bShellQuery) {
 				return SnappyMailHelper::startApp(true);
 			}
 		}
@@ -33,9 +35,16 @@ class PageController extends Controller
 			\OCP\Util::addScript('nextsnapmail', 'nextsnapmail');
 			\OCP\Util::addStyle('nextsnapmail', 'style');
 			SnappyMailHelper::startApp();
+			$sIframeUrl = SnappyMailHelper::normalizeUrl(SnappyMailHelper::getAppUrl());
+			$sAccount = \is_string($_GET['account'] ?? null) ? \strtolower($_GET['account']) : '';
+			if (\preg_match('/^[a-f0-9]{40}$/D', $sAccount)) {
+				$sIframeUrl .= '?account=' . \rawurlencode($sAccount);
+			}
+			if (\is_string($_GET['target'] ?? null) && '' !== $_GET['target']) {
+				$sIframeUrl .= '#' . $_GET['target'];
+			}
 			$response = new TemplateResponse('nextsnapmail', 'index', [
-				'nextsnapmail-iframe-url' => SnappyMailHelper::normalizeUrl(SnappyMailHelper::getAppUrl())
-					. (empty($_GET['target']) ? '' : "#{$_GET['target']}")
+				'nextsnapmail-iframe-url' => \htmlspecialchars($sIframeUrl, ENT_QUOTES|ENT_SUBSTITUTE, 'UTF-8')
 			]);
 			$csp = new ContentSecurityPolicy();
 			$csp->addAllowedFrameDomain("'self'");

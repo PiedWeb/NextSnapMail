@@ -25,6 +25,10 @@ python3 tools/package-release.py
 tests du paquet Pied Web. `package-release.py` ne lit ni configuration privée,
 ni compte, ni message : il assemble exclusivement les fichiers versionnés.
 
+Depuis NextSnapMail 0.1.12, l’identifiant opaque du compte actif est porté par
+l’URL et propagé aux requêtes Mail. Plusieurs onglets d’un même navigateur
+peuvent ainsi rester sur des boîtes différentes sans état serveur par onglet.
+
 ## Relation avec l’amont
 
 Le composant `apps/nextsnapmail` est importé depuis

@@ -24,6 +24,8 @@ continued maintenance.
 
 Newest changes first:
 
+- Scoped the selected mail account to an opaque URL context, so different
+  browser tabs can keep different linked mailboxes open without shared state.
 - Integrated Gmail / Google OAuth2 login directly into the Nextcloud app, so
   Gmail accounts can be connected from the personal settings and as additional
   accounts without requiring a separate plugin.

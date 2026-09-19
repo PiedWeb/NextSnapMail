@@ -20,6 +20,20 @@ trait UserAuth
 	 */
 	private $oAdditionalAuthAccount = false;
 	private $oMainAuthAccount = false;
+	private ?string $sAccountContext = null;
+
+	/**
+	 * Select the account for this HTTP request without changing browser-wide state.
+	 * Empty and legacy `0` contexts keep the historical cookie-based behaviour.
+	 */
+	public function SetAccountContext(?string $sAccountContext): void
+	{
+		$sAccountContext = \strtolower(\trim((string) $sAccountContext));
+		$this->sAccountContext = '' === $sAccountContext || '0' === $sAccountContext
+			? null
+			: $sAccountContext;
+		$this->oAdditionalAuthAccount = false;
+	}
 
 	public function DoResealCryptKey() : array
 	{
@@ -227,7 +241,38 @@ trait UserAuth
 	 */
 	public function getAccountFromToken(bool $bThrowExceptionOnFalse = true): ?Account
 	{
-		$this->getMainAccountFromToken($bThrowExceptionOnFalse);
+		$oMainAccount = $this->getMainAccountFromToken($bThrowExceptionOnFalse);
+
+		if (null !== $this->sAccountContext && $oMainAccount) {
+			if ('main' === $this->sAccountContext
+			 || \hash_equals(\strtolower($oMainAccount->Hash()), $this->sAccountContext)
+			) {
+				$this->oAdditionalAuthAccount = null;
+				return $oMainAccount;
+			}
+
+			if (\preg_match('/^[a-f0-9]{40}$/D', $this->sAccountContext)
+			 && $this->GetCapa(Capa::ADDITIONAL_ACCOUNTS)
+			) {
+				foreach ($this->GetAccounts($oMainAccount) as $aAccountData) {
+					try {
+						$oAccount = AdditionalAccount::NewInstanceFromTokenArray($this, $aAccountData, false);
+						if ($oAccount && \hash_equals(\strtolower($oAccount->Hash()), $this->sAccountContext)) {
+							$this->oAdditionalAuthAccount = $oAccount;
+							return $oAccount;
+						}
+					} catch (\Throwable $e) {
+						// One stale saved account must not hide another valid account.
+					}
+				}
+			}
+
+			$this->oAdditionalAuthAccount = null;
+			if ($bThrowExceptionOnFalse) {
+				throw new ClientException(Notifications::AccountDoesNotExist);
+			}
+			return null;
+		}
 
 		if (false === $this->oAdditionalAuthAccount && isset($_COOKIE[self::AUTH_ADDITIONAL_TOKEN_KEY])) {
 			$aData = Cookies::getSecure(self::AUTH_ADDITIONAL_TOKEN_KEY);

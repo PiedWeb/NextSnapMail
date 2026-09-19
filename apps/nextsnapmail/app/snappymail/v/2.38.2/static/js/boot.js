@@ -4,6 +4,10 @@ const
 	qUri = path => doc.location.pathname.replace(/\/+$/,'') + '/?/' + path,
 	eId = id => doc.getElementById('rl-'+id),
 	admin = '1' == eId('app').dataset.admin,
+	accountContext = () => {
+		const value = new URLSearchParams(doc.location.search).get('account') || '';
+		return !admin && /^[a-f0-9]{40}$/i.test(value) ? value.toLowerCase() : (admin ? '0' : 'main');
+	},
 	mimeJSON = 'application/json',
 
 	toggle = div => {
@@ -141,7 +145,7 @@ if (!navigator.cookieEnabled) {
 } else if (![].flat) {
 	toggle(eId('BadBrowser'));
 } else {
-	rl.fetchJSON(qUri(`${admin ? 'Admin' : ''}AppData/0/${Math.random().toString().slice(2)}/`))
+	rl.fetchJSON(qUri(`${admin ? 'Admin' : ''}AppData/${accountContext()}/${Math.random().toString().slice(2)}/`))
 	.then(appData => {
 		RL_APP_DATA = appData;
 		const url = appData.StaticLibsJs,

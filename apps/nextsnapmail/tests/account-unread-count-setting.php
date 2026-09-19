@@ -91,6 +91,7 @@ namespace {
         public function HasActionParam(string $sName): bool { return \array_key_exists($sName, $this->params); }
         public function GetActionParam(string $sName, $mDefault = null) { return $this->params[$sName] ?? $mDefault; }
         public function getAccountFromToken(bool $bThrow = true) { return new \RainLoop\Model\AdditionalAccount('robin@other.test', 'robin@example.test'); }
+        public function getMainAccountFromToken(bool $bThrow = true) { return new \RainLoop\Model\MainAccount('robin@example.test'); }
         public function DefaultResponse($mResult): array { return ['Result' => $mResult]; }
     }
 

@@ -51,6 +51,11 @@ class ServiceActions
 	public function SetPaths(array $aPaths) : self
 	{
 		$this->aPaths = $aPaths;
+		if (\in_array(\strtolower((string) ($aPaths[0] ?? '')), [
+			'appdata', 'json', 'raw', 'upload', 'uploadcontacts', 'uploadbackground'
+		], true)) {
+			$this->oActions->SetAccountContext((string) ($aPaths[1] ?? ''));
+		}
 		return $this;
 	}
 
@@ -496,6 +501,14 @@ class ServiceActions
 
 	public function ServiceAppData() : string
 	{
+		// A bookmarked account may have been removed since the URL was created.
+		// Recover this read-only bootstrap on the main account so the client can
+		// canonicalize the URL; explicit JSON/raw/upload actions still fail closed.
+		if (!$this->oActions->getAccountFromToken(false)
+		 && $this->oActions->getMainAccountFromToken(false)
+		) {
+			$this->oActions->SetAccountContext('main');
+		}
 		return $this->localAppData(false);
 	}
 

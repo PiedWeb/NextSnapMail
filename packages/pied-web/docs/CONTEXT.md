@@ -62,7 +62,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   account Feed, with no visible or requested **All accounts** view. Two or more accounts get
   both entries and default to **All accounts**. That overview keeps account + folder + UID as
   row identity, labels every source account, never merges conversations across accounts and
-  switches through the native account endpoint before opening a foreign source. Keep bulk
+  navigates through the tab-local opaque account URL before opening a foreign source. Keep bulk
   actions account-local. See `FEEDS.md`.
 - Since 1.8.5, the working `INBOX`-backed view also has an independent per-account mixed-order preference.
   Since 1.8.9, the first page gathers every unread received row, followed by the first

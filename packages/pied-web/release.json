@@ -1,8 +1,8 @@
 {
-  "version": "1.9.2",
+  "version": "1.9.3",
   "tested": {
     "nextcloud": "34.0.4",
-    "nextsnapmail": "0.1.11",
+    "nextsnapmail": "0.1.12",
     "snappymail": "2.38.2"
   },
   "files": {
@@ -25,14 +25,14 @@
     "plugin/pied-web-ux/composer-toolbar.js": "9765fee4a094f6c40f10ad80d4287591ebfc7db5b4156df0fe633b5f58669bd2",
     "plugin/pied-web-ux/conversation-thread.js": "e4b9dec9b994a5ed504eabbf44ae1744e29c4b34dc51fa05d1f0ad7bf1cd4c6d",
     "plugin/pied-web-ux/filtered-selection.js": "ac3b4e42136985b4846c755003ec8ce5d22428f7c2c76bc0b0c447158abcdb14",
-    "plugin/pied-web-ux/feed.js": "e772c2534408a326beb293c74dc3c138722fddac765c6fbaa56111e5062591fc",
+    "plugin/pied-web-ux/feed.js": "cea984cdf33cfe5929a36dc0d825093292dda95bb9d26f789fb3a28208e7ecb8",
     "plugin/pied-web-ux/folder-rail.js": "e09b61e8f5802e564ecbc21ad78617ef017cbf35d55ebd6f8b69c7b69dd14781",
     "plugin/pied-web-ux/image-compression-license.txt": "6aeb9cd1549315900b91eea89819e509818c733ea3040d59d67041c168703694",
     "plugin/pied-web-ux/image-compression-source.json": "b4c0b77c9c083584528f4e8498d78abbff31d89a6417cfa2b74641f7cae9dbdf",
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "2ab6cc32d88524a8f35e7bea571ccb31bcf9bc68dc307591cad8952e8d68bdba",
+    "plugin/pied-web-ux/index.php": "6443b596a14b88e404756da871673e7bcc5f31947143175e43012f2154a2d477",
     "plugin/pied-web-ux/inline-reply.js": "85a5ae3bf65e80c16b8d19235639e29a37961a76cebc7e0f1775c3577be9e089",
     "plugin/pied-web-ux/left-panel-state.js": "f3970d887448903d92d53eb700abad0073da0c8e0967cfbe545be4f8f8356ebd",
     "plugin/pied-web-ux/list-interactions.js": "61bbfde9c016e21ba3fb6328f28f558ce75b762c268673745ba2a0a603424dd0",
@@ -70,12 +70,16 @@
     "patched_commit": "c13bf1bc45d9d638a50f6fb21c1f4dfd3af0e402",
     "files": {
       "app/libraries/RainLoop/Actions.php": "86586fa4314cf10194912e070e47d529130ea67fbce573f12f622d2afbe19af1",
-      "app/libraries/RainLoop/Actions/Accounts.php": "f0fb49280192ccac77aa604f120b8439e34c4415da48e7649a6014c98addd265",
+      "app/libraries/RainLoop/Actions/Accounts.php": "114b08e8a21398cafd32b4a6a66e16f025fd4d780f9fcb7ca049408f9a44e300",
+      "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
       "app/libraries/RainLoop/Actions/User.php": "f8102dfe66b411964d9e28f6ac693788d4425b82fbcda5bc3d6465d58c0e0c0f",
-      "static/js/app.js": "547b570b16b22ed90c5589ac52945e5676db29fe85149031e5677d8d4ea87f7c",
-      "static/js/min/app.min.js": "73bdb933df06ae0300e068ea6ff293abb2aa7550d675c5e3db6e27af063226e2",
-      "static/js/min/app.min.js.gz": "863efd83c8c2217b6650d9c969df3091dd651f97afb6024f4c7cd45124dcbe64",
-      "static/js/min/app.min.js.br": "5e72ce7c91f5e338f7e6de1b8ab2f4bc1df3d03ff5290ae8eff9f140d35812aa"
+      "app/libraries/RainLoop/ServiceActions.php": "d224923aac286432ccf9f9965cdcca3198194fafa0cb7f2406d2538a18b74741",
+      "static/js/app.js": "7aa475a467ac2e726d252aa7133985eb1ed0f45ae9fc96e2201f127fe8df6b02",
+      "static/js/boot.js": "6566984149da3580d91d62f0535738a7a888764631996e44084f6c33db1e0f25",
+      "static/js/min/app.min.js": "346653a4ebd4461b411e0c50676191f8897a8996d7da2d4b4ddef03b5f21b285",
+      "static/js/min/app.min.js.gz": "d070b0c52a4cfb6889a1f92b26b7a46c773e0e871380c2cb26fd298deb062ded",
+      "static/js/min/app.min.js.br": "a3d314f56421dd0afb6b805ea1f9f3bfa3a524a64723d7fda808679b7c767988",
+      "static/js/min/boot.min.js": "b295b7bb79274da307df3337e72b20e3d65182f9ae447305d0b6a0d504b2bb00"
     }
   }
 }
