@@ -1,0 +1,58 @@
+name: Upstream watch
+
+on:
+  schedule:
+    - cron: '17 5 * * *'
+      timezone: Europe/Paris
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+concurrency:
+  group: nextsnapmail-upstream-watch
+  cancel-in-progress: false
+
+jobs:
+  synchronize:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          fetch-depth: 0
+      - id: upstream
+        name: Check the upstream branch
+        run: python3 tools/check-upstream.py --github-output "$GITHUB_OUTPUT"
+      - name: Prepare tested synchronization
+        if: steps.upstream.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TARGET_SHA: ${{ steps.upstream.outputs.current }}
+        run: |
+          set -euo pipefail
+          short=${TARGET_SHA:0:12}
+          branch="automation/nextsnapmail-$short"
+          git config user.name "piedweb-upstream-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git checkout -B "$branch"
+
+          if ! ./tools/sync-upstream.sh; then
+            title="NextSnapMail upstream $short needs a manual merge"
+            if [[ -z $(gh issue list --state open --search "$title in:title" --json number --jq '.[0].number // empty') ]]; then
+              gh issue create --title "$title" --body "The automated subtree merge failed. Upstream commit: $TARGET_SHA. No deployment was attempted."
+            fi
+            exit 1
+          fi
+
+          ./tools/test.sh
+          git push --force-with-lease origin "$branch"
+
+          if [[ -z $(gh pr list --state open --head "$branch" --json number --jq '.[0].number // empty') ]]; then
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "Sync NextSnapMail upstream $short" \
+              --body "Automated upstream proposal for $TARGET_SHA. The complete monorepo test suite passed. Review is required; this workflow never deploys."
+          fi

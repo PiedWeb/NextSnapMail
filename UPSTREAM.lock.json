@@ -1,0 +1,18 @@
+{
+  "schema": 1,
+  "updated": "2026-09-19T00:00:00Z",
+  "components": {
+    "nextsnapmail": {
+      "repository": "https://github.com/oe79/NextSnapMail.git",
+      "branch": "master",
+      "commit": "87112a79114994942bdcf2a02ebdd90645cc68d8",
+      "path": "apps/nextsnapmail"
+    },
+    "pied-web-import": {
+      "repository": "https://github.com/RobinDev/nextsnapmail-pied-web.git",
+      "commit": "b4305f17578cf15baf282fadf1a9ae0fa1d3684f",
+      "path": "packages/pied-web",
+      "note": "The following monorepo commit imports the local 1.9.2 worktree."
+    }
+  }
+}
