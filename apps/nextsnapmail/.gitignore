@@ -1,0 +1,11 @@
+appinfo/signature.json
+build/
+dist/
+node_modules/
+*.tar
+*.tar.gz
+*.zip
+*.sig
+*.log
+.DS_Store
+Thumbs.db
