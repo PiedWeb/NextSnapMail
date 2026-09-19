@@ -148,7 +148,8 @@ if (!navigator.cookieEnabled) {
 	rl.fetchJSON(qUri(`${admin ? 'Admin' : ''}AppData/${accountContext()}/${Math.random().toString().slice(2)}/`))
 	.then(appData => {
 		RL_APP_DATA = appData;
-		const url = appData.StaticLibsJs,
+		const assetVersion = encodeURIComponent(appData.System.assetVersion || appData.System.version),
+			url = appData.StaticLibsJs + (appData.StaticLibsJs.includes('?') ? '&' : '?') + 'v=' + assetVersion,
 			cb = () => rl.app.bootstart();
 		loadScript(url)
 			.then(() => loadScript(url.replace('/libs.', `/${admin?'admin':'app'}.`)))

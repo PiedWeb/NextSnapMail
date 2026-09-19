@@ -69,17 +69,17 @@
     "base_commit": "d3b0a34f4bec9f8cbb1e722f5467e50305c788c1",
     "patched_commit": "c13bf1bc45d9d638a50f6fb21c1f4dfd3af0e402",
     "files": {
-      "app/libraries/RainLoop/Actions.php": "86586fa4314cf10194912e070e47d529130ea67fbce573f12f622d2afbe19af1",
+      "app/libraries/RainLoop/Actions.php": "1c78cdeef8e5a622cc1b9c2e3193522014df53f8b4feaf60e5e61fcbfa32ebe0",
       "app/libraries/RainLoop/Actions/Accounts.php": "114b08e8a21398cafd32b4a6a66e16f025fd4d780f9fcb7ca049408f9a44e300",
       "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
       "app/libraries/RainLoop/Actions/User.php": "f8102dfe66b411964d9e28f6ac693788d4425b82fbcda5bc3d6465d58c0e0c0f",
       "app/libraries/RainLoop/ServiceActions.php": "d224923aac286432ccf9f9965cdcca3198194fafa0cb7f2406d2538a18b74741",
       "static/js/app.js": "7aa475a467ac2e726d252aa7133985eb1ed0f45ae9fc96e2201f127fe8df6b02",
-      "static/js/boot.js": "6566984149da3580d91d62f0535738a7a888764631996e44084f6c33db1e0f25",
+      "static/js/boot.js": "1ab8387890f24763a38c6fae03c2c1ccd62b4876a6b945f48498487908e9bf95",
       "static/js/min/app.min.js": "346653a4ebd4461b411e0c50676191f8897a8996d7da2d4b4ddef03b5f21b285",
       "static/js/min/app.min.js.gz": "d070b0c52a4cfb6889a1f92b26b7a46c773e0e871380c2cb26fd298deb062ded",
       "static/js/min/app.min.js.br": "a3d314f56421dd0afb6b805ea1f9f3bfa3a524a64723d7fda808679b7c767988",
-      "static/js/min/boot.min.js": "b295b7bb79274da307df3337e72b20e3d65182f9ae447305d0b6a0d504b2bb00"
+      "static/js/min/boot.min.js": "fde762de3ddaffccdd7a880da98b4b3608810824a5ca784feaa252e64b5abd0e"
     }
   }
 }

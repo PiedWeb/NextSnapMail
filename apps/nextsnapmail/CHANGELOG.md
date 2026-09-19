@@ -6,6 +6,8 @@
   parameter so different browser tabs can keep different mailboxes open.
 - Carry that account context through AppData, JSON, upload and raw-resource
   requests, including attachment and message-source links.
+- Version the core JavaScript bundle URL from the deployed source timestamp so
+  browsers do not retain an older account-routing bundle after an update.
 
 ### Changed
 

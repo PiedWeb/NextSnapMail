@@ -82,6 +82,7 @@ test('canonicalization and switching preserve the mailbox fragment and other que
 
 test('boot and account menu use URL context instead of the shared switch endpoint', () => {
   assert.match(bootSource, /AppData\/\$\{accountContext\(\)\}/);
+  assert.match(bootSource, /StaticLibsJs.*assetVersion/);
   const accountClick = appSource.slice(
     appSource.indexOf('\n\t\taccountClick(account, event)'),
     appSource.indexOf('\n\t\taccountName()', appSource.indexOf('\n\t\taccountClick(account, event)'))

@@ -564,6 +564,7 @@ class Actions
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,
+				'assetVersion' => (string) (\filemtime(APP_VERSION_ROOT_PATH . 'static/js/app.js') ?: APP_VERSION),
 				'token' => Utils::GetCsrfToken(),
 				'languages' => \SnappyMail\L10n::getLanguages(false),
 				'webPath' => \RainLoop\Utils::WebPath(),
