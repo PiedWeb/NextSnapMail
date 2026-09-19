@@ -1,13 +1,16 @@
 # Keeping every customization recoverable
 
-The canonical working copy is `~/localhost/Nextcloud/nextsnapmail-pied-web`, with the existing GitHub
-remote `RobinDev/nextsnapmail-pied-web`. It was created private and made public after a
-repository and release-asset audit. Source, documentation,
-checks and releases live together; private runtime configuration lives only on the server.
+The canonical working copy is now
+`~/localhost/Nextcloud/PiedWeb-NextSnapMail/packages/pied-web`, published from
+the `PiedWeb/NextSnapMail` monorepo. The former
+`RobinDev/nextsnapmail-pied-web` repository remains a historical release source
+and an optional reviewed subtree export. It was created private and made public
+after a repository and release-asset audit. Source, documentation, checks and
+releases live together; private runtime configuration lives only on the server.
 
 For every change:
 
-1. Work from this repository, inspect the installed release before overwriting anything.
+1. Work from the monorepo, inspect the installed release before overwriting anything.
 2. Update source and relevant regression coverage. Keep short reasons and limitations in
    the changelog/feature docs, plus durable native contracts in `CONTEXT.md` when needed.
 3. Bump the plugin version, update `release.json` version and payload SHA-256 fingerprints.

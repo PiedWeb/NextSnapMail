@@ -1,7 +1,10 @@
 # Working on Pied Web for NextSnapMail
 
-This repository is the source of truth for the customizations. The owner explicitly
-asks that every change remain recoverable after an upstream update.
+This directory is the product package inside the canonical
+`PiedWeb/NextSnapMail` monorepo. The owner explicitly asks that every change
+remain recoverable after an upstream update. The former standalone repository
+is historical and may receive reviewed subtree exports, but it is no longer the
+working source of truth.
 
 - Read `docs/CONTEXT.md`, `docs/MAINTENANCE.md` and the current `release.json` before changing behavior.
 - Edit `plugin/pied-web-ux/` and `theme-src/` here. Rebuild the theme with `tools/build-theme.py`.
@@ -34,7 +37,8 @@ If both fail, say so and stop browser work; do not keep diagnosing connection er
 
 ## Local layout
 
-Canonical source: `~/localhost/Nextcloud/nextsnapmail-pied-web`.
-Upstream source for native fixtures: `~/localhost/Nextcloud/NextSnapMail`.
+Canonical source: `~/localhost/Nextcloud/PiedWeb-NextSnapMail/packages/pied-web`.
+Upstream source for native fixtures: `../../apps/nextsnapmail`.
+Historical standalone source: `~/localhost/Nextcloud/nextsnapmail-pied-web`.
 Historical design report: `~/localhost/Nextcloud/nextsnapmail/report.html`.
 The former `.local-work` directory contains historical private artifacts, not the current source.
