@@ -1,5 +1,7 @@
 # Pied Web NextSnapMail
 
+[![CI](https://github.com/PiedWeb/NextSnapMail/actions/workflows/ci.yml/badge.svg)](https://github.com/PiedWeb/NextSnapMail/actions/workflows/ci.yml)
+
 Monorepo de l’application Mail utilisée par Pied Web dans Nextcloud. Il réunit
 le fork applicatif de NextSnapMail et la couche produit Pied Web afin que le
 code, les tests et les versions puissent évoluer dans une seule branche.
