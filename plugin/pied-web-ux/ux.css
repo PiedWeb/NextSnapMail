@@ -1,5 +1,5 @@
 /* Toolbar additions belong to Pied Web; delayed sending works with every theme. */
-html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-feed-settings, .pw-threads, .pw-threads-error, .pw-unread-order-error, .pw-unread-order-setting) {
+html:not(.pw-theme) #rl-app :is(.pw-message-actions, .pw-message-extras, .pw-account-label, .pw-feed-settings, .pw-feed-nav, .pw-global-feed, .pw-feed-settings-panel, .pw-threads, .pw-threads-error, .pw-unread-order-error, .pw-unread-order-setting) {
     display: none !important;
 }
 #rl-app .pw-inline-reply-slot {

@@ -1,7 +1,8 @@
-# Unread drafts in the Inbox feed
+# Unread drafts in the account Feed
 
 Since 1.7.0, Pied Web displays **Unread drafts / Brouillons non lus** at the top of the
-first Inbox page, inside the same scrolling feed. It uses the current account's configured
+first working-mail page, inside the same scrolling feed. Since 1.9.0 this is the dedicated
+account Feed; the restored native Inbox does not show Draft reminders. It uses the current account's configured
 Drafts folder and the actual IMAP `UNSEEN` state, excluding deleted messages. A `\Draft`
 flag is not required. Read drafts stay in the ordinary Drafts folder.
 
@@ -10,9 +11,9 @@ reveals the fetched page, then loads further pages of ten. The section disappear
 unread drafts remain. It is hidden while searching, viewing another folder, opening a
 conversation or browsing later Inbox pages. Search and Inbox pagination retain their scope.
 
-Since 1.8.5, the Inbox’s optional mixed-order preference also changes this query to
-ascending date order. Its first page then contains the genuinely oldest unread drafts;
-without that preference the established newest-first order remains. Draft reminders stay
+Since 1.8.5, the optional mixed-order preference also changes this query to ascending date
+order. Since 1.9.0 the preference defaults on, so the first page contains the genuinely oldest
+unread drafts unless the account disables it. Draft reminders stay
 in their separate section rather than entering native Inbox selection.
 
 Clicking a reminder resumes native Draft composition with the original folder/UID,
@@ -42,7 +43,8 @@ one folder. Inbox and Drafts can contain identical UIDs. Inserting draft models 
 the received-message collection could act on the wrong mail. These reminders therefore have
 their own native-draft opening buttons, without Inbox checkboxes. Received-mail counts,
 selection, search, filtered deletion and thread grouping keep their established behavior.
-This is not a combined multi-folder search or an all-account unified inbox.
+This is not a combined native folder. The global Feed renders separate account-safe overview
+rows and opens a Draft only after switching to its source account.
 
 ## Native contracts and tests
 

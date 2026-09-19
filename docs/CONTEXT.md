@@ -50,7 +50,15 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   strip native thread parameters from list and reader requests outside `INBOX`, and
   never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
   a custom folder. An Inbox conversation may still contain its matching Sent replies.
-- Since 1.8.5, `INBOX` also has an independent per-account mixed-order preference.
+- Since 1.9.0, the working workflow lives in a dedicated Feed per account and the Inbox entry
+  is restored as an unmodified native folder. Only Feed `MessageList` requests carry the
+  `PiedWebFeed=1` marker; never enrich an unmarked Inbox response. One account gets only its
+  account Feed, with no visible or requested **All accounts** view. Two or more accounts get
+  both entries and default to **All accounts**. That overview keeps account + folder + UID as
+  row identity, labels every source account, never merges conversations across accounts and
+  switches through the native account endpoint before opening a foreign source. Keep bulk
+  actions account-local. See `FEEDS.md`.
+- Since 1.8.5, the working `INBOX`-backed view also has an independent per-account mixed-order preference.
   Since 1.8.9, the first page gathers every unread received row, followed by the first
   native page's read rows newest-first; later pages suppress gathered unread duplicates
   without moving or dropping their native read rows. Since 1.8.10, unread root messages
@@ -214,7 +222,8 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   download through authenticated same-origin WebDAV, compress locally and insert inline.
   Drag/drop remains a normal attachment; Compress is explicit on attachment cards.
 
-- Since 1.7.0, only actual unread Drafts-folder messages appear above the first Inbox page.
+- Since 1.7.0, only actual unread Drafts-folder messages appear above the first working page;
+  since 1.9.0 that page is the account Feed, never native Inbox.
   A distinct section protects single-folder native UID selection; clicking resumes Draft mode.
   Read drafts are not reminders. See `UNREAD_DRAFTS.md` for scope and refresh rules.
 
@@ -255,6 +264,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.9.0 | Split the working workflow into per-account and multi-account Feeds while restoring native Inbox; omit All accounts entirely for one account. |
 | 1.8.12 | Preserve the current forwarding note and fold from the real ruled Outlook header inside broad mail wrappers. |
 | 1.8.11 | Keep a whole Outlook-shaped message visible when its four-field header starts the body. |
 | 1.8.10 | Keep visibly unread roots together before read-root conversations that still contain an unread member. |
@@ -282,7 +292,8 @@ live mailbox. Original private reports remain in the historical local workspace.
 the standalone distributions from 1.6.5 onward. `CHANGELOG.md` and deployment records supersede
 historical notes for current installed behavior.
 
-Not implemented: a unified inbox, server scheduled delivery, or a new vacation responder.
+The global Feed is an account-safe overview, not a unified IMAP folder: cross-account bulk actions
+are not implemented. A new vacation responder is also not implemented.
 Sieve availability/settings and existing calendar options are configuration concerns; never overwrite
 them while deploying this theme/plugin. The linked-account unread change is preserved separately
 as upstream PR #41 and the version-specific patch.

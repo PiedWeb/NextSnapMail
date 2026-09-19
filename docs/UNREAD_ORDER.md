@@ -1,9 +1,13 @@
-# Mixed unread order in the Inbox feed
+# Mixed unread order in the account Feed
 
-Since 1.8.5, the Inbox toolbar has an independent **Unread: oldest first / Non lus :
+Since 1.8.5, the working-mail toolbar has an independent **Unread: oldest first / Non lus :
 anciens d’abord** preference beside **Conversations**. Both can be active at the same
 time. The preference belongs to the active account and is stored in its local SnappyMail
 settings as `PiedWebUnreadOldestFirst`.
+
+Since 1.9.0, this workflow belongs to the account **Feed** rather than Inbox. The preference
+defaults on to preserve the established workflow. The restored native Inbox never shows the
+control and its unmarked `MessageList` response is left untouched.
 
 Since 1.8.6.1, **Settings → General → Message list** also has a per-account
 **When a message becomes read / Quand un message devient lu** choice, stored as
@@ -17,7 +21,7 @@ Since 1.8.6.1, **Settings → General → Message list** also has a per-account
 
 The choice has no effect when the mixed-order preference is off.
 
-When enabled in the ordinary `INBOX` feed:
+When enabled in an account Feed backed by `INBOX`:
 
 - every unread received row is gathered on the first Inbox page;
 - rows whose visible/root message is unread come first, from oldest to newest;
@@ -45,14 +49,15 @@ the first native page already covers every unread UID, it does no supplementary 
 large unread sets are fetched in native batches on the same connection. Failure of this optional
 step leaves the ordinary native page intact.
 
-Disabling the preference clears the gathered UID set and reloads the native list. Read/unread
+Disabling the preference clears the gathered UID set and reloads the account Feed's native list. Read/unread
 changes follow the account's **When a message becomes read** setting: either the row stays in
 place until refresh, or the active row stays pinned until the reader leaves it and is then
-reclassified without moving the next visible row. Search, thread detail and non-Inbox requests
-never run or merge the supplementary collection.
+reclassified without moving the next visible row. Search, thread detail, native Inbox and
+non-Inbox requests never run or merge the supplementary collection.
 
 `tests/unread-order.php` covers authenticated per-account persistence, input validation,
-first-page scope, the targeted query shape and the no-query fast path.
+Feed-marker and first-page scope, native Inbox exclusion, the targeted query shape and the
+no-query fast path.
 `tests/unread-drafts.php` checks the matching IMAP sort direction. The fictional browser
 fixture checks Conversation coexistence, complete native merging, later-page deduplication,
 separate root-unread and conversation-member groups, received and Draft ordering, read-state changes, scope,

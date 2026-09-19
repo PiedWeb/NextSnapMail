@@ -32,7 +32,7 @@ final class PiedWebUnreadDrafts
         $params = new \MailSo\Mail\MessageListParams;
         $params->sFolderName = $folder;
         $params->sSearch = 'is:unseen';
-        $params->sSort = (bool) $settings->GetConf('PiedWebUnreadOldestFirst', false)
+        $params->sSort = (bool) $settings->GetConf('PiedWebUnreadOldestFirst', true)
             ? 'DATE' : 'REVERSE DATE';
         $params->bHideDeleted = true;
         $params->bUseThreads = false;

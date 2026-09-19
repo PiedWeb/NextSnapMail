@@ -1,5 +1,27 @@
 # Releases
 
+## 1.9.0, 2026-09-19
+
+The unread-Drafts and mixed-order workflow now lives in a dedicated **Feed / Flux** for each
+account. **Inbox / Boîte de réception** is restored as the ordinary native folder: only a Feed
+request carries the server marker that gathers every unread row, so opening Inbox retains native
+ordering and pagination.
+
+With several accounts, **All accounts / Tous les comptes** provides one labelled overview ordered
+as unread Drafts, visibly unread messages, conversations containing an older unread member, then
+read messages newest first. Rows retain account, folder and UID identity; opening a foreign row
+switches through the native account endpoint before navigating to its source. Cross-account bulk
+actions are intentionally unavailable. A failed account does not hide successful accounts.
+
+With exactly one account, All accounts is absent and its endpoint is never requested: the sole
+account Feed opens directly. General settings can choose the opening view, show or hide unread
+Drafts and read rows, enable the established oldest-first workflow, and include each account in
+the global overview. Defaults preserve the workflow previously applied to Inbox.
+
+Endpoint tests cover account-scoped settings, exclusions, folder/UID collisions and independent
+Conversation preferences. Fictional browser coverage verifies single- and multi-account defaults,
+native Inbox isolation, priority grouping, settings, mobile geometry and switch-before-open.
+
 ## 1.8.18, 2026-09-19
 
 The reader's reminder clock now uses the same icon pipeline as Reply, Mark unread, Archive and

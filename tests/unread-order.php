@@ -32,8 +32,8 @@ namespace {
     $n = 0; $check = function($ok, $label) use (&$n) { if (!$ok) throw new \RuntimeException($label); ++$n; echo "PASS $label\n"; };
 
     $_SERVER['REQUEST_METHOD'] = 'POST';
-    $check($plugin->UnreadOrder() === ['enabled'=>false,'behavior'=>1] && $settings->saves === 0,
-        'The per-account preference defaults off and a read does not write settings');
+    $check($plugin->UnreadOrder() === ['enabled'=>true,'behavior'=>1] && $settings->saves === 0,
+        'The per-account Feed preference defaults on and a read does not write settings');
     $actions->params = ['enabled'=>'1'];
     $check($plugin->UnreadOrder() === ['enabled'=>true,'behavior'=>1] && $settings->saves === 1
         && $settings->values['PiedWebUnreadOldestFirst'] === true,
@@ -71,7 +71,7 @@ namespace {
     $settings->values[PiedWebUnreadOrder::SETTING] = true;
     $actions->collection = new \MailSo\Mail\MessageCollection;
     $actions->collection->totalEmails = 14;
-    $actions->params = ['useThreads'=>1,'threadAlgorithm'=>'REFERENCES'];
+    $actions->params = ['PiedWebFeed'=>'1','useThreads'=>1,'threadAlgorithm'=>'REFERENCES'];
     $response = ['Result'=>[
         '@Collection'=>[['folder'=>'INBOX','uid'=>119,'flags'=>[],'threadUnseen'=>[]]],
         'folder'=>['name'=>'INBOX','unreadEmails'=>14], 'offset'=>0, 'search'=>'',
@@ -88,6 +88,17 @@ namespace {
         'The native unread collection is attached for client-side revival');
 
     $before = count($actions->mailCalls);
+    $nativeInbox = ['Result'=>[
+        '@Collection'=>[['folder'=>'INBOX','uid'=>120,'flags'=>[],'threadUnseen'=>[]]],
+        'folder'=>['name'=>'INBOX','unreadEmails'=>14], 'offset'=>0, 'search'=>'',
+        'threadUid'=>0, 'sort'=>'REVERSE DATE', 'totalThreads'=>198
+    ]];
+    $actions->params = ['useThreads'=>1,'threadAlgorithm'=>'REFERENCES'];
+    PiedWebUnreadOrder::augmentMessageList($actions, $nativeInbox);
+    $check(count($actions->mailCalls) === $before && !isset($nativeInbox['PiedWebUnreadOrder']),
+        'The same native Inbox request is untouched without the Feed marker');
+    $actions->params = ['PiedWebFeed'=>'1','useThreads'=>1,'threadAlgorithm'=>'REFERENCES'];
+
     $covered = ['Result'=>[
         '@Collection'=>[['folder'=>'INBOX','uid'=>119,'flags'=>[],'threadUnseen'=>[117,118]]],
         'folder'=>['name'=>'INBOX','unreadEmails'=>3], 'offset'=>0, 'search'=>'',

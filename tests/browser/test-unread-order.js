@@ -27,7 +27,8 @@ check('The setting load is account-scoped and read-only', await page.evaluate(()
     unreadOrderRequests.length === 1 && Object.keys(unreadOrderRequests[0]).length === 0));
 check('The existing read-transition preference is preserved', await page.evaluate(() =>
     document.querySelector('#pw-unread-order-read-behavior')?.value === '2'
-    && document.querySelectorAll('.pw-unread-order-setting').length === 1));
+    && document.querySelector('.pw-unread-order-enabled-setting input')?.checked
+    && document.querySelectorAll('.pw-unread-order-setting').length === 2));
 
 await page.evaluate(() => {
     listVM.messageList().find(message => message.uid === 4).threadUnseen([44]);
@@ -168,11 +169,13 @@ check('Mode 2 still reorders a non-open message immediately', await page.evaluat
 await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=settings&unreadOrder=1');
 await page.waitForFunction(() => !document.querySelector('.pw-unread-order-setting select')?.disabled);
 check('General settings exposes the per-account choice with mode 1 selected by default', await page.evaluate(() => {
-    const control = document.querySelector('.pw-unread-order-setting'), select = control?.querySelector('select');
+    const select = document.querySelector('#pw-unread-order-read-behavior');
+    const control = select?.closest('.pw-unread-order-setting');
     const legends = [...document.querySelectorAll('#V-Settings-General .legend')];
     return !!control && select.value === '1' && select.options.length === 2
         && control.nextElementSibling === legends[2]
-        && control.textContent.includes('Non lus : anciens d’abord');
+        && control.textContent.includes('Non lus : anciens d’abord')
+        && document.querySelector('.pw-unread-order-enabled-setting input')?.checked;
 }));
 await page.selectOption('.pw-unread-order-setting select', '2');
 await page.waitForFunction(() => unreadOrderBehavior === 2 && !document.querySelector('.pw-unread-order-setting select').disabled);

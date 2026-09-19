@@ -18,6 +18,7 @@ final class PiedWebUnreadOrder
         $folder = \is_array($result) ? ($result['folder'] ?? null) : null;
         if (!\is_array($result) || !\is_array($folder)
             || \strcasecmp((string) ($folder['name'] ?? ''), 'INBOX') !== 0
+            || (string) $actions->GetActionParam('PiedWebFeed', '') !== '1'
             || (int) ($result['offset'] ?? -1) !== 0
             || \trim((string) ($result['search'] ?? '')) !== ''
             || (int) ($result['threadUid'] ?? 0) !== 0
@@ -30,7 +31,7 @@ final class PiedWebUnreadOrder
             return;
         }
         $settings = $actions->SettingsProvider(true)->Load($account);
-        if (!$settings || !(bool) $settings->GetConf(self::SETTING, false)) {
+        if (!$settings || !(bool) $settings->GetConf(self::SETTING, true)) {
             return;
         }
 
@@ -140,7 +141,7 @@ final class PiedWebUnreadOrder
 
         $behavior = (int) $settings->GetConf(self::BEHAVIOR_SETTING, 1);
         return [
-            'enabled' => (bool) $settings->GetConf(self::SETTING, false),
+            'enabled' => (bool) $settings->GetConf(self::SETTING, true),
             'behavior' => \in_array($behavior, [1, 2], true) ? $behavior : 1,
         ];
     }

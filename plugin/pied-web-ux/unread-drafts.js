@@ -1,6 +1,7 @@
 /* Read-only draft reminders inside the Inbox feed. Never mix folder-scoped native selections. */
 (() => {
     'use strict';
+    const api = window.PiedWebUx = window.PiedWebUx || {};
     const active = () => document.documentElement.classList.contains('pw-theme');
     const t = (fr, en) => (document.documentElement.lang || 'fr').startsWith('fr') ? fr : en;
     const unseen = message => Array.isArray(message?.flags)
@@ -21,7 +22,9 @@
         let scope = '', generation = 0, entries = [], folder = '', total = 0, visible = 3, nextOffset = 0, etag = '';
         let loading = false, opening = false, disposed = false, timer, CollectionModel, error = '', failedPage = false;
         const currentScope = () => JSON.stringify([rl.settings.get('accountHash'),list()?.folder,list.page?.(),list()?.search,list.threadUid?.()]);
-        const eligible = () => active() && String(list()?.folder || '').toUpperCase() === 'INBOX'
+        const eligible = () => active()
+            && (api.feed?.isAccountFeed ? api.feed.isAccountFeed(list()?.folder) : String(list()?.folder || '').toUpperCase() === 'INBOX')
+            && (api.feed?.showDrafts?.() ?? true)
             && (list.page?.() || 1) === 1 && !(list()?.search || '').trim() && !list.threadUid?.();
         const valid = (version, snapshot) => !disposed && version === generation && snapshot === currentScope() && eligible();
         const message = text => { note.textContent = text; note.hidden = !text; };
@@ -139,11 +142,13 @@
         };
         addEventListener('focus',wake); document.addEventListener('visibilitychange',wake);
         addEventListener('pw-unread-order-changed', orderChanged);
+        addEventListener('pw-feed-mode-changed', orderChanged);
         const poll = setInterval(() => void refresh(),60000); schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; ++generation; clearTimeout(timer); clearInterval(poll); theme.disconnect();
             subscriptions.forEach(sub => sub.dispose()); removeEventListener('focus',wake); document.removeEventListener('visibilitychange',wake);
             removeEventListener('pw-unread-order-changed', orderChanged);
+            removeEventListener('pw-feed-mode-changed', orderChanged);
         });
     });
 })();

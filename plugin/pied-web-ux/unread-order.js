@@ -1,4 +1,4 @@
-/* Inbox-only mixed order: unread roots, unread conversations, then read rows. */
+/* Account Feed order: unread roots, unread conversations, then read rows. */
 (() => {
     'use strict';
     const api = window.PiedWebUx = window.PiedWebUx || {};
@@ -31,7 +31,7 @@
 
     let enabled = false, behavior = 1, ready = false, loading = false, generation = 0;
     let currentAccount = '', listView, button, group, error, sorting = false, frame = 0, pendingAnchor = null;
-    let settingsSelect, settingsStatus, messageSubscriptions = [], readerSubscription;
+    let settingsToggle, settingsSelect, settingsStatus, messageSubscriptions = [], readerSubscription;
     let activeMessageKey = '', heldMessageKey = '', heldIndex = -1, listScope = '';
     let injectedScope = '', injectedUnread = new Set(), receivedGlobal = false;
 
@@ -50,6 +50,7 @@
     const mergeUnreadResponse = data => {
         const result = data?.Result, folder = result?.folder, rows = rawRows(result);
         if (!active() || !result || !Array.isArray(rows) || !isInbox(folder?.name)
+            || (api.feed && !api.feed.isAccountFeed(folder?.name))
             || (result.search || '').trim() || Number(result.threadUid || 0)) return;
         const offset = Number(result.offset || 0), extra = rawRows(data?.PiedWebUnreadOrder);
         if (!offset) {
@@ -84,7 +85,8 @@
 
     const baseFeed = list => {
         const collection = list?.();
-        return active() && isInbox(collection?.folder)
+        return active() && (api.feed?.isAccountFeed
+            ? api.feed.isAccountFeed(collection?.folder) : isInbox(collection?.folder))
             && !(collection?.search || '').trim() && !list.threadUid?.();
     };
     const scope = list => {
@@ -162,14 +164,26 @@
         pendingAnchor = null;
         const list = listView?.messageList, collection = list?.();
         watchMessages(list);
-        if (!enabled || !baseFeed(list) || list.loading?.() || !Array.isArray(collection) || collection.length < 2) return;
+        if (!enabled || !baseFeed(list) || list.loading?.() || !Array.isArray(collection)) {
+            updateReadVisibility();
+            return;
+        }
         const ordered = orderedMessages(Array.from(collection));
-        if (ordered.every((message, index) => message === collection[index])) return;
-        sorting = true;
-        ordered.forEach((message, index) => { collection[index] = message; });
-        list.valueHasMutated?.();
-        sorting = false;
-        restoreAnchor(anchor);
+        if (!ordered.every((message, index) => message === collection[index])) {
+            sorting = true;
+            ordered.forEach((message, index) => { collection[index] = message; });
+            list.valueHasMutated?.();
+            sorting = false;
+            restoreAnchor(anchor);
+        }
+        updateReadVisibility();
+    };
+    const updateReadVisibility = () => {
+        const hideRead = enabled && baseFeed(listView?.messageList) && api.feed?.showRead?.() === false;
+        listView?.viewModelDom?.classList.toggle('pw-feed-unread-only', !!hideRead);
+        requestAnimationFrame(() => listView?.viewModelDom?.querySelectorAll('.messageListItem').forEach(row => {
+            row.hidden = !!hideRead && unreadRank(ko.dataFor(row)) === 0;
+        }));
     };
     function schedule() {
         if (frame) cancelAnimationFrame(frame);
@@ -186,10 +200,16 @@
     };
 
     const updateSettings = () => {
-        if (!settingsSelect?.isConnected) return;
-        settingsSelect.value = String(behavior);
-        settingsSelect.disabled = loading;
-        settingsSelect.setAttribute('aria-busy', String(loading));
+        if (settingsToggle?.isConnected) {
+            settingsToggle.checked = enabled;
+            settingsToggle.disabled = loading;
+            settingsToggle.setAttribute('aria-busy', String(loading));
+        }
+        if (settingsSelect?.isConnected) {
+            settingsSelect.value = String(behavior);
+            settingsSelect.disabled = loading || !enabled;
+            settingsSelect.setAttribute('aria-busy', String(loading));
+        }
     };
     const update = () => {
         updateSettings();
@@ -248,12 +268,16 @@
     };
     const saveEnabled = state => {
         const version = ++generation, snapshot = account();
-        loading = true; error.textContent = ''; update();
+        loading = true;
+        if (error) error.textContent = '';
+        if (settingsStatus) settingsStatus.textContent = '';
+        update();
         request({enabled:state ? 1 : 0}, (failure, saved) => {
             if (version !== generation || snapshot !== account()) return;
             loading = false;
             if (failure) {
-                error.textContent = t('Impossible d’enregistrer l’ordre des non-lus. Réessayez.', 'Could not save the unread order. Try again.');
+                if (error) error.textContent = t('Impossible d’enregistrer l’ordre des non-lus. Réessayez.', 'Could not save the unread order. Try again.');
+                if (settingsStatus) settingsStatus.textContent = t('Impossible d’enregistrer ce choix. Réessayez.', 'Could not save this choice. Try again.');
             } else {
                 ready = true; enabled = saved.enabled; behavior = saved.behavior;
                 clearInjected();
@@ -287,6 +311,17 @@
             : general.querySelector('.form-horizontal') || general;
         const control = document.createElement('div');
         control.className = 'control-group pw-unread-order-setting';
+        const enabledControl = document.createElement('div');
+        enabledControl.className = 'control-group pw-unread-order-setting pw-unread-order-enabled-setting';
+        const enabledLabel = document.createElement('label');
+        settingsToggle = document.createElement('input');
+        settingsToggle.type = 'checkbox';
+        enabledLabel.append(settingsToggle, document.createTextNode(t(' Classer les non-lus du plus ancien au plus récent', ' Sort unread messages from oldest to newest')));
+        const enabledField = document.createElement('div');
+        const enabledHelp = document.createElement('small');
+        enabledHelp.className = 'pw-unread-order-setting-help';
+        enabledHelp.textContent = t('Dans le Flux uniquement ; la Boîte de réception garde son ordre natif.', 'In Feed only; Inbox keeps its native order.');
+        enabledField.append(enabledHelp); enabledControl.append(enabledLabel, enabledField);
         const id = 'pw-unread-order-read-behavior';
         const label = document.createElement('label');
         label.htmlFor = id;
@@ -305,8 +340,9 @@
         field.append(settingsSelect, help, settingsStatus);
         control.append(label, field);
         const messageViewLegend = form.querySelectorAll('.legend')[2];
-        if (messageViewLegend) messageViewLegend.before(control);
-        else form.append(control);
+        if (messageViewLegend) messageViewLegend.before(enabledControl, control);
+        else form.append(enabledControl, control);
+        settingsToggle.addEventListener('change', () => saveEnabled(settingsToggle.checked));
         settingsSelect.addEventListener('change', () => saveBehavior(Number(settingsSelect.value)));
         updateSettings();
         if (!ready && !loading) load();
@@ -316,7 +352,8 @@
         enabled: () => enabled,
         behavior: () => behavior,
         ready: () => ready,
-        apply: schedule
+        apply: schedule,
+        setEnabled: state => ready ? saveEnabled(!!state) : load()
     };
 
     addEventListener('rl-view-model', ({detail:vm}) => {
@@ -367,5 +404,6 @@
         if (!ready && !loading) load();
         else schedule();
     });
+    addEventListener('pw-feed-mode-changed', () => { update(); schedule(); });
     queueMicrotask(mountSettings);
 })();
