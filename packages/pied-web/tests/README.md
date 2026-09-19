@@ -19,6 +19,7 @@ NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-order.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/feed.php
+NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/folder-order.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
 NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
@@ -73,6 +74,7 @@ dev-browser-agent --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser-agent --timeout 35 < tests/browser/test-conversation-toggle.js
 dev-browser-agent --timeout 40 < tests/browser/test-unread-order.js
 dev-browser-agent --timeout 90 < tests/browser/test-feed.js
+dev-browser-agent --timeout 45 < tests/browser/test-folder-rail.js
 dev-browser-agent --timeout 45 < tests/browser/test-left-panel-state.js
 dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
 dev-browser-agent --timeout 90 < tests/browser/test-reminders.js

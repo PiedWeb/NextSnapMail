@@ -31,7 +31,7 @@ check('Leaving Pied Web restores the Nextcloud header',await p.evaluate(()=>getC
 await p.evaluate(()=>document.querySelector('#app-theme-style').dataset.name='PiedWeb@nextcloud');
 await p.waitForFunction(()=>document.body.classList.contains('pw-mail-shell'));
 check('Returning to Pied Web hides the wrapper again',await p.evaluate(()=>document.querySelector('#content').getBoundingClientRect().y===0));
-await p.setViewportSize({width:1200,height:800});await p.evaluate(()=>document.documentElement.classList.add('rl-left-panel-disabled'));await p.evaluate(()=>dispatchEvent(new Event('resize')));
+await p.setViewportSize({width:1200,height:800});await p.waitForFunction(()=>!document.documentElement.classList.contains('rl-mobile'));await p.evaluate(()=>document.documentElement.classList.add('rl-left-panel-disabled'));await p.evaluate(()=>dispatchEvent(new Event('resize')));
 check('Compact sidebar keeps a clear launcher slot',await p.evaluate(()=>document.querySelector('.buttonCompose').getBoundingClientRect().y>=55.9));
 check('Compact sidebar returns to its 72px icon rail',await p.evaluate(()=>{const rail=document.querySelector('#rl-left').getBoundingClientRect(),list=document.querySelector('.messageList').getBoundingClientRect();return Math.abs(rail.width-72)<1&&list.x>=rail.right-1&&document.documentElement.scrollWidth<=innerWidth;}));
 await p.evaluate(()=>dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true})));

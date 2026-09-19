@@ -5712,3 +5712,71 @@ html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
   #rl-app #V-MailMessageList .pw-global-account { max-width:13ch; }
   #rl-app #V-Settings-General .pw-feed-setting-row { grid-template-columns:1fr; gap:var(--pw-space-1); }
 }
+
+/* Compact navigation mirrors native folder links without moving Knockout-owned nodes. */
+#rl-app {
+  --pw-folder-rail-folder-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 5h6l2 3h10v12H3Z'/%3E%3C/svg%3E");
+}
+#rl-app #V-MailFolderList .pw-folder-rail { display:none; }
+@media(min-width:800px) {
+  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList.pw-folder-rail-ready .b-content > :is(.b-folders-system,hr,.search-input-wrp,.e-checkbox,.b-folders-user,.move-action-content-wrapper) {
+    display:none!important;
+  }
+  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList .pw-folder-rail {
+    display:flex; flex-direction:column; gap:var(--pw-space-0-5); width:100%; box-sizing:border-box;
+    margin:0; padding:0; list-style:none; touch-action:none;
+  }
+  #rl-app #V-MailFolderList .pw-folder-rail-item { display:block; width:100%; margin:0; padding:0; }
+  #rl-app #V-MailFolderList .pw-folder-rail-button {
+    position:relative; display:flex; align-items:center; justify-content:center;
+    width:100%; height:56px; min-height:56px; box-sizing:border-box; margin:0; padding:0;
+    border:0!important; border-radius:8px; background:transparent; color:var(--pw-grey-800);
+    font:var(--pw-weight-strong) var(--pw-text-xs)/1 var(--pw-font); cursor:pointer;
+  }
+  #rl-app #V-MailFolderList .pw-folder-rail-button::before {
+    content:''; position:absolute; inset-inline-start:50%; top:24px; width:23px; height:23px;
+    background:currentColor; mask:var(--pw-rail-icon,var(--pw-folder-rail-folder-icon)) center/contain no-repeat;
+    transform:translate(-50%,-50%);
+  }
+  [dir="rtl"] #rl-app #V-MailFolderList .pw-folder-rail-button::before { transform:translate(50%,-50%); }
+  #rl-app #V-MailFolderList .pw-folder-rail-button:is(:hover,:focus-visible) { background:var(--pw-grey-100); color:var(--nc-color-main-text); }
+  #rl-app #V-MailFolderList .pw-folder-rail-button:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:-2px; }
+  #rl-app #V-MailFolderList .pw-folder-rail-button.selected { background:var(--pw-selected); color:var(--nc-color-primary-element); }
+  #rl-app #V-MailFolderList .pw-folder-rail-monogram {
+    position:absolute; z-index:1; inset-inline-start:50%; top:25px; width:19px;
+    overflow:hidden; transform:translate(-50%,-50%); color:currentColor;
+    font-size:8px; font-weight:700; line-height:1; letter-spacing:-.03em; text-align:center;
+  }
+  [dir="rtl"] #rl-app #V-MailFolderList .pw-folder-rail-monogram { transform:translate(50%,-50%); }
+  #rl-app #V-MailFolderList .pw-folder-rail-button:not(.pw-folder-custom) .pw-folder-rail-monogram { display:none; }
+  #rl-app #V-MailFolderList .pw-folder-rail-count {
+    position:absolute; inset-inline-end:4px; bottom:3px; min-width:0; margin:0; padding:0;
+    color:var(--pw-grey-500); font-size:var(--pw-text-xs); font-weight:var(--pw-weight-medium);
+    line-height:14px; font-variant-numeric:tabular-nums;
+  }
+  #rl-app #V-MailFolderList .pw-folder-rail-count[hidden] { display:none; }
+  #rl-app #V-MailFolderList .pw-folder-rail-button.selected .pw-folder-rail-count { color:currentColor; }
+  #rl-app #V-MailFolderList .pw-folder-rail.pw-reordering .pw-folder-rail-button:not(.pw-dragging) { color:var(--pw-grey-500); }
+  #rl-app #V-MailFolderList .pw-folder-rail-button.pw-dragging {
+    z-index:2; background:var(--pw-primary-100); color:var(--nc-color-primary-element);
+    box-shadow:var(--pw-elevation-2); cursor:grabbing;
+  }
+}
+.pw-folder-rail-tooltip {
+  position:fixed; z-index:2300; display:grid; gap:2px; width:max-content; max-width:min(320px,calc(100vw - 24px));
+  box-sizing:border-box; padding:var(--pw-space-2) var(--pw-space-3); border-radius:var(--pw-radius-md);
+  background:var(--pw-grey-900); color:var(--pw-grey-50); box-shadow:var(--pw-elevation-2);
+  font:var(--pw-weight-regular) var(--pw-text-xs)/1.4 var(--pw-font,system-ui,sans-serif); pointer-events:none;
+}
+.pw-folder-rail-tooltip[hidden] { display:none; }
+.pw-folder-rail-tooltip strong { max-width:38ch; overflow:hidden; text-overflow:ellipsis; font:inherit; font-weight:var(--pw-weight-medium); white-space:nowrap; }
+.pw-folder-rail-tooltip span { color:var(--pw-grey-300); }
+.pw-folder-rail-status {
+  position:fixed!important; width:1px!important; height:1px!important; margin:-1px!important; padding:0!important;
+  overflow:hidden!important; clip:rect(0 0 0 0)!important; white-space:nowrap!important; border:0!important;
+}
+html.pw-folder-dragging, html.pw-folder-dragging * { cursor:grabbing!important; user-select:none!important; }
+@media(prefers-color-scheme:dark) {
+  #rl-app #V-MailFolderList .pw-folder-rail-button.selected,
+  #rl-app #V-MailFolderList .pw-folder-rail-button.pw-dragging { color:var(--pw-primary-ink); }
+}

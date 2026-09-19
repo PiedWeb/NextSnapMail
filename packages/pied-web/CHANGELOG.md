@@ -1,5 +1,19 @@
 # Releases
 
+## 1.9.2, 2026-09-19
+
+The collapsed 72 px folder rail now distinguishes custom folders with compact two-character
+monograms, while hover and keyboard focus expose the complete folder path, unread count and
+reorder hint. System folders and Feed entries retain their semantic icons. The rail mirrors and
+activates native SnappyMail links instead of moving Knockout-owned nodes.
+
+Holding an icon for 450 ms starts vertical reordering across Feed, system and custom mailboxes;
+`Alt+ArrowUp` and `Alt+ArrowDown` provide the same operation from the keyboard. The account-scoped
+order is saved through an authenticated plugin endpoint and cached locally for the first paint.
+Expanding the sidebar restores the untouched native hierarchy. PHP coverage validates preference
+input and storage failures; the fictional browser fixture covers monograms, names, normal clicks,
+pointer and keyboard reordering, reload persistence, live counts, selection and expansion.
+
 ## 1.9.1, 2026-09-19
 
 Sending an edited unread Draft now removes its reminder as soon as the send succeeds. Closing

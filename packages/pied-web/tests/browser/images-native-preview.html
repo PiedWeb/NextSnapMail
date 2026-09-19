@@ -395,6 +395,7 @@ window.mockRequests=[]; window.mockCount=451; window.mockError='';
 window.unreadOrderEnabled=new URLSearchParams(location.search).get('unreadOrder')==='1';window.unreadOrderBehavior=Number(new URLSearchParams(location.search).get('unreadBehavior'))||1;window.unreadOrderRequests=[];
 window.feedSettings={defaultView:new URLSearchParams(location.search).get('feedDefault')||'auto',showDrafts:true,showRead:true,includeGlobal:true,accountCount:fixtureAccountCount};
 window.feedRequests=[];
+window.folderOrderRequests=[];
 window.feedGlobalItems=[
  {folder:'INBOX.Brouillons',uid:201,subject:'Réponse en attente',dateTimestamp:1789000000,flags:[],to:{'@Collection':[{name:'Camille',email:'camille@example.test'}]},from:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:'fixture-A',_pwKind:'draft'},
  {folder:'INBOX',uid:101,subject:'Ancien message non lu',dateTimestamp:1789000100,flags:[],from:{'@Collection':[{name:'Camille',email:'camille@example.test'}]},to:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:'fixture-A',_pwKind:'message'},
@@ -403,6 +404,12 @@ window.feedGlobalItems=[
  {folder:'INBOX',uid:302,subject:'Dernier message lu',dateTimestamp:1789000400,flags:['\\seen'],from:{'@Collection':[{name:'Noa',email:'noa@example.test'}]},to:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'hello@example.test',_pwAccountName:'Pied Web',_pwAccountHash:'fixture-B',_pwKind:'message'}
 ];
 rl.pluginRemoteRequest=(cb,action,params)=>{
+ if(action==='PiedWebFolderOrder'){
+  folderOrderRequests.push({...params});
+  let saved=[];try{saved=JSON.parse(localStorage.getItem('fixture-folder-order-server')||'[]');}catch{}
+  if(Object.hasOwn(params,'order')){try{saved=JSON.parse(params.order);localStorage.setItem('fixture-folder-order-server',JSON.stringify(saved));}catch{return setTimeout(()=>cb(1,{Result:{error:'order'}}),20);}}
+  return setTimeout(()=>cb(0,{Result:{order:saved}}),20);
+ }
  if(action==='PiedWebFeed'){
   feedRequests.push({...params});
   if(params.operation==='global')return setTimeout(()=>cb(0,{Result:{accounts:fixtureAccounts().map(account=>({...account,hash:'fixture',error:''})),items:structuredClone(feedGlobalItems),generatedAt:1789000500}}),20);
@@ -441,7 +448,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/squire-next-capture.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next-vendor.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next.js?squire=249"></script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/feed.js?feed=190"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/unread-order.js?order=190"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
+</script><script src="/.local-work/pied-web-ux/squire-next-capture.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next-vendor.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next.js?squire=249"></script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/feed.js?feed=190"></script><script src="/.local-work/pied-web-ux/folder-rail.js?rail=192"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/unread-order.js?order=190"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 window.composerOpened=[];

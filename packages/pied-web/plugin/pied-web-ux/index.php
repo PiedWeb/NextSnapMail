@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.9.1',
+        VERSION = '1.9.2',
         RELEASE = '2026-09-19',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -21,6 +21,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('scheduled-send.js');
         $this->addJs('filtered-selection.js');
         $this->addJs('feed.js');
+        $this->addJs('folder-rail.js');
         $this->addJs('inbox-conversations.js');
         $this->addJs('ux.js');
         $this->addJs('unread-order.js');
@@ -49,6 +50,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJsonHook('PiedWebUnreadDrafts', 'UnreadDrafts');
         $this->addJsonHook('PiedWebUnreadOrder', 'UnreadOrder');
         $this->addJsonHook('PiedWebFeed', 'Feed');
+        $this->addJsonHook('PiedWebFolderOrder', 'FolderOrder');
         $this->addJsonHook('PiedWebConversation', 'Conversation');
         $this->addJsonHook('PiedWebScheduledSend', 'ScheduledSend');
         $this->addJsonHook('PiedWebReminders', 'Reminders');
@@ -141,6 +143,18 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
             $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'feed'];
         }
         return $this->Manager()->JsonResponseHelper('PiedWebFeed', $result);
+    }
+
+    public function FolderOrder(): array
+    {
+        require_once __DIR__ . '/FolderOrder.php';
+        try {
+            $result = PiedWebFolderOrder::handle(\RainLoop\Api::Actions());
+        } catch (\Throwable $error) {
+            $known = ['order', 'settings'];
+            $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'folder-order'];
+        }
+        return $this->Manager()->JsonResponseHelper('PiedWebFolderOrder', $result);
     }
 
     public function AttachmentImage(): array

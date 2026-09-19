@@ -8,7 +8,7 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 
 ## Included
 
-- Clear folder hierarchy, quieter secondary counters and a compact icon sidebar that stays collapsed after a reload. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
+- Clear folder hierarchy, quieter secondary counters and a compact sidebar that stays collapsed after a reload. Custom folders keep distinct monograms and complete hover/focus labels; a long click or `Alt` plus an arrow reorders every mailbox and persists that order per account. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop, carrying the already-open message into the group before adding the clicked row; a long touch starts selection on mobile, with no visible checkboxes.
 - Reply and Reply all compose inline at the bottom of an active Inbox conversation, with an
   Expand control that keeps the same draft and cursor in the full composer. Multi-correspondent
@@ -59,7 +59,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.9.1**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.9.2**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

@@ -37,6 +37,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   label, balancing the existing trailing rule; the mobile headings stay unchanged.
 - Consistent folder geometry and native special-folder icons. A collapsed 72 px icon rail
   with small counters; secondary counters are quieter than inbox unread counts.
+- Since 1.9.2 the collapsed desktop rail is a presentation layer over untouched native folder
+  links. Custom folders receive two-character monograms and full hover/focus labels. A 450 ms
+  primary-pointer hold starts reordering across Feed, system and custom entries; Alt+Arrow keys
+  are the keyboard equivalent. Persist stable identifiers per active account, cache them only for
+  first paint, ignore missing entries and append new ones. Expanding must restore the native
+  hierarchy and order. See `FOLDER_RAIL.md`.
 - Conversation totals and unread counts are visually distinct; list stars use an
   outlined/filled pair and preserve native folder/selection commands.
   Since 1.7.2 followed messages use an amber star and row tint. Metadata CSS belongs to the
