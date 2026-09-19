@@ -232,6 +232,7 @@
         if (!actions || !header || !vm.message?.subscribe) return;
         vm.pwReminderReader = true;
         const button = document.createElement('button'); button.type = 'button'; button.className = 'btn pw-remind-message';
+        button.dataset.pwIcon = 'clock';
         button.setAttribute('aria-haspopup','dialog'); button.setAttribute('aria-expanded','false'); button.append(glyph('clock') || '◷');
         actions.append(button);
         const bar = document.createElement('section'); bar.className = 'pw-reminder-bar'; bar.hidden = true;

@@ -751,6 +751,10 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 #rl-app #V-MailMessageList .pw-selection-remind:focus-visible {
     outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
 }
+#rl-app [data-pw-icon="clock"] {
+    --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3.5 2'/%3E%3C/svg%3E");
+}
+#rl-app #V-MailMessageView .pw-message-actions > .pw-remind-message { border-radius:0!important; }
 #rl-app #V-MailMessageView .pw-remind-message[hidden] { display:none!important; }
 #rl-app #V-MailMessageView .pw-remind-message svg { width:20px; height:20px; pointer-events:none; }
 

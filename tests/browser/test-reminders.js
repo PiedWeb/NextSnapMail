@@ -31,6 +31,17 @@ check('Inbox reader exposes one accessible reminder action',await p.evaluate(()=
  return document.querySelectorAll('.pw-remind-message').length===1&&button.getAttribute('aria-label')==='Me le rappeler'
   &&button.getAttribute('aria-haspopup')==='dialog'&&button.querySelector('svg');
 }));
+check('The reader reminder matches the native action group',await p.evaluate(()=>{
+ const button=document.querySelector('.pw-remind-message'),peer=document.querySelector('.pw-mark-unread');
+ const style=getComputedStyle(button),peerStyle=getComputedStyle(peer),box=button.getBoundingClientRect(),peerBox=peer.getBoundingClientRect();
+ const icon=getComputedStyle(button,'::before'),peerIcon=getComputedStyle(peer,'::before');
+ return style.display===peerStyle.display&&style.borderTopWidth==='0px'&&style.boxShadow==='none'
+  &&style.backgroundColor==='rgba(0, 0, 0, 0)'&&style.borderRadius===peerStyle.borderRadius
+  &&Math.abs(box.width-peerBox.width)<.5&&Math.abs(box.height-peerBox.height)<.5
+  &&button.dataset.pwIcon==='clock'&&icon.maskImage!=='none'
+  &&Math.abs(parseFloat(icon.width)-parseFloat(peerIcon.width))<.5
+  &&Math.abs(parseFloat(icon.height)-parseFloat(peerIcon.height))<.5;
+}));
 await p.evaluate(()=>document.querySelector('.pw-remind-message').click());await p.waitForSelector('.pw-reminder-panel');
 await p.waitForFunction(()=>document.querySelector('.pw-reminder-panel')?.style.left);
 check('The picker offers the useful shortcuts and a custom local date',await p.evaluate(()=>{

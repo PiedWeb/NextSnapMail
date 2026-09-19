@@ -1,5 +1,15 @@
 # Releases
 
+## 1.8.18, 2026-09-19
+
+The reader's reminder clock now uses the same icon pipeline as Reply, Mark unread, Archive and
+Delete. It therefore shares their exact toolbar box, quiet resting colour, borderless surface,
+hover treatment and responsive geometry instead of inheriting SnappyMail's generic bordered
+button at the end of the group. The clock also uses the common 1.8 px stroke and optical size.
+
+There is no reminder or mailbox behavior change. The fictional browser fixture now compares the
+clock's computed box, border, surface, radius and icon dimensions directly with Mark unread.
+
 ## 1.8.17, 2026-09-18
 
 The composer now gives **From**, **To**, **Cc**, **Bcc**, **Reply-To** and **Subject** the

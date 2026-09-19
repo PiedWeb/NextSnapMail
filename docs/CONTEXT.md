@@ -176,7 +176,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   worker heartbeat is stale or custom keywords are unsupported. A move failure must restore
   the former unread state; a wake failure must leave the message read and stamped in Reminders.
   The reader and list expose reschedule and immediate return, and conversation actions include
-  every native thread UID once. See `REMINDERS.md`.
+  every native thread UID once. Since 1.8.18, the reader clock must use the shared
+  `data-pw-icon` toolbar pipeline rather than a separately styled generic button. See
+  `REMINDERS.md`.
 - Markdown and source complement the native visual editor. Send/save remains native HTML.
 - Since 1.8.6, General settings offer upstream `Squire 2.4 (test)` beside native `Squire`.
   Native Squire remains the default. The per-account choice is read only when a composer is
