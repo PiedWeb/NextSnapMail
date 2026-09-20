@@ -333,6 +333,15 @@ html.rl-mobile #rl-left{top:48px;bottom:0;left:0;max-width:calc(100vw - 48px)}
 <script src="/app/snappymail/v/2.38.2/static/js/libs.js"></script>
 <script>
 window.fixtureErrors=[];addEventListener("unhandledrejection",e=>fixtureErrors.push(String(e.reason?.stack||e.reason)));addEventListener("error",e=>fixtureErrors.push(e.message));window.actionCalls=[];
+// Browser suites share the persistent Chrome profile. Start each top-level
+// fixture at a neutral view while preserving state across its own account
+// navigation. Add ?persistView=1 only for an explicit persistence scenario.
+const fixtureBootstrapParams=new URLSearchParams(location.search);
+if(!fixtureBootstrapParams.has('account')&&!fixtureBootstrapParams.has('persistView')){
+ for(const storage of [sessionStorage,localStorage]){
+  for(let index=storage.length-1;index>=0;index--){const key=storage.key(index);if(key?.startsWith('pw-mail-view:'))storage.removeItem(key);}
+ }
+}
 document.querySelector('#no-sort-list')?.closest('.btn-group').remove();
 document.querySelector('#sort-list-dropdown-id').textContent='📅⬇';
 document.querySelector('.b-folders .buttonContacts')?.setAttribute('hidden','');
@@ -392,7 +401,7 @@ window.systemVM={viewModelTemplateID:'SystemDropDown',viewModelDom:document.getE
 const fixtureFolder=new URLSearchParams(location.search).get('folder')||'INBOX';
 const messages=Object.assign([{}, {}, {}],{folder:fixtureFolder,search:''});
 const messageList=ko.observableArray(messages);
-Object.assign(messageList,{mainSearch(value){actionCalls.push('search:'+value);},count:ko.observable(128),pageCount:ko.observable(1),loading:ko.observable(false),isIncomplete:ko.observable(false),threadUid:ko.observable(0),reload(){actionCalls.push('reload');}});
+Object.assign(messageList,{mainSearch(value){actionCalls.push('search:'+value);},count:ko.observable(128),pageCount:ko.observable(1),loading:ko.observable(false),isIncomplete:ko.observable(false),uidValidity:ko.observable(77),threadUid:ko.observable(0),reload(){actionCalls.push('reload');}});
 window.mockRequests=[]; window.mockCount=451; window.mockError='';
 window.unreadOrderEnabled=new URLSearchParams(location.search).get('unreadOrder')==='1';window.unreadOrderBehavior=Number(new URLSearchParams(location.search).get('unreadBehavior'))||1;window.unreadOrderRequests=[];
 window.feedSettings={defaultView:new URLSearchParams(location.search).get('feedDefault')||'auto',showDrafts:true,showRead:true,includeGlobal:true,accountCount:fixtureAccountCount};
@@ -402,7 +411,7 @@ window.feedGlobalItems=[
  {folder:'INBOX.Brouillons',uid:201,subject:'Réponse en attente',dateTimestamp:1789000000,flags:[],to:{'@Collection':[{name:'Camille',email:'camille@example.test'}]},from:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:fixtureHashA,_pwKind:'draft'},
  {folder:'INBOX',uid:101,subject:'Ancien message non lu',dateTimestamp:1789000100,flags:[],from:{'@Collection':[{name:'Camille',email:'camille@example.test'}]},to:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:fixtureHashA,_pwKind:'message'},
  {folder:'INBOX',uid:301,subject:'Message professionnel',dateTimestamp:1789000200,flags:[],from:{'@Collection':[{name:'Morgan',email:'morgan@example.test'}]},to:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'hello@example.test',_pwAccountName:'Pied Web',_pwAccountHash:fixtureHashB,_pwKind:'message'},
- {folder:'INBOX',uid:102,subject:'Conversation à reprendre',dateTimestamp:1789000300,flags:['\\seen'],from:{'@Collection':[{name:'Lou',email:'lou@example.test'}]},to:{'@Collection':[]},threadUnseen:[99],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:fixtureHashA,_pwKind:'message'},
+ {folder:'INBOX',uid:102,subject:'Conversation à reprendre',dateTimestamp:1789000300,flags:['\\seen'],from:{'@Collection':[{name:'Lou',email:'lou@example.test'}]},to:{'@Collection':[]},threads:[99,102],threadUnseen:[99],_pwAccountEmail:'alex@example.test',_pwAccountName:'Personnel',_pwAccountHash:fixtureHashA,_pwKind:'message'},
  {folder:'INBOX',uid:302,subject:'Dernier message lu',dateTimestamp:1789000400,flags:['\\seen'],from:{'@Collection':[{name:'Noa',email:'noa@example.test'}]},to:{'@Collection':[]},threadUnseen:[],_pwAccountEmail:'hello@example.test',_pwAccountName:'Pied Web',_pwAccountHash:fixtureHashB,_pwKind:'message'}
 ];
 rl.pluginRemoteRequest=(cb,action,params)=>{
@@ -414,8 +423,10 @@ rl.pluginRemoteRequest=(cb,action,params)=>{
  }
  if(action==='PiedWebFeed'){
   feedRequests.push({...params});
+  if(window.mailboxFixtureRequest?.(params,cb))return;
   if(params.operation==='global')return setTimeout(()=>cb(0,{Result:{accounts:fixtureAccounts().map(account=>({...account,hash:account.accountHash,error:''})),items:structuredClone(feedGlobalItems),generatedAt:1789000500}}),20);
-  ['showDrafts','showRead','includeGlobal'].forEach(key=>{if(Object.hasOwn(params,key))feedSettings[key]=!!Number(params[key]);});
+  ['showDrafts','showRead','includeGlobal','compact'].forEach(key=>{if(Object.hasOwn(params,key))feedSettings[key]=!!Number(params[key]);});
+  ['lastView','lastFolder','lastAccountHash'].forEach(key=>{if(Object.hasOwn(params,key))feedSettings[key]=params[key];});
   if(Object.hasOwn(params,'defaultView'))feedSettings.defaultView=params.defaultView;
   return setTimeout(()=>cb(0,{Result:{...feedSettings}}),20);
  }
@@ -450,7 +461,7 @@ document.getElementById('V-SettingsMenu').hidden=mode!=='settings';
 document.getElementById('V-SettingsPane').hidden=mode!=='settings';
 document.querySelectorAll('.toggleLeft').forEach(el=>el.addEventListener('click',()=>document.documentElement.classList.toggle('rl-left-panel-disabled')));
 document.querySelector('#V-SettingsMenu nav').innerHTML='<a class="selected">Général</a><a>Comptes</a><a>Dossiers</a><a>Thèmes</a>';
-</script><script src="/.local-work/pied-web-ux/squire-next-capture.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next-vendor.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next.js?squire=249"></script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/feed.js?feed=190"></script><script src="/.local-work/pied-web-ux/folder-rail.js?rail=192"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/unread-order.js?order=190"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
+</script><script src="/.local-work/mailbox-workspace-fixture.js"></script><script src="/.local-work/pied-web-ux/squire-next-capture.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next-vendor.js?squire=249"></script><script src="/.local-work/pied-web-ux/squire-next.js?squire=249"></script><script src="/.local-work/pied-web-ux/send-delay.js?images=166a"></script><script src="/.local-work/pied-web-ux/mailbox-actions.js"></script><script src="/.local-work/pied-web-ux/feed-workspace.js"></script><script src="/.local-work/pied-web-ux/interface-comfort.js"></script><script src="/.local-work/pied-web-ux/filtered-selection.js?images=166a"></script><script src="/.local-work/pied-web-ux/feed.js?feed=190"></script><script src="/.local-work/pied-web-ux/folder-rail.js?rail=192"></script><script src="/.local-work/pied-web-ux/inbox-conversations.js?inbox=184"></script><script src="/.local-work/pied-web-ux/ux.js?compose=1840"></script><script src="/.local-work/pied-web-ux/unread-order.js?order=190"></script><script src="/.local-work/pied-web-ux/studio.js?images=173a"></script><script src="/.local-work/pied-web-ux/list-interactions.js?images=175c"></script><script src="/.local-work/pied-web-ux/list-metadata.js?images=174c"></script><script src="/.local-work/pied-web-ux/address-actions.js?addresses=178a"></script><script src="/.local-work/pied-web-ux/left-panel-state.js?panel=1"></script>
 <script>
 ko.applyBindingAccessorsToNode(document.querySelector('#V-MailMessageView .buttonClose'),{click:()=>readerVM.closeMessage},readerVM);
 window.composerOpened=[];
@@ -511,7 +522,7 @@ bindFixtureTagMenu(document.querySelector('.messageTags .btn-group'));
 window.fixtureMenuTemplate=document.querySelector('#more-view-dropdown-id').parentNode.querySelector('[class="dividerbar"]:last-child')?.innerHTML;
 for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/app-shell-fixture.js"></script><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
 <script src="/.local-work/pied-web-ux/markdown-vendors.js?images=166a"></script>
-<script src="/.local-work/pied-web-ux/markdown.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=166a"></script>
+<script src="/.local-work/pied-web-ux/markdown.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/reminders.js"></script>
 <style>
 /* Fixture-only address fields; editor/tab/template/styles are native. */
 .fixture-addresses {padding:12px 18px;display:grid;gap:6px;}

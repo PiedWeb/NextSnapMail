@@ -17,6 +17,18 @@
         bar.append(countLabel,finish);
         dom.querySelector(':scope > .btn-toolbar')?.after(bar);
         const selectedCount=ko.computed(()=>list().filter(message=>ko.unwrap(message.checked)).length);
+        const selectAll=dom.querySelector('.checkboxCheckAll');
+        if (selectAll) {
+            selectAll.tabIndex=0; selectAll.setAttribute('role','checkbox');
+            const label=(document.documentElement.lang||'fr').startsWith('fr') ? 'Sélectionner les éléments de cette page' : 'Select items on this page';
+            selectAll.setAttribute('aria-label',label);selectAll.title=label;
+            selectAll.addEventListener('keydown',event=>{
+                if (![' ','Enter'].includes(event.key) || !available() || window.PiedWebUx?.feed?.isGlobal?.()) return;
+                event.preventDefault();event.stopImmediatePropagation();
+                const all=list().length>0 && list().every(message=>ko.unwrap(message.checked));
+                list().forEach(message=>message.checked?.(!all));
+            });
+        }
         const syncSelection=()=>{
             const count=active() ? selectedCount() : 0;
             dom.classList.toggle('pw-selection-mode',count>0);
@@ -26,6 +38,8 @@
                 : `${count} message${count===1?'':'s'} selected`;
             finish.textContent=fr ? 'Terminer' : 'Done';
             finish.setAttribute('aria-label',fr ? 'Terminer la sélection' : 'Finish selection');
+            const all=count>0 && count===list().length;
+            selectAll?.setAttribute('aria-checked',count && !all ? 'mixed' : String(all));
         };
         selectedCount.subscribe(syncSelection);
         const clearSelection=()=>{

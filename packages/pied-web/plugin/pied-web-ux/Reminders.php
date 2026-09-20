@@ -29,6 +29,38 @@ final class PiedWebReminders
         return self::PREFIX . \strtolower(\base_convert((string) $when, 10, 36));
     }
 
+    /** Cross-account callers must first resolve account membership from the login.
+     * Supply an already authenticated mail client; never switch session account state. */
+    public static function validateScoped($actions, $account, $mail, string $remindAt): void
+    {
+        $when = self::parse($remindAt);
+        $sender = self::sender();
+        if ($sender < 1 || \time() - $sender > 1800) throw new \RuntimeException('sender');
+        if (!$mail->ImapClient()->hasCapability('MOVE')) throw new \RuntimeException('capability');
+        self::resolve(self::scopedActions($actions, $mail, []), $account);
+        if (!$mail->ImapClient()->FolderSelect('INBOX', true)->IsFlagSupported(self::keyword($when))) {
+            throw new \RuntimeException('keyword');
+        }
+    }
+
+    public static function applyScoped($actions, $account, $mail, array $uids, string $remindAt): array
+    {
+        self::validateScoped($actions, $account, $mail, $remindAt);
+        $scoped = self::scopedActions($actions, $mail, ['uids' => \implode(',', $uids), 'remindAt' => $remindAt]);
+        return self::schedule($scoped, $account, false);
+    }
+
+    private static function scopedActions($actions, $mail, array $params)
+    {
+        return new class($actions, $mail, $params) {
+            public function __construct(private $actions, private $mail, private array $params) {}
+            public function ImapClient() { return $this->mail->ImapClient(); }
+            public function MailClient() { return $this->mail; }
+            public function GetActionParam($name, $default = '') { return $this->params[$name] ?? $default; }
+            public function SettingsProvider($local) { return $this->actions->SettingsProvider($local); }
+        };
+    }
+
     public static function timeFromFlags(array $flags): ?int
     {
         $times = [];

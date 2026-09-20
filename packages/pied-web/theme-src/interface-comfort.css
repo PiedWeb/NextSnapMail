@@ -1,0 +1,28 @@
+/* Only native popup dialogs use the animate lifecycle. The inline reply is the
+ * same bound composer promoted to non-modal, and must not move or fade. */
+html.pw-theme #rl-popups > dialog:not(.pw-inline-reply) {
+  top:0;
+  background-color:var(--dialog-bg-clr,var(--nc-color-main-background));
+  transform:translateY(0);
+  transition:opacity 150ms cubic-bezier(.22,1,.36,1), transform 150ms cubic-bezier(.22,1,.36,1);
+}
+html.pw-theme #rl-popups > dialog:not(.pw-inline-reply):not(.animate) {
+  top:0;
+  transform:translateY(-6px);
+}
+/* The native popup lifecycle has a computed-duration completion fallback, so
+ * suppressing motion cannot leave an invisible modal in the browser top layer. */
+@media (prefers-reduced-motion:reduce) {
+  html.pw-theme #rl-popups > dialog:not(.pw-inline-reply) {
+    transform:none;
+    transition:none;
+  }
+  html.pw-theme #rl-popups > dialog:not(.pw-inline-reply):not(.animate) { transform:none; }
+}
+/* Focus is a navigation cursor, not the delayed reader selection. Keep the
+ * current native opened/checked backgrounds and add a synchronous shape cue. */
+html.pw-theme #rl-app #V-MailMessageList .messageListItem.focused {
+  outline:2px solid var(--nc-color-primary-element);
+  outline-offset:-2px;
+  transition:none;
+}

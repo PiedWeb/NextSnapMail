@@ -10,21 +10,26 @@
     const isInbox = folder => String(value(folder) || '').toUpperCase() === 'INBOX';
     const stateKey = () => 'pw-mail-view:' + accountHash();
     const pendingKey = 'pw-mail-feed-open';
+    const returnKey = 'pw-mail-feed-return';
     const getSession = key => { try { return sessionStorage.getItem(key); } catch { return null; } };
     const setSession = (key, next) => { try { next === null ? sessionStorage.removeItem(key) : sessionStorage.setItem(key, next); } catch {} };
+    const getDurable = key => { try { return localStorage.getItem(key); } catch { return null; } };
+    const setDurable = (key,next) => { try { localStorage.setItem(key,next); } catch {} };
     const validMode = candidate => ['feed', 'global', 'inbox'].includes(candidate) ? candidate : '';
 
-    let mode = validMode(getSession(stateKey())) || 'feed';
-    let settings = {defaultView:'auto', showDrafts:true, showRead:true, includeGlobal:true, accountCount:1};
+    const explicitMessage = /\/m\d+(?:\/|$)/.test(location.hash);
+    let mode = explicitMessage ? 'inbox' : (validMode(getSession(stateKey())) || validMode(getDurable(stateKey())) || 'feed');
+    let settings = {defaultView:'auto', showDrafts:true, showRead:true, includeGlobal:true, accountCount:1,compact:false};
     let settingsReady = false, settingsLoading = false, settingsGeneration = 0;
     let listView, folderView, systemView, globalSection, globalStatus, globalRows, globalRefresh;
     let feedLink, feedItem, globalLink, globalItem, nativeInbox, accountSubscription, accountCount = 1;
     let globalGeneration = 0, globalLoading = false, globalReloadPending = false, globalItems = [], globalAccounts = [];
+    let workspace, persistTimer, globalLoaded = false, pendingRestore, pendingInboxReload = false;
 
     const currentEmail = () => String(value(systemView?.accountEmail) || window.rl?.settings?.get?.('Email') || '');
     const currentFolder = () => String(value(listView?.messageList)?.folder || value(folderView?.currentFolder)?.fullName || '');
     const accountFeed = folder => active() && mode === 'feed' && isInbox(folder === undefined ? currentFolder() : folder);
-    const globalFeed = () => active() && mode === 'global' && accountCount > 1;
+    const globalFeed = () => active() && ((mode === 'global' && accountCount > 1) || workspace?.isSearch());
     const notify = () => dispatchEvent(new CustomEvent('pw-feed-mode-changed', {
         detail:{mode, showDrafts:settings.showDrafts, showRead:settings.showRead, accountCount}
     }));
@@ -83,6 +88,7 @@
 
     const resolvedDefault = () => {
         const preferred = settings.defaultView;
+        if (preferred === 'last') return validMode(settings.lastView) || (accountCount > 1 ? 'global' : 'feed');
         if ((preferred === 'global' || preferred === 'auto') && accountCount > 1) return 'global';
         if (preferred === 'inbox') return 'inbox';
         return 'feed';
@@ -92,7 +98,15 @@
         if (next === 'global' && accountCount < 2) next = 'feed';
         const changed = next !== mode;
         mode = next;
-        if (persist) setSession(stateKey(), mode);
+        if (persist) {
+            setSession(stateKey(), mode); setDurable(stateKey(),mode);
+            clearTimeout(persistTimer);
+            if (settingsReady) persistTimer = setTimeout(() => {
+                const folder = currentFolder();
+                requestPlugin({operation:'settings',lastView:isInbox(folder) ? mode : 'folder',
+                    lastFolder:isInbox(folder) ? '' : folder,lastAccountHash:accountHash()},() => {});
+            },400);
+        }
         updateNavigation();
         renderGlobal();
         if (changed) notify();
@@ -104,6 +118,7 @@
         else listView?.reload?.();
     };
     const selectView = next => {
+        workspace?.reset();
         setMode(next);
         if (!isInbox(currentFolder())) {
             const href = nativeInbox?.href;
@@ -139,6 +154,8 @@
             listView.viewModelDom.classList.toggle('pw-global-active', globalFeed());
             listView.viewModelDom.classList.toggle('pw-account-feed-active', accountFeed());
         }
+        workspace?.updateScope();
+        document.documentElement.classList.toggle('pw-compact',active() && !!settings.compact);
     };
 
     const folderName = link => {
@@ -159,17 +176,30 @@
         const globalNav = document.createElement('li'); globalNav.className = 'pw-feed-nav pw-global-nav';
         globalLink = document.createElement('a'); linkLabel(globalLink, t('Tous les comptes', 'All accounts'), 'global');
         globalNav.append(globalLink); globalItem = globalNav;
-        list.prepend(globalNav, feedNav);
+        list.prepend(feedNav);
+        mountAccountEntry();
 
         feedLink.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); selectView('feed'); });
         globalLink.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); selectView('global'); });
         root.addEventListener('click', event => {
             const link = event.target.closest?.('a.selectable');
             if (!link || link === feedLink || link === globalLink) return;
+            workspace?.reset();
             setMode('inbox');
         }, true);
-        vm.currentFolder?.subscribe?.(updateNavigation);
+        vm.currentFolder?.subscribe?.(() => { updateNavigation(); if (settingsReady && !isInbox(currentFolder())) setMode('inbox'); });
         updateNavigation();
+    };
+
+    const mountAccountEntry = () => {
+        if (!globalItem) return;
+        const menu = value(systemView?.accountMenu)?.querySelector?.('menu.dropdown-menu')
+            || systemView?.viewModelDom?.querySelector('menu.dropdown-menu')
+            || document.querySelector('#top-system-dropdown-id')?.parentElement?.querySelector('menu.dropdown-menu');
+        if (menu && globalItem.parentElement !== menu) {
+            globalItem.setAttribute('role','presentation'); globalLink.setAttribute('role','menuitem');
+            globalLink.dataset.icon = '☷'; menu.prepend(globalItem);
+        }
     };
 
     const addressText = (item, property) => {
@@ -233,7 +263,8 @@
     const consumePending = async target => {
         if (!target?.email || target.email !== currentEmail() || !target.folder || !target.uid) return false;
         setSession(pendingKey, null);
-        setMode('feed');
+        setMode('feed',false);
+        setSession(stateKey(),'feed');
         if (target.kind === 'draft') {
             try { await openDraft(target); }
             catch { globalStatus && (globalStatus.textContent = t('Impossible d’ouvrir ce brouillon.', 'Could not open this draft.')); }
@@ -280,6 +311,10 @@
     };
     const paintGlobal = () => {
         if (!globalRows) return;
+        if (workspace) {
+            workspace.paint(sortedGlobal().filter(item => settings.showRead || rank(item)>0),globalAccounts,globalLoading);
+            return;
+        }
         globalRows.replaceChildren();
         if (!globalFeed()) return;
         const items = sortedGlobal().filter(item => settings.showRead || rank(item) > 0);
@@ -302,6 +337,7 @@
     };
     const loadGlobal = (force = false) => {
         if (!globalFeed()) return;
+        if (workspace?.isSearch()) return workspace.refresh();
         if (globalLoading) {
             if (force) globalReloadPending = true;
             return;
@@ -321,7 +357,9 @@
             }
             globalItems = result.items;
             globalAccounts = result.accounts;
+            globalLoaded = true;
             paintGlobal();
+            if (pendingRestore) { void workspace?.restore(pendingRestore); pendingRestore = null; }
             if (reload) loadGlobal();
         });
     };
@@ -340,6 +378,14 @@
         globalStatus.setAttribute('role', 'status'); globalStatus.setAttribute('aria-live', 'polite');
         globalRows = document.createElement('div'); globalRows.className = 'pw-global-rows';
         globalSection.append(header, globalStatus, globalRows); content.prepend(globalSection);
+        if (api.createFeedWorkspace) workspace = api.createFeedWorkspace({vm,section:globalSection,rows:globalRows,status:globalStatus,refreshButton:globalRefresh,
+            rank,unseen,sectionTitle,dateText,accountText,
+            primary:item => addressText(item,item._pwKind === 'draft' ? 'to' : 'from') || t('Sans destinataire ou expéditeur','No recipient or sender'),
+            accountHash,accountCount:() => accountCount,mode:() => mode,folder:currentFolder,
+            accountLabel:() => String(value(systemView?.accountName) || currentEmail()),
+            folderLabel:() => String(value(value(folderView?.currentFolder)?.localName) || currentFolder()),
+            refresh:() => loadGlobal(true),render:renderGlobal,open:openGlobalItem,
+            beforeOpen:state => setSession(returnKey,JSON.stringify({...state,accountHash:accountHash(),mode}))});
         const list = vm.messageList;
         [list, list?.page, list?.threadUid].filter(observable => observable?.subscribe)
             .forEach(observable => observable.subscribe(() => { updateNavigation(); renderGlobal(); }));
@@ -349,7 +395,7 @@
         updateNavigation();
         if (!globalSection) return;
         globalSection.hidden = !globalFeed();
-        if (!globalSection.hidden && (force || (!globalItems.length && !globalLoading))) loadGlobal(force);
+        if (!globalSection.hidden && !workspace?.isSearch() && (force || (!globalLoaded && !globalLoading))) loadGlobal(force);
     }
 
     const updateAccountCount = () => {
@@ -360,11 +406,48 @@
         const observedCount = Array.isArray(accounts) && accounts.length ? accounts.length : 0;
         accountCount = Math.max(1, observedCount || Number(settings.accountCount) || 1);
         settings.accountCount = accountCount;
+        mountAccountEntry();
         if (mode === 'global' && accountCount < 2) setMode('feed');
         updateNavigation(); renderGlobal(); updateSettingsForm();
+        restoreReturn();
     };
 
-    let defaultSelect, draftsInput, readInput, globalInput, settingsStatus;
+    const returnState = () => { try { return JSON.parse(getSession(returnKey) || 'null'); } catch { return null; } };
+    const restoreReturn = () => {
+        const state = returnState();
+        if (!state?.resume || !workspace || state.accountHash !== accountHash() || !settingsReady) return;
+        setSession(returnKey,null); setMode(state.mode || 'global');
+        if (state.search || globalLoaded) void workspace.restore(state);
+        else pendingRestore = state;
+    };
+    const mountReaderReturn = vm => {
+        if (vm.pwFeedReturn || !vm.viewModelDom) return;
+        vm.pwFeedReturn = true;
+        const button = document.createElement('button'); button.type = 'button'; button.className = 'pw-feed-return';
+        button.textContent = t('Retour à la liste d’origine','Back to the original list');
+        button.hidden = !returnState();
+        (vm.viewModelDom.querySelector('.messageView') || vm.viewModelDom).prepend(button);
+        const nativeClose = vm.closeMessage;
+        const back = () => {
+            const state = returnState();
+            nativeClose?.call(vm);
+            if (!state) return;
+            state.resume = true; setSession(returnKey,JSON.stringify(state));
+            if (state.accountHash !== accountHash()) {
+                const url = new URL(location.href); url.searchParams.set('account',state.accountHash); url.hash = '#/mailbox/INBOX'; location.assign(url.href);
+            } else { restoreReturn(); button.hidden = true; }
+        };
+        button.addEventListener('click',back);
+        vm.closeMessage = back;
+        vm.viewModelDom.addEventListener('click',event => {
+            if (returnState() && event.target.closest?.('.close,[data-bind*="click: closeMessage"]')) {
+                event.preventDefault(); event.stopImmediatePropagation(); back();
+            }
+        },true);
+        vm.message?.subscribe?.(() => { button.hidden = !returnState(); });
+    };
+
+    let defaultSelect, draftsInput, readInput, globalInput, compactInput, settingsStatus;
     const updateSettingsForm = () => {
         if (!defaultSelect?.isConnected) return;
         const current = settings.defaultView;
@@ -372,6 +455,7 @@
         const choices = accountCount > 1
             ? [['auto',t('Tous les comptes', 'All accounts')],['feed',t('Flux du compte', 'Account feed')],['inbox',t('Boîte de réception', 'Inbox')]]
             : [['auto',t('Flux', 'Feed')],['inbox',t('Boîte de réception', 'Inbox')]];
+        choices.unshift(['last',t('Dernière vue utilisée','Last used view')]);
         choices.forEach(([id,label]) => {
             const option = document.createElement('option'); option.value = id; option.textContent = label; defaultSelect.append(option);
         });
@@ -379,8 +463,9 @@
         draftsInput.checked = settings.showDrafts;
         readInput.checked = settings.showRead;
         globalInput.checked = settings.includeGlobal;
+        compactInput.checked = settings.compact;
         globalInput.closest('.pw-feed-setting-row').hidden = accountCount < 2;
-        [defaultSelect,draftsInput,readInput,globalInput].forEach(control => {
+        [defaultSelect,draftsInput,readInput,globalInput,compactInput].forEach(control => {
             control.disabled = settingsLoading; control.setAttribute('aria-busy', String(settingsLoading));
         });
     };
@@ -418,24 +503,27 @@
         draftsInput = document.createElement('input'); draftsInput.type = 'checkbox';
         readInput = document.createElement('input'); readInput.type = 'checkbox';
         globalInput = document.createElement('input'); globalInput.type = 'checkbox';
+        compactInput = document.createElement('input'); compactInput.type = 'checkbox';
         settingsStatus = document.createElement('p'); settingsStatus.className = 'pw-feed-settings-status';
         settingsStatus.setAttribute('role', 'status'); settingsStatus.setAttribute('aria-live', 'polite');
         panel.append(legend, defaultRow,
             settingRow(t('Afficher les brouillons non lus', 'Show unread drafts'), draftsInput),
             settingRow(t('Afficher les messages lus après les non-lus', 'Show read messages after unread messages'), readInput),
             settingRow(t('Inclure ce compte dans « Tous les comptes »', 'Include this account in “All accounts”'), globalInput),
+            settingRow(t('Mode compact','Compact mode'),compactInput,t('Des lignes plus denses sur ordinateur.','Denser message rows on desktop.')),
             settingsStatus);
         general.append(panel);
         defaultSelect.addEventListener('change', () => saveSettings({defaultView:defaultSelect.value}));
         draftsInput.addEventListener('change', () => saveSettings({showDrafts:draftsInput.checked}));
         readInput.addEventListener('change', () => saveSettings({showRead:readInput.checked}));
         globalInput.addEventListener('change', () => saveSettings({includeGlobal:globalInput.checked}));
+        compactInput.addEventListener('change', () => saveSettings({compact:compactInput.checked}));
         updateSettingsForm();
     };
 
     const loadSettings = () => {
         if (settingsLoading) return;
-        const version = ++settingsGeneration, hadStoredMode = !!validMode(getSession(stateKey()));
+        const version = ++settingsGeneration, hadStoredMode = !!validMode(getSession(stateKey())) || !!validMode(getDurable(stateKey()));
         settingsLoading = true; updateSettingsForm();
         requestPlugin({operation:'settings'}, (failure, result) => {
             if (version !== settingsGeneration) return;
@@ -448,13 +536,21 @@
                 // A pending cross-account open can establish the target account's
                 // mode while this request is in flight. Do not overwrite it with
                 // the default when the settings response arrives afterwards.
-                if (!hadStoredMode && !validMode(getSession(stateKey()))) {
+                if (!explicitMessage && !hadStoredMode && !validMode(getSession(stateKey()))) {
                     const opening = resolvedDefault();
-                    setMode(opening);
+                    setMode(opening,false);
+                    if (settings.defaultView === 'last' && settings.lastView === 'folder' && settings.lastFolder && !location.hash) {
+                        const url = new URL(location.href); url.hash = '#/mailbox/' + encodeURIComponent(settings.lastFolder);
+                        if (settings.lastAccountHash) url.searchParams.set('account',settings.lastAccountHash);
+                        location.assign(url.href);
+                    }
                     // The bootstrap request may have started while Feed was the
                     // provisional mode. Reload once without its marker when the
                     // saved opening view is the native Inbox.
-                    if (opening === 'inbox' && isInbox(currentFolder())) reloadList();
+                    if (opening === 'inbox') {
+                        if (listView && isInbox(currentFolder())) reloadList();
+                        else pendingInboxReload = true;
+                    }
                 }
             }
             updateAccountCount(); updateSettingsForm(); notify(); renderGlobal();
@@ -476,6 +572,10 @@
         if (vm.viewModelTemplateID === 'MailFolderList') mountNavigation(vm);
         if (vm.viewModelTemplateID === 'MailMessageList') {
             mountGlobal(vm);
+            if (pendingInboxReload && isInbox(currentFolder())) {
+                pendingInboxReload = false;
+                reloadList();
+            }
             const raw = getSession(pendingKey);
             if (raw) { try { void consumePending(JSON.parse(raw)); } catch { setSession(pendingKey, null); } }
         }
@@ -485,6 +585,7 @@
             accountSubscription = vm.accounts?.subscribe?.(updateAccountCount);
             updateAccountCount();
         }
+        if (vm.viewModelTemplateID === 'MailMessageView') mountReaderReturn(vm);
         mountSettings();
         if (!settingsReady && !settingsLoading) loadSettings();
     });
@@ -492,5 +593,6 @@
     // Background Send emits this only after the server has removed its durable
     // draft. Refresh a global Feed that may still be showing the earlier copy.
     addEventListener('pw-message-sent', () => { if (globalFeed()) renderGlobal(true); });
+    addEventListener('pw-mailbox-changed',() => { if (globalFeed()) renderGlobal(true); });
     queueMicrotask(() => { mountSettings(); if (!settingsReady && !settingsLoading) loadSettings(); });
 })();

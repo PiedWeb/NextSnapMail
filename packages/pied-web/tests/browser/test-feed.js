@@ -9,7 +9,7 @@ const check = (name, ok) => {
 const base = 'http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1';
 const fresh = async url => {
     await page.goto(url);
-    await page.evaluate(() => sessionStorage.clear());
+    await page.evaluate(() => { sessionStorage.clear(); Object.keys(localStorage).filter(key => key.startsWith('pw-mail-view:')).forEach(key => localStorage.removeItem(key)); });
     await page.reload();
     await page.waitForFunction(() => window.PiedWebUx?.feed && feedRequests.length > 0);
 };
@@ -53,7 +53,7 @@ check('Single-account settings contain no global-feed choice or inclusion contro
     const select = document.querySelector('#pw-feed-default-view');
     const globalRow = [...document.querySelectorAll('.pw-feed-setting-row')]
         .find(row => row.textContent.includes('Tous les comptes'));
-    return [...select.options].map(option => option.textContent).join('|') === 'Flux|Boîte de réception'
+    return [...select.options].map(option => option.textContent).join('|') === 'Dernière vue utilisée|Flux|Boîte de réception'
         && globalRow?.hidden === true;
 }));
 check('Single-account startup never requests the global endpoint', await page.evaluate(() =>
@@ -80,7 +80,8 @@ await page.waitForFunction(() => PiedWebUx.feed.mode() === 'global'
     && document.querySelectorAll('.pw-global-row').length === 5);
 check('Multiple accounts default to All accounts and keep the account Feed available', await page.evaluate(() => {
     const visible = [...document.querySelectorAll('.pw-feed-nav')].filter(item => !item.hidden);
-    return visible.map(item => item.textContent.trim()).join('|') === 'Tous les comptes|Flux'
+    return document.querySelector('menu .pw-global-nav') && visible.some(item => item.textContent.trim() === 'Flux')
+        && !document.querySelector('.b-folders-system .pw-global-nav')
         && document.querySelector('.pw-global-nav .pw-feed-link').classList.contains('selected')
         && PiedWebUx.feed.accountCount() === 2;
 }));
@@ -112,7 +113,7 @@ check('Multi-account settings expose the global default and inclusion control', 
     const globalRow = [...document.querySelectorAll('.pw-feed-setting-row')]
         .find(row => row.textContent.includes('Tous les comptes'));
     return [...select.options].map(option => option.textContent).join('|')
-        === 'Tous les comptes|Flux du compte|Boîte de réception'
+        === 'Dernière vue utilisée|Tous les comptes|Flux du compte|Boîte de réception'
         && globalRow?.hidden === false;
 }));
 

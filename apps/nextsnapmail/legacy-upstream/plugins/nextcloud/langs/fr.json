@@ -1,0 +1,14 @@
+{
+	"NEXTCLOUD": {
+		"SAVE_ATTACHMENTS": "Enregistrer dans Nextcloud",
+		"SAVE_EML": "Enregistrer le fichier .eml dans Nextcloud",
+		"SAVE_ICS": "Ajouter au calendrier",
+		"SELECT_FOLDER": "Choisir un dossier",
+		"SELECT_FILES": "Choisir des fichiers",
+		"ATTACH_FILES": "Joindre des fichiers Nextcloud",
+		"SELECT_CALENDAR": "Choisir un calendrier",
+		"FILE_ATTACH": "Pièce jointe",
+		"FILE_INTERNAL": "Lien interne",
+		"FILE_PUBLIC": "Lien public"
+	}
+}

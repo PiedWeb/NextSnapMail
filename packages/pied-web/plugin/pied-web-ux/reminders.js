@@ -94,7 +94,7 @@
         return result;
     }
 
-    function picker(anchor, uids, mode, done) {
+    function picker(anchor, uids, mode, done, submit) {
         openPanel?.close(false);
         const currentToast = document.querySelector('.pw-reminder-toast');
         if (currentToast) currentToast.textContent = '';
@@ -147,7 +147,8 @@
             if (date.getTime() < Date.now() + 30000) { note.textContent = t('Choisissez un moment à venir.','Choose a time in the future.'); return; }
             busy(true); note.textContent = t('Enregistrement…','Saving…');
             try {
-                const result = await hook({operation:mode, uids:uids.join(','), remindAt:date.toISOString()});
+                const result = submit ? await submit(date)
+                    : await hook({operation:mode, uids:uids.join(','), remindAt:date.toISOString()});
                 reminderFolder = String(result.folder || reminderFolder); checked = 0;
                 close(false); done?.(result);
                 const count = Number(result.count || uids.length);
@@ -280,8 +281,22 @@
         ko.utils.domNodeDisposal.addDisposeCallback(dom,() => { subscription.dispose(); button.remove(); bar.remove(); });
     }
 
+    // The shared picker accepts an account-safe operation supplied by the Feed.
+    // Never fall back to this tab's mailbox when acting on another account's row.
+    api.reminders = {choose:(anchor,submit,done) => picker(anchor,[],'set',done,submit)};
+
     addEventListener('rl-view-model', ({detail:vm}) => {
         if (vm.viewModelTemplateID === 'MailMessageList') mountList(vm);
         else if (vm.viewModelTemplateID === 'MailMessageView') mountReader(vm);
+    });
+    // Plugins can be enabled or reloaded after SnappyMail has already emitted
+    // its view-model events. Recover the live models instead of depending on
+    // script order; the per-view markers keep this idempotent.
+    queueMicrotask(() => {
+        if (typeof ko === 'undefined') return;
+        const list = ko.dataFor(document.getElementById('V-MailMessageList'));
+        const reader = ko.dataFor(document.getElementById('V-MailMessageView'));
+        if (list?.viewModelTemplateID === 'MailMessageList') mountList(list);
+        if (reader?.viewModelTemplateID === 'MailMessageView') mountReader(reader);
     });
 })();

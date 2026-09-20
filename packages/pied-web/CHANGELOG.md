@@ -1,5 +1,60 @@
 # Releases
 
+## 1.10.2, 2026-09-20
+
+Desktop Feed rows now share one quick-action group, moved to the currently hovered or focused
+row, instead of rendering hidden SVG buttons for every result. Keyboard access and exact dynamic
+row scope are preserved; touch layouts retain visible actions per row. On the production global
+Feed this removes hundreds of inactive DOM nodes without changing the read-only server request.
+
+## 1.10.1, 2026-09-20
+
+Feed quick and bulk actions now expand a displayed conversation to every validated native thread
+UID instead of modifying only its representative row. Native-list actions preserve the folder
+UIDVALIDITY received with the rendered page and refuse preparation if the mailbox generation has
+since changed, preventing recycled UIDs from targeting another message.
+
+Mailbox preparation and mutations also reuse each fresh forced IMAP examine for UIDVALIDITY and
+flag validation. A native prepare now needs one examine per folder, reversible Trash one examine
+plus the final writable select, and Undo two examines plus its final writable select. NextSnapMail
+advances to **0.1.14** so the added native UIDVALIDITY store and rebuilt assets receive a new cache
+identity.
+
+## 1.10.0, 2026-09-20
+
+The global Feed is now a complete multi-account workspace rather than a read-only overview.
+**All accounts** lives in the account menu, the list always names its active account/folder
+scope, and the native search field can run one server-side search across every authorized
+account and eligible folder. Results are frozen under an opaque, expiring token for stable
+pagination and **Select all results**; no private query or mailbox identity is exposed in that
+token.
+
+Page, search-result and explicit row selections share exact `(account, folder, UIDVALIDITY,
+UID)` identities. Delete moves only to each account's configured Trash, works in bounded batches
+and offers Undo only after the server confirms a complete COPYUID/MOVE mapping. Quick Delete and
+Remind controls use the same account-safe operation path. Partial, changed-mailbox, expired and
+uncertain outcomes stop with explicit feedback instead of retrying a mutation blindly.
+
+The active view now persists on the server per account, with browser storage only as a fast
+tab-safe fallback. Global rows restore keyboard navigation, visible focus, native-style selection
+and return-to-list context. Desktop native lists keep a single accessible **Select page** checkbox
+in the header; row checkboxes remain hidden. Shortcut handling is harmonized across list, reader,
+folder and menu scopes without stealing keys from editors or open controls.
+
+An optional compact mode reduces desktop account-Feed/native rows to roughly 50–54 px. Dialogs
+use a short opacity/scale transition with a reduced-motion-safe lifecycle. Conversation stacks
+open with an identifiable excerpt of the preceding message, keep older cards folded, expose an
+explicit full-account exchange from filed mail and preserve the visible line, keyed cards and
+keyboard focus while late content changes size.
+
+The core app advances to NextSnapMail **0.1.13**. Its source and deterministic minified assets
+add the plugin search bridge, dynamic folder labels, private-keyword filtering and race-safe modal
+transitions while retaining the 2.38.2 native contracts. The fictional browser suite contains 37
+scripts; mailbox endpoint tests cover batching, token quotas, UIDVALIDITY, multi-account search,
+MOVE/COPYUID Undo and account-scoped reminders without touching a real mailbox. On the 200-message
+conversation fixture, the median first render improved from about 212 ms to 68 ms with one search
+request and no eager message-body reads.
+
 ## 1.9.3, 2026-09-19
 
 Account selection is now local to each browser tab through the opaque account context in the

@@ -92,6 +92,17 @@ export class AppUser extends AbstractApp {
 		this.loadAccountsAndIdentities = loadAccountsAndIdentities;
 	}
 
+	/** Current account's native folder roles, resolved after its folder load. */
+	mailboxFolders() {
+		return {
+			inbox: getFolderInboxName(),
+			trash: FolderUserStore.trashFolder(),
+			spam: FolderUserStore.spamFolder(),
+			drafts: FolderUserStore.draftsFolder(),
+			archive: FolderUserStore.archiveFolder()
+		};
+	}
+
 	/**
 	 * @param {number} iFolderType
 	 * @param {string} sFromFolderFullName

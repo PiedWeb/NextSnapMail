@@ -4,11 +4,18 @@ await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=
 await p.waitForFunction(()=>document.querySelector('#V-MailMessageList')?.dataset.pwSelectionVersion==='1.7.15');
 await p.evaluate(()=>{window.fixtureRowOpens=[];demoRows.forEach((row,i)=>row.addEventListener('click',()=>fixtureRowOpens.push(i+1)));});
 const results=[];const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
-check('No checkbox or selection banner appears at rest',await p.evaluate(()=>{
+check('Only the page-wide checkbox appears at rest',await p.evaluate(()=>{
  const list=document.querySelector('#V-MailMessageList');
  return !list.classList.contains('pw-selection-mode')&&list.querySelector('.pw-selection-bar').hidden
-   &&[...list.querySelectorAll('.messageCheckbox,.checkboxCheckAll')].every(x=>getComputedStyle(x).display==='none');
+   &&[...list.querySelectorAll('.messageCheckbox')].every(x=>getComputedStyle(x).display==='none')
+   &&getComputedStyle(list.querySelector('.checkboxCheckAll')).display!=='none'
+   &&list.querySelector('.checkboxCheckAll').getAttribute('role')==='checkbox'
+   &&list.querySelector('.checkboxCheckAll').getAttribute('aria-label')==='Sélectionner les éléments de cette page';
 }));
+await p.locator('.checkboxCheckAll').press('Space');
+check('Keyboard Space selects the current page immediately',await p.evaluate(()=>demoMessages.every(message=>message.checked())
+ &&document.querySelector('.checkboxCheckAll').getAttribute('aria-checked')==='true'));
+await p.locator('.pw-selection-finish').click();
 await p.locator('.messageListItem .senderParent').nth(2).click();
 check('Ordinary click keeps the native open behavior',await p.evaluate(()=>fixtureRowOpens.join(',')==='3'&&demoMessages.every(m=>!m.checked())));
 await p.evaluate(()=>demoRows[0].querySelector('.senderParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
@@ -24,12 +31,19 @@ check('Done clears checked state and returns to normal mode',await p.evaluate(()
 await p.evaluate(()=>demoRows[0].querySelector('.subjectParent').dispatchEvent(new MouseEvent('click',{bubbles:true,ctrlKey:true})));
 await p.locator('.messageListItem .subjectParent').nth(1).click();
 await p.evaluate(()=>listVM.deleteCommand());
-check('Existing grouped actions still receive exactly the selected messages',await p.evaluate(()=>fixtureMoves.length===1&&fixtureMoves[0].uids.join(',')==='1,2'));
+await p.waitForFunction(()=>mailboxFixtureCalls.some(request=>request.operation==='action'));
+check('The reversible grouped action receives exactly the selected messages',await p.evaluate(()=>{
+ const prepared=mailboxFixtureCalls.find(request=>request.operation==='prepare');
+ const action=mailboxFixtureCalls.find(request=>request.operation==='action');
+ return prepared?.folder==='INBOX'&&prepared.uids==='[1,2]'&&prepared.uidValidity===77&&action?.action==='trash';
+}));
 await p.evaluate(()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
 check('Escape leaves selection mode',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));
 await p.setViewportSize({width:390,height:844});
 await p.waitForFunction(()=>document.documentElement.classList.contains('rl-mobile'));
-check('Mobile has no checkbox or separate selection menu entry',await p.evaluate(()=>[...document.querySelectorAll('.messageCheckbox,.checkboxCheckAll,.pw-mobile-select')].every(x=>getComputedStyle(x).display==='none')));
+check('Mobile keeps selection gesture-only without per-row controls',await p.evaluate(()=>
+ [...document.querySelectorAll('.messageCheckbox,.checkboxCheckAll,.pw-mobile-select')]
+  .every(x=>getComputedStyle(x).display==='none'||!x.getClientRects().length)));
 await p.locator('.messageListItem .subjectParent').nth(3).click();
 check('Short mobile tap still opens the message',await p.evaluate(()=>fixtureRowOpens.at(-1)===4&&demoMessages.every(m=>!m.checked())));
 await p.evaluate(async()=>{

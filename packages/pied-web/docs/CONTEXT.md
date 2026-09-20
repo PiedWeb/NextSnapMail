@@ -62,8 +62,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   account Feed, with no visible or requested **All accounts** view. Two or more accounts get
   both entries and default to **All accounts**. That overview keeps account + folder + UID as
   row identity, labels every source account, never merges conversations across accounts and
-  navigates through the tab-local opaque account URL before opening a foreign source. Keep bulk
-  actions account-local. See `FEEDS.md`.
+  navigates through the tab-local opaque account URL before opening a foreign source. Since 1.10.0,
+  All accounts lives in the account menu and adds frozen server search, explicit page/all-results
+  selection, quick actions and reversible cross-account Trash over exact account/folder/
+  UIDVALIDITY/UID identities. See `FEEDS.md`.
 - Since 1.8.5, the working `INBOX`-backed view also has an independent per-account mixed-order preference.
   Since 1.8.9, the first page gathers every unread received row, followed by the first
   native page's read rows newest-first; later pages suppress gathered unread duplicates
@@ -270,6 +272,9 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.10.2 | Reuse one desktop Feed quick-action group on the hovered/focused row instead of rendering hidden controls for every result. |
+| 1.10.1 | Expand Feed thread actions, bind native mutations to the rendered UIDVALIDITY and remove redundant forced IMAP mailbox selections. |
+| 1.10.0 | Turn All accounts into a keyboard-complete, server-searched workspace with scoped multi-page selection, reversible Trash, compact mode and stable conversation excerpts. |
 | 1.9.0 | Split the working workflow into per-account and multi-account Feeds while restoring native Inbox; omit All accounts entirely for one account. |
 | 1.8.12 | Preserve the current forwarding note and fold from the real ruled Outlook header inside broad mail wrappers. |
 | 1.8.11 | Keep a whole Outlook-shaped message visible when its four-field header starts the body. |
@@ -298,8 +303,9 @@ live mailbox. Original private reports remain in the historical local workspace.
 the standalone distributions from 1.6.5 onward. `CHANGELOG.md` and deployment records supersede
 historical notes for current installed behavior.
 
-The global Feed is an account-safe overview, not a unified IMAP folder: cross-account bulk actions
-are not implemented. A new vacation responder is also not implemented.
+The global Feed is an account-safe workspace, not a unified IMAP folder. Its cross-account actions
+operate only on frozen exact identities and never create a merged mailbox. A new vacation responder
+is not implemented.
 Sieve availability/settings and existing calendar options are configuration concerns; never overwrite
 them while deploying this theme/plugin. The linked-account unread change is preserved separately
 as upstream PR #41 and the version-specific patch.

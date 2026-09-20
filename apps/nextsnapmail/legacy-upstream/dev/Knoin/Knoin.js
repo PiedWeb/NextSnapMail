@@ -74,22 +74,45 @@ const
 //					vmDom.addEventListener('close', () => vm.modalVisible(false));
 
 					// show/hide popup/modal
-					// transitionend is called for each property, so we only listen to `opacity`
-					// as defined in CSS by `dialog:not(.animate)`
+					// CSS may disable transitions (reduced motion), or a rapid toggle
+					// may cancel them. Complete once per visibility generation even
+					// when no opacity transitionend reaches the native dialog.
+					let popupEpoch = 0, popupCompleted = 0, popupFrame = 0, popupTimer = 0, popupFocus = 0;
+					const completeVisibility = epoch => {
+						if (epoch !== popupEpoch || popupCompleted === epoch) return;
+						popupCompleted = epoch;
+						clearTimeout(popupTimer);
+						if (vm.modalVisible()) {
+							vm.afterShow?.();
+							fireEvent('rl-vm-visible', vm);
+						} else {
+							vmDom.close();
+							vm.afterHide?.();
+						}
+					};
+					const armCompletion = epoch => {
+						const style = getComputedStyle(vmDom),
+							milliseconds = value => (parseFloat(value) || 0) * (value.trim().endsWith('ms') ? 1 : 1000),
+							properties = style.transitionProperty.split(',').map(value => value.trim()),
+							durations = style.transitionDuration.split(',').map(milliseconds),
+							delays = style.transitionDelay.split(',').map(milliseconds),
+							duration = Number(style.opacity) === (vm.modalVisible() ? 1 : 0) ? 0 : Math.max(0,
+								...properties.map((property, index) => ['all', 'opacity'].includes(property)
+									? durations[index % durations.length] + delays[index % delays.length] : 0));
+						popupTimer = setTimeout(() => completeVisibility(epoch), duration > 0 ? duration + 34 : 0);
+					};
 					const endShowHide = e => {
-						if (e.target === vmDom && 'opacity' === e.propertyName) {
-							if (vmDom.classList.contains('animate')) {
-								vm.afterShow?.();
-								fireEvent('rl-vm-visible', vm);
-							} else {
-								vmDom.close();
-								vm.afterHide?.();
-//								fireEvent('rl-vm-hidden', vm);
-							}
+						if (e.target === vmDom && 'opacity' === e.propertyName
+							&& vmDom.classList.contains('animate') === !!vm.modalVisible()) {
+							completeVisibility(popupEpoch);
 						}
 					};
 
 					vm.modalVisible.subscribe(value => {
+						const epoch = ++popupEpoch;
+						cancelAnimationFrame(popupFrame);
+						clearTimeout(popupTimer);
+						clearTimeout(popupFocus);
 						if (value) {
 							i18nToNodes(vmDom);
 							visiblePopups.add(vm);
@@ -99,16 +122,19 @@ const
 								vmDom.backdrop.style.zIndex = 3000 + (visiblePopups.size * 2);
 							}
 							vm.keyScope.set();
-							setTimeout(()=>autofocus(vmDom),1);
-							requestAnimationFrame(() => { // wait just before the next paint
+							popupFocus = setTimeout(() => { if (epoch === popupEpoch && vm.modalVisible()) autofocus(vmDom); }, 1);
+							popupFrame = requestAnimationFrame(() => { // wait just before the next paint
+								if (epoch !== popupEpoch || !vm.modalVisible()) return;
 								vmDom.offsetHeight; // force a reflow
 								vmDom.classList.add('animate'); // trigger the transitions
+								armCompletion(epoch);
 							});
 						} else {
 							visiblePopups.delete(vm);
 							vm.onHide?.();
 							vm.keyScope.unset();
 							vmDom.classList.remove('animate'); // trigger the transitions
+							armCompletion(epoch);
 						}
 						arePopupsVisible(0 < visiblePopups.size);
 					});

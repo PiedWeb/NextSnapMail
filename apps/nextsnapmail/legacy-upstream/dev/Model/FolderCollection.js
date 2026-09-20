@@ -449,11 +449,11 @@ export class FolderModel extends AbstractModel {
 
 			localName: () => {
 				let name = this.name();
+				translateTrigger();
 				if (this.isSystemFolder()) {
-					translateTrigger();
 					name = getSystemFolderName(this.type(), name);
 				}
-				return name;
+				return rl.mailUi?.folderLabel?.(this, name, FolderUserStore.draftsFolder()) ?? name;
 			},
 
 			nameInfo: () => {

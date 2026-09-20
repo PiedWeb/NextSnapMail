@@ -10,7 +10,8 @@ check('Unread draft count does not alter Inbox count or pagination',await p.eval
 await p.locator('.pw-draft-row').first().click();await p.waitForFunction(()=>openedDrafts.length===1);
 check('Click opens native Draft mode in the correct folder despite UID collision',await p.evaluate(()=>openedDrafts[0][0]===5&&openedDrafts[0][1].constructor.name==='MessageModel'&&openedDrafts[0][1].folder==='INBOX.Brouillons'&&openedDrafts[0][1].uid===2));
 check('HTML, CID image, recipients, attachment and reply references survive native revival',await p.evaluate(()=>{const m=openedDrafts[0][1];return m.isHtml()&&m.bodyAsHTML().includes('cid:illustration')&&m.to[0].email==='camille@example.test'&&m.attachments()[0].fileName==='document.pdf'&&m.references==='older parent-id'&&m.inReplyTo==='parent-id'&&m.draftInfo[0]==='reply';}));
-check('Listing and opening do not set Seen or rewrite the draft',await p.evaluate(()=>draftData[0].flags.length===0&&draftRequests.every(r=>['PiedWebUnreadDrafts','Message'].includes(r.action))));
+check('Listing and opening do not set Seen or rewrite the draft',await p.evaluate(()=>draftData[0].flags.length===0
+ &&draftRequests.every(r=>['PiedWebUnreadDrafts','PiedWebFolderOrder','Message','PiedWebFeed'].includes(r.action))));
 await p.evaluate(()=>{draftData[0].flags.push('\\seen');listVM.popupVisibility(false);});await p.waitForFunction(()=>document.querySelectorAll('.pw-draft-row').length===1);
 check('A draft marked read disappears after composer closes',await p.evaluate(()=>document.querySelector('.pw-draft-row').dataset.uid==='3'));
 // Composer close can start a Drafts query before background Send has removed its

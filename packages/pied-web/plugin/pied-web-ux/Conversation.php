@@ -25,6 +25,10 @@ final class PiedWebConversation
     /** Rows returned to the reader, guards a runaway thread. */
     private const MAX_ROWS = 200;
 
+    /** Explicit account-wide lookup only, never used by the Inbox refresh. */
+    private const MAX_FOLDERS = 50;
+    private const MAX_FULL_SEARCHES = 160;
+
     public static function scan($actions): array
     {
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
@@ -70,6 +74,10 @@ final class PiedWebConversation
             $sent = '';
         }
         $hideDeleted = !empty($settings->GetConf('HideDeleted', 1));
+
+        if ($actions->GetActionParam('scope', '') === 'account') {
+            return self::accountScan($actions, $mail, $settings, $folder, $anchors, $hideDeleted);
+        }
 
         // Cheap freshness probe: one STATUS per folder. The reader sends back the
         // previous value, so an unchanged mailbox costs no SEARCH and no FETCH.
@@ -149,6 +157,84 @@ final class PiedWebConversation
     }
 
     /**
+     * Explicit reader lookup, independent of the native list's thread setting.
+     * Only headers are read. Folders with drafts, scheduled mail, reminders,
+     * junk or deleted mail are excluded unless they are the opened origin.
+     * Limits and inaccessible folders are reported, never silently called complete.
+     */
+    private static function accountScan($actions, $mail, $settings, string $origin,
+        array $anchors, bool $hideDeleted): array
+    {
+        $excluded = ['Scheduled', 'Reminders'];
+        foreach (['DraftFolder', 'SpamFolder', 'TrashFolder'] as $setting) {
+            $excluded[] = (string) $settings->GetConf($setting, '');
+        }
+        $folders = [$origin => true];
+        $partial = false;
+        foreach ($mail->Folders('', '*', false) ?? [] as $folder) {
+            $name = (string) $folder->FullName;
+            if ($name === '' || !$folder->Selectable() || \in_array($name, $excluded, true)) continue;
+            if (\count($folders) >= self::MAX_FOLDERS && !isset($folders[$name])) { $partial = true; continue; }
+            $folders[$name] = true;
+        }
+        $rows = [];
+        $failed = [];
+        $queries = [];
+        $remaining = self::MAX_FULL_SEARCHES;
+        $started = \microtime(true);
+        $root = self::root($actions);
+        $query = static function(string $folder, string $header, string $id) use (
+            $mail, $hideDeleted, &$rows, &$failed, &$queries, &$remaining, &$partial, $started
+        ): void {
+            $key = $folder . "\0" . $header . "\0" . self::normalize($id);
+            if (isset($queries[$key]) || isset($failed[$folder])) return;
+            if ($remaining <= 0 || \count($rows) >= self::MAX_ROWS
+                || \microtime(true) - $started > 12) { $partial = true; return; }
+            $queries[$key] = true;
+            try {
+                $hits = self::search($mail, $folder, \http_build_query(['header' => $header . ' ' . $id]),
+                    $hideDeleted, 0, '', $remaining, $partial);
+                if (\count($hits) >= self::MAX_ROWS) $partial = true;
+                foreach ($hits as $message) {
+                    $value = $header === 'Message-ID' ? $message->sMessageId
+                        : ($header === 'References' ? $message->References : $message->InReplyTo);
+                    if ($message->sFolder === $folder && self::matches($value, $id)) {
+                        if (\count($rows) >= self::MAX_ROWS) { $partial = true; break; }
+                        $rows[self::key($message)] = $message;
+                    }
+                }
+            } catch (\Throwable $exception) {
+                $failed[$folder] = true;
+                $partial = true;
+            }
+        };
+        if ($root !== '') {
+            // Most standards-compliant conversations need only these three
+            // header searches per folder, irrespective of conversation length.
+            foreach ($folders as $folder => $_) {
+                $query($folder, 'References', $root);
+                $query($folder, 'Message-ID', $root);
+                $query($folder, 'In-Reply-To', $root);
+            }
+            // Recover parent messages referenced by the origin even if they do
+            // not themselves carry References. Do not scan every discovered ID:
+            // that used to turn a long thread into dozens of redundant requests.
+            $knownIds = [];
+            foreach ($rows as $message) {
+                foreach (self::ids($message->sMessageId) as $id) $knownIds[self::normalize($id)] = true;
+            }
+            $missingAnchors = \array_filter($anchors, static fn($id) => !isset($knownIds[self::normalize($id)]));
+            if (\count($missingAnchors) > self::MAX_SENT_SCANS) $partial = true;
+            foreach (\array_slice($missingAnchors, 0, self::MAX_SENT_SCANS, true) as $id) {
+                foreach ($folders as $folder => $_) $query($folder, 'Message-ID', $id);
+            }
+        }
+        return ['etag' => '', 'unchanged' => false, 'messages' => \array_values($rows),
+            'scope' => 'account', 'partial' => $partial, 'searchedFolders' => \count($folders),
+            'failedFolders' => \count($failed), 'missingMessageId' => $root === ''];
+    }
+
+    /**
      * The reader passes the origin headers; the thread root is the first
      * reference, then the first In-Reply-To, then the message's own id.
      */
@@ -178,10 +264,14 @@ final class PiedWebConversation
      * @return \MailSo\Mail\Message[]
      */
     private static function search($mail, string $folder, string $query, bool $hideDeleted,
-        int $threadUid = 0, string $algorithm = ''): array
+        int $threadUid = 0, string $algorithm = '', ?int &$remaining = null, ?bool &$truncated = null): array
     {
         $found = [];
         for ($offset = 0; $offset < self::MAX_OFFSET; $offset += self::PAGE) {
+            if ($remaining !== null) {
+                if ($remaining <= 0) { $truncated = true; break; }
+                --$remaining;
+            }
             $params = new \MailSo\Mail\MessageListParams;
             $params->sFolderName = $folder;
             $params->sSearch = $query;

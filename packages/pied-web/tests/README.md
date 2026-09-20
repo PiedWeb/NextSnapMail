@@ -53,6 +53,7 @@ dev-browser-agent --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-copy-md.js
 dev-browser-agent --timeout 30 < tests/browser/test-quote-readability.js
 dev-browser-agent --timeout 40 < tests/browser/test-reader-addresses.js
+dev-browser-agent --timeout 30 < tests/browser/test-reader-tags.js
 dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
 dev-browser-agent --timeout 45 < tests/browser/test-inline-reply.js
 dev-browser-agent --timeout 30 < tests/browser/test-reply-priority.js
@@ -65,6 +66,7 @@ dev-browser-agent --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser-agent --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-actions.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-recipients.js
+dev-browser-agent --timeout 45 < tests/browser/test-composer-tabs.js
 dev-browser-agent --timeout 45 < tests/browser/test-elevation.js
 dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
 dev-browser-agent --timeout 45 < tests/browser/test-empty-state.js
@@ -78,7 +80,17 @@ dev-browser-agent --timeout 45 < tests/browser/test-folder-rail.js
 dev-browser-agent --timeout 45 < tests/browser/test-left-panel-state.js
 dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
 dev-browser-agent --timeout 90 < tests/browser/test-reminders.js
+dev-browser-agent --timeout 45 < tests/browser/test-app-shell.js
+dev-browser-agent --timeout 60 < tests/browser/test-interface-comfort.js
+dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
+dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
+
+The curated suite currently contains 39 scripts. `test-mailbox-workspace.js`
+exercises scoped server search, thread-safe quick actions, multi-page selection
+and Undo with fictional data. `test-conversation-performance.js` is a synthetic
+200-message comparison; `benchmark-live-feed.js` is a separate authenticated,
+read-only production timing probe and must never log message or account content.
 
 `test-squire-next.js` first proves that the optional bundle registers without replacing the
 native default, then selects `Squire 2.4 (test)` through the native editor-name contract. It

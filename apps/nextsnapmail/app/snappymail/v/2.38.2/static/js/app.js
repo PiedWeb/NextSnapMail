@@ -3399,7 +3399,10 @@
 		'$notdelivered'
 	],
 
-	isAllowedKeyword = value => '\\' != value[0] && !ignoredKeywords.includes(value.toLowerCase()),
+	// Optional UI policy, never an IMAP flag transformation. Also prevents users
+	// from manually adding a reserved service keyword through the tag picker.
+	isAllowedKeyword = value => '\\' != value[0] && !ignoredKeywords.includes(value.toLowerCase())
+		&& !rl.mailUi?.isInternalKeyword?.(value),
 
 	FolderUserStore = new class {
 		constructor() {
@@ -4146,22 +4149,45 @@
 	//					vmDom.addEventListener('close', () => vm.modalVisible(false));
 
 						// show/hide popup/modal
-						// transitionend is called for each property, so we only listen to `opacity`
-						// as defined in CSS by `dialog:not(.animate)`
+						// CSS may disable transitions (reduced motion), or a rapid toggle
+						// may cancel them. Complete once per visibility generation even
+						// when no opacity transitionend reaches the native dialog.
+						let popupEpoch = 0, popupCompleted = 0, popupFrame = 0, popupTimer = 0, popupFocus = 0;
+						const completeVisibility = epoch => {
+							if (epoch !== popupEpoch || popupCompleted === epoch) return;
+							popupCompleted = epoch;
+							clearTimeout(popupTimer);
+							if (vm.modalVisible()) {
+								vm.afterShow?.();
+								fireEvent('rl-vm-visible', vm);
+							} else {
+								vmDom.close();
+								vm.afterHide?.();
+							}
+						};
+						const armCompletion = epoch => {
+							const style = getComputedStyle(vmDom),
+								milliseconds = value => (parseFloat(value) || 0) * (value.trim().endsWith('ms') ? 1 : 1000),
+								properties = style.transitionProperty.split(',').map(value => value.trim()),
+								durations = style.transitionDuration.split(',').map(milliseconds),
+								delays = style.transitionDelay.split(',').map(milliseconds),
+								duration = Number(style.opacity) === (vm.modalVisible() ? 1 : 0) ? 0 : Math.max(0,
+									...properties.map((property, index) => ['all', 'opacity'].includes(property)
+										? durations[index % durations.length] + delays[index % delays.length] : 0));
+							popupTimer = setTimeout(() => completeVisibility(epoch), duration > 0 ? duration + 34 : 0);
+						};
 						const endShowHide = e => {
-							if (e.target === vmDom && 'opacity' === e.propertyName) {
-								if (vmDom.classList.contains('animate')) {
-									vm.afterShow?.();
-									fireEvent('rl-vm-visible', vm);
-								} else {
-									vmDom.close();
-									vm.afterHide?.();
-	//								fireEvent('rl-vm-hidden', vm);
-								}
+							if (e.target === vmDom && 'opacity' === e.propertyName
+								&& vmDom.classList.contains('animate') === !!vm.modalVisible()) {
+								completeVisibility(popupEpoch);
 							}
 						};
 
 						vm.modalVisible.subscribe(value => {
+							const epoch = ++popupEpoch;
+							cancelAnimationFrame(popupFrame);
+							clearTimeout(popupTimer);
+							clearTimeout(popupFocus);
 							if (value) {
 								i18nToNodes(vmDom);
 								visiblePopups.add(vm);
@@ -4171,16 +4197,19 @@
 									vmDom.backdrop.style.zIndex = 3000 + (visiblePopups.size * 2);
 								}
 								vm.keyScope.set();
-								setTimeout(()=>autofocus(vmDom),1);
-								requestAnimationFrame(() => { // wait just before the next paint
+								popupFocus = setTimeout(() => { if (epoch === popupEpoch && vm.modalVisible()) autofocus(vmDom); }, 1);
+								popupFrame = requestAnimationFrame(() => { // wait just before the next paint
+									if (epoch !== popupEpoch || !vm.modalVisible()) return;
 									vmDom.offsetHeight; // force a reflow
 									vmDom.classList.add('animate'); // trigger the transitions
+									armCompletion(epoch);
 								});
 							} else {
 								visiblePopups.delete(vm);
 								vm.onHide?.();
 								vm.keyScope.unset();
 								vmDom.classList.remove('animate'); // trigger the transitions
+								armCompletion(epoch);
 							}
 							arePopupsVisible(0 < visiblePopups.size);
 						});
@@ -6983,6 +7012,7 @@ body > * {
 		count: 0,
 		listSearch: '',
 		listLimited: 0,
+		uidValidity: 0,
 		threadUid: 0,
 		page: 1,
 		pageBeforeThread: 1,
@@ -7032,10 +7062,12 @@ body > * {
 
 		mainSearch: {
 			read: MessagelistUserStore.listSearch,
-			write: value => hasher.setHash(
-				mailBox(FolderUserStore.currentFolderFullNameHash(), 1,
-					value.toString().trim(), MessagelistUserStore.threadUid())
-			)
+			write: value => {
+				value = value.toString().trim();
+				if (rl.mailUi?.onSearch?.(value) === true) return;
+				hasher.setHash(mailBox(FolderUserStore.currentFolderFullNameHash(), 1,
+					value, MessagelistUserStore.threadUid()));
+			}
 		},
 
 		listCheckedOrSelected: () => {
@@ -7211,6 +7243,7 @@ body > * {
 						MessagelistUserStore.count(collection.totalEmails);
 						MessagelistUserStore.listSearch(pString(collection.search));
 						MessagelistUserStore.listLimited(!!collection.limited);
+						MessagelistUserStore.uidValidity(Number(folderInfo.uidValidity) || 0);
 						MessagelistUserStore.page(Math.ceil(collection.offset / SettingsUserStore.messagesPerPage() + 1));
 						MessagelistUserStore.threadUid(collection.threadUid);
 
@@ -8434,11 +8467,11 @@ body > * {
 
 				localName: () => {
 					let name = this.name();
+					translateTrigger();
 					if (this.isSystemFolder()) {
-						translateTrigger();
 						name = getSystemFolderName(this.type(), name);
 					}
-					return name;
+					return rl.mailUi?.folderLabel?.(this, name, FolderUserStore.draftsFolder()) ?? name;
 				},
 
 				nameInfo: () => {
@@ -14921,7 +14954,7 @@ body > * {
 			let message = currentMessage();
 			if (message) {
 				let keyword = prompt(i18n('MESSAGE/NEW_TAG'), '')?.replace(/[\s\\]+/g, '');
-				if (keyword.length && isAllowedKeyword(keyword)) {
+				if (keyword?.length && isAllowedKeyword(keyword)) {
 					message.toggleTag(keyword);
 					FolderUserStore.currentFolder().permanentFlags.push(keyword);
 				}
@@ -16432,6 +16465,17 @@ body > * {
 			this.ask = AskPopupView;
 
 			this.loadAccountsAndIdentities = loadAccountsAndIdentities;
+		}
+
+		/** Current account's native folder roles, resolved after its folder load. */
+		mailboxFolders() {
+			return {
+				inbox: getFolderInboxName(),
+				trash: FolderUserStore.trashFolder(),
+				spam: FolderUserStore.spamFolder(),
+				drafts: FolderUserStore.draftsFolder(),
+				archive: FolderUserStore.archiveFolder()
+			};
 		}
 
 		/**

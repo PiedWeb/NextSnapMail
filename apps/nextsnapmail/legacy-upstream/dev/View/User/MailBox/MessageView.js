@@ -634,7 +634,7 @@ export class MailMessageView extends AbstractViewRight {
 		let message = currentMessage();
 		if (message) {
 			let keyword = prompt(i18n('MESSAGE/NEW_TAG'), '')?.replace(/[\s\\]+/g, '');
-			if (keyword.length && isAllowedKeyword(keyword)) {
+			if (keyword?.length && isAllowedKeyword(keyword)) {
 				message.toggleTag(keyword);
 				FolderUserStore.currentFolder().permanentFlags.push(keyword);
 			}

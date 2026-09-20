@@ -1,5 +1,5 @@
 <?php
-class PiedWebRuntimeMaintenanceV9Plugin extends \RainLoop\Plugins\AbstractPlugin {
+class PiedWebRuntimeMaintenanceV10Plugin extends \RainLoop\Plugins\AbstractPlugin {
     const NAME = 'Temporary Pied Web runtime check', VERSION = '1.2.0', REQUIRED = '2.38.2';
     public function Init(): void { $this->addJsonHook('PiedWebRuntimeCheck', 'Check'); }
     public function Check(): array {
@@ -13,6 +13,8 @@ class PiedWebRuntimeMaintenanceV9Plugin extends \RainLoop\Plugins\AbstractPlugin
             'plugin/AttachmentImage.php' => $root . 'AttachmentImage.php',
             'plugin/Conversation.php' => $root . 'Conversation.php',
             'plugin/Feed.php' => $root . 'Feed.php',
+            'plugin/MailboxOperations.php' => $root . 'MailboxOperations.php',
+            'plugin/MailboxMailClient.php' => $root . 'MailboxMailClient.php',
             'plugin/FilteredSelection.php' => $root . 'FilteredSelection.php',
             'plugin/FolderOrder.php' => $root . 'FolderOrder.php',
             'plugin/Reminders.php' => $root . 'Reminders.php',

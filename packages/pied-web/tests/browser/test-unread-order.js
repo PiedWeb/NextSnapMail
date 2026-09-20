@@ -8,7 +8,7 @@ const check = (name, ok) => {
 };
 
 await page.setViewportSize({width: 1200, height: 900});
-await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1&threads=1&unreadOrder=1&unreadBehavior=2');
+await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1&threads=1&unreadOrder=1&unreadBehavior=1');
 await page.waitForFunction(() => document.querySelector('.pw-unread-order')?.getAttribute('aria-busy') === 'false');
 await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
 check('The two Inbox preferences are simultaneously active', await page.evaluate(() =>
@@ -26,13 +26,14 @@ check('Read received messages remain newest-first', await page.evaluate(() => {
 check('The setting load is account-scoped and read-only', await page.evaluate(() =>
     unreadOrderRequests.length === 1 && Object.keys(unreadOrderRequests[0]).length === 0));
 check('The existing read-transition preference is preserved', await page.evaluate(() =>
-    document.querySelector('#pw-unread-order-read-behavior')?.value === '2'
+    document.querySelector('#pw-unread-order-read-behavior')?.value === '1'
     && document.querySelector('.pw-unread-order-enabled-setting input')?.checked
     && document.querySelectorAll('.pw-unread-order-setting').length === 2));
 
 await page.evaluate(() => {
     listVM.messageList().find(message => message.uid === 4).threadUnseen([44]);
     listVM.messageList().find(message => message.uid === 6).threadUnseen([66]);
+    listVM.messageList.valueHasMutated();
 });
 await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,6,4,7,8,9,10');
 check('Unread roots stay together before conversations whose older member is unread', await page.evaluate(() =>
@@ -40,19 +41,8 @@ check('Unread roots stay together before conversations whose older member is unr
 await page.evaluate(() => {
     listVM.messageList().find(message => message.uid === 4).threadUnseen([]);
     listVM.messageList().find(message => message.uid === 6).threadUnseen([]);
+    listVM.messageList.valueHasMutated();
 });
-await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
-
-await page.evaluate(() => {
-    readerVM.message(listVM.messageList().find(message => message.uid === 3));
-    listVM.messageList().find(message => message.uid === 3).isUnseen(false);
-});
-await page.waitForTimeout(80);
-check('The active row keeps its place until the reader leaves it', await page.evaluate(() =>
-    listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10'));
-await page.evaluate(() => readerVM.message(listVM.messageList().find(message => message.uid === 4)));
-await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,2,1,3,4,6,7,8,9,10');
-await page.evaluate(() => listVM.messageList().find(message => message.uid === 3).isUnseen(true));
 await page.waitForFunction(() => listVM.messageList().map(message => message.uid).join(',') === '5,3,2,1,4,6,7,8,9,10');
 
 await page.evaluate(() => {

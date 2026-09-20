@@ -6,8 +6,12 @@ final class PiedWebFeed
     public const SHOW_DRAFTS_SETTING = 'PiedWebFeedShowDrafts';
     public const SHOW_READ_SETTING = 'PiedWebFeedShowRead';
     public const INCLUDE_GLOBAL_SETTING = 'PiedWebFeedIncludeGlobal';
+    public const COMPACT_SETTING = 'PiedWebCompact';
+    public const LAST_VIEW_SETTING = 'PiedWebLastView';
+    public const LAST_FOLDER_SETTING = 'PiedWebLastFolder';
+    public const LAST_ACCOUNT_SETTING = 'PiedWebLastAccountHash';
 
-    private const ALLOWED_DEFAULT_VIEWS = ['auto', 'feed', 'global', 'inbox'];
+    private const ALLOWED_DEFAULT_VIEWS = ['auto', 'last', 'feed', 'global', 'inbox'];
     private const PAGE_SIZE = 999;
     private const READ_LIMIT = 20;
 
@@ -29,6 +33,10 @@ final class PiedWebFeed
         if ($operation === 'global') {
             return self::globalFeed($actions, $main);
         }
+        if (\in_array($operation, ['search', 'prepare', 'action', 'undo'], true)) {
+            require_once __DIR__ . '/MailboxOperations.php';
+            return (new PiedWebMailboxOperations($actions, $main))->handle($operation);
+        }
         throw new \RuntimeException('scope');
     }
 
@@ -41,6 +49,28 @@ final class PiedWebFeed
         }
 
         $updates = [];
+        // Presentation belongs to the person, not whichever linked account is active.
+        if ($actions->HasActionParam('compact')) {
+            $value = $actions->GetActionParam('compact', '');
+            if (!\in_array($value, [0, 1, '0', '1', false, true], true)) throw new \RuntimeException('compact');
+            $shared->SetConf(self::COMPACT_SETTING, (bool) $value);
+            $updates['shared'] = true;
+        }
+        if ($actions->HasActionParam('lastView')) {
+            $value = (string) $actions->GetActionParam('lastView', '');
+            if (!\in_array($value, ['feed', 'global', 'inbox', 'folder'], true)) throw new \RuntimeException('lastView');
+            $folder = (string) $actions->GetActionParam('lastFolder', '');
+            if (\strlen($folder) > 1024 || \preg_match('/[\x00-\x1f\x7f]/', $folder)
+                || ($value === 'folder' && $folder === '')) throw new \RuntimeException('lastFolder');
+            $hash = (string) $actions->GetActionParam('lastAccountHash', $account->Hash());
+            if (!\in_array($hash, \array_map(static fn($entry) => $entry['account']->Hash(), self::accounts($actions, $main)), true)) {
+                throw new \RuntimeException('scope');
+            }
+            $shared->SetConf(self::LAST_VIEW_SETTING, $value);
+            $shared->SetConf(self::LAST_FOLDER_SETTING, $value === 'folder' ? $folder : '');
+            $shared->SetConf(self::LAST_ACCOUNT_SETTING, $hash);
+            $updates['shared'] = true;
+        }
         if ($actions->HasActionParam('defaultView')) {
             $value = (string) $actions->GetActionParam('defaultView', '');
             if (!\in_array($value, self::ALLOWED_DEFAULT_VIEWS, true)) {
@@ -88,6 +118,10 @@ final class PiedWebFeed
             'showRead' => (bool) $local->GetConf(self::SHOW_READ_SETTING, true),
             'includeGlobal' => (bool) $local->GetConf(self::INCLUDE_GLOBAL_SETTING, true),
             'accountCount' => \count(self::accounts($actions, $main)),
+            'compact' => (bool) $shared->GetConf(self::COMPACT_SETTING, false),
+            'lastView' => (string) $shared->GetConf(self::LAST_VIEW_SETTING, ''),
+            'lastFolder' => (string) $shared->GetConf(self::LAST_FOLDER_SETTING, ''),
+            'lastAccountHash' => (string) $shared->GetConf(self::LAST_ACCOUNT_SETTING, ''),
         ];
     }
 
@@ -119,7 +153,7 @@ final class PiedWebFeed
         return ['accounts' => $accounts, 'items' => $items, 'generatedAt' => \time()];
     }
 
-    private static function accounts($actions, $main): array
+    public static function accounts($actions, $main): array
     {
         $result = [[
             'account' => $main,
@@ -144,13 +178,14 @@ final class PiedWebFeed
         return $result;
     }
 
-    private static function mailClient($actions, $account)
+    public static function mailClient($actions, $account)
     {
         // Tests provide the same contract without opening a network connection.
         if (\method_exists($actions, 'PiedWebFeedMailClient')) {
             return $actions->PiedWebFeedMailClient($account);
         }
-        $mail = new \MailSo\Mail\MailClient();
+        require_once __DIR__ . '/MailboxMailClient.php';
+        $mail = new PiedWebMailboxMailClient();
         $account->ImapConnectAndLogin($actions->Plugins(), $mail->ImapClient(), $actions->Config());
         return $mail;
     }
@@ -159,6 +194,7 @@ final class PiedWebFeed
     {
         $inbox = self::params($actions, $account, $settings, 'INBOX', '', 'REVERSE DATE', self::READ_LIMIT);
         $native = $mail->MessageList($inbox);
+        $public['uidValidity'] = (int) ($native->FolderInfo->UIDVALIDITY ?? 0);
         $items = self::rows($native, $public, 'message');
 
         $unread = self::params($actions, $account, $settings, 'INBOX', 'is:unseen', 'DATE', self::PAGE_SIZE);
@@ -214,13 +250,18 @@ final class PiedWebFeed
         $messages = [];
         $collection = $mail->MessageList($params);
         foreach ($collection as $message) {
-            $messages[] = $message;
+            $row = $message instanceof \JsonSerializable ? $message->jsonSerialize() : (array) $message;
+            $row['_pwUidValidity'] = (int) ($collection->FolderInfo->UIDVALIDITY ?? 0);
+            $messages[] = $row;
         }
         $total = \max(0, (int) ($collection->totalEmails ?? 0));
         for ($offset = $params->iLimit; $offset < $total; $offset += $params->iLimit) {
             $params->iOffset = $offset;
-            foreach ($mail->MessageList($params) as $message) {
-                $messages[] = $message;
+            $page = $mail->MessageList($params);
+            foreach ($page as $message) {
+                $row = $message instanceof \JsonSerializable ? $message->jsonSerialize() : (array) $message;
+                $row['_pwUidValidity'] = (int) ($page->FolderInfo->UIDVALIDITY ?? 0);
+                $messages[] = $row;
             }
         }
         return $messages;
@@ -242,6 +283,7 @@ final class PiedWebFeed
         $row['_pwAccountName'] = $public['name'];
         $row['_pwAccountHash'] = $public['hash'];
         $row['_pwKind'] = $kind;
+        $row['_pwUidValidity'] = (int) ($row['_pwUidValidity'] ?? $public['uidValidity'] ?? 0);
         return $row;
     }
 

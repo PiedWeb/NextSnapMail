@@ -36,7 +36,8 @@ namespace {
 
     $actions = new class {
         public $account; public string $sent = 'Sent'; public array $params = [], $calls = [];
-        public $imap; public array $responses = []; public string $hash = 'a'; public int $hashCalls = 0;
+        public $imap; public array $responses = [], $folderNames = [], $failedFolders = [];
+        public string $hash = 'a'; public int $hashCalls = 0;
         public function __construct() {
             $this->imap = new ReadOnlyImap;
             $this->account = new class { public int $logins = 0; public function ImapConnectAndLogin(...$a) { ++$this->logins; } };
@@ -44,17 +45,23 @@ namespace {
         public function getAccountFromToken() { return $this->account; }
         public function SettingsProvider($local) { return $this; }
         public function Load($account) { return $this; }
-        public function GetConf($name, $default) { return $name === 'SentFolder' ? $this->sent : $default; }
+        public function GetConf($name, $default) {
+            return ['SentFolder'=>$this->sent,'TrashFolder'=>'Trash','SpamFolder'=>'Junk','DraftFolder'=>'Drafts'][$name] ?? $default;
+        }
         public function GetActionParam($name, $default) { return $this->params[$name] ?? $default; }
         public function Plugins() { return null; }
         public function Config() { return null; }
         public function ImapClient() { return $this->imap; }
         public function MailClient() { return $this; }
         public function FolderHash($folder) { ++$this->hashCalls; return $this->hash . ':' . $folder; }
+        public function Folders(...$args) {
+            return array_map(fn($name) => new \MailSo\Imap\Folder($name, '/', $name === 'Unselectable' ? ['\\noselect'] : []), $this->folderNames);
+        }
         public function MessageList($params) {
             $this->calls[] = ['folder'=>$params->sFolderName, 'search'=>$params->sSearch,
                 'threads'=>$params->bUseThreads, 'threadUid'=>$params->iThreadUid,
                 'offset'=>$params->iOffset, 'limit'=>$params->iLimit, 'sort'=>$params->sSort];
+            if (in_array($params->sFolderName, $this->failedFolders, true)) throw new \RuntimeException('fixture inaccessible');
             $key = $params->sFolderName . '|' . $params->sSearch;
             $pages = $this->responses[$key] ?? [];
             $page = $pages[intdiv($params->iOffset, 50)] ?? [];
@@ -118,6 +125,56 @@ namespace {
     $result = $plugin->Conversation();
     $check(count($actions->calls) <= 25, 'The Sent walk is bounded: ' . count($actions->calls) . ' searches');
     $check(count($result['messages']) <= 200, 'The returned row count is bounded');
+
+    // Explicit filed-message exchange, without changing any native list setting.
+    $actions->folderNames = ['INBOX','Sent','Archive','Projects','Drafts','Trash','Junk','Scheduled','Reminders','Unselectable'];
+    $actions->params = ['scope'=>'account','folder'=>'Archive','uid'=>71,'messageId'=>$reply,'references'=>$root];
+    $actions->responses = [
+        'INBOX|' . http_build_query(['header'=>'Message-ID ' . $root]) => [[message('INBOX',11,$root)]],
+        'Sent|' . http_build_query(['header'=>'References ' . $root]) => [[message('Sent',21,$reply,$root,$root)]],
+        'Projects|' . http_build_query(['header'=>'References ' . $root]) => [[
+            message('Projects',31,'<project@example.test>',$reply,$root . ' ' . $reply),
+            message('Projects',32,'<unrelated@example.test>','','<noise@example.test>'),
+        ]],
+    ];
+    $actions->calls = [];
+    $result = $plugin->Conversation();
+    $keys = array_map(fn($m) => $m->sFolder . '/' . $m->Uid, $result['messages']);
+    $check(in_array('INBOX/11',$keys,true) && in_array('Sent/21',$keys,true) && in_array('Projects/31',$keys,true),
+        'Explicit account lookup joins original, sent and filed messages using header identity');
+    $check(!in_array('Projects/32',$keys,true), 'Account lookup also rejects inexact Message-ID header hits');
+    $check(array_diff(array_unique(array_column($actions->calls,'folder')),['Archive','INBOX','Sent','Projects']) === [],
+        'Drafts, Trash, Junk, scheduled mail, reminders and non-selectable folders stay excluded');
+    $check(!$result['partial'] && $result['searchedFolders'] === 4 && $result['scope'] === 'account',
+        'The explicit search reports its actual account scope');
+    $check(array_reduce($actions->calls,fn($ok,$call) => $ok && !$call['threads'] && $call['threadUid'] === 0,true),
+        'Explicit exchange never enables native threading on filed folder lists');
+    $actions->failedFolders = ['Projects']; $actions->calls = [];
+    $result = $plugin->Conversation();
+    $check($result['partial'] && $result['failedFolders'] === 1 && count($result['messages']) >= 2,
+        'One inaccessible folder reports partial results without discarding healthy folders');
+    $check(count(array_filter($actions->calls,fn($call) => $call['folder'] === 'Projects')) === 1,
+        'An inaccessible folder is attempted once, not once per header');
+    $actions->failedFolders = []; $actions->calls = [];
+    $actions->params['folder'] = 'Trash'; $plugin->Conversation();
+    $check(in_array('Trash',array_column($actions->calls,'folder'),true), 'An explicitly opened excluded origin stays in scope');
+    $actions->folderNames = array_map(fn($i) => 'Folder' . $i,range(1,100));
+    $actions->calls = []; $result = $plugin->Conversation();
+    $check($result['partial'] && $result['searchedFolders'] === 50 && count($actions->calls) <= 160,
+        'Large account lookup reports folder/query budget truncation');
+    $noise = array_map(fn($i) => message('Noise',1000+$i,'<noise@example.test>','','<unrelated@example.test>'),range(1,50));
+    $actions->responses = [];
+    foreach ($actions->folderNames as $folder) {
+        $key = $folder . '|' . http_build_query(['header'=>'References ' . $root]);
+        $actions->responses[$key] = [$noise,$noise,$noise,$noise];
+        $actions->responses[$key . '|total'] = 200;
+    }
+    $actions->calls = []; $result = $plugin->Conversation();
+    $check($result['partial'] && count($actions->calls) <= 160,
+        'The account budget counts every pagination request, not only logical queries');
+    $actions->params = ['scope'=>'account','folder'=>'Archive','uid'=>71]; $actions->calls = [];
+    $result = $plugin->Conversation();
+    $check($result['missingMessageId'] && !$actions->calls, 'A message without identifiers does not trigger speculative subject searches');
 
     // Guards.
     foreach ([['folder'=>'','uid'=>1], ['folder'=>'INBOX','uid'=>0], ['folder'=>'INBOX','uid'=>'x'],

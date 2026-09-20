@@ -16,7 +16,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
   visible Unsubscribe and Messages/Conversations switching remain in the reader toolbar.
   The reader's native label menu sits as an icon between message details and the star.
 - In Inbox Conversations mode, the newest received or sent message opens in the native reader; earlier messages show a one-line text preview and stay one click away, without storing extra copies. Trash and every other folder always show individual messages.
-- Selection of all filtered results across pages, with explicit deletion confirmation.
+- Page or all-results selection across server-paginated searches, including an explicitly labelled
+  multi-account scope, with reversible Trash and exact server confirmation.
 - Swipe to delete and Delete-key handling for selected list messages.
 - Readable interleaved quotations, folded Outlook histories and native message flag controls.
 - Floating three-second Undo Send while continuing to use the mailbox, with a send
@@ -38,6 +39,10 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - A dedicated working Feed for each account, separate from the restored native Inbox. With
   several accounts, **All accounts** adds an account-labelled overview and becomes the default;
   with one account, that global entry does not exist and the sole account Feed opens directly.
+- One server-side search spans authorized accounts and eligible folders from the native search
+  field; its frozen result token supports stable pagination and selecting every matching page.
+- Durable per-account last-view and compact-density preferences, visible active scope, consistent
+  keyboard navigation and quick Delete/Remind actions with Undo after confirmed Trash moves.
 - Account selection lives in the opaque NextSnapMail URL, so separate browser tabs retain
   separate linked mailboxes. Global Feed navigation changes only the current tab.
 - Genuinely unread drafts at the top of the account Feed, with one-click resume.
@@ -48,8 +53,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 The optional linked-account unread counter correction is a separate [upstream PR](https://github.com/oe79/NextSnapMail/pull/41) and [version-specific patch](patches/README.md).
 Selected UX enhancements are proposed for upstream integration in [NextSnapMail issue #46](https://github.com/oe79/NextSnapMail/issues/46). This public repository provides the prototype and validation history; the proposal asks the maintainer which focused changes to accept and does not claim the plugin can be merged as-is.
 
-The global Feed is an account-safe overview and navigation layer, not one merged IMAP folder:
-bulk actions stay inside an account after its source message is opened. This does **not** implement
+The global Feed is an account-safe workspace, not one merged IMAP folder: server snapshots retain
+the exact account, folder, UIDVALIDITY and UID for every selected message. This does **not** implement
 a new vacation responder. Nextcloud invitation import and Sieve use the existing integrations and
 administrator configuration. Undo Send is a browser delay before SMTP submission, not recall after
 delivery. Scheduled delivery is a delayed submission by the companion app on this server, not a
@@ -61,7 +66,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.9.2**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.11**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.2**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

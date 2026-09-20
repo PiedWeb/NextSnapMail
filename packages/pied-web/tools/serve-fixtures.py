@@ -13,6 +13,7 @@ parser.add_argument('--port', type=int, default=8876)
 args = parser.parse_args()
 root = Path(__file__).resolve().parent.parent
 mounts = {'/app/': args.upstream.resolve() / 'app', '/.local-work/pied-web-ux/': root / 'plugin/pied-web-ux',
+          '/theme-src/': root / 'theme-src',
           # The theme asks for its font at the path the engine rewrites it to.
           '/themes/PiedWeb/snappymail/': root / 'theme/PiedWeb/snappymail',
           '/.local-work/theme/': root / 'theme/PiedWeb/snappymail', '/.local-work/': root / 'tests/browser'}

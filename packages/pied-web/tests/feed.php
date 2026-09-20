@@ -40,7 +40,11 @@ namespace {
     }
     final class FeedTestCollection implements \IteratorAggregate {
         public int $totalEmails;
-        public function __construct(private array $rows, ?int $total = null) { $this->totalEmails = $total ?? \count($rows); }
+        public object $FolderInfo;
+        public function __construct(private array $rows, ?int $total = null, int $validity = 123) {
+            $this->totalEmails = $total ?? \count($rows);
+            $this->FolderInfo = (object) ['UIDVALIDITY' => $validity];
+        }
         public function getIterator(): \Traversable { return new \ArrayIterator($this->rows); }
     }
     final class FeedTestMail {
@@ -61,7 +65,7 @@ namespace {
             } elseif ($params->sFolderName === 'Drafts' && $params->sSearch === 'is:unseen') {
                 $rows = [new FeedTestMessage(['folder'=>'Drafts','uid'=>10,'subject'=>'Draft '.$this->email,'flags'=>[], 'threadUnseen'=>[], 'dateTimestamp'=>50])];
             }
-            return new FeedTestCollection($rows);
+            return new FeedTestCollection($rows, null, $params->sFolderName === 'Drafts' ? 456 : 123);
         }
     }
     final class FeedTestActions {
@@ -111,7 +115,8 @@ namespace {
 
     $actions->params = ['operation'=>'settings'];
     $state = $plugin->Feed();
-    $check($state === ['defaultView'=>'auto','showDrafts'=>true,'showRead'=>true,'includeGlobal'=>true,'accountCount'=>2],
+    $check($state === ['defaultView'=>'auto','showDrafts'=>true,'showRead'=>true,'includeGlobal'=>true,'accountCount'=>2,
+        'compact'=>false,'lastView'=>'','lastFolder'=>'','lastAccountHash'=>''],
         'Feed settings default to the current workflow and detect both accounts');
     $check($localMain->saves === 0 && $actions->shared->saves === 0,
         'Reading Feed settings performs no write');
@@ -134,6 +139,8 @@ namespace {
         'Account, folder and UID form a collision-free row identity');
     $check(\count(\array_filter($global['items'], fn($item) => $item['_pwKind'] === 'draft')) === 2,
         'Unread drafts stay distinct and retain their source account');
+    $check(!\array_filter($global['items'], fn($item) => $item['_pwUidValidity'] !== ($item['_pwKind'] === 'draft' ? 456 : 123)),
+        'Global Inbox and Drafts rows carry their own folder UIDVALIDITY');
     $check($actions->mails['main@example.test']->calls[0]->bUseThreads
         && !$actions->mails['work@example.test']->calls[0]->bUseThreads,
         'Each account keeps its own Conversations preference');
@@ -154,6 +161,24 @@ namespace {
         && \count(\array_filter($global['items'], fn($item) => $item['_pwAccountEmail'] === 'main@example.test')) === 3,
         'One unavailable mailbox is reported without hiding the successful account');
     $actions->failingAccounts = [];
+
+    $actions->params = ['operation'=>'settings','defaultView'=>'last','compact'=>'1','lastView'=>'folder',
+        'lastFolder'=>'Projects','lastAccountHash'=>'work-hash'];
+    $state = $plugin->Feed();
+    $check($state['compact'] && $state['defaultView'] === 'last' && $state['lastView'] === 'folder'
+        && $state['lastFolder'] === 'Projects' && $state['lastAccountHash'] === 'work-hash',
+        'Compact mode and exact last folder/account persist as shared user preferences');
+    $actions->active = $work;
+    $actions->params = ['operation'=>'settings'];
+    $check($plugin->Feed()['lastAccountHash'] === 'work-hash' && $plugin->Feed()['compact'],
+        'Linked accounts read the same shared presentation preferences');
+    $actions->active = $main;
+    $actions->params = ['operation'=>'settings','lastView'=>'feed','lastAccountHash'=>'foreign-hash'];
+    $check(isset($plugin->Feed()['error']), 'Last-view persistence rejects an unauthorized account hash');
+    $actions->params = ['operation'=>'settings','compact'=>'yes'];
+    $check(isset($plugin->Feed()['error']), 'Compact mode rejects non-boolean values');
+    $actions->params = ['operation'=>'settings','lastView'=>'folder','lastFolder'=>"bad\nfolder"];
+    $check(isset($plugin->Feed()['error']), 'Last-folder persistence rejects control characters');
 
     $actions->params = ['operation'=>'settings','defaultView'=>'unknown'];
     $check(isset($plugin->Feed()['error']), 'Invalid opening views are rejected');

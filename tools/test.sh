@@ -24,6 +24,7 @@ for test in \
     tests/unread-drafts.php \
     tests/unread-order.php \
     tests/feed.php \
+    tests/mailbox-operations.php \
     tests/folder-order.php \
     tests/virtual-conversation-search.php \
     tests/conversation.php \

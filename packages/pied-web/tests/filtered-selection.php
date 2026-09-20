@@ -100,7 +100,8 @@ namespace {
         check($call(['operation' => 'prepare'])['error'] === 'capability', 'No broad EXPUNGE fallback without MOVE');
         $actions->imap->capabilities = ['MOVE', 'UIDPLUS', 'MULTISEARCH'];
         check($call(['operation' => 'prepare', 'search' => 'in:subtree from:news@example.test'])['error'] === 'scope', 'Multi-folder search cannot be treated as one folder');
-        check($call(['operation' => 'prepare', 'search' => ''])['error'] === 'scope', 'Unfiltered deletion is not exposed by this feature');
+        $unfiltered = $call(['operation' => 'prepare', 'search' => '']);
+        check(($unfiltered['count'] ?? 0) === count($actions->imap->uids), 'An explicit single-folder selection can cover all pages without a search query');
         $actions->settings['TrashFolder'] = '__UNUSE__';
         check($call(['operation' => 'prepare'])['error'] === 'trash', 'No implicit permanent deletion when Trash is disabled');
         $actions->settings['TrashFolder'] = 'Trash';

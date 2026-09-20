@@ -4,8 +4,8 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.9.3',
-        RELEASE = '2026-09-19',
+        VERSION = '1.10.2',
+        RELEASE = '2026-09-20',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
         DESCRIPTION = 'Accessible message actions for the Pied Web theme, using native mail commands.';
@@ -19,6 +19,10 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('send-delay.js');
         $this->addJs('background-send.js');
         $this->addJs('scheduled-send.js');
+        $this->addJs('mailbox-actions.js');
+        $this->addJs('feed-workspace.js');
+        $this->addJs('interface-comfort.js');
+        $this->addJs('keyboard-help.js');
         $this->addJs('filtered-selection.js');
         $this->addJs('feed.js');
         $this->addJs('folder-rail.js');
@@ -139,7 +143,9 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         try {
             $result = PiedWebFeed::handle(\RainLoop\Api::Actions());
         } catch (\Throwable $error) {
-            $known = ['scope', 'settings', 'defaultView', 'showDrafts', 'showRead', 'includeGlobal'];
+            $known = ['scope', 'settings', 'defaultView', 'showDrafts', 'showRead', 'includeGlobal',
+                'compact', 'lastView', 'lastFolder', 'expired', 'changed', 'uncertain', 'storage',
+                'limit', 'missing', 'capability', 'trash', 'sender', 'time', 'keyword'];
             $result = ['error' => \in_array($error->getMessage(), $known, true) ? $error->getMessage() : 'feed'];
         }
         return $this->Manager()->JsonResponseHelper('PiedWebFeed', $result);
@@ -183,7 +189,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         try {
             $folder = (string) $actions->GetActionParam('folder', '');
             $search = (string) $actions->GetActionParam('search', '');
-            if (!$folder || !trim($search) || strlen($search) > 8192 || strlen($folder) > 1024) {
+            if (!$folder || strlen($search) > 8192 || strlen($folder) > 1024) {
                 throw new \RuntimeException('scope');
             }
             $imap = $actions->ImapClient();

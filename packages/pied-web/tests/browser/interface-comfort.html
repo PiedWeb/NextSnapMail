@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="fr" class="pw-theme sm-msgView-side" data-themes="light">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Interface comfort, fictional regression fixture</title>
+<link rel="stylesheet" href="/app/snappymail/v/2.38.2/static/css/app.css">
+<link rel="stylesheet" href="/.local-work/theme/style.css">
+<link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css">
+<link rel="stylesheet" href="/theme-src/compact.css">
+<link rel="stylesheet" href="/theme-src/interface-comfort.css">
+<style>
+  :root { --color-primary:#107b76; --color-primary-element:#107b76; }
+  body { margin:0; background:var(--nc-color-main-background); }
+  #rl-app { position:static; height:auto; min-height:100vh; padding:16px; box-sizing:border-box; }
+  html.sm-msgView-side #rl-app #rl-right { position:static; display:block; width:100%; }
+  #V-MailMessageList { max-width:640px; width:100%; }
+  #V-MailMessageList .messageList { position:static; width:100%; min-width:0; max-width:none; }
+  .fixture-controls { padding:16px 0; display:flex; gap:16px; flex-wrap:wrap; }
+  .fixture-controls button { min-height:44px; }
+  #fixture-popup { width:360px; }
+  #fixture-popup .fixture-dialog-content { padding:24px; }
+  #fixture-labels { margin:24px 0; }
+</style>
+<div id="rl-app"><div id="rl-right">
+  <div class="fixture-controls">
+    <label><input id="compact" type="checkbox"> Mode compact</label>
+    <button id="open-popup">Recherche avancée fictive</button>
+  </div>
+  <div id="V-MailMessageList" data-pw-selection-version="1.7.15">
+    <div class="messageList">
+      <div class="messageListItem unseen focused" tabindex="0"><div class="messageCheckbox"><div class="checkboxMessage">☐</div></div><div><div class="senderParent">Camille Martin</div><div class="subjectParent">Atelier de jeudi, préparation et documents</div><span class="threads-len">12</span><div class="flagParent" role="button" aria-label="Suivre le message" tabindex="0">☆</div><div class="attachmentParent">▱</div></div></div>
+      <div class="messageListItem" tabindex="0"><div class="messageCheckbox"><div class="checkboxMessage">☐</div></div><div><div class="senderParent">Atelier Horizon</div><div class="subjectParent">Un sujet volontairement long qui doit rester lisible sans déborder de sa colonne</div><div class="flagParent" role="button" aria-label="Suivre le message" tabindex="0">☆</div><div class="attachmentParent"></div></div></div>
+      <div class="messageListItem selected" tabindex="0"><div class="messageCheckbox"><div class="checkboxMessage">☐</div></div><div><div class="senderParent">Équipe du projet</div><div class="subjectParent">Le dossier est prêt</div><div class="flagParent" role="button" aria-label="Suivre le message" tabindex="0">☆</div><div class="attachmentParent"></div></div></div>
+    </div>
+    <section class="pw-global-feed"><header><h1>Tous les comptes</h1></header>
+      <button class="pw-global-row pw-global-unread"><span class="pw-global-primary">Camille Martin</span><span class="pw-global-subject">Compte rendu de notre atelier</span><span class="pw-global-account">Personnel · example.test</span><time class="pw-global-time">09:42</time></button>
+      <button class="pw-global-row"><span class="pw-global-primary">Atelier Horizon</span><span class="pw-global-subject">Les documents de la semaine</span><span class="pw-global-account">Studio · example.test</span><time class="pw-global-time">Hier</time></button>
+    </section>
+  </div>
+  <div id="fixture-labels"><ul id="folder-labels"></ul><select id="tag-options" aria-label="Étiquettes"></select><div id="reader-tags"></div><a id="attach-files"></a><a id="save-eml"></a></div>
+</div><div id="rl-popups"><dialog id="fixture-popup"><div class="fixture-dialog-content"><h2>Recherche avancée</h2><input autofocus aria-label="Sujet"><button id="close-popup">Fermer</button></div></dialog></div></div>
+<script>
+  window.fixtureErrors=[];
+  addEventListener('error',event=>fixtureErrors.push(event.message));
+  window.rl={mailUi:{}};
+</script>
+<script src="/.local-work/pied-web-ux/interface-comfort.js"></script>
+<script>
+  const compact=document.querySelector('#compact');
+  compact.onchange=()=>document.documentElement.classList.toggle('pw-compact',compact.checked);
+  window.fixtureFlags=['client','Important','$pwremind-txyz1','$PWSENDING','$pwcustom','$pwremind-not-a-stamp'];
+  window.fixtureFolders=[{fullName:'INBOX.Reminders',delimiter:'.'},{fullName:'INBOX.Scheduled',delimiter:'.'},{fullName:'Projects.Scheduled',delimiter:'.'}];
+  window.fixtureReady=(async()=>{
+    const source=await (await fetch('/app/snappymail/v/2.38.2/static/js/app.js')).text();
+    // Exercise the native predicate rather than duplicating its hidden-keyword
+    // rule; the only dependency here is the pre-existing native exclusion list.
+    const predicateStart=source.indexOf('isAllowedKeyword = value =>');
+    const predicateEnd=source.indexOf('FolderUserStore =',predicateStart);
+    const predicate=source.slice(predicateStart,predicateEnd).trim().replace(/,$/,'');
+    window.nativeKeywordAllowed=Function('ignoredKeywords', 'let '+predicate+';return isAllowedKeyword;')([]);
+    window.renderFixtureLabels=async(lang='fr')=>{
+      document.documentElement.lang=lang;
+      const data=await (await fetch('/app/bundled-plugins/nextcloud/langs/'+lang+'.json')).json();
+      document.querySelector('#attach-files').textContent=data.NEXTCLOUD.ATTACH_FILES;
+      document.querySelector('#save-eml').textContent=data.NEXTCLOUD.SAVE_EML;
+      document.querySelector('#folder-labels').replaceChildren(...fixtureFolders.map(folder=>{
+        const node=document.createElement('li');node.textContent=rl.mailUi.folderLabel(folder,folder.fullName.split('.').pop(),'INBOX.Drafts');return node;
+      }));
+      const tags=fixtureFlags.filter(nativeKeywordAllowed);
+      document.querySelector('#tag-options').replaceChildren(...tags.map(tag=>new Option(tag,tag)));
+      document.querySelector('#reader-tags').textContent=tags.join(', ');
+    };
+    await renderFixtureLabels();
+    const vmDom=document.querySelector('#fixture-popup');
+    let visible=false,notify;
+    const modalVisible=value=>value===undefined ? visible : (visible=!!value,notify?.(visible));
+    modalVisible.subscribe=callback=>{notify=callback;};
+    window.fixtureModalEvents=[];
+    const stamp=type=>fixtureModalEvents.push({type,time:performance.now()});
+    const vm={modalVisible,keyScope:{set(){},unset(){}},afterShow:()=>stamp('shown'),onHide:()=>stamp('hiding'),afterHide:()=>stamp('hidden')};
+    const start=source.indexOf('// show/hide popup/modal');
+    const marker="vmDom.addEventListener('transitionend', endShowHide);";
+    const end=source.indexOf(marker,start)+marker.length;
+    if(start<0||end<marker.length)throw Error('Native popup lifecycle contract not found');
+    Function('vm','vmDom','visiblePopups','i18nToNodes','arePopupsVisible','autofocus','fireEvent',source.slice(start,end))(
+      vm,vmDom,new Set,()=>{},()=>{},node=>node.querySelector('[autofocus]')?.focus(),()=>{});
+    window.fixtureModal=vm;
+    document.querySelector('#open-popup').onclick=()=>vm.modalVisible(true);
+    document.querySelector('#close-popup').onclick=()=>vm.modalVisible(false);
+    window.fixtureNativeMotionFallback=source.slice(start,end).includes('setTimeout');
+    return true;
+  })();
+</script>

@@ -1,7 +1,8 @@
 /* Selection uses the native checked state without displaying checkbox controls. */
 html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"] .messageListItem .messageCheckbox,
-html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"] .checkboxCheckAll,
 html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"] .pw-mobile-select {display:none!important;}
+html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"]:not(.pw-global-active) .checkboxCheckAll {display:inline-flex!important;align-items:center;justify-content:center;min-width:36px;min-height:36px;cursor:pointer;}
+html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:-2px;}
 html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .second-toolbar {display:none!important;}
 #rl-app #V-MailMessageList .pw-selection-bar[hidden] {display:none!important;}
 #rl-app #V-MailMessageList .pw-selection-bar {
@@ -17,6 +18,7 @@ html.pw-theme #rl-app #V-MailMessageList.pw-selection-mode .messageList > .secon
 #rl-app #V-MailMessageList .pw-selection-finish:hover {filter:brightness(.94);}
 #rl-app #V-MailMessageList .pw-selection-finish:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:2px;}
 @media(max-width:799px) {
+    html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"]:not(.pw-global-active) .checkboxCheckAll {min-width:44px;min-height:44px;}
     #rl-app #V-MailMessageList .pw-selection-bar {min-height:52px;padding-inline:var(--pw-space-4);}
     #rl-app #V-MailMessageList .pw-selection-finish {height:44px;min-height:44px;}
 }

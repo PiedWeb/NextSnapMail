@@ -44,7 +44,10 @@ ignoredKeywords = [
 	'$notdelivered'
 ],
 
-isAllowedKeyword = value => '\\' != value[0] && !ignoredKeywords.includes(value.toLowerCase()),
+// Optional UI policy, never an IMAP flag transformation. Also prevents users
+// from manually adding a reserved service keyword through the tag picker.
+isAllowedKeyword = value => '\\' != value[0] && !ignoredKeywords.includes(value.toLowerCase())
+	&& !rl.mailUi?.isInternalKeyword?.(value),
 
 FolderUserStore = new class {
 	constructor() {

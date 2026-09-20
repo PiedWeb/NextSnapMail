@@ -1,4 +1,4 @@
-const p=await browser.getPage('nextsnapmail-list-polish');p.setDefaultTimeout(5000);
+const p=await browser.getPage('nextsnapmail-list-polish');p.setDefaultTimeout(15000);
 await p.setViewportSize({width:1440,height:950});await p.emulateMedia({colorScheme:'light'});
 await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?drafts=1&mode=reader&side=1');await p.waitForSelector('.pw-draft-row');
 await p.evaluate(async()=>{

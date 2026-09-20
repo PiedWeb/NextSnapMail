@@ -50,6 +50,7 @@ addObservablesTo(MessagelistUserStore, {
 	count: 0,
 	listSearch: '',
 	listLimited: 0,
+	uidValidity: 0,
 	threadUid: 0,
 	page: 1,
 	pageBeforeThread: 1,
@@ -99,10 +100,12 @@ addComputablesTo(MessagelistUserStore, {
 
 	mainSearch: {
 		read: MessagelistUserStore.listSearch,
-		write: value => hasher.setHash(
-			mailBox(FolderUserStore.currentFolderFullNameHash(), 1,
-				value.toString().trim(), MessagelistUserStore.threadUid())
-		)
+		write: value => {
+			value = value.toString().trim();
+			if (rl.mailUi?.onSearch?.(value) === true) return;
+			hasher.setHash(mailBox(FolderUserStore.currentFolderFullNameHash(), 1,
+				value, MessagelistUserStore.threadUid()));
+		}
 	},
 
 	listCheckedOrSelected: () => {
@@ -278,6 +281,7 @@ MessagelistUserStore.reload = (bDropPagePosition = false, bDropCurrentFolderCach
 					MessagelistUserStore.count(collection.totalEmails);
 					MessagelistUserStore.listSearch(pString(collection.search));
 					MessagelistUserStore.listLimited(!!collection.limited);
+					MessagelistUserStore.uidValidity(Number(folderInfo.uidValidity) || 0);
 					MessagelistUserStore.page(Math.ceil(collection.offset / SettingsUserStore.messagesPerPage() + 1));
 					MessagelistUserStore.threadUid(collection.threadUid);
 
