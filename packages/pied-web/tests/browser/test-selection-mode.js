@@ -10,11 +10,27 @@ check('Only the page-wide checkbox appears at rest',await p.evaluate(()=>{
    &&[...list.querySelectorAll('.messageCheckbox')].every(x=>getComputedStyle(x).display==='none')
    &&getComputedStyle(list.querySelector('.checkboxCheckAll')).display!=='none'
    &&list.querySelector('.checkboxCheckAll').getAttribute('role')==='checkbox'
-   &&list.querySelector('.checkboxCheckAll').getAttribute('aria-label')==='Sélectionner les éléments de cette page';
+   &&list.querySelector('.checkboxCheckAll').getAttribute('aria-label')==='Sélectionner les éléments de cette page'
+   &&!list.querySelector('.pw-select-results').getClientRects().length;
+}));
+await p.locator('.messageListItem').first().hover();
+check('Native Flag, Trash and Reminder share a reserved rail with a real bin icon',await p.evaluate(()=>{
+ const row=document.querySelector('.messageListItem'),group=row.querySelector(':scope > .pw-row-actions');
+ const trash=group?.querySelector('[data-pw-row-icon="trash-2"]'),subject=row.querySelector('.subjectParent');
+ return group?.firstElementChild?.classList.contains('flagParent')&&group.children.length===3
+  &&trash&&!trash.textContent.trim()&&getComputedStyle(trash,'::before').maskImage!=='none'
+  &&subject.getBoundingClientRect().right<=group.getBoundingClientRect().left;
 }));
 await p.locator('.checkboxCheckAll').press('Space');
 check('Keyboard Space selects the current page immediately',await p.evaluate(()=>demoMessages.every(message=>message.checked())
- &&document.querySelector('.checkboxCheckAll').getAttribute('aria-checked')==='true'));
+ &&document.querySelector('.checkboxCheckAll').getAttribute('aria-checked')==='true'
+ &&document.querySelector('.checkboxCheckAll').parentElement.classList.contains('pw-selection-bar')
+ &&!document.querySelector('.pw-select-results').hidden));
+await p.locator('.checkboxCheckAll').press('Space');
+check('The same checkbox remains available and deselects the page',await p.evaluate(()=>demoMessages.every(message=>!message.checked())
+ &&document.querySelector('.pw-selection-bar').hidden
+ &&document.querySelector('.checkboxCheckAll').getAttribute('aria-checked')==='false'));
+await p.locator('.checkboxCheckAll').press('Space');
 await p.locator('.pw-selection-finish').click();
 await p.locator('.messageListItem .senderParent').nth(2).click();
 check('Ordinary click keeps the native open behavior',await p.evaluate(()=>fixtureRowOpens.join(',')==='3'&&demoMessages.every(m=>!m.checked())));

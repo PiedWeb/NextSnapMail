@@ -357,7 +357,7 @@ final class PiedWebMailboxOperations
         if ((string) $this->param('confirmed') !== '1') throw new \RuntimeException('scope');
         $token = (string) $this->param('token');
         $action = (string) $this->param('action');
-        if (!\in_array($action, ['read', 'unread', 'trash', 'remind'], true)) throw new \RuntimeException('scope');
+        if (!\in_array($action, ['read', 'unread', 'flag', 'unflag', 'trash', 'remind'], true)) throw new \RuntimeException('scope');
         return $this->store->withSnapshot($token, 'selection', function(array &$state, $persist) use ($token, $action): array {
             $cursor = (int) $this->param('cursor', -1);
             if ($state['pending'] || $state['undoPending']) throw new \RuntimeException('uncertain');
@@ -411,7 +411,8 @@ final class PiedWebMailboxOperations
                 } elseif ($action === 'remind') {
                     PiedWebReminders::applyScoped($this->actions, $this->accounts[$hash]['account'], $mail, $uids, $remindAt);
                 } else {
-                    $mail->MessageSetFlag($first['folder'], $range, '\\Seen', $action === 'read', false);
+                    $flag = \in_array($action, ['flag', 'unflag'], true) ? '\\Flagged' : '\\Seen';
+                    $mail->MessageSetFlag($first['folder'], $range, $flag, \in_array($action, ['read', 'flag'], true), false);
                 }
             } catch (\Throwable $error) {
                 // A transport failure after issuing UID MOVE must never be replayed.

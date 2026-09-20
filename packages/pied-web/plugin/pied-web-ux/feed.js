@@ -10,6 +10,7 @@
     const isInbox = folder => String(value(folder) || '').toUpperCase() === 'INBOX';
     const stateKey = () => 'pw-mail-view:' + accountHash();
     const pendingKey = 'pw-mail-feed-open';
+    const accountSwitchKey = 'pw-mail-feed-account-switch';
     const returnKey = 'pw-mail-feed-return';
     const getSession = key => { try { return sessionStorage.getItem(key); } catch { return null; } };
     const setSession = (key, next) => { try { next === null ? sessionStorage.removeItem(key) : sessionStorage.setItem(key, next); } catch {} };
@@ -18,7 +19,12 @@
     const validMode = candidate => ['feed', 'global', 'inbox'].includes(candidate) ? candidate : '';
 
     const explicitMessage = /\/m\d+(?:\/|$)/.test(location.hash);
-    let mode = explicitMessage ? 'inbox' : (validMode(getSession(stateKey())) || validMode(getDurable(stateKey())) || 'feed');
+    let switchedTo = '';
+    try { switchedTo = String(JSON.parse(getSession(accountSwitchKey) || 'null')?.email || ''); } catch {}
+    setSession(accountSwitchKey,null);
+    const accountSwitch = !!switchedTo && switchedTo === String(window.rl?.settings?.get?.('Email') || '');
+    let mode = explicitMessage ? 'inbox' : accountSwitch ? 'feed'
+        : (validMode(getSession(stateKey())) || validMode(getDurable(stateKey())) || 'feed');
     let settings = {defaultView:'auto', showDrafts:true, showRead:true, includeGlobal:true, accountCount:1,compact:false};
     let settingsReady = false, settingsLoading = false, settingsGeneration = 0;
     let listView, folderView, systemView, globalSection, globalStatus, globalRows, globalRefresh;
@@ -174,7 +180,7 @@
         feedLink = document.createElement('a'); linkLabel(feedLink, t('Flux', 'Feed'), 'account');
         feedNav.append(feedLink); feedItem = feedNav;
         const globalNav = document.createElement('li'); globalNav.className = 'pw-feed-nav pw-global-nav';
-        globalLink = document.createElement('a'); linkLabel(globalLink, t('Tous les comptes', 'All accounts'), 'global');
+        globalLink = document.createElement('a'); linkLabel(globalLink, t('Tous mes comptes', 'All my accounts'), 'global');
         globalNav.append(globalLink); globalItem = globalNav;
         list.prepend(feedNav);
         mountAccountEntry();
@@ -369,7 +375,7 @@
         listView = vm;
         globalSection = document.createElement('section'); globalSection.className = 'pw-global-feed'; globalSection.hidden = true;
         const header = document.createElement('header');
-        const title = document.createElement('h1'); title.textContent = t('Tous les comptes', 'All accounts');
+        const title = document.createElement('h1'); title.textContent = t('Tous mes comptes', 'All my accounts');
         globalRefresh = document.createElement('button'); globalRefresh.type = 'button'; globalRefresh.className = 'pw-global-refresh';
         globalRefresh.textContent = t('Actualiser', 'Refresh');
         globalRefresh.addEventListener('click', loadGlobal);
@@ -453,7 +459,7 @@
         const current = settings.defaultView;
         defaultSelect.replaceChildren();
         const choices = accountCount > 1
-            ? [['auto',t('Tous les comptes', 'All accounts')],['feed',t('Flux du compte', 'Account feed')],['inbox',t('Boîte de réception', 'Inbox')]]
+            ? [['auto',t('Tous mes comptes', 'All my accounts')],['feed',t('Flux du compte', 'Account feed')],['inbox',t('Boîte de réception', 'Inbox')]]
             : [['auto',t('Flux', 'Feed')],['inbox',t('Boîte de réception', 'Inbox')]];
         choices.unshift(['last',t('Dernière vue utilisée','Last used view')]);
         choices.forEach(([id,label]) => {
@@ -509,7 +515,7 @@
         panel.append(legend, defaultRow,
             settingRow(t('Afficher les brouillons non lus', 'Show unread drafts'), draftsInput),
             settingRow(t('Afficher les messages lus après les non-lus', 'Show read messages after unread messages'), readInput),
-            settingRow(t('Inclure ce compte dans « Tous les comptes »', 'Include this account in “All accounts”'), globalInput),
+            settingRow(t('Inclure ce compte dans « Tous mes comptes »', 'Include this account in “All my accounts”'), globalInput),
             settingRow(t('Mode compact','Compact mode'),compactInput,t('Des lignes plus denses sur ordinateur.','Denser message rows on desktop.')),
             settingsStatus);
         general.append(panel);
@@ -536,7 +542,7 @@
                 // A pending cross-account open can establish the target account's
                 // mode while this request is in flight. Do not overwrite it with
                 // the default when the settings response arrives afterwards.
-                if (!explicitMessage && !hadStoredMode && !validMode(getSession(stateKey()))) {
+                if (!explicitMessage && !accountSwitch && !hadStoredMode && !validMode(getSession(stateKey()))) {
                     const opening = resolvedDefault();
                     setMode(opening,false);
                     if (settings.defaultView === 'last' && settings.lastView === 'folder' && settings.lastFolder && !location.hash) {
@@ -567,6 +573,22 @@
         setMode,
         refreshGlobal: () => renderGlobal(true)
     };
+
+    // A deliberate account-menu choice always opens that account's Feed. The
+    // global Feed remains its own explicit menu destination and never leaks as
+    // a remembered per-account mode.
+    addEventListener('rl-view-model.create',({detail:vm}) => {
+        if (vm.viewModelTemplateID !== 'SystemDropDown' || vm.pwAccountFeedSwitch || typeof vm.accountClick !== 'function') return;
+        vm.pwAccountFeedSwitch = true;
+        const native = vm.accountClick;
+        vm.accountClick = function(account,event) {
+            const email = String(account?.email || '');
+            if (email && email !== String(value(this.accountEmail) || '')) {
+                setSession(accountSwitchKey,JSON.stringify({email}));
+            }
+            return native.apply(this,arguments);
+        };
+    });
 
     addEventListener('rl-view-model', ({detail:vm}) => {
         if (vm.viewModelTemplateID === 'MailFolderList') mountNavigation(vm);

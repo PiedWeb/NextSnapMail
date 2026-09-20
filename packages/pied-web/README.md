@@ -10,6 +10,9 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 
 - Clear folder hierarchy, quieter secondary counters and a compact sidebar that stays collapsed after a reload. Custom folders keep distinct monograms and complete hover/focus labels; a long click or `Alt` plus an arrow reorders every mailbox and persists that order per account. A roomier desktop layout starts at 1200 px, leaving mobile unchanged. Desktop list rows have a clickable read-status dot, hover/focus stars, right-hand attachment and conversation-count columns, and resizable panes.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop, carrying the already-open message into the group before adding the clicked row; a long touch starts selection on mobile, with no visible checkboxes.
+- Flag, Trash and Reminder share a reserved row-action rail, with a real bin icon and no overlap
+  over message text. The page checkbox remains available to clear selection; all-pages selection
+  appears beside it only after the current page is selected.
 - Reply and Reply all compose inline at the bottom of an active Inbox conversation, with an
   Expand control that keeps the same draft and cursor in the full composer. Multi-correspondent
   messages put Reply all first in the reader and use it as the icon-labeled bottom action. Mark unread,
@@ -22,6 +25,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Readable interleaved quotations, folded Outlook histories and native message flag controls.
 - Floating three-second Undo Send while continuing to use the mailbox, with a send
   glyph that skips the rest of the countdown.
+- Closing a non-empty composer immediately saves a background Draft; failed persistence keeps a
+  resumable copy instead of interrupting the close with a confirmation dialog.
 - Timed mail reminders from one message or a selection: the message waits, read, in a visible
   IMAP folder and returns to Inbox unread at the chosen time, even with the browser closed.
   See [mail reminders](docs/REMINDERS.md).
@@ -37,8 +42,9 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Browser-side compression for clipboard images and local, Nextcloud or restored image attachments.
 - Nextcloud files from the Image toolbar, compressed and inserted directly in the message body.
 - A dedicated working Feed for each account, separate from the restored native Inbox. With
-  several accounts, **All accounts** adds an account-labelled overview and becomes the default;
+  several accounts, **All my accounts** adds an account-labelled overview and becomes the default;
   with one account, that global entry does not exist and the sole account Feed opens directly.
+  Choosing an account always opens its own Feed.
 - One server-side search spans authorized accounts and eligible folders from the native search
   field; its frozen result token supports stable pagination and selecting every matching page.
 - Durable per-account last-view and compact-density preferences, visible active scope, consistent
@@ -66,7 +72,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.10.2**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.3**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

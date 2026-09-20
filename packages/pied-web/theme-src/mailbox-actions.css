@@ -1,9 +1,15 @@
 #rl-app .messageListItem { position:relative; }
-#rl-app .pw-row-actions { display:flex;align-items:center;gap:2px; }
-#rl-app .messageListItem > .pw-row-actions { position:absolute;inset-inline-end:8px;top:50%;transform:translateY(-50%);background:var(--pw-paper);opacity:0;pointer-events:none; }
+#rl-app .pw-row-actions { display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--pw-line);border-radius:7px;background:var(--pw-paper);box-shadow:var(--pw-elevation-1); }
+#rl-app .messageListItem > .pw-row-actions { position:absolute;z-index:2;inset-inline-end:12px;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none; }
 #rl-app .messageListItem:is(:hover,:focus-within,.focused) > .pw-row-actions { opacity:1;pointer-events:auto; }
-#rl-app .pw-row-action { display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;padding:6px;border:0!important;border-radius:var(--pw-radius-md);background:transparent;color:var(--pw-grey-700);cursor:pointer; }
+#rl-app .pw-row-action { display:inline-flex;align-items:center;justify-content:center;width:32px;min-width:32px;height:32px;min-height:32px;padding:5px;border:0!important;border-radius:5px;background:transparent;color:var(--pw-grey-700);cursor:pointer; }
 #rl-app .pw-row-action svg { width:18px;height:18px;pointer-events:none; }
+#rl-app .pw-row-action[data-pw-row-icon]::before { content:'';display:block;width:18px;height:18px;background:currentColor; }
+#rl-app .pw-row-action[data-pw-row-icon="trash-2"]::before { mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7'/%3E%3C/svg%3E") center/contain no-repeat; }
+#rl-app .pw-row-action[data-pw-row-icon="star"]::before { mask:var(--pw-star-icon) center/contain no-repeat; }
+#rl-app .pw-row-action.pw-flag-action[data-flagged="true"] { color:var(--pw-flag-ink);background:var(--pw-flag-tint); }
+#rl-app .pw-row-action.pw-flag-action[data-flagged="true"]::before { mask-image:var(--pw-star-filled-icon); }
+#rl-app .pw-row-action[hidden] { display:none!important; }
 #rl-app .pw-row-action:hover { background:var(--pw-selected);color:var(--nc-color-primary-element); }
 #rl-app .pw-row-action:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:-2px; }
 #rl-app .pw-mailbox-notice { position:fixed;inset-inline:16px;bottom:16px;z-index:3500;display:flex;align-items:center;gap:12px;max-width:680px;margin:auto;padding:12px 16px;background:var(--pw-paper);color:var(--nc-color-main-text);box-shadow:var(--pw-elevation-3);border:1px solid var(--pw-line);border-radius:var(--pw-radius-md);font:var(--pw-weight-regular) var(--pw-text-sm)/1.4 var(--pw-font); }
@@ -12,7 +18,11 @@
 #rl-app .pw-mailbox-notice button { min-height:44px;min-width:44px;padding:8px;border:0!important;background:transparent;color:var(--nc-color-primary-element);font:inherit;cursor:pointer; }
 #rl-app .pw-mailbox-notice button:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:2px; }
 #rl-app .pw-mailbox-notice[data-state="error"] > span { color:var(--pw-danger); }
+@media(min-width:800px) and (pointer:fine) {
+  #rl-app #V-MailMessageList .messageListItem.pw-has-row-actions { padding-inline-end:128px!important; }
+  #rl-app #V-MailMessageList .messageListItem > .pw-row-actions .flagParent { width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important; }
+}
 @media(pointer:coarse) {
   #rl-app .pw-row-action { min-height:44px;min-width:44px; }
-  #rl-app .messageListItem > .pw-row-actions { position:static;transform:none;opacity:1;pointer-events:auto;grid-column:1/-1;justify-content:flex-end;background:transparent; }
+  #rl-app .messageListItem > .pw-row-actions { position:static;transform:none;opacity:1;pointer-events:auto;grid-column:1/-1;justify-content:flex-end;background:transparent;box-shadow:none; }
 }

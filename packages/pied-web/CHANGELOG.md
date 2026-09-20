@@ -1,5 +1,26 @@
 # Releases
 
+## 1.10.3, 2026-09-20
+
+Folded conversation cards now offer **Show more / Afficher la suite** only when their one-line
+excerpt is actually truncated. Short messages no longer expose an action that repeats the text
+already on screen; an excerpt missing from the conversation lookup uses **Load preview / Charger
+l’aperçu** until its read-only body request resolves. Expanded text replaces the one-line summary
+instead of duplicating it, and the activated card keeps its viewport position while its height changes.
+
+The account menu now names its global destination **All my accounts / Tous mes comptes**. Choosing
+an individual account always opens that account's Feed, independently of an older remembered Inbox
+view or the global opening default. Native and global rows reserve one action rail for Flag, Trash and Reminder; Trash uses a real
+bin glyph and no control covers sender or subject text. Global Flag/Unflag is account-, folder- and
+UIDVALIDITY-scoped through the same confirmed mailbox endpoint.
+
+Page selection keeps its checkbox visible inside the selection bar, where it can deselect the page.
+**Select all pages/results** appears beside it only after the current page is selected, and the global
+snapshot keeps the checkbox checked while its exact server total is active. Closing a non-empty
+composer now closes immediately and saves an independent Draft copy in the background; a compact
+notice confirms success, while a failed save retains a resumable copy instead of showing the former
+intermediate confirmation dialog.
+
 ## 1.10.2, 2026-09-20
 
 Desktop Feed rows now share one quick-action group, moved to the currently hovered or focused

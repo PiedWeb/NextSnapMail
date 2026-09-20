@@ -30,15 +30,18 @@
         const vm = event.detail, dom = vm.viewModelDom, list = vm.messageList;
         if (vm.viewModelTemplateID === 'MailMessageView') readerView = vm;
         if (vm.viewModelTemplateID !== 'MailMessageList' || !dom || dom.querySelector('.pw-filtered-selection')) return;
-        const bar = document.createElement('div');
+        const bar = document.createElement('span');
         bar.className = 'pw-filtered-selection';
         const select = document.createElement('button');
         select.type = 'button'; select.className = 'pw-select-results';
         select.textContent = t('Sélectionner toutes les pages…', 'Select all pages…');
         select.title = t('Inclure toutes les pages du filtre dans ce dossier', 'Include all pages matching this folder’s filter');
         bar.append(select);
-        const searchbar = dom.querySelector('.messageList > .second-toolbar');
-        if (searchbar) searchbar.after(bar); else dom.querySelector('.messageList')?.prepend(bar);
+        const mount = () => {
+            const selection = dom.querySelector('.pw-selection-bar');
+            if (selection && bar.parentNode !== selection) selection.insertBefore(bar,selection.querySelector('.pw-selection-finish'));
+        };
+        queueMicrotask(mount);
         const dialog = document.createElement('dialog');
         dialog.className = 'pw-bulk-dialog animate';
         dialog.setAttribute('aria-labelledby', 'pw-bulk-title');
@@ -61,12 +64,22 @@
         const sameContext = () => JSON.stringify(context()) === JSON.stringify(selectedContext) && !list.threadUid?.();
         const refresh = () => {
             const current = context();
-            bar.hidden = !current.folder || !!list.threadUid?.() || !!api.feed?.isGlobal?.();
+            mount();
+            const pageSelected = !!list().length && list().every(message => !!ko.unwrap(message.checked));
+            bar.hidden = !current.folder || !!list.threadUid?.() || !!api.feed?.isGlobal?.() || !pageSelected;
             select.disabled = !!list.loading?.() || !!list.isIncomplete?.() || !list()?.length;
             if (dialog.open && selectedContext && !sameContext() && !busy) dialog.close();
         };
         ko.computed(refresh);
         addEventListener('pw-feed-mode-changed',refresh);
+        addEventListener('pw-native-selection-changed',event => {
+            if (event.detail?.dom !== dom) return;
+            if (!event.detail.all) {
+                snapshot = null;
+                if (dialog.open && !busy) dialog.close();
+            }
+            refresh();
+        });
         dialog.addEventListener('keydown', e => e.stopPropagation());
         dialog.addEventListener('cancel', e => { if (busy) e.preventDefault(); });
         dialog.addEventListener('close', () => {

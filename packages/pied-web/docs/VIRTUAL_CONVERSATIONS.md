@@ -5,8 +5,10 @@
 There is exactly one native actionable message. Its header says **Active message**;
 reply, move, delete, attachments and remote-image permissions remain owned by the
 native reader. Clicking a folded card opens that message through the native selector.
-An independent **Read a preview** button expands a bounded plain-text excerpt without
-changing the active message, flags or native commands. Other history stays folded.
+An independent preview control expands a bounded plain-text continuation without changing
+the active message, flags or native commands. It appears only when the one-line excerpt is
+actually truncated; short messages no longer repeat the same text under a redundant action.
+The triggered card keeps its viewport position while the continuation opens. Other history stays folded.
 The immediate predecessor shows its sender, timestamp and excerpt when the conversation
 opens, rather than an anonymous 24px strip. Only that predecessor is prefetched; other
 missing excerpts load on hover, keyboard focus or explicit preview, at most two at once.

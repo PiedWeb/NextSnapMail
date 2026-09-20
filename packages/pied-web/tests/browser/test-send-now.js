@@ -152,6 +152,43 @@ check('A successful reply marks the feed immediately and announces the Sent copy
   &&actionCalls.filter(value=>value==='reload').length===sendReloadsBefore;
 }));
 
+await p.evaluate(()=>{
+ const get=rl.settings.get;rl.settings.get=key=>key==='DraftsFolder'?'Drafts':get(key);
+ window.closePromptCalls=0;window.closeDraftSaves=0;
+ class FakeDraftCompose {
+  constructor(){
+   this.viewModelTemplateID='PopupsCompose';this.viewModelDom=document.createElement('dialog');
+   this.viewModelDom.append(document.createElement('div'));document.body.append(this.viewModelDom);this.viewModelDom.show();
+   const fields={currentIdentity:'fixture',from:'alex@example.test',to:'camille@example.test',cc:'',bcc:'',replyTo:'',
+    subject:'Brouillon fermé',requestDsn:false,requestReadReceipt:false,requireTLS:false,markAsImportant:false,
+    showCc:false,showBcc:false,showReplyTo:false,doSign:false,doEncrypt:false,draftsFolder:'',draftUid:0,savedTime:0,
+    sending:false,saving:false,sendError:false,savedError:false,sendSuccessButSaveError:false,
+    attachmentsInProcessError:false,attachmentsInErrorError:false};
+   Object.entries(fields).forEach(([key,value])=>this[key]=ko.observable(value));
+   this.sendErrorDesc=ko.observable('');this.savedErrorDesc=ko.observable('');
+   this.aDraftInfo=null;this.sInReplyTo='';this.sReferences='';this.bFromDraft=false;
+   this.attachments=ko.observableArray([]);this.signOptions=ko.observableArray([]);this.encryptOptions=ko.observableArray([]);
+   this.attachmentsInProcess=this.attachmentsInError=()=>[];this.viewArea=()=> 'body';this.mailvelope=null;
+   this.modalVisible=ko.observable(true);this.oEditor={isHtml:()=>true,getData:()=>'<p>Texte conservé</p>',editor:{mode:'visual',plain:{value:''}}};
+  }
+  isEmptyForm(){return false;}
+  saveCommand(){this.saving(true);closeDraftSaves++;setTimeout(()=>{this.draftsFolder('Drafts');this.draftUid(777);this.saving(false);},30);}
+  sendCommand(){}
+  doClose(){closePromptCalls++;}
+  close(){this.modalVisible(false);}
+  attachmentsArea(){}
+ }
+ FakeDraftCompose.inEdit=ko.observable(false);FakeDraftCompose.showModal=()=>{};FakeDraftCompose.prototype.sendCommand.canExecute=()=>true;
+ window.fakeDraftCompose=new FakeDraftCompose;
+ dispatchEvent(new CustomEvent('rl-view-model.create',{detail:fakeDraftCompose}));
+ fakeDraftCompose.doClose();
+});
+await p.waitForFunction(()=>!fakeDraftCompose.modalVisible()&&closeDraftSaves===1
+ &&[...document.querySelectorAll('.pw-outgoing-status')].some(node=>node.textContent==='Brouillon enregistré'));
+check('Closing a non-empty composer saves a Draft and closes immediately without confirmation',await p.evaluate(() =>
+ closePromptCalls===0&&closeDraftSaves===1&&!fakeDraftCompose.modalVisible()
+ &&fakeDraftCompose.viewModelDom.open===false));
+
 // Skipping the wait must not skip the guarantee the wait exists for: a cancelled
 // delay stays cancelled even once its deadline passes.
 check('A cancelled delay never runs its send, before or after the deadline',await p.evaluate(()=>{

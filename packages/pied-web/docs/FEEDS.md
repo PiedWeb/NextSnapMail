@@ -6,15 +6,17 @@ restores **Inbox / Boîte de réception** as the ordinary native folder.
 ## Views and defaults
 
 - Every account has one account Feed. It uses that account's native Inbox models and actions.
-- With exactly one account, **All accounts / Tous les comptes** is not shown and is never
+- With exactly one account, **All my accounts / Tous mes comptes** is not shown and is never
   requested. The sole account Feed is the default.
-- With two or more accounts, **All accounts** is shown and is the default. The account Feed
+- With two or more accounts, **All my accounts** is shown and is the default. The account Feed
   remains available beside it.
+- Choosing an individual account from the account menu always opens that account's Feed. The
+  remembered Inbox state cannot override this explicit account choice.
 - Inbox is always available as a separate native entry. Its request has no Pied Web Feed marker,
   so its native order and pagination are not enriched by the working workflow.
 
 The opening view can be changed under **Settings → General → Feed**. `Auto` means the account
-Feed with one account and All accounts with several. Inbox can also be selected explicitly.
+Feed with one account and All my accounts with several. Inbox can also be selected explicitly.
 Choosing **Last used view** persists the account/folder scope on the server. Per-account browser
 storage accelerates the first paint and stays isolated between explicit tab/account URLs; it is
 not the authority for a cross-account open or an explicit message link.
@@ -32,14 +34,14 @@ The mixed order, Draft reminders and read segment can be switched in General set
 defaults reproduce the workflow that existed before the Feed was split from Inbox. Searches,
 opened threads and folders other than Inbox retain native behavior.
 
-All accounts uses the same four ranks across included accounts. Every row retains its account,
+All my accounts uses the same four ranks across included accounts. Every row retains its account,
 folder and UID; identical UIDs in different accounts or folders never share an identity. Account
 labels remain visible in the overview. Conversations are resolved using each account's own
 setting and are never merged across accounts.
 
 ## Opening and actions
 
-The global view is a workspace, not a synthetic IMAP folder. **All accounts** is located in the
+The global view is a workspace, not a synthetic IMAP folder. **All my accounts** is located in the
 account menu and the list names its current scope. Selecting a row from the active account opens
 its real source. Selecting a row from another account first loads that tab-local account context,
 then opens the exact folder and UID. Drafts resume in native Draft compose mode.
@@ -48,15 +50,17 @@ The native search field can ask the server for matching headers across every aut
 and eligible folder. Trash, Junk, Drafts, Reminders and scheduled-mail folders are excluded unless
 they are the explicit active scope. The first response freezes exact message identities under a
 short-lived opaque token; later pages and **Select all results** reuse that snapshot. Page selection
-states the current page scope, while all-results selection states the exact total and every
+states the current page scope. The all-pages choice appears only after that page is selected and
+stays grouped with its deselectable checkbox; all-results selection states the exact total and every
 included account/folder. The server rejects expired, changed or oversized snapshots.
 
-Delete and Remind operate in bounded batches on those exact identities. Delete requires each
+Flag/Unflag, Delete and Remind share one reserved row-action rail and operate on those exact
+identities. Delete requires each
 account's configured Trash and exposes Undo only after the mail server confirms the destination
 UID mapping. Undo therefore restores the original folder and read state rather than replaying
 stale source UIDs. Uncertain or partial results are reported and are never retried blindly.
 
-Each account can be excluded from All accounts under General settings. One unavailable mailbox
+Each account can be excluded from All my accounts under General settings. One unavailable mailbox
 is reported without hiding rows fetched from the others. The endpoint returns message-list header
 data only and persists no copied mail. Opening a Draft fetches its body only after the source
 account is active.

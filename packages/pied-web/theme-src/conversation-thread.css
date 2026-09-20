@@ -81,11 +81,16 @@
 }
 #rl-app #V-MailMessageView .pw-conversation-full[hidden],
 #rl-app #V-MailMessageView .pw-conversation-current[hidden],
+#rl-app #V-MailMessageView .pw-conversation-card-summary[hidden],
+#rl-app #V-MailMessageView .pw-conversation-preview-toggle[hidden],
 #rl-app #V-MailMessageView .pw-conversation-preview[hidden] { display:none; }
 #rl-app #V-MailMessageView .pw-conversation-preview-toggle {
  display:block; margin:0 var(--pw-space-3) var(--pw-space-1); padding:var(--pw-space-1);
  border:0!important; box-shadow:none!important; background:transparent; color:var(--nc-color-primary-element); min-height:32px;
  font:var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
+}
+#rl-app #V-MailMessageView .pw-conversation-preview-toggle[aria-busy="true"] {
+ color:var(--pw-muted); cursor:progress;
 }
 #rl-app #V-MailMessageView .pw-conversation-preview {
  margin:var(--pw-space-1) var(--pw-space-4) var(--pw-space-4); max-width:72ch;

@@ -12,9 +12,9 @@ check('Desktop read dots reflect the native unread state and have an accessible 
  const first=demoRows[0].querySelector('.pw-read-toggle'),read=demoRows[3].querySelector('.pw-read-toggle');
  return document.querySelectorAll('.pw-read-toggle').length===demoRows.length&&first.dataset.unread==='1'&&read.dataset.unread==='0'&&first.title==='Marquer comme lu'&&read.title==='Marquer comme non lu'&&getComputedStyle(first,'::before').backgroundColor!==getComputedStyle(read,'::before').backgroundColor;
 }));
-check('The attachment occupies a dedicated column after the star',await p.evaluate(()=>{
- const row=demoRows[0],content=row.querySelector(':scope > div:not(.messageCheckbox)'),star=row.querySelector('.flagParent').getBoundingClientRect(),attachment=row.querySelector('.attachmentParent').getBoundingClientRect(),subject=row.querySelector('.subjectParent').getBoundingClientRect();
- return getComputedStyle(content).display==='grid'&&attachment.left>=star.right&&attachment.left>=subject.right&&attachment.width>=24;
+check('The attachment keeps its dedicated column before the grouped actions',await p.evaluate(()=>{
+ const row=demoRows[0],content=row.querySelector(':scope > div:not(.messageCheckbox):not(.pw-row-actions)'),actions=row.querySelector(':scope > .pw-row-actions').getBoundingClientRect(),attachment=row.querySelector('.attachmentParent').getBoundingClientRect(),subject=row.querySelector('.subjectParent').getBoundingClientRect();
+ return getComputedStyle(content).display==='grid'&&attachment.left>=subject.right&&attachment.right<=actions.left&&attachment.width>=24;
 }));
 check('Desktop row dates are hidden while day headings remain visible',await p.evaluate(()=>
  [...document.querySelectorAll('.messageListItem time')].every(el=>getComputedStyle(el).display==='none')

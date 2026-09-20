@@ -17,7 +17,7 @@ const fresh = async url => {
 await page.setViewportSize({width:1200, height:900});
 await fresh(base);
 await page.waitForFunction(() => PiedWebUx.feed.mode() === 'feed');
-check('A single account exposes one account Feed and no All accounts entry', await page.evaluate(() => {
+check('A single account exposes one account Feed and no All my accounts entry', await page.evaluate(() => {
     const visible = [...document.querySelectorAll('.pw-feed-nav')].filter(item => !item.hidden);
     return visible.length === 1
         && visible[0].textContent.trim() === 'Flux'
@@ -52,7 +52,7 @@ check('The account Feed can be restored without changing folder', await page.eva
 check('Single-account settings contain no global-feed choice or inclusion control', await page.evaluate(() => {
     const select = document.querySelector('#pw-feed-default-view');
     const globalRow = [...document.querySelectorAll('.pw-feed-setting-row')]
-        .find(row => row.textContent.includes('Tous les comptes'));
+        .find(row => row.textContent.includes('Tous mes comptes'));
     return [...select.options].map(option => option.textContent).join('|') === 'Dernière vue utilisée|Flux|Boîte de réception'
         && globalRow?.hidden === true;
 }));
@@ -78,7 +78,7 @@ check('An empty native account store during bootstrap does not lose the global d
 await fresh(base + '&accounts=2');
 await page.waitForFunction(() => PiedWebUx.feed.mode() === 'global'
     && document.querySelectorAll('.pw-global-row').length === 5);
-check('Multiple accounts default to All accounts and keep the account Feed available', await page.evaluate(() => {
+check('Multiple accounts default to All my accounts and keep the account Feed available', await page.evaluate(() => {
     const visible = [...document.querySelectorAll('.pw-feed-nav')].filter(item => !item.hidden);
     return document.querySelector('menu .pw-global-nav') && visible.some(item => item.textContent.trim() === 'Flux')
         && !document.querySelector('.b-folders-system .pw-global-nav')
@@ -111,9 +111,9 @@ check('The per-account setting can hide read messages from the global feed', awa
 check('Multi-account settings expose the global default and inclusion control', await page.evaluate(() => {
     const select = document.querySelector('#pw-feed-default-view');
     const globalRow = [...document.querySelectorAll('.pw-feed-setting-row')]
-        .find(row => row.textContent.includes('Tous les comptes'));
+        .find(row => row.textContent.includes('Tous mes comptes'));
     return [...select.options].map(option => option.textContent).join('|')
-        === 'Dernière vue utilisée|Tous les comptes|Flux du compte|Boîte de réception'
+        === 'Dernière vue utilisée|Tous mes comptes|Flux du compte|Boîte de réception'
         && globalRow?.hidden === false;
 }));
 
@@ -150,5 +150,35 @@ check('Opening another account switches safely before navigating to its source m
     && location.hash === '#/mailbox/INBOX/m301'
     && !actionCalls.some(call => Array.isArray(call) && call[1] === 'AccountSwitch')));
 check('Cross-account opening has no runtime error', await page.evaluate(() => fixtureErrors.length === 0));
+
+await page.evaluate(() => {
+    localStorage.setItem('pw-mail-view:'+'a'.repeat(40),'inbox');
+    const vm={viewModelTemplateID:'SystemDropDown',accountEmail:ko.observable('hello@example.test'),
+        accountClick(){window.fixtureNativeAccountClick=true;return true;}};
+    dispatchEvent(new CustomEvent('rl-view-model.create',{detail:vm}));
+    vm.accountClick({email:'alex@example.test'},{button:0});
+});
+await page.goto(base+'&accounts=2&account='+'a'.repeat(40)+'&feedDefault=inbox&persistView=1');
+await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'feed');
+check('Choosing an account always opens that account Feed, even if its remembered view was Inbox',await page.evaluate(() =>
+    rl.settings.get('Email')==='alex@example.test'
+    &&PiedWebUx.feed.mode()==='feed'
+    &&sessionStorage.getItem('pw-mail-feed-account-switch')===null));
+
+await page.evaluate(() => {
+    const target='b'.repeat(40);
+    sessionStorage.removeItem('pw-mail-view:'+target);
+    localStorage.removeItem('pw-mail-view:'+target);
+    const vm={viewModelTemplateID:'SystemDropDown',accountEmail:ko.observable('alex@example.test'),
+        accountClick(){return true;}};
+    dispatchEvent(new CustomEvent('rl-view-model.create',{detail:vm}));
+    vm.accountClick({email:'hello@example.test'},{button:0});
+});
+await page.goto(base+'&accounts=2&account='+'b'.repeat(40)+'&feedDefault=global&persistView=1');
+await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'feed');
+check('Choosing an account opens its Feed before a global default when it has no remembered view',await page.evaluate(() =>
+    rl.settings.get('Email')==='hello@example.test'
+    &&PiedWebUx.feed.mode()==='feed'
+    &&sessionStorage.getItem('pw-mail-feed-account-switch')===null));
 
 console.log(JSON.stringify({passed:checks.length, checks}, null, 2));

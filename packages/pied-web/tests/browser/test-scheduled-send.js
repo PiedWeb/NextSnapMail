@@ -74,7 +74,9 @@ check('Opening names the panel, marks the control expanded and takes the focus',
 }));
 check('Every offered time is in the future, on the hour, and reads as a day and a time',await p.evaluate(()=>{
  const options=[...document.querySelectorAll('.pw-schedule-option')];
- if(options.length<2||options.length>3)return false;
+ // Late on Sunday, "tomorrow morning" and "Monday morning" are deliberately
+ // deduplicated, and the evening slot has already passed.
+ if(options.length<1||options.length>3)return false;
  return options.every(option=>{
   const label=option.querySelector('.pw-schedule-when').textContent;
   const detail=option.querySelector('.pw-schedule-detail').textContent;
@@ -99,13 +101,16 @@ check('The panel rests on its own surface, above the composer, with no button bo
 }));
 check('The confirm is the one filled control; the offered times rest on nothing',await p.evaluate(()=>{
  const empty=colour=>/rgba\(0, 0, 0, 0\)|transparent/.test(colour);
- // The panel opens with the first time focused, so read one that is not.
- const resting=[...document.querySelectorAll('.pw-schedule-option')].find(node=>node!==document.activeElement);
+ // A late-Sunday panel can have a single deduplicated preset, so explicitly
+ // return it to rest before reading its surface.
+ document.activeElement?.blur();
+ const resting=document.querySelector('.pw-schedule-option');
  return !empty(getComputedStyle(document.querySelector('.pw-schedule-confirm')).backgroundColor)
   &&empty(getComputedStyle(document.querySelector('.pw-schedule-cancel')).backgroundColor)
   &&empty(getComputedStyle(resting).backgroundColor);
 }));
-await p.locator('.pw-schedule-option').first().press('Tab');
+await p.locator('button.pw-schedule').focus();
+await p.keyboard.press('Tab');
 check('Keyboard movement inside the panel shows a visible ring',await p.evaluate(()=>{
  const focused=document.activeElement,style=getComputedStyle(focused);
  return document.querySelector('.pw-schedule-panel').contains(focused)&&focused.matches(':focus-visible')

@@ -51,6 +51,15 @@
         const previews = new Map();
         const previewQueue = [];
         const cards = new Map();
+        let previewControlFrame = 0;
+        const schedulePreviewControls = () => {
+            if (previewControlFrame) return;
+            previewControlFrame = requestAnimationFrame(() => {
+                previewControlFrame = 0;
+                const measured = [...cards.values()].map(state => [state,state.canExpand?.()]);
+                measured.forEach(([state,expandable]) => state.syncPreviewControl?.(expandable));
+            });
+        };
         let geometry;
         const observeGeometry = node => {
             if (!geometry) return;
@@ -169,6 +178,17 @@
             const delta = saved.node.getBoundingClientRect().top - saved.box.getBoundingClientRect().top - saved.offset;
             if (Math.abs(delta) > 0.5) { saved.box.scrollTop += delta; saved.scrollTop = saved.box.scrollTop; }
         };
+        const rememberElementPosition = node => {
+            const box = scroller();
+            if (!box || !node?.isConnected || !active()) return;
+            viewportAnchor = {
+                box,
+                node,
+                offset:node.getBoundingClientRect().top - box.getBoundingClientRect().top,
+                key:currentKey(),
+                scrollTop:box.scrollTop
+            };
+        };
         const anchor = () => {
             const key = currentKey();
             if (before.hidden || !key || anchored === key
@@ -231,40 +251,68 @@
                 date.textContent = value.toLocaleString(document.documentElement.lang || 'fr', {dateStyle:'medium',timeStyle:'short'});
             }
             const summary = document.createElement('span'); summary.className = 'pw-conversation-card-summary';
-            const knownPreview = previewText(raw);
-            summary.textContent = knownPreview;
-            if (!knownPreview) summary.textContent = t('Aperçu à la demande', 'Preview on demand');
+            let fullPreview = previewText(raw,2400), previewResolved = !!fullPreview, previewLoading = false;
+            summary.textContent = fullPreview.slice(0,180);
+            summary.hidden = !fullPreview;
             const previewButton = document.createElement('button'); previewButton.type = 'button';
             previewButton.className = 'pw-conversation-preview-toggle';
-            previewButton.textContent = t('Lire un aperçu', 'Read a preview');
+            previewButton.textContent = t('Charger l’aperçu', 'Load preview');
+            previewButton.hidden = previewResolved;
             previewButton.setAttribute('aria-expanded','false');
             const preview = document.createElement('p'); preview.className = 'pw-conversation-preview'; preview.hidden = true;
             preview.id = 'pw-conversation-preview-' + generation + '-' + cards.size;
             previewButton.setAttribute('aria-controls',preview.id);
+            const canExpand = () => !!fullPreview && (fullPreview.length > 180
+                || summary.scrollWidth > summary.clientWidth + 1);
+            const syncPreviewControl = (expandable = canExpand()) => {
+                const expanded = previewButton.getAttribute('aria-expanded') === 'true';
+                if (expanded) {
+                    previewButton.hidden = false;
+                    text(previewButton,t('Réduire', 'Show less'));
+                    return;
+                }
+                summary.hidden = !previewResolved; preview.hidden = true;
+                previewButton.hidden = previewResolved && !expandable;
+                text(previewButton,previewResolved
+                    ? t('Afficher la suite', 'Show more') : t('Charger l’aperçu', 'Load preview'));
+            };
             const reveal = async (expanded = false) => {
                 const owner = account();
-                const value = previewText(state.entry.raw,2400) || await fetchPreview(state.entry);
+                if (!previewResolved) {
+                    previewLoading = true; previewButton.disabled = true;
+                    previewButton.setAttribute('aria-busy','true');
+                    text(previewButton,t('Chargement…', 'Loading…'));
+                    fullPreview = previewText(state.entry.raw,2400) || await fetchPreview(state.entry);
+                    previewResolved = true; previewLoading = false; previewButton.disabled = false;
+                    previewButton.removeAttribute('aria-busy');
+                }
                 if (disposed || account() !== owner || !article.isConnected) return;
-                if (value) text(summary,value.slice(0,180));
-                if (expanded && previewButton.getAttribute('aria-expanded') === 'true') {
-                    text(preview,value || t('Aperçu indisponible. Ouvrez le message pour le lire.', 'Preview unavailable. Open the message to read it.'));
+                text(summary,fullPreview.slice(0,180) || t('Aperçu indisponible. Ouvrez le message pour le lire.', 'Preview unavailable. Open the message to read it.'));
+                if (expanded && canExpand()) {
+                    previewButton.setAttribute('aria-expanded','true');
+                    summary.hidden = true;
+                    text(preview,fullPreview);
                     preview.hidden = false;
                 }
+                syncPreviewControl();
+                if (previewButton.hidden && document.activeElement === previewButton) button.focus({preventScroll:true});
                 restorePosition();
             };
             state.reveal = reveal;
             previewButton.addEventListener('click', () => {
-                const expanded = previewButton.getAttribute('aria-expanded') !== 'true';
-                previewButton.setAttribute('aria-expanded',String(expanded));
-                previewButton.textContent = expanded ? t('Replier l’aperçu', 'Collapse preview') : t('Lire un aperçu', 'Read a preview');
-                preview.hidden = !expanded;
-                if (expanded) {
-                    preview.textContent = t('Chargement de l’aperçu…', 'Loading preview…');
-                    void reveal(true);
+                if (previewLoading) return;
+                rememberElementPosition(previewButton);
+                if (previewButton.getAttribute('aria-expanded') === 'true') {
+                    previewButton.setAttribute('aria-expanded','false');
+                    summary.hidden = false; preview.hidden = true;
+                    syncPreviewControl(); restorePosition();
+                    return;
                 }
-                rememberPosition();
+                void reveal(true);
             });
-            if (!knownPreview) {
+            state.canExpand = canExpand;
+            state.syncPreviewControl = syncPreviewControl;
+            if (!previewResolved) {
                 // A summary costs one full message fetch, so ask for it when the
                 // reader actually points at the card instead of for every card
                 // the viewport happens to cross.
@@ -292,6 +340,7 @@
                 const node = card(entry), position = container.children[index];
                 if (position !== node) container.insertBefore(node,position || null);
             });
+            schedulePreviewControls();
         }
 
         function render() {
@@ -486,7 +535,10 @@
         dom.addEventListener('wheel',manual,{passive:true});
         dom.addEventListener('touchstart',manual,{passive:true});
         dom.addEventListener('keydown',manual);
-        geometry = typeof ResizeObserver === 'function' ? new ResizeObserver(restorePosition) : null;
+        geometry = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
+            restorePosition();
+            schedulePreviewControls();
+        }) : null;
         [beforeCards,afterCards,item,header].forEach(observeGeometry);
         // ResizeObserver's default delivery differs for padding-only changes.
         // Attribute-driven late layout (lazy widgets, expanded previews, test
@@ -501,6 +553,7 @@
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
             disposed = true; reset(); clearTimeout(timer); clearInterval(poll); theme.disconnect();
+            cancelAnimationFrame(previewControlFrame);
             previews.clear(); geometry?.disconnect(); geometryMutations.disconnect();
             dom.removeEventListener('scroll',scroll,true);
             dom.removeEventListener('wheel',manual); dom.removeEventListener('touchstart',manual);

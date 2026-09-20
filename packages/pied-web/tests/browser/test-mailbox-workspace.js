@@ -6,10 +6,10 @@ await page.waitForFunction(() => window.PiedWebUx?.mailbox && document.querySele
 const checks=[];
 const check=(name,pass)=>{if(!pass)throw Error(name);checks.push(name);console.log('PASS '+name);};
 
-check('All accounts lives in the account menu while the folder rail keeps only the account Feed',await page.evaluate(() =>
+check('All my accounts lives in the account menu while the folder rail keeps only the account Feed',await page.evaluate(() =>
     document.querySelector('.pw-global-nav')?.parentElement === document.querySelector('#V-SystemDropDown menu')
     && !document.querySelector('.b-folders-system .pw-global-nav')
-    && document.querySelector('.pw-list-scope-label').textContent === 'Tous les comptes'));
+    && document.querySelector('.pw-list-scope-label').textContent === 'Tous mes comptes'));
 
 await page.locator('.pw-global-row').first().focus();
 await page.keyboard.press('ArrowDown');
@@ -61,11 +61,18 @@ check('An empty server result is announced without falling back to stale Feed ro
 await input.fill('projet');
 await input.press('Enter');
 await page.waitForFunction(() => document.querySelectorAll('.pw-global-row').length===50);
+check('All-pages selection stays hidden until the page checkbox is selected',await page.evaluate(() =>
+    document.querySelector('.pw-global-selection button').hidden));
+await page.locator('.pw-global-selection input[type="checkbox"]').check();
+check('The page and all-pages choices share one progressive selection control',await page.evaluate(() =>
+    !document.querySelector('.pw-global-selection button').hidden
+    && document.querySelector('.pw-global-selection input[type="checkbox"]').checked));
 await page.getByRole('button',{name:/Sélectionner les 125 résultats/}).click();
 await page.waitForFunction(() => document.querySelector('.pw-global-selection [role="status"]').textContent.includes('125'));
 check('Select all results freezes every page and states the exact message count',await page.evaluate(() => {
     const call=mailboxFixtureCalls.filter(request=>request.operation==='prepare').at(-1);
     return /^search-/.test(call.searchToken)
+        && document.querySelector('.pw-global-selection input[type="checkbox"]').checked
         && document.querySelector('.pw-global-status').textContent.includes('125 messages, toutes pages incluses');
 }));
 await page.getByRole('button',{name:'Supprimer',exact:true}).first().click();
@@ -87,18 +94,30 @@ check('Undo restores the mapped server snapshot instead of replaying stale sourc
 await input.fill('');
 await input.press('Enter');
 await page.waitForFunction(() => document.querySelectorAll('.pw-global-row').length===5);
-const openCalls=await page.evaluate(()=>actionCalls.length);
 const threadedRow=page.locator('.pw-global-row').filter({hasText:'Conversation à reprendre'});
 await threadedRow.hover();
+check('Flag, Trash and Reminder form one reserved action rail without covering row text',await threadedRow.evaluate(row => {
+    const group=row.querySelector('.pw-row-actions'),subject=row.querySelector('.pw-global-subject');
+    const buttons=[...group.querySelectorAll('button')];
+    return buttons.length===3&&buttons[0].classList.contains('pw-flag-action')
+        &&buttons[1].dataset.pwRowIcon==='trash-2'&&buttons[2].classList.contains('pw-remind-action')
+        &&subject.getBoundingClientRect().right<=group.getBoundingClientRect().left;
+}));
+await threadedRow.locator('.pw-flag-action').click();
+await page.waitForFunction(() => mailboxFixtureCalls.some(request=>request.operation==='action'&&request.action==='flag'));
+check('The global flag action reaches the account-safe mailbox endpoint',await page.evaluate(() =>
+    mailboxFixtureCalls.some(request=>request.operation==='action'&&request.action==='flag')));
+await threadedRow.hover();
+const trashActions=await page.evaluate(() => mailboxFixtureCalls.filter(request=>request.operation==='action'&&request.action==='trash').length);
 await threadedRow.locator('.pw-row-action[aria-label="Supprimer"]').click();
-await page.waitForFunction(() => mailboxFixtureCalls.filter(request=>request.operation==='prepare').length>=2);
-check('A quick row action sends every UID in the exact account/folder/UIDVALIDITY thread scope and does not open the row',await page.evaluate(before => {
+await page.waitForFunction(before => mailboxFixtureCalls.filter(request=>request.operation==='action'&&request.action==='trash').length>before,trashActions);
+check('A quick row action sends every UID in the exact account/folder/UIDVALIDITY thread scope and does not open the row',await page.evaluate(() => {
     const call=mailboxFixtureCalls.filter(request=>request.operation==='prepare').at(-1),items=JSON.parse(call.items||'[]');
     return items.length===2 && items.every(item=>item.accountHash&&item.folder==='INBOX'&&item.uidValidity===77)
         && items.map(item=>item.uid).sort((a,b)=>a-b).join(',')==='99,102'
         && document.querySelectorAll('.pw-global-row .pw-row-actions').length===1
-        && actionCalls.length===before && !location.hash.includes('/m');
-},openCalls));
+        && !location.hash.includes('/m') && sessionStorage.getItem('pw-mail-feed-open')===null;
+}));
 
 check('Workspace run has no fixture runtime error',await page.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:checks.length,checks},null,2));

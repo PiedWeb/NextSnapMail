@@ -212,7 +212,7 @@
             now.setAttribute('aria-label', label); now.title = label;
             now.addEventListener('click', () => sendNow(job));
             job.node.querySelector('.pw-outgoing-action').addEventListener('click', () => {
-                if (['sent','copy-error'].includes(job.phase)) remove(job);
+                if (['sent','copy-error','draft-saved'].includes(job.phase)) remove(job);
                 else if (job.phase === 'scheduled') unschedule(job);
                 else restore(job);
             });
@@ -223,6 +223,8 @@
             sending:t('Envoi en cours…', 'Sending…'), sent:t('Message envoyé', 'Message sent'),
             cancelled:t('Envoi annulé', 'Send cancelled'), error:t('Envoi non confirmé', 'Send not confirmed'),
             'copy-error':t('Envoyé, copie non enregistrée', 'Sent, but copy could not be saved'),
+            'saving-draft':t('Enregistrement du brouillon…', 'Saving draft…'),
+            'draft-saved':t('Brouillon enregistré', 'Draft saved'),
             scheduling:t('Programmation…', 'Scheduling…'), scheduled:t('Envoi programmé', 'Send scheduled')
         };
         const status = job.node.querySelector('.pw-outgoing-status');
@@ -231,12 +233,13 @@
         job.node.querySelector('.pw-outgoing-detail').textContent = job.detail || '';
         job.node.querySelector('.pw-outgoing-now').hidden = job.phase !== 'waiting';
         const button = job.node.querySelector('.pw-outgoing-action');
-        button.disabled = ['sending','scheduling'].includes(job.phase);
+        button.disabled = ['sending','scheduling','saving-draft'].includes(job.phase);
         button.textContent = ['waiting','ready','scheduled'].includes(job.phase)
             ? t('Annuler', 'Undo') + (job.seconds ? ` (${job.seconds})` : '')
             : job.phase === 'sending' ? t('Envoi…', 'Sending…')
                 : job.phase === 'scheduling' ? t('Programmation…', 'Scheduling…')
-                    : ['sent','copy-error'].includes(job.phase) ? t('Fermer', 'Dismiss') : t('Reprendre', 'Resume');
+                    : job.phase === 'saving-draft' ? t('Enregistrement…', 'Saving…')
+                    : ['sent','copy-error','draft-saved'].includes(job.phase) ? t('Fermer', 'Dismiss') : t('Reprendre', 'Resume');
         button.setAttribute('aria-label', ['waiting','ready'].includes(job.phase) ? t('Annuler l’envoi', 'Undo send')
             : job.phase === 'scheduled' ? t('Annuler l’envoi programmé', 'Cancel the scheduled send') : button.textContent);
         placeHost();
@@ -368,6 +371,45 @@
             state?.attachments.forEach(item => item.onDestroy?.());
         } finally { vm.sending(false); unlock(); preparing=false; }
     }
+    async function closeAsDraft(vm, original, args) {
+        if (preparing || restoring || !vm.modalVisible?.()) return false;
+        if (vm.isEmptyForm?.(false) && !Number(vm.draftUid?.() || 0)) {
+            await hideComposer(vm); return true;
+        }
+        if (!canSaveDraft()) {
+            vm.savedError?.(true);
+            vm.savedErrorDesc?.(t('Configurez un dossier Brouillons avant de fermer.', 'Configure a Drafts folder before closing.'));
+            return false;
+        }
+        if (vm.attachmentsInProcess?.().length || vm.saving?.() || vm.sending?.()) {
+            vm.attachmentsInProcessError?.(!!vm.attachmentsInProcess?.().length);
+            vm.attachmentsArea?.(); return false;
+        }
+        preparing = true;
+        let state;
+        try {
+            state = capture(vm);
+            const copy = shadow(vm,state);
+            const job = {id:++serial,state,copy,account:identity(),armoredDraft:'',phase:'saving-draft',seconds:0,
+                persisted:false,durable:false,detail:'',persist:null};
+            jobs.push(job); render(job);
+            job.persist = nativeSave(vm,copy).then(() => {
+                job.persisted = job.durable = true; job.phase = 'draft-saved'; render(job);
+                job.noticeTimer = clock.later(() => remove(job),3500);
+            }).catch(error => {
+                job.persisted = true; job.phase = 'error';
+                job.detail = t('Brouillon non enregistré. Reprenez-le pour réessayer. ', 'Draft not saved. Resume it to try again. ')
+                    + String(error.message || error);
+                render(job);
+            });
+            await hideComposer(vm);
+            return true;
+        } catch (error) {
+            state?.attachments.forEach(item => item.onDestroy?.());
+            vm.savedError?.(true); vm.savedErrorDesc?.(String(error.message || error));
+            return original?.apply(vm,args);
+        } finally { preparing = false; }
+    }
     const reason = error => ({
         drafts: t('Activez un dossier Brouillons pour programmer un envoi.', 'Enable a Drafts folder to schedule a send.'),
         folder: t('Le dossier des envois programmés est indisponible.', 'The scheduled folder is unavailable.'),
@@ -453,6 +495,10 @@
             compose=vm; vm.pwBackgroundSend=true; serializeDraftWrites();
             const original=vm.sendCommand;
             vm.sendCommand=(...args)=>send(vm,original,args); vm.sendCommand.canExecute=original.canExecute;
+            if (typeof vm.doClose === 'function') {
+                const close = vm.doClose;
+                vm.doClose=(...args)=>closeAsDraft(vm,close,args);
+            }
             const onShow=vm.onShow;
             vm.onShow=function(...args){vm.pwReplyMessage=Array.isArray(args[1])?args[1][0]:args[1];return onShow.apply(vm,args);};
         }

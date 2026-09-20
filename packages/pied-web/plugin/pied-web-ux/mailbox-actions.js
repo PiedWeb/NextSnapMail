@@ -120,11 +120,31 @@
         button.setAttribute('aria-label',label); button.title = label;
         const svg = api.composerIcons?.[name];
         if (svg) { const template = document.createElement('template'); template.innerHTML = svg; button.append(template.content.cloneNode(true)); }
-        else button.textContent = name === 'trash-2' ? '×' : '◷';
+        else if (['trash-2','star'].includes(name)) button.dataset.pwRowIcon = name;
+        else button.textContent = '◷';
         return button;
     };
-    const rowActions = (scope,onDone,allowReminder = false) => {
+    const rowActions = (scope,onDone,options = {}) => {
+        if (typeof options === 'boolean') options = {reminder:options};
         const group = document.createElement('span'); group.className = 'pw-row-actions';
+        if (typeof options.flagged === 'function') {
+            const flag = glyph('star',''); flag.classList.add('pw-flag-action');
+            const sync = () => {
+                const set = !!options.flagged();
+                flag.dataset.flagged = String(set);
+                flag.setAttribute('aria-pressed',String(set));
+                flag.setAttribute('aria-label',set ? t('Retirer le drapeau','Remove flag') : t('Ajouter un drapeau','Add flag'));
+                flag.title = flag.getAttribute('aria-label');
+            };
+            flag.addEventListener('click',async event => {
+                event.preventDefault(); event.stopPropagation(); if (!active() || flag.disabled) return;
+                flag.disabled = true;
+                try { await perform(scope(),options.flagged() ? 'unflag' : 'flag'); onDone?.(); }
+                catch (error) { reportError(error); }
+                finally { flag.disabled = false; sync(); }
+            });
+            group.append(flag); group.pwSync = sync; sync();
+        }
         const trash = glyph('trash-2',t('Supprimer','Delete'));
         trash.addEventListener('click',async event => {
             event.preventDefault(); event.stopPropagation(); if (!active() || trash.disabled) return;
@@ -134,7 +154,7 @@
             finally { trash.disabled = false; }
         });
         group.append(trash);
-        if (allowReminder) {
+        if (options.reminder) {
             const remind = glyph('clock',t('Me le rappeler','Remind me'));
             remind.classList.add('pw-remind-action');
             remind.setAttribute('aria-haspopup','dialog');
@@ -159,15 +179,29 @@
         if (vm.viewModelTemplateID !== 'MailMessageList' || vm.pwMailboxActions) return;
         vm.pwMailboxActions = true;
         const root = vm.viewModelDom;
+        const restore = group => {
+            group.closest('.messageListItem')?.classList.remove('pw-has-row-actions');
+            const home = group.pwNativeFlag;
+            if (home?.flag && home.parent?.isConnected) home.parent.insertBefore(home.flag,home.next?.parentNode === home.parent ? home.next : null);
+            group.remove();
+        };
         const paint = () => {
-            if (!active()) { root.querySelectorAll('.pw-row-actions').forEach(n => n.remove()); return; }
+            if (!active()) { root.querySelectorAll('.pw-row-actions').forEach(restore); return; }
             root.querySelectorAll('.messageListItem').forEach(row => {
                 const message = window.ko?.dataFor?.(row);
                 if (!message?.uid || !message.folder || row.querySelector('.pw-row-actions')) return;
                 const folder = String(message.folder);
                 // Trash uses the native permanent-delete confirmation, never our reversible shortcut.
                 const isTrash = folder === rl.app.mailboxFolders?.().trash;
-                if (!isTrash) row.append(rowActions(() => nativeScope(window.ko.dataFor(row)),null,/^inbox$/i.test(folder)));
+                if (!isTrash) {
+                    const group = rowActions(() => nativeScope(window.ko.dataFor(row)),null,{reminder:/^inbox$/i.test(folder)});
+                    const flag = row.querySelector('.flagParent');
+                    if (flag) {
+                        group.pwNativeFlag = {flag,parent:flag.parentNode,next:flag.nextSibling};
+                        group.prepend(flag);
+                    }
+                    row.classList.add('pw-has-row-actions'); row.append(group);
+                }
             });
         };
         let frame = 0;
@@ -175,7 +209,10 @@
         const observer = new MutationObserver(schedule); observer.observe(root,{childList:true,subtree:true});
         const themeObserver = new MutationObserver(schedule); themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
         const subscription = vm.messageList?.subscribe?.(schedule); paint();
-        window.ko?.utils?.domNodeDisposal?.addDisposeCallback(root,() => { observer.disconnect(); themeObserver.disconnect(); subscription?.dispose?.(); cancelAnimationFrame(frame); });
+        window.ko?.utils?.domNodeDisposal?.addDisposeCallback(root,() => {
+            observer.disconnect(); themeObserver.disconnect(); subscription?.dispose?.(); cancelAnimationFrame(frame);
+            root.querySelectorAll('.pw-row-actions').forEach(restore);
+        });
         if (!nativeWrapped && typeof rl.app.moveMessagesToFolderType === 'function') {
             const native = rl.app.moveMessagesToFolderType;
             rl.app.moveMessagesToFolderType = function(type,folder,ids,permanent) {

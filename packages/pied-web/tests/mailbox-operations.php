@@ -211,6 +211,13 @@ namespace {
         check(!in_array('\\Seen', $a->data['INBOX'][99]['flags'], true), 'New arrivals remain outside the prepared selection');
         check($call(array_replace($action, ['action' => 'trash']))['error'] === 'scope', 'A prepared action cannot silently change operation after starting');
 
+        $flagSelection = $call(['operation' => 'prepare', 'folder' => 'INBOX', 'uids' => '[3]', 'uidValidity' => $a->validity['INBOX']]);
+        $flagged = $call(['operation' => 'action', 'action' => 'flag', 'token' => $flagSelection['token'], 'cursor' => 0, 'confirmed' => '1']);
+        check($flagged['done'] && in_array('\\Flagged', $a->data['INBOX'][3]['flags'], true), 'Feed row action sets the native IMAP flagged state');
+        $unflagSelection = $call(['operation' => 'prepare', 'folder' => 'INBOX', 'uids' => '[3]', 'uidValidity' => $a->validity['INBOX']]);
+        $unflagged = $call(['operation' => 'action', 'action' => 'unflag', 'token' => $unflagSelection['token'], 'cursor' => 0, 'confirmed' => '1']);
+        check($unflagged['done'] && !in_array('\\Flagged', $a->data['INBOX'][3]['flags'], true), 'Feed row action removes the native IMAP flagged state');
+
         $a->data['INBOX'][1]['flags'] = []; $a->data['INBOX'][2]['flags'] = ['\\Seen'];
         $selects = static fn() => \count(\array_filter($a->calls, static fn($entry) => $entry[0] === 'select'));
         $beforeSelects = $selects();

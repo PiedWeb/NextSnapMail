@@ -109,6 +109,20 @@ check('Folded cards show one-line plain-text body previews, never the repeated s
     &&[...document.querySelectorAll('.pw-conversation-card-summary')].every(node=>!node.textContent.includes('Projet Alpha'))
     &&getComputedStyle(document.querySelector('.pw-conversation-card-summary')).whiteSpace==='nowrap'));
 check('Inert preview extraction does not fetch remote tracking images',previewNetworkRequests===0);
+await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
+    .filter(button=>button.textContent==='Afficher la suite').every(button=>button.hidden));
+check('Known short excerpts do not offer a redundant preview action',await p.evaluate(()=>
+    [...document.querySelectorAll('.pw-conversation-preview-toggle')]
+        .filter(button=>button.textContent==='Afficher la suite').every(button=>button.hidden)
+    &&[...document.querySelectorAll('.pw-conversation-preview-toggle')]
+        .some(button=>!button.hidden&&button.textContent==='Charger l’aperçu')));
+await p.evaluate(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
+    .find(button=>!button.hidden&&button.textContent==='Charger l’aperçu').click());
+await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
+    .every(button=>button.hidden));
+check('Loading a short missing excerpt fills the summary and removes the spent action',await p.evaluate(()=>
+    [...document.querySelectorAll('.pw-conversation-card-summary')].some(summary=>summary.textContent==='Premier message')
+    &&document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===0));
 await p.locator('.pw-conversation-card-toggle').nth(2).click();
 await p.waitForFunction(()=>readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===12
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===2
@@ -284,6 +298,8 @@ check('A message opened from Trash stays in the single native reader with no con
 
 await p.setViewportSize({width:1280,height:620});
 await p.evaluate(()=>{
+    sentMatches[0].plain='Réponse envoyée seule. '+('Cette suite fictive permet de vérifier un aperçu réellement développé. '.repeat(5));
+    sentMatches[0].html='';
     filedRaw={...sourceRaw,folder:'Projects',uid:80,hash:'Projects-80',messageId:'<filed@example.test>',
         references:'<single@example.test>',inReplyTo:'<single@example.test>',subject:'Message classé',
         dateTimestamp:1789000700,plain:'Message actif classé'};
@@ -306,14 +322,23 @@ check('Explicit full exchange keeps the filed message as the only native action 
     &&document.querySelector('.pw-conversation-scope').textContent.includes('hors brouillons')));
 await p.locator('.pw-conversation-preview-toggle').last().click();
 await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===1);
-check('A previous-message preview expands separately without changing reader selection or reading flags',await p.evaluate(()=>
+check('A useful previous-message continuation expands without duplicating its one-line excerpt or changing reader state',await p.evaluate(()=>
     readerVM.message().folder==='Projects'&&readerVM.message().uid===80
     &&document.querySelectorAll('.pw-conversation-preview[hidden]').length===1
-    &&[...document.querySelectorAll('.pw-conversation-preview')].some(node=>!node.hidden&&node.textContent==='Réponse envoyée seule')
+    &&[...document.querySelectorAll('.pw-conversation-preview')].some(node=>!node.hidden&&node.textContent.length>180)
+    &&document.querySelector('.pw-conversation-card-summary[hidden]')
+    &&document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]')?.textContent==='Réduire'
     &&threadRequests.every(request=>['PiedWebConversation','Message'].includes(request.action))));
+await p.setViewportSize({width:390,height:850});
+check('An expanded continuation fits a narrow reader',await p.evaluate(()=>{
+    const card=document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]')?.closest('.pw-conversation-card');
+    const box=card?.getBoundingClientRect();
+    return box&&box.left>=0&&box.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth;
+}));
+await p.setViewportSize({width:1280,height:620});
 await p.evaluate(()=>{
     stableCards=[...document.querySelectorAll('.pw-conversation-card')];
-    document.querySelector('.pw-conversation-preview-toggle').focus();
+    document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]').focus();
     stableFocus=document.activeElement;
     readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);
 });

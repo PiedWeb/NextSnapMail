@@ -18,6 +18,7 @@
         dom.querySelector(':scope > .btn-toolbar')?.after(bar);
         const selectedCount=ko.computed(()=>list().filter(message=>ko.unwrap(message.checked)).length);
         const selectAll=dom.querySelector('.checkboxCheckAll');
+        const selectAllHome=selectAll ? {parent:selectAll.parentNode,next:selectAll.nextSibling} : null;
         if (selectAll) {
             selectAll.tabIndex=0; selectAll.setAttribute('role','checkbox');
             const label=(document.documentElement.lang||'fr').startsWith('fr') ? 'Sélectionner les éléments de cette page' : 'Select items on this page';
@@ -31,6 +32,12 @@
         }
         const syncSelection=()=>{
             const count=active() ? selectedCount() : 0;
+            if (selectAll && selectAllHome) {
+                if (count && selectAll.parentNode!==bar) bar.prepend(selectAll);
+                else if (!count && selectAll.parentNode===bar) {
+                    selectAllHome.parent.insertBefore(selectAll,selectAllHome.next?.parentNode===selectAllHome.parent ? selectAllHome.next : null);
+                }
+            }
             dom.classList.toggle('pw-selection-mode',count>0);
             bar.hidden=!count;
             const fr=(document.documentElement.lang||'fr').startsWith('fr');
@@ -40,6 +47,7 @@
             finish.setAttribute('aria-label',fr ? 'Terminer la sélection' : 'Finish selection');
             const all=count>0 && count===list().length;
             selectAll?.setAttribute('aria-checked',count && !all ? 'mixed' : String(all));
+            dispatchEvent(new CustomEvent('pw-native-selection-changed',{detail:{dom,count,all}}));
         };
         selectedCount.subscribe(syncSelection);
         const clearSelection=()=>{
@@ -75,7 +83,11 @@
         const themeObserver=new MutationObserver(syncSelection);
         themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class','lang']});
         syncSelection();
-        ko.utils.domNodeDisposal.addDisposeCallback(dom,()=>{selectedCount.dispose();themeObserver.disconnect();bar.remove();});
+        ko.utils.domNodeDisposal.addDisposeCallback(dom,()=>{
+            selectedCount.dispose();themeObserver.disconnect();
+            if (selectAll?.parentNode===bar && selectAllHome?.parent?.isConnected) selectAllHome.parent.insertBefore(selectAll,selectAllHome.next?.parentNode===selectAllHome.parent ? selectAllHome.next : null);
+            bar.remove();
+        });
 
         // The reader can retain the native shortcut scope after checking list rows.
         // Checked messages must take precedence over that reader's current message.

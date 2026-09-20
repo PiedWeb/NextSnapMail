@@ -23,7 +23,7 @@
         const scopeBar = document.createElement('div'); scopeBar.className = 'pw-list-scope';
         const scopeLabel = document.createElement('strong'); scopeLabel.className = 'pw-list-scope-label';
         const searchScope = document.createElement('select'); searchScope.setAttribute('aria-label',t('Portée de la recherche','Search scope'));
-        [['folder',t('Ce dossier','This folder')],['account',t('Tous les dossiers du compte','All folders in this account')],['global',t('Tous les comptes','All accounts')]]
+        [['folder',t('Ce dossier','This folder')],['account',t('Tous les dossiers du compte','All folders in this account')],['global',t('Tous mes comptes','All my accounts')]]
             .forEach(([value,label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; searchScope.append(option); });
         scopeBar.append(scopeLabel,searchScope); dom.querySelector(':scope > .btn-toolbar')?.after(scopeBar);
         const controls = document.createElement('div'); controls.className = 'pw-global-selection';
@@ -52,7 +52,7 @@
         const selectChanged = () => {
             const visible = currentItems(), n = snapshot ? Number(snapshot.count) : selected.size;
             all.checked = !!visible.length && visible.every(item => selected.has(key(item)));
-            all.indeterminate = !!n && (!all.checked || !!snapshot);
+            all.indeterminate = !!n && !all.checked;
             all.disabled = busy || loading || !visible.length;
             all.setAttribute('aria-checked',all.indeterminate ? 'mixed' : String(all.checked));
             count.textContent = n ? t(`${n} message(s) sélectionné(s)`,`${n} message(s) selected`) : '';
@@ -60,7 +60,7 @@
             actionButtons.forEach(button => button.disabled = busy || loading || !n);
             remind.hidden = snapshot ? !!snapshot.groups?.some(group => !/^inbox$/i.test(group.folder))
                 : visible.filter(item => selected.has(key(item))).some(item => !/^inbox$/i.test(item.folder));
-            allResults.hidden = busy || loading || !visible.length;
+            allResults.hidden = busy || loading || !visible.length || !all.checked || !!snapshot;
             allResults.textContent = searchState
                 ? t(`Sélectionner les ${searchState.total} résultats`, `Select all ${searchState.total} results`)
                 : t('Sélectionner toutes les boîtes de réception…','Select all inboxes…');
@@ -85,7 +85,10 @@
         const toggle = id => { snapshot = null; selected.has(id) ? selected.delete(id) : selected.add(id); anchor = id; selectChanged(); };
         const open = item => { options.beforeOpen?.({search:searchState?.query || '',scope:searchScope.value,offset:searchState?.offset || 0,key:key(item),scroll:section.parentElement?.scrollTop || 0}); options.open(item); };
         const createRowActions = (node,allowReminder) => {
-            const group = api.mailbox.rowActions(() => rowScope(node.pwItem),() => refreshResults(),allowReminder);
+            const group = api.mailbox.rowActions(() => rowScope(node.pwItem),() => refreshResults(),{
+                reminder:allowReminder,
+                flagged:() => (node.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged')
+            });
             group.setAttribute('role','gridcell'); return group;
         };
         // Desktop needs actions only on the hovered/focused row. Reusing this
@@ -95,9 +98,13 @@
             if (!api.mailbox || !desktopActions.matches || !node?.pwItem) return;
             actionRow = node;
             if (!sharedRowActions) {
-                sharedRowActions = api.mailbox.rowActions(() => rowScope(actionRow.pwItem),() => refreshResults(),true);
+                sharedRowActions = api.mailbox.rowActions(() => rowScope(actionRow.pwItem),() => refreshResults(),{
+                    reminder:true,
+                    flagged:() => (actionRow.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged')
+                });
                 sharedRowActions.setAttribute('role','gridcell');
             }
+            sharedRowActions.pwSync?.();
             const remindAction = sharedRowActions.querySelector('.pw-remind-action');
             if (remindAction) remindAction.hidden = !/^inbox$/i.test(node.pwItem.folder);
             node.append(sharedRowActions);
@@ -178,7 +185,7 @@
         };
         const updateScope = () => {
             const global = options.mode() === 'global';
-            scopeLabel.textContent = searchState ? t('Résultats de recherche','Search results') : global ? t('Tous les comptes','All accounts')
+            scopeLabel.textContent = searchState ? t('Résultats de recherche','Search results') : global ? t('Tous mes comptes','All my accounts')
                 : [options.accountLabel(), options.mode() === 'feed' ? t('Flux','Feed') : options.folderLabel()].filter(Boolean).join(' · ');
             searchScope.querySelector('option[value="global"]').hidden = options.accountCount() < 2;
             if (!searchState && searchScope.dataset.mode !== options.mode()) {
