@@ -1,8 +1,8 @@
 {
-  "version": "1.10.6",
+  "version": "1.10.7",
   "tested": {
     "nextcloud": "34.0.4",
-    "nextsnapmail": "0.1.14",
+    "nextsnapmail": "0.1.15",
     "snappymail": "2.38.2"
   },
   "files": {
@@ -35,7 +35,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "b2aa3ec6bc67d03a457aabe588a80cb09bb2a4076ac341b3230379396e4c59d8",
+    "plugin/pied-web-ux/index.php": "24f63a5f00ac169b89f437c3d32f174c78f76d16ad7601ca020c949898310489",
     "plugin/pied-web-ux/inline-reply.js": "85a5ae3bf65e80c16b8d19235639e29a37961a76cebc7e0f1775c3577be9e089",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",
@@ -74,8 +74,11 @@
     "pull_request": "https://github.com/oe79/NextSnapMail/pull/41",
     "base_commit": "d3b0a34f4bec9f8cbb1e722f5467e50305c788c1",
     "patched_commit": "c13bf1bc45d9d638a50f6fb21c1f4dfd3af0e402",
+    "local_changes": [
+      "Default SoundNotification to false while preserving explicit user settings"
+    ],
     "files": {
-      "app/libraries/RainLoop/Actions.php": "1c78cdeef8e5a622cc1b9c2e3193522014df53f8b4feaf60e5e61fcbfa32ebe0",
+      "app/libraries/RainLoop/Actions.php": "fbd39d81ffad23ec96b5be9594dedc8115957ba7b3ed7d3513c9a084007ffcba",
       "app/libraries/RainLoop/Actions/Accounts.php": "114b08e8a21398cafd32b4a6a66e16f025fd4d780f9fcb7ca049408f9a44e300",
       "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
       "app/libraries/RainLoop/Actions/User.php": "f8102dfe66b411964d9e28f6ac693788d4425b82fbcda5bc3d6465d58c0e0c0f",

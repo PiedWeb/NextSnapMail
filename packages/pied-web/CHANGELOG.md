@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.7, 2026-09-21
+
+NextSnapMail 0.1.15 now starts with new-mail sound notifications disabled. The
+production migration applies the same quiet preference to every existing shared
+account profile while preserving the user's ability to turn the sound back on
+from General settings.
+
 ## 1.10.6, 2026-09-21
 
 Changing accounts from the account menu now keeps the current mailbox context instead of always

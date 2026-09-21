@@ -7,6 +7,7 @@ cd "$repo_root/apps/nextsnapmail"
 php tests/account-url-context.php
 php tests/account-unread-counts.php
 php tests/account-unread-count-setting.php
+php tests/notification-sound-default.php
 node --test tests/account-url-context.mjs
 node tests/account-unread-counts.mjs
 

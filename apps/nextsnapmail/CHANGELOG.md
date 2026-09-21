@@ -1,3 +1,11 @@
+## 0.1.15 – 2026-09-21
+
+### Changed
+
+- Disable new-mail sound notifications by default. Existing stored user choices
+  remain supported; the production rollout separately migrates current profiles
+  to the quiet setting.
+
 ## 0.1.12 – 2026-09-19
 
 ### Added

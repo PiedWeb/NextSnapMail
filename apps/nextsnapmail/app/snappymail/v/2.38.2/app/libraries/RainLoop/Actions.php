@@ -600,7 +600,7 @@ class Actions
 						'messageReadAuto' => true, // (bool) $oConfig->Get('webmail', 'message_read_auto', true),
 						'MessageReadDelay' => (int) $oConfig->Get('webmail', 'message_read_delay', 5),
 						'MsgDefaultAction' => (int) $oConfig->Get('defaults', 'msg_default_action', 1),
-						'SoundNotification' => true,
+						'SoundNotification' => false,
 						'NotificationSound' => 'new-mail',
 						'DesktopNotifications' => true,
 						'Layout' => (int) $oConfig->Get('defaults', 'view_layout', Enumerations\Layout::SIDE_PREVIEW),
