@@ -1,5 +1,18 @@
 # Releases
 
+## 1.10.4, 2026-09-21
+
+Trash now removes native-list, account-Feed and global-Feed rows from view immediately instead of
+leaving them visible through snapshot preparation, the confirmed IMAP move and the following list
+refresh. This is visual staging, not an early success claim: the existing account/folder/
+UIDVALIDITY validation still runs unchanged, Undo still appears only after a completed reversible
+move, and any preparation or server failure restores the exact staged rows and keyboard focus.
+
+Fictional browser transport deliberately holds both successful and refused operations open. The
+regressions verify that single and grouped rows disappear before the first response, rejected
+operations restore the rows and selection, and success keeps the exact thread scope without opening
+the message.
+
 ## 1.10.3, 2026-09-20
 
 Folded conversation cards now offer **Show more / Afficher la suite** only when their one-line

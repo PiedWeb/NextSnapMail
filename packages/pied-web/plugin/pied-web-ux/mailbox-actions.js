@@ -1,4 +1,4 @@
-/* Account-safe, confirmed mailbox operations. No optimistic success or blind retries. */
+/* Account-safe mailbox operations. Immediate visual removal, confirmed success, no blind retries. */
 (() => {
     'use strict';
     const api = window.PiedWebUx = window.PiedWebUx || {};
@@ -23,6 +23,31 @@
         trash:t('Configurez le dossier Corbeille dans les paramètres.','Configure the Trash folder in settings.')
         ,busy:t('Une opération est déjà en cours. Patientez avant de recommencer.','An operation is already running. Wait before trying again.')
     })[error?.message] || t('Opération interrompue. Vérifiez la liste avant de recommencer.','Operation interrupted. Check the list before trying again.');
+    const stageRows = rows => {
+        const focus = document.activeElement, staged = [...new Set(rows)].filter(row => row instanceof Element
+            && row.isConnected && !row.classList.contains('pw-trash-pending')).map(row => ({
+                row, ariaHidden:row.getAttribute('aria-hidden'), inert:'inert' in row ? row.inert : undefined
+            }));
+        staged.forEach(({row}) => {
+            row.classList.add('pw-trash-pending'); row.setAttribute('aria-hidden','true');
+            if ('inert' in row) row.inert = true;
+        });
+        return {rollback:() => {
+            staged.forEach(({row,ariaHidden,inert}) => {
+                row.classList.remove('pw-trash-pending');
+                ariaHidden == null ? row.removeAttribute('aria-hidden') : row.setAttribute('aria-hidden',ariaHidden);
+                if (inert !== undefined) row.inert = inert;
+            });
+            if (focus instanceof HTMLElement && focus.isConnected) focus.focus({preventScroll:true});
+        }};
+    };
+    const nativeRows = (folder,ids) => {
+        const wanted = new Set([...ids].map(Number));
+        return [...document.querySelectorAll('#V-MailMessageList .messageListItem')].filter(row => {
+            const message = window.ko?.dataFor?.(row);
+            return message && String(message.folder) === String(folder) && wanted.has(Number(message.uid));
+        });
+    };
     let notice, label, undoButton, closeButton, undoTokens = [], timer, busy = false, running = false;
     const mountNotice = () => {
         if (notice?.isConnected) return;
@@ -148,10 +173,11 @@
         const trash = glyph('trash-2',t('Supprimer','Delete'));
         trash.addEventListener('click',async event => {
             event.preventDefault(); event.stopPropagation(); if (!active() || trash.disabled) return;
-            trash.disabled = true;
-            try { await perform(scope(),'trash'); onDone?.(); }
+            trash.disabled = true; const pending = stageRows([trash.closest('.messageListItem,.pw-global-row')]); let confirmed = false;
+            try { await perform(scope(),'trash'); confirmed = true; }
             catch (error) { reportError(error); }
-            finally { trash.disabled = false; }
+            finally { trash.disabled = false; if (!confirmed) pending.rollback(); }
+            if (confirmed) onDone?.();
         });
         group.append(trash);
         if (options.reminder) {
@@ -173,7 +199,7 @@
         }
         return group;
     };
-    api.mailbox = {request,prepare,run,perform,reason,show,rowActions,nativeScope,uids};
+    api.mailbox = {request,prepare,run,perform,reason,show,rowActions,nativeScope,uids,stageRows};
     let nativeWrapped = false;
     const mountNative = vm => {
         if (vm.viewModelTemplateID !== 'MailMessageList' || vm.pwMailboxActions) return;
@@ -219,9 +245,10 @@
                 if (!active() || type !== 5 || permanent || !ids?.size
                     || [rl.app.mailboxFolders?.().trash,rl.app.mailboxFolders?.().spam].includes(folder))
                     return native.call(this,type,folder,ids,permanent);
+                const pending = stageRows(nativeRows(folder,ids));
                 return perform({folder,uids:JSON.stringify([...ids]),uidValidity:nativeValidity(),
                     accountHashes:JSON.stringify([account()])},'trash')
-                    .catch(reportError);
+                    .catch(error => { pending.rollback(); reportError(error); });
             };
             nativeWrapped = true;
         }

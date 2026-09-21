@@ -162,6 +162,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.
   All filtered pages use a confirmed, account/folder/filter-scoped UID snapshot.
+  Since 1.10.4, Trash hides the affected native or global rows before snapshot preparation returns,
+  but this is only reversible visual staging: never announce success or expose Undo before the
+  confirmed IMAP move. A preparation or mutation failure must restore the exact rows, accessibility
+  state and prior keyboard focus. An authoritative refresh owns the final list.
 - The Undo Send window floats after closing compose, while mailbox use continues.
   It delays browser submission; there is no recall after delivery.
   Since 1.7.53 the window is three seconds, held in one place as

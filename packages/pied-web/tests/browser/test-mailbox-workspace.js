@@ -109,7 +109,13 @@ check('The global flag action reaches the account-safe mailbox endpoint',await p
     mailboxFixtureCalls.some(request=>request.operation==='action'&&request.action==='flag')));
 await threadedRow.hover();
 const trashActions=await page.evaluate(() => mailboxFixtureCalls.filter(request=>request.operation==='action'&&request.action==='trash').length);
+await page.evaluate(() => { mailboxFixtureDelay=300; });
 await threadedRow.locator('.pw-row-action[aria-label="Supprimer"]').click();
+check('A quick Trash action hides its row before the server round trip completes',await page.evaluate(() => {
+    const row=[...document.querySelectorAll('.pw-global-row')].find(node=>node.pwItem?.uid===102);
+    return row?.classList.contains('pw-trash-pending') && getComputedStyle(row).display==='none'
+        && !document.querySelector('.pw-mailbox-notice')?.textContent.includes('mis à la corbeille');
+}));
 await page.waitForFunction(before => mailboxFixtureCalls.filter(request=>request.operation==='action'&&request.action==='trash').length>before,trashActions);
 check('A quick row action sends every UID in the exact account/folder/UIDVALIDITY thread scope and does not open the row',await page.evaluate(() => {
     const call=mailboxFixtureCalls.filter(request=>request.operation==='prepare').at(-1),items=JSON.parse(call.items||'[]');
@@ -118,6 +124,17 @@ check('A quick row action sends every UID in the exact account/folder/UIDVALIDIT
         && document.querySelectorAll('.pw-global-row .pw-row-actions').length===1
         && !location.hash.includes('/m') && sessionStorage.getItem('pw-mail-feed-open')===null;
 }));
+
+await page.evaluate(() => { mailboxFixtureDelay=250; mailboxFixtureFailure='changed'; });
+const failedRow=page.locator('.pw-global-row').first();await failedRow.hover();
+await failedRow.locator('.pw-row-action[aria-label="Supprimer"]').click();
+check('A failed Trash stays hidden while its server result is pending',await failedRow.evaluate(row =>
+    row.classList.contains('pw-trash-pending') && getComputedStyle(row).display==='none'));
+await page.waitForFunction(() => document.querySelector('.pw-mailbox-notice')?.dataset.state==='error');
+check('A refused Trash restores the row and exposes the confirmed error',await failedRow.evaluate(row =>
+    !row.classList.contains('pw-trash-pending') && getComputedStyle(row).display!=='none'
+    && document.querySelector('.pw-mailbox-notice')?.textContent.includes('Le dossier a changé')));
+await page.evaluate(() => { mailboxFixtureFailure=''; mailboxFixtureDelay=20; });
 
 check('Workspace run has no fixture runtime error',await page.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:checks.length,checks},null,2));

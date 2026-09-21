@@ -81,6 +81,8 @@ account is active.
   into the browser-visible token.
 - A mutable action requires an explicit confirmation, UIDVALIDITY revalidation and monotonic batch
   cursor. Only a completed Trash move may mint an Undo token.
+- Trash may stage affected rows out of view immediately, but a failed preparation or move must
+  restore them. The staged visual state must never be presented as confirmed success or expose Undo.
 - Leaving the Pied Web theme hides all Feed-only interface.
 
 `tests/feed.php` covers settings scopes, defaults, account isolation, UID collisions, Drafts,

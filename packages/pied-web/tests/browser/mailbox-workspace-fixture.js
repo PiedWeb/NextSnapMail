@@ -3,8 +3,9 @@
     const snapshots = new Map(), undo = new Map(); let sequence = 0;
     window.mailboxFixtureCalls = [];
     window.mailboxFixtureFailure = '';
+    window.mailboxFixtureDelay = 20;
     window.feedGlobalItems?.forEach(item => { item._pwUidValidity = 77; });
-    const send = (callback,result) => setTimeout(() => callback(0,{Result:result}),20);
+    const send = (callback,result) => setTimeout(() => callback(0,{Result:result}),mailboxFixtureDelay);
     window.mailboxFixtureRequest = (params,callback) => {
         if (!['search','prepare','action','undo'].includes(params.operation)) return false;
         mailboxFixtureCalls.push(structuredClone(params));

@@ -12,7 +12,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop, carrying the already-open message into the group before adding the clicked row; a long touch starts selection on mobile, with no visible checkboxes.
 - Flag, Trash and Reminder share a reserved row-action rail, with a real bin icon and no overlap
   over message text. The page checkbox remains available to clear selection; all-pages selection
-  appears beside it only after the current page is selected.
+  appears beside it only after the current page is selected. Trash removes staged rows from view
+  immediately, restores them on failure and offers Undo only after the server confirms the move.
 - Reply and Reply all compose inline at the bottom of an active Inbox conversation, with an
   Expand control that keeps the same draft and cursor in the full composer. Multi-correspondent
   messages put Reply all first in the reader and use it as the icon-labeled bottom action. Mark unread,
@@ -72,7 +73,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.10.3**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.4**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

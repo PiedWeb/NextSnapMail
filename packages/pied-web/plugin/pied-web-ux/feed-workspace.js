@@ -157,6 +157,8 @@
                 }
                 let node = nodes.get(id); if (!node) { node = makeRow(item); nodes.set(id,node); }
                 node.pwItem = item;
+                node.classList.remove('pw-trash-pending'); node.removeAttribute('aria-hidden');
+                if ('inert' in node) node.inert = false;
                 node.classList.toggle('pw-global-unread',options.unseen(item));
                 node.classList.toggle('pw-global-thread-unread',!options.unseen(item) && rank === 1);
                 node.classList.toggle('pw-global-draft',item._pwKind === 'draft');
@@ -231,7 +233,8 @@
         dom.querySelector('.inputSearch,input[type="search"]')?.addEventListener('search',event => { if (!event.target.value && searchState) search(''); });
         const execute = async (action,extra = {}) => {
             if (busy || loading || (!snapshot && !selected.size)) return;
-            const current = generation;
+            const current = generation, pending = action === 'trash'
+                ? api.mailbox.stageRows([...selected].map(id => nodes.get(id))) : null;
             busy = true; selectChanged();
             try {
                 const prepared = snapshot || await api.mailbox.prepare({items:JSON.stringify(items
@@ -239,7 +242,11 @@
                 const result = await api.mailbox.run(prepared,action,extra,(cursor,total) => { status.textContent = `${cursor} / ${total}`; });
                 if (current === generation) { resetSelection(); await refreshResults(); }
                 return {...result,...extra};
-            } catch (error) { if (current === generation) status.textContent = api.mailbox.reason(error); throw error; }
+            } catch (error) {
+                pending?.rollback();
+                if (current === generation) status.textContent = api.mailbox.reason(error);
+                throw error;
+            }
             finally { busy = false; selectChanged(); }
         };
         allResults.addEventListener('click',async () => {

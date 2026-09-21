@@ -5869,6 +5869,7 @@ html.pw-folder-dragging, html.pw-folder-dragging * { cursor:grabbing!important; 
 #rl-app .pw-mailbox-notice button { min-height:44px;min-width:44px;padding:8px;border:0!important;background:transparent;color:var(--nc-color-primary-element);font:inherit;cursor:pointer; }
 #rl-app .pw-mailbox-notice button:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:2px; }
 #rl-app .pw-mailbox-notice[data-state="error"] > span { color:var(--pw-danger); }
+#rl-app .pw-trash-pending { display:none!important; }
 @media(min-width:800px) and (pointer:fine) {
   #rl-app #V-MailMessageList .messageListItem.pw-has-row-actions { padding-inline-end:128px!important; }
   #rl-app #V-MailMessageList .messageListItem > .pw-row-actions .flagParent { width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important; }
