@@ -1,5 +1,24 @@
 # Releases
 
+## 1.10.5, 2026-09-21
+
+The remaining global-Feed mailbox actions now acknowledge input before the network round trip.
+Flag/Unflag updates its pressed state immediately, while bulk read/unread updates the selected
+rows without moving them until the authoritative refresh. A refused preparation or mutation
+restores the exact prior flags, conversation-unread metadata and selection. Busy row and bulk
+controls now have a consistent disabled cursor and opacity, and Undo exposes the same explicit
+busy state while restoration is pending.
+
+Choosing a reminder date now stages the affected global, quick-action or native selected rows out
+of view before the reversible move begins, with exact rollback if the reminder service refuses it.
+Global search keeps the previous result set visible, muted and inert while a new query is pending;
+on failure it explains that those retained rows are stale instead of replacing the workspace with
+an empty flash.
+
+The fictional browser transport holds successful and refused responses open. Workspace coverage is
+now 29 checks, reminder coverage 16 and native selection coverage 23, including optimistic state,
+rollback, stale-search isolation, explicit busy affordances and responsive reminder staging.
+
 ## 1.10.4, 2026-09-21
 
 Trash now removes native-list, account-Feed and global-Feed rows from view immediately instead of

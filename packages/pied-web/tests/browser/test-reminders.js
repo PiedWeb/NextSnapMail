@@ -4,7 +4,7 @@ await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=
 await p.waitForSelector('#V-MailMessageView .pw-message-actions');
 await p.evaluate(async()=>{
  document.querySelectorAll('dialog[open]').forEach(node=>{try{node.close();}catch{}node.hidden=true;});
- window.reminderCalls=[];window.reminderFailure='';window.reminderEntries=[];
+ window.reminderCalls=[];window.reminderFailure='';window.reminderEntries=[];window.reminderDelay=20;
  const previous=rl.pluginRemoteRequest;
  rl.pluginRemoteRequest=(callback,action,params,timeout)=>{
   if(action!=='PiedWebReminders')return previous(callback,action,params,timeout);
@@ -14,7 +14,7 @@ await p.evaluate(async()=>{
   else if(params.operation==='list')result={folder:'INBOX.Reminders',entries:reminderEntries};
   else if(params.operation==='wake')result={folder:'INBOX',count:String(params.uids).split(',').length};
   else result={folder:'INBOX.Reminders',count:String(params.uids).split(',').length,remindAt:params.remindAt};
-  setTimeout(()=>callback(0,{Result:result}),20);
+  setTimeout(()=>callback(0,{Result:result}),reminderDelay);
  };
  const current=readerVM.message();
  readerVM.message({...current,uid:1,folder:'INBOX',threads:()=>[11,12]});
@@ -72,7 +72,8 @@ check('Escape closes the picker and returns focus to its action',await p.evaluat
 await p.evaluate(()=>{window.reminderFailure='sender';document.querySelector('.pw-remind-message').click();});
 await p.locator('.pw-reminder-option').first().click();await p.waitForFunction(()=>document.querySelector('.pw-reminder-note')?.textContent.includes('service de rappel'));
 check('A stopped worker leaves the picker open with a specific explanation',await p.evaluate(() =>
- document.querySelector('.pw-reminder-panel')&&document.querySelector('.pw-reminder-note').textContent==='Le service de rappel n’est pas actif sur ce serveur.'));
+ document.querySelector('.pw-reminder-panel')&&document.querySelector('.pw-reminder-note').textContent==='Le service de rappel n’est pas actif sur ce serveur.'
+ &&!document.querySelector('.pw-row-pending')));
 await p.evaluate(()=>window.reminderFailure='');await p.locator('.pw-reminder-option').first().click();
 await p.waitForFunction(()=>!document.querySelector('.pw-reminder-panel')&&document.querySelector('.pw-reminder-toast')?.textContent);
 check('One future UTC instant schedules the root and thread messages',await p.evaluate(()=>{
@@ -91,11 +92,21 @@ await p.waitForSelector('.pw-selection-remind:not([hidden])');
 check('The selected-message bar exposes the same reminder action',await p.evaluate(()=>{
  const button=document.querySelector('.pw-selection-remind');return button.getAttribute('aria-label')==='Me le rappeler'&&button.querySelector('svg');
 }));
+await p.evaluate(()=>{reminderDelay=250;});
 await p.locator('.pw-selection-remind').click();await p.locator('.pw-reminder-option').last().click();
+check('Bulk reminder rows leave the native list as soon as a date is confirmed',await p.evaluate(() =>
+ document.querySelectorAll('.messageListItem.pw-row-pending').length===2
+ &&[...document.querySelectorAll('.messageListItem.pw-row-pending')].every(row=>getComputedStyle(row).display==='none')
+ &&document.querySelector('.pw-reminder-note')?.textContent==='Enregistrement…'));
 await p.waitForFunction(()=>demoMessages.every(message=>!message.checked()));
+await p.evaluate(()=>{reminderDelay=20;});
 check('Bulk reminders include conversation UIDs once and leave selection mode',await p.evaluate(()=>{
  const call=reminderCalls.filter(item=>item.operation==='set').at(-1);
  return call.uids==='1,101,102,2'&&document.querySelector('.pw-selection-bar').hidden&&actionCalls.includes('reload');
+}));
+// The static fixture has no authoritative MessageList response to replace moved rows.
+await p.evaluate(()=>document.querySelectorAll('.pw-row-pending').forEach(row=>{
+ row.classList.remove('pw-row-pending');row.removeAttribute('aria-hidden');row.inert=false;
 }));
 
 // Switch the fixture to the IMAP Reminders folder and expose its due metadata.

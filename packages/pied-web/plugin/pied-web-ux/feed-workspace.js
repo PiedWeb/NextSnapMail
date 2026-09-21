@@ -16,7 +16,7 @@
     const editable = node => node?.closest?.('input,textarea,select,[contenteditable]:not([contenteditable="false"]),[role="textbox"]');
     api.createFeedWorkspace = options => {
         const {vm,section,rows,status,refreshButton} = options, dom = vm.viewModelDom;
-        let items = [], accounts = [], loading = false, selected = new Set(), focused = '', anchor = '',
+        let items = [], accounts = [], loading = false, stale = false, selected = new Set(), focused = '', anchor = '',
             searchState = null, generation = 0, snapshot = null, busy = false, keyboardEntered = false;
         const nodes = new Map(), headings = new Map(), desktopActions = matchMedia('(min-width:800px)');
         let sharedRowActions = null, actionRow = null;
@@ -53,14 +53,15 @@
             const visible = currentItems(), n = snapshot ? Number(snapshot.count) : selected.size;
             all.checked = !!visible.length && visible.every(item => selected.has(key(item)));
             all.indeterminate = !!n && !all.checked;
-            all.disabled = busy || loading || !visible.length;
+            const blocked = busy || loading || stale;
+            all.disabled = blocked || !visible.length;
             all.setAttribute('aria-checked',all.indeterminate ? 'mixed' : String(all.checked));
             count.textContent = n ? t(`${n} message(s) sélectionné(s)`,`${n} message(s) selected`) : '';
             clear.hidden = !n; clear.disabled = busy; actions.hidden = !n;
-            actionButtons.forEach(button => button.disabled = busy || loading || !n);
+            actionButtons.forEach(button => button.disabled = blocked || !n);
             remind.hidden = snapshot ? !!snapshot.groups?.some(group => !/^inbox$/i.test(group.folder))
                 : visible.filter(item => selected.has(key(item))).some(item => !/^inbox$/i.test(item.folder));
-            allResults.hidden = busy || loading || !visible.length || !all.checked || !!snapshot;
+            allResults.hidden = blocked || !visible.length || !all.checked || !!snapshot;
             allResults.textContent = searchState
                 ? t(`Sélectionner les ${searchState.total} résultats`, `Select all ${searchState.total} results`)
                 : t('Sélectionner toutes les boîtes de réception…','Select all inboxes…');
@@ -70,6 +71,13 @@
             }
         };
         const resetSelection = () => { snapshot = null; selected.clear(); anchor = ''; selectChanged(); };
+        const setFlagged = (item,value) => {
+            const previous = Array.isArray(item.flags) ? item.flags.slice() : [];
+            const flags = previous.filter(flag => String(flag).toLowerCase() !== '\\flagged');
+            if (value) flags.push('\\Flagged');
+            item.flags = flags;
+            return () => { item.flags = previous; };
+        };
         all.addEventListener('change',() => {
             snapshot = null; selected = all.checked ? new Set(currentItems().map(key)) : new Set(); selectChanged();
         });
@@ -87,7 +95,8 @@
         const createRowActions = (node,allowReminder) => {
             const group = api.mailbox.rowActions(() => rowScope(node.pwItem),() => refreshResults(),{
                 reminder:allowReminder,
-                flagged:() => (node.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged')
+                flagged:() => (node.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged'),
+                setFlagged:value => setFlagged(node.pwItem,value)
             });
             group.setAttribute('role','gridcell'); return group;
         };
@@ -100,7 +109,8 @@
             if (!sharedRowActions) {
                 sharedRowActions = api.mailbox.rowActions(() => rowScope(actionRow.pwItem),() => refreshResults(),{
                     reminder:true,
-                    flagged:() => (actionRow.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged')
+                    flagged:() => (actionRow.pwItem.flags || []).some(flag => String(flag).toLowerCase() === '\\flagged'),
+                    setFlagged:value => setFlagged(actionRow.pwItem,value)
                 });
                 sharedRowActions.setAttribute('role','gridcell');
             }
@@ -118,7 +128,7 @@
             [main,subject,account,time].forEach(cell => cell.setAttribute('role','gridcell'));
             node.append(main,subject,account,time);
             node.addEventListener('click',event => {
-                if (loading || busy || event.target.closest('button')) return;
+                if (loading || stale || busy || event.target.closest('button')) return;
                 const current = node.pwItem, id = key(current); focused = id;
                 if (event.shiftKey) { snapshot = null; selectRange(id); selectChanged(); }
                 else if (event.ctrlKey || event.metaKey || selected.size) toggle(id);
@@ -129,7 +139,7 @@
             // Native list uses long touch to select; keep the same 550 ms contract.
             let hold, origin;
             node.addEventListener('pointerdown',event => {
-                if (busy || loading || event.pointerType !== 'touch' || event.target.closest('button')) return;
+                if (busy || loading || stale || event.pointerType !== 'touch' || event.target.closest('button')) return;
                 origin = {x:event.clientX,y:event.clientY};
                 hold = setTimeout(() => { toggle(key(node.pwItem)); node.pwSuppressClick = true; },550);
             });
@@ -157,7 +167,7 @@
                 }
                 let node = nodes.get(id); if (!node) { node = makeRow(item); nodes.set(id,node); }
                 node.pwItem = item;
-                node.classList.remove('pw-trash-pending'); node.removeAttribute('aria-hidden');
+                node.classList.remove('pw-row-pending'); node.removeAttribute('aria-hidden');
                 if ('inert' in node) node.inert = false;
                 node.classList.toggle('pw-global-unread',options.unseen(item));
                 node.classList.toggle('pw-global-thread-unread',!options.unseen(item) && rank === 1);
@@ -172,8 +182,10 @@
             for (const [rank,heading] of headings) if (!activeHeadings.has(rank)) heading.remove();
             rows.setAttribute('role','grid'); rows.setAttribute('aria-multiselectable','true'); rows.setAttribute('aria-label',t('Messages','Messages'));
             rows.setAttribute('aria-busy',String(loading));
+            rows.classList.toggle('pw-results-stale',stale); rows.setAttribute('aria-disabled',String(stale));
+            if ('inert' in rows) rows.inert = stale;
             const failed = accounts.filter(account => account.error).length;
-            status.textContent = loading ? t('Chargement…','Loading…') : failed
+            status.textContent = loading ? (stale ? t('Actualisation des résultats…','Refreshing results…') : t('Chargement…','Loading…')) : failed
                 ? t(`${failed} compte(s) indisponible(s). Résultats partiels.`,`${failed} account(s) unavailable. Partial results.`)
                 : searchState ? t(`${searchState.total} résultat(s). Corbeille et Indésirables exclus.`,`${searchState.total} result(s). Trash and Junk excluded.`)
                 : !items.length ? t('Aucun message à afficher.','No messages to show.') : '';
@@ -196,22 +208,24 @@
         };
         const search = async (query,offset = 0,reuse = false) => {
             query = String(query).trim();
-            if (!query) { searchState = null; loading = false; ++generation; resetSelection(); options.render(true); return; }
+            if (!query) { searchState = null; loading = stale = false; ++generation; resetSelection(); options.render(true); return; }
             const current = ++generation, previousState = searchState;
             searchState = {query,offset,limit:50,total:previousState?.total || 0,token:reuse ? previousState?.token : ''};
             const params = {operation:'search',search:query,scope:searchScope.value === 'folder' ? 'folder' : 'all',folder:options.folder(),offset,limit:50};
             if (searchScope.value !== 'global') params.accountHashes = JSON.stringify([options.accountHash()]);
             if (reuse && searchState.token) params.searchToken = searchState.token;
-            loading = true; items = []; resetSelection(); options.render(); paint();
+            loading = true; stale = !!items.length; resetSelection(); options.render(); paint();
             try {
                 const result = await api.mailbox.request(params);
                 if (current !== generation) return;
                 if (!Array.isArray(result.items)) throw new Error('mail');
                 searchState = {...searchState,total:Number(result.total),token:result.searchToken,limit:Number(result.limit || 50),offset:Number(result.offset || 0)};
-                items = result.items; accounts = result.accounts || []; loading = false; paint();
+                items = result.items; accounts = result.accounts || []; loading = stale = false; paint();
             } catch (error) {
                 if (current !== generation) return;
-                loading = false; items = []; searchState.total = 0; searchState.token = ''; paint(); status.textContent = api.mailbox.reason(error);
+                loading = false; stale = !!items.length; searchState.token = ''; paint();
+                status.textContent = api.mailbox.reason(error) + (stale
+                    ? t(' Les résultats précédents restent affichés sans être interactifs.',' Previous results remain visible but inactive.') : '');
             }
         };
         previous.addEventListener('click',() => search(searchState.query,Math.max(0,searchState.offset-searchState.limit),true));
@@ -232,9 +246,31 @@
         },true);
         dom.querySelector('.inputSearch,input[type="search"]')?.addEventListener('search',event => { if (!event.target.value && searchState) search(''); });
         const execute = async (action,extra = {}) => {
-            if (busy || loading || (!snapshot && !selected.size)) return;
-            const current = generation, pending = action === 'trash'
-                ? api.mailbox.stageRows([...selected].map(id => nodes.get(id))) : null;
+            if (busy || loading || stale || (!snapshot && !selected.size)) return;
+            const current = generation, targets = items.filter(item => selected.has(key(item)));
+            const pending = ['trash','remind'].includes(action)
+                ? api.mailbox.stageRows(targets.map(item => nodes.get(key(item)))) : null;
+            let rowState = null;
+            if (['read','unread'].includes(action)) {
+                const read = action === 'read';
+                const previous = targets.map(item => ({item,flags:Array.isArray(item.flags) ? item.flags.slice() : [],
+                    threadUnseen:Array.isArray(item.threadUnseen) ? item.threadUnseen.slice() : item.threadUnseen}));
+                targets.forEach(item => {
+                    const flags = (Array.isArray(item.flags) ? item.flags : []).filter(flag => String(flag).toLowerCase() !== '\\seen');
+                    if (read) flags.push('\\Seen');
+                    item.flags = flags;
+                    if (read && Array.isArray(item.threadUnseen)) item.threadUnseen = [];
+                    const node = nodes.get(key(item));
+                    node?.classList.toggle('pw-global-unread',options.unseen(item));
+                    node?.classList.toggle('pw-global-thread-unread',!options.unseen(item) && options.rank(item) === 1);
+                });
+                rowState = {rollback:() => previous.forEach(({item,flags,threadUnseen}) => {
+                    item.flags = flags; item.threadUnseen = threadUnseen;
+                    const node = nodes.get(key(item));
+                    node?.classList.toggle('pw-global-unread',options.unseen(item));
+                    node?.classList.toggle('pw-global-thread-unread',!options.unseen(item) && options.rank(item) === 1);
+                })};
+            }
             busy = true; selectChanged();
             try {
                 const prepared = snapshot || await api.mailbox.prepare({items:JSON.stringify(items
@@ -243,14 +279,14 @@
                 if (current === generation) { resetSelection(); await refreshResults(); }
                 return {...result,...extra};
             } catch (error) {
-                pending?.rollback();
+                pending?.rollback(); rowState?.rollback();
                 if (current === generation) status.textContent = api.mailbox.reason(error);
                 throw error;
             }
             finally { busy = false; selectChanged(); }
         };
         allResults.addEventListener('click',async () => {
-            if (busy || loading) return;
+            if (busy || loading || stale) return;
             const current = generation;
             busy = true; selectChanged();
             try {
@@ -287,7 +323,7 @@
                 event.preventDefault(); event.stopImmediatePropagation();
                 status.textContent = t('Ouvrez un message pour utiliser cette action.','Open a message to use this action.'); return;
             }
-            if ((busy || loading) && ['Delete','Enter','ArrowRight',' ','q','u'].includes(event.key)) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+            if ((busy || loading || stale) && ['Delete','Enter','ArrowRight',' ','q','u'].includes(event.key)) { event.preventDefault(); event.stopImmediatePropagation(); return; }
             if (modifier && lower === 'r') void refreshResults();
             else if (event.key === 'ArrowDown') target = ids[Math.min(ids.length-1,index+1)];
             else if (event.key === 'ArrowUp') target = ids[Math.max(0,index-1)];
@@ -319,14 +355,14 @@
             if (mailUi.onSearch === onSearch) mailUi.onSearch = priorSearch;
         });
         const active = () => document.documentElement.classList.contains('pw-theme');
-        return {isSearch:() => !!searchState,reset:() => { searchState = null; loading = false; ++generation; resetSelection(); },updateScope,
+        return {isSearch:() => !!searchState,reset:() => { searchState = null; loading = stale = false; ++generation; resetSelection(); },updateScope,
             refresh:refreshResults,search,restore:async state => {
                 searchScope.value = state.scope || 'global';
                 if (state.search) await search(state.search,Number(state.offset || 0));
                 if (state.key && nodes.has(state.key)) focus(state.key);
                 if (section.parentElement) section.parentElement.scrollTop = Number(state.scroll || 0);
             },
-            paint:(newItems,newAccounts,isLoading) => { if (searchState) return; items = newItems; accounts = newAccounts; loading = isLoading; paint(); },
+            paint:(newItems,newAccounts,isLoading) => { if (searchState) return; items = newItems; accounts = newAccounts; loading = isLoading; stale = false; paint(); },
             state:() => ({selected:selected.size,focused,search:!!searchState,total:searchState?.total || items.length})};
     };
 })();

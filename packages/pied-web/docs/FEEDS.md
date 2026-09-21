@@ -52,13 +52,17 @@ they are the explicit active scope. The first response freezes exact message ide
 short-lived opaque token; later pages and **Select all results** reuse that snapshot. Page selection
 states the current page scope. The all-pages choice appears only after that page is selected and
 stays grouped with its deselectable checkbox; all-results selection states the exact total and every
-included account/folder. The server rejects expired, changed or oversized snapshots.
+included account/folder. While a query is pending, previous results remain visible but muted and
+inert. If the query fails, they stay explicitly stale and non-interactive until a retry or exit.
+The server rejects expired, changed or oversized snapshots.
 
 Flag/Unflag, Delete and Remind share one reserved row-action rail and operate on those exact
 identities. Delete requires each
 account's configured Trash and exposes Undo only after the mail server confirms the destination
 UID mapping. Undo therefore restores the original folder and read state rather than replaying
-stale source UIDs. Uncertain or partial results are reported and are never retried blindly.
+stale source UIDs. Flag and bulk read/unread paint their intended state immediately, and reminder
+rows leave the visible list only after a date is confirmed. Every optimistic state rolls back on
+refusal; uncertain or partial results are reported and are never retried blindly.
 
 Each account can be excluded from All my accounts under General settings. One unavailable mailbox
 is reported without hiding rows fetched from the others. The endpoint returns message-list header
@@ -83,6 +87,10 @@ account is active.
   cursor. Only a completed Trash move may mint an Undo token.
 - Trash may stage affected rows out of view immediately, but a failed preparation or move must
   restore them. The staged visual state must never be presented as confirmed success or expose Undo.
+- Reminder staging begins only after a valid date is chosen. Flag/read staging changes local header
+  state only; it must preserve the exact identity snapshot and restore prior flags on refusal.
+- Rows retained from an older search are inert and labelled by status as previous results. They must
+  never open, select or mutate under the scope of a newer failed query.
 - Leaving the Pied Web theme hides all Feed-only interface.
 
 `tests/feed.php` covers settings scopes, defaults, account isolation, UID collisions, Drafts,

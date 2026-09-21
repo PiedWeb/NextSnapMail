@@ -17,6 +17,7 @@
 #rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:36px;padding:6px 10px;border:0!important;border-radius:var(--pw-radius-md);background:transparent;color:var(--nc-color-primary-element);font:var(--pw-weight-medium) var(--pw-text-xs)/1.4 var(--pw-font);cursor:pointer; }
 #rl-app .pw-global-selection [hidden],#rl-app .pw-global-pager[hidden],#rl-app .pw-feed-return[hidden] { display:none!important; }
 #rl-app .pw-global-selection button:focus-visible,#rl-app .pw-global-pager button:focus-visible,#rl-app .pw-feed-return:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:-2px; }
+#rl-app .pw-global-selection button:disabled,#rl-app .pw-global-pager button:disabled { cursor:progress;opacity:.55; }
 #rl-app .pw-global-pager { display:flex;align-items:center;justify-content:center;gap:12px;padding:12px; }
 #rl-app #V-MailMessageList .pw-global-row { position:relative; }
 #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions { grid-area:actions;align-self:center;justify-self:end;opacity:0;pointer-events:none; }
@@ -120,6 +121,9 @@
   cursor:pointer;
 }
 #rl-app #V-MailMessageList .pw-global-row:hover { background:var(--pw-grey-100); }
+#rl-app #V-MailMessageList .pw-global-rows { transition:opacity 180ms cubic-bezier(.22,1,.36,1); }
+#rl-app #V-MailMessageList .pw-global-rows.pw-results-stale { opacity:.58;pointer-events:none; }
+#rl-app #V-MailMessageList .pw-global-rows.pw-results-stale .pw-global-row { cursor:progress; }
 #rl-app #V-MailMessageList .pw-global-primary {
   grid-area:primary;
   min-width:0;
@@ -206,4 +210,7 @@
 @media(pointer:coarse) {
   #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions { opacity:1;pointer-events:auto;justify-content:flex-end;background:transparent;box-shadow:none; }
   #rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:44px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  #rl-app #V-MailMessageList .pw-global-rows { transition:none; }
 }

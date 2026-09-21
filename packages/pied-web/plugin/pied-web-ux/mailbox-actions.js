@@ -1,4 +1,4 @@
-/* Account-safe mailbox operations. Immediate visual removal, confirmed success, no blind retries. */
+/* Account-safe mailbox operations. Immediate reversible feedback, confirmed success, no blind retries. */
 (() => {
     'use strict';
     const api = window.PiedWebUx = window.PiedWebUx || {};
@@ -25,16 +25,16 @@
     })[error?.message] || t('Opération interrompue. Vérifiez la liste avant de recommencer.','Operation interrupted. Check the list before trying again.');
     const stageRows = rows => {
         const focus = document.activeElement, staged = [...new Set(rows)].filter(row => row instanceof Element
-            && row.isConnected && !row.classList.contains('pw-trash-pending')).map(row => ({
+            && row.isConnected && !row.classList.contains('pw-row-pending')).map(row => ({
                 row, ariaHidden:row.getAttribute('aria-hidden'), inert:'inert' in row ? row.inert : undefined
             }));
         staged.forEach(({row}) => {
-            row.classList.add('pw-trash-pending'); row.setAttribute('aria-hidden','true');
+            row.classList.add('pw-row-pending'); row.setAttribute('aria-hidden','true');
             if ('inert' in row) row.inert = true;
         });
         return {rollback:() => {
             staged.forEach(({row,ariaHidden,inert}) => {
-                row.classList.remove('pw-trash-pending');
+                row.classList.remove('pw-row-pending');
                 ariaHidden == null ? row.removeAttribute('aria-hidden') : row.setAttribute('aria-hidden',ariaHidden);
                 if (inert !== undefined) row.inert = inert;
             });
@@ -61,6 +61,7 @@
         undoButton.addEventListener('click',async () => {
             if (busy || running || !undoTokens.length) return;
             busy = true; undoButton.disabled = closeButton.disabled = true; clearTimeout(timer);
+            notice.dataset.state = 'busy'; notice.setAttribute('aria-busy','true');
             const tokens = undoTokens.splice(0); let restored = 0;
             try {
                 for (const undoToken of tokens) {
@@ -76,7 +77,10 @@
                 }
                 show(t(`${restored} message(s) restauré(s).`,`${restored} message(s) restored.`));
             } catch (error) { show(reason(error),[],true); }
-            finally { busy = false; undoButton.disabled = closeButton.disabled = false; changed(); }
+            finally {
+                busy = false; notice.removeAttribute('aria-busy');
+                undoButton.disabled = closeButton.disabled = false; changed();
+            }
         });
     };
     const show = (text,tokens = [],failed = false) => {
@@ -163,10 +167,11 @@
             };
             flag.addEventListener('click',async event => {
                 event.preventDefault(); event.stopPropagation(); if (!active() || flag.disabled) return;
-                flag.disabled = true;
-                try { await perform(scope(),options.flagged() ? 'unflag' : 'flag'); onDone?.(); }
-                catch (error) { reportError(error); }
-                finally { flag.disabled = false; sync(); }
+                const params = scope(), wasSet = !!options.flagged(), rollback = options.setFlagged?.(!wasSet);
+                flag.disabled = true; flag.setAttribute('aria-busy','true'); sync();
+                try { await perform(params,wasSet ? 'unflag' : 'flag'); onDone?.(); }
+                catch (error) { rollback?.(); reportError(error); }
+                finally { flag.disabled = false; flag.removeAttribute('aria-busy'); sync(); }
             });
             group.append(flag); group.pwSync = sync; sync();
         }
@@ -189,10 +194,13 @@
                 if (!active() || busy || running) return;
                 // A refresh or account change may recycle the row while the
                 // picker is open. Capture the exact target before asking when.
-                const params = scope();
+                const params = scope(), row = remind.closest('.messageListItem,.pw-global-row');
                 api.reminders?.choose?.(remind,async date => {
-                    const result = await perform(params,'remind',{remindAt:date.toISOString()}); onDone?.();
-                    return {...result,remindAt:date.toISOString()};
+                    const pending = stageRows([row]); let confirmed = false;
+                    try {
+                        const result = await perform(params,'remind',{remindAt:date.toISOString()});
+                        confirmed = true; onDone?.(); return {...result,remindAt:date.toISOString()};
+                    } finally { if (!confirmed) pending.rollback(); }
                 });
             });
             group.append(remind);

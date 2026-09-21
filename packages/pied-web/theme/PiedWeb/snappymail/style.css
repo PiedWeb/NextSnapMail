@@ -5590,6 +5590,7 @@ html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
 #rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:36px;padding:6px 10px;border:0!important;border-radius:var(--pw-radius-md);background:transparent;color:var(--nc-color-primary-element);font:var(--pw-weight-medium) var(--pw-text-xs)/1.4 var(--pw-font);cursor:pointer; }
 #rl-app .pw-global-selection [hidden],#rl-app .pw-global-pager[hidden],#rl-app .pw-feed-return[hidden] { display:none!important; }
 #rl-app .pw-global-selection button:focus-visible,#rl-app .pw-global-pager button:focus-visible,#rl-app .pw-feed-return:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:-2px; }
+#rl-app .pw-global-selection button:disabled,#rl-app .pw-global-pager button:disabled { cursor:progress;opacity:.55; }
 #rl-app .pw-global-pager { display:flex;align-items:center;justify-content:center;gap:12px;padding:12px; }
 #rl-app #V-MailMessageList .pw-global-row { position:relative; }
 #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions { grid-area:actions;align-self:center;justify-self:end;opacity:0;pointer-events:none; }
@@ -5693,6 +5694,9 @@ html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
   cursor:pointer;
 }
 #rl-app #V-MailMessageList .pw-global-row:hover { background:var(--pw-grey-100); }
+#rl-app #V-MailMessageList .pw-global-rows { transition:opacity 180ms cubic-bezier(.22,1,.36,1); }
+#rl-app #V-MailMessageList .pw-global-rows.pw-results-stale { opacity:.58;pointer-events:none; }
+#rl-app #V-MailMessageList .pw-global-rows.pw-results-stale .pw-global-row { cursor:progress; }
 #rl-app #V-MailMessageList .pw-global-primary {
   grid-area:primary;
   min-width:0;
@@ -5780,6 +5784,9 @@ html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
   #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions { opacity:1;pointer-events:auto;justify-content:flex-end;background:transparent;box-shadow:none; }
   #rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:44px; }
 }
+@media(prefers-reduced-motion:reduce) {
+  #rl-app #V-MailMessageList .pw-global-rows { transition:none; }
+}
 
 /* Compact navigation mirrors native folder links without moving Knockout-owned nodes. */
 #rl-app {
@@ -5861,15 +5868,17 @@ html.pw-folder-dragging, html.pw-folder-dragging * { cursor:grabbing!important; 
 #rl-app .pw-row-action.pw-flag-action[data-flagged="true"] { color:var(--pw-flag-ink);background:var(--pw-flag-tint); }
 #rl-app .pw-row-action.pw-flag-action[data-flagged="true"]::before { mask-image:var(--pw-star-filled-icon); }
 #rl-app .pw-row-action[hidden] { display:none!important; }
-#rl-app .pw-row-action:hover { background:var(--pw-selected);color:var(--nc-color-primary-element); }
+#rl-app .pw-row-action:not(:disabled):hover { background:var(--pw-selected);color:var(--nc-color-primary-element); }
+#rl-app .pw-row-action:disabled { cursor:progress;opacity:.55;background:var(--pw-grey-100); }
 #rl-app .pw-row-action:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:-2px; }
 #rl-app .pw-mailbox-notice { position:fixed;inset-inline:16px;bottom:16px;z-index:3500;display:flex;align-items:center;gap:12px;max-width:680px;margin:auto;padding:12px 16px;background:var(--pw-paper);color:var(--nc-color-main-text);box-shadow:var(--pw-elevation-3);border:1px solid var(--pw-line);border-radius:var(--pw-radius-md);font:var(--pw-weight-regular) var(--pw-text-sm)/1.4 var(--pw-font); }
 #rl-app .pw-mailbox-notice[hidden],#rl-app .pw-mailbox-notice button[hidden] { display:none!important; }
 #rl-app .pw-mailbox-notice > span { flex:1; }
 #rl-app .pw-mailbox-notice button { min-height:44px;min-width:44px;padding:8px;border:0!important;background:transparent;color:var(--nc-color-primary-element);font:inherit;cursor:pointer; }
+#rl-app .pw-mailbox-notice button:disabled { cursor:progress;opacity:.55; }
 #rl-app .pw-mailbox-notice button:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:2px; }
 #rl-app .pw-mailbox-notice[data-state="error"] > span { color:var(--pw-danger); }
-#rl-app .pw-trash-pending { display:none!important; }
+#rl-app .pw-row-pending { display:none!important; }
 @media(min-width:800px) and (pointer:fine) {
   #rl-app #V-MailMessageList .messageListItem.pw-has-row-actions { padding-inline-end:128px!important; }
   #rl-app #V-MailMessageList .messageListItem > .pw-row-actions .flagParent { width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important; }

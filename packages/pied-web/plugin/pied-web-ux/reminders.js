@@ -46,6 +46,22 @@
         if (Array.isArray(threads)) threads.forEach(value => { value = Number(value); if (value > 0) values.add(value); });
         return [...values];
     };
+    const messageKey = message => `${String(message?.folder || '')}\x1f${Number(message?.uid || 0)}`;
+    const messageRows = (dom,messages) => {
+        const objects = new Set(messages), keys = new Set(messages.map(messageKey));
+        return [...(dom?.querySelectorAll?.('.messageListItem') || [])].filter(row => {
+            const message = typeof ko === 'undefined' ? null : ko.dataFor(row);
+            return objects.has(message) || keys.has(messageKey(message));
+        });
+    };
+    const movingSubmit = (dom,messages,uids,mode) => mode !== 'set' ? null : async date => {
+        const pending = api.mailbox?.stageRows?.(messageRows(dom,messages)) || {rollback(){}};
+        let confirmed = false;
+        try {
+            const result = await hook({operation:mode,uids:uids.join(','),remindAt:date.toISOString()});
+            confirmed = true; return result;
+        } finally { if (!confirmed) pending.rollback(); }
+    };
 
     function load(force) {
         const current = account();
@@ -213,7 +229,7 @@
                 dom.querySelector('.pw-selection-finish')?.click();
                 vm.reload?.();
                 if (mode === 'reschedule') load(true).then(() => paint(dom));
-            });
+            },movingSubmit(dom,messages,uids,mode));
         });
         let frame = 0;
         const schedule = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; refresh(); update(); }); };
@@ -262,7 +278,7 @@
             picker(button,uids,mode,() => {
                 listVM?.reload?.();
                 if (mode === 'reschedule') load(true).then(update);
-            });
+            },movingSubmit(listVM?.viewModelDom,[message],uids,mode));
         });
         wake.addEventListener('click', async () => {
             const uids = messageUids(vm.message?.());

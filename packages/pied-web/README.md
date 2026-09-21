@@ -12,8 +12,10 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - Mobile account identity, usable account menus, consistent icons and message actions. Ctrl+click enters multi-selection on desktop, carrying the already-open message into the group before adding the clicked row; a long touch starts selection on mobile, with no visible checkboxes.
 - Flag, Trash and Reminder share a reserved row-action rail, with a real bin icon and no overlap
   over message text. The page checkbox remains available to clear selection; all-pages selection
-  appears beside it only after the current page is selected. Trash removes staged rows from view
-  immediately, restores them on failure and offers Undo only after the server confirms the move.
+  appears beside it only after the current page is selected. Flag and bulk read state change
+  immediately and roll back on refusal; Trash and confirmed reminders stage moving rows out of
+  view. Disabled controls visibly remain busy, and Undo appears only after the server confirms a
+  reversible move.
 - Reply and Reply all compose inline at the bottom of an active Inbox conversation, with an
   Expand control that keeps the same draft and cursor in the full composer. Multi-correspondent
   messages put Reply all first in the reader and use it as the icon-labeled bottom action. Mark unread,
@@ -48,6 +50,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
   Choosing an account always opens its own Feed.
 - One server-side search spans authorized accounts and eligible folders from the native search
   field; its frozen result token supports stable pagination and selecting every matching page.
+  A pending or refused search keeps the previous rows visible, muted and non-interactive instead
+  of flashing an empty list.
 - Durable per-account last-view and compact-density preferences, visible active scope, consistent
   keyboard navigation and quick Delete/Remind actions with Undo after confirmed Trash moves.
 - Account selection lives in the opaque NextSnapMail URL, so separate browser tabs retain
@@ -73,7 +77,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.10.4**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.5**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

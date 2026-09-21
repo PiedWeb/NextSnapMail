@@ -748,6 +748,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 #rl-app #V-MailMessageList .pw-selection-remind[hidden] { display:none; }
 #rl-app #V-MailMessageList .pw-selection-remind svg { width:20px; height:20px; }
 #rl-app #V-MailMessageList .pw-selection-remind:is(:hover,[aria-expanded="true"]) { background:var(--pw-primary-100); }
+#rl-app #V-MailMessageList .pw-selection-remind:disabled { opacity:.55; cursor:progress; }
 #rl-app #V-MailMessageList .pw-selection-remind:focus-visible {
     outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
 }
@@ -794,7 +795,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
     color:var(--nc-color-primary-element-text,#fff); font-weight:var(--pw-weight-medium);
 }
 #rl-app .pw-reminder-confirm:is(:hover,:focus-visible) { background:var(--pw-primary-600,var(--nc-color-primary-element-hover)); }
-#rl-app .pw-reminder-panel button:disabled, #rl-app .pw-reminder-panel input:disabled { opacity:.65; cursor:default; }
+#rl-app .pw-reminder-panel button:disabled, #rl-app .pw-reminder-panel input:disabled { opacity:.65; cursor:progress; }
 #rl-app .pw-reminder-panel :is(button,input):focus-visible {
     outline:2px solid var(--pw-primary-500,currentColor); outline-offset:-2px;
 }

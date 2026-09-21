@@ -166,6 +166,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   but this is only reversible visual staging: never announce success or expose Undo before the
   confirmed IMAP move. A preparation or mutation failure must restore the exact rows, accessibility
   state and prior keyboard focus. An authoritative refresh owns the final list.
+  Since 1.10.5, global Flag and bulk read/unread paint the intended state before preparation and
+  restore their exact flags on refusal. A confirmed reminder choice stages moving rows using the
+  same reversible primitive. A pending or refused global search keeps prior rows visible but inert;
+  never let stale results remain actionable under a different query.
 - The Undo Send window floats after closing compose, while mailbox use continues.
   It delays browser submission; there is no recall after delivery.
   Since 1.7.53 the window is three seconds, held in one place as
@@ -276,6 +280,8 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 | Version | Main change |
 | --- | --- |
+| 1.10.5 | Make global Flag and read state optimistic with rollback, stage reminders, preserve inert stale search results and standardize busy controls. |
+| 1.10.4 | Stage Trash rows out of view immediately and restore their accessibility and focus state after refusal. |
 | 1.10.2 | Reuse one desktop Feed quick-action group on the hovered/focused row instead of rendering hidden controls for every result. |
 | 1.10.1 | Expand Feed thread actions, bind native mutations to the rendered UIDVALIDITY and remove redundant forced IMAP mailbox selections. |
 | 1.10.0 | Turn All accounts into a keyboard-complete, server-searched workspace with scoped multi-page selection, reversible Trash, compact mode and stable conversation excerpts. |

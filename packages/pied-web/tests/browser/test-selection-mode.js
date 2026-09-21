@@ -48,11 +48,11 @@ await p.evaluate(()=>demoRows[0].querySelector('.subjectParent').dispatchEvent(n
 await p.locator('.messageListItem .subjectParent').nth(1).click();
 await p.evaluate(()=>{mailboxFixtureFailure='changed';mailboxFixtureDelay=250;listVM.deleteCommand();});
 check('Grouped Trash hides every selected native row before its preparation returns',await p.evaluate(() =>
- document.querySelectorAll('.messageListItem.pw-trash-pending').length===2
- &&[...document.querySelectorAll('.messageListItem.pw-trash-pending')].every(row=>getComputedStyle(row).display==='none')));
+ document.querySelectorAll('.messageListItem.pw-row-pending').length===2
+ &&[...document.querySelectorAll('.messageListItem.pw-row-pending')].every(row=>getComputedStyle(row).display==='none')));
 await p.waitForFunction(()=>document.querySelector('.pw-mailbox-notice')?.dataset.state==='error');
 check('A failed grouped Trash restores the native rows and their exact selection',await p.evaluate(() =>
- !document.querySelector('.messageListItem.pw-trash-pending')&&demoMessages[0].checked()&&demoMessages[1].checked()));
+ !document.querySelector('.messageListItem.pw-row-pending')&&demoMessages[0].checked()&&demoMessages[1].checked()));
 await p.evaluate(()=>{mailboxFixtureFailure='';mailboxFixtureDelay=20;mailboxFixtureCalls.length=0;});
 await p.evaluate(()=>listVM.deleteCommand());
 await p.waitForFunction(()=>mailboxFixtureCalls.some(request=>request.operation==='action'));
@@ -62,8 +62,8 @@ check('The reversible grouped action receives exactly the selected messages',awa
  return prepared?.folder==='INBOX'&&prepared.uids==='[1,2]'&&prepared.uidValidity===77&&action?.action==='trash';
 }));
 // The static fixture has no authoritative MessageList response to replace moved rows.
-await p.evaluate(()=>document.querySelectorAll('.pw-trash-pending').forEach(row=>{
- row.classList.remove('pw-trash-pending');row.removeAttribute('aria-hidden');row.inert=false;
+await p.evaluate(()=>document.querySelectorAll('.pw-row-pending').forEach(row=>{
+ row.classList.remove('pw-row-pending');row.removeAttribute('aria-hidden');row.inert=false;
 }));
 await p.evaluate(()=>document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true})));
 check('Escape leaves selection mode',await p.evaluate(()=>demoMessages.every(m=>!m.checked())&&document.querySelector('.pw-selection-bar').hidden));

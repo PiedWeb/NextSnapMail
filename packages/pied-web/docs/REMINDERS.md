@@ -5,6 +5,9 @@
 **Me le rappeler** is available on an open Inbox message and in the existing selected-message
 bar. It offers this evening when still useful, tomorrow morning, one week and a free local date.
 A conversation action includes the root and every native thread UID once.
+Once a valid date is chosen, affected visible rows leave the list immediately while the confirmed
+move runs. A refused operation restores those rows, their selection and focus; merely opening the
+date picker never changes the list.
 
 The operation marks each message read and moves it to a visible `Reminders` folder next to the
 account's configured Drafts folder. The folder shows the due date on each row. Its reader can
@@ -51,6 +54,6 @@ message flags; there is no reminder table or content file to migrate.
 - `tests/reminders.php` drives the authenticated endpoint against mocked IMAP with native
   MailSo flags and sequence sets.
 - `integrations/scheduler/tests/reminders.php` drives due, future, dry-run and failed-wake paths.
-- `tests/browser/test-reminders.js` covers reader and bulk actions, thread UIDs, failure copy,
-  dates, keyboard focus, the folder badges, immediate return and 390 px geometry with fictional
-  messages and mocked transport.
+- `tests/browser/test-reminders.js` covers reader and bulk actions, immediate row staging and
+  rollback, thread UIDs, failure copy, dates, keyboard focus, the folder badges, immediate return
+  and 390 px geometry with fictional messages and mocked transport.
