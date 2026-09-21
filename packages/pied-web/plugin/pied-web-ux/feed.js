@@ -17,13 +17,40 @@
     const getDurable = key => { try { return localStorage.getItem(key); } catch { return null; } };
     const setDurable = (key,next) => { try { localStorage.setItem(key,next); } catch {} };
     const validMode = candidate => ['feed', 'global', 'inbox'].includes(candidate) ? candidate : '';
+    const decode = candidate => {
+        let encoded = String(candidate || '').replace(/-/g, '+').replace(/_/g, '/');
+        encoded += '='.repeat((4 - encoded.length % 4) % 4);
+        const binary = atob(encoded), bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
+        return JSON.parse(new TextDecoder().decode(bytes));
+    };
+    const encode = candidate => {
+        const bytes = new TextEncoder().encode(JSON.stringify(candidate));
+        let binary = '';
+        bytes.forEach(byte => { binary += String.fromCharCode(byte); });
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    };
+    const folderHash = folder => String(folder || '').replace(/[^a-z0-9._-]+/giu, match => encode(match));
+    const folderSettings = {
+        sent:'SentFolder', drafts:'DraftsFolder', junk:'JunkFolder', trash:'TrashFolder', archive:'ArchiveFolder'
+    };
+
+    let switchIntent = null;
+    try { switchIntent = JSON.parse(getSession(accountSwitchKey) || 'null'); } catch {}
+    setSession(accountSwitchKey,null);
+    const accountSwitch = !!switchIntent?.email
+        && String(switchIntent.email) === String(window.rl?.settings?.get?.('Email') || '');
+    if (accountSwitch && switchIntent.folder) {
+        const setting = folderSettings[String(switchIntent.role || '')];
+        const targetFolder = switchIntent.role === 'inbox' ? 'INBOX'
+            : setting ? String(window.rl?.settings?.get?.(setting) || 'INBOX')
+            : String(switchIntent.folder);
+        const url = new URL(location.href);
+        url.hash = '#/mailbox/' + folderHash(targetFolder);
+        history.replaceState(history.state, '', url.href);
+    }
 
     const explicitMessage = /\/m\d+(?:\/|$)/.test(location.hash);
-    let switchedTo = '';
-    try { switchedTo = String(JSON.parse(getSession(accountSwitchKey) || 'null')?.email || ''); } catch {}
-    setSession(accountSwitchKey,null);
-    const accountSwitch = !!switchedTo && switchedTo === String(window.rl?.settings?.get?.('Email') || '');
-    let mode = explicitMessage ? 'inbox' : accountSwitch ? 'feed'
+    let mode = explicitMessage ? 'inbox' : accountSwitch ? (validMode(switchIntent.mode) || 'feed')
         : (validMode(getSession(stateKey())) || validMode(getDurable(stateKey())) || 'feed');
     let settings = {defaultView:'auto', showDrafts:true, showRead:true, includeGlobal:true, accountCount:1,compact:false};
     let settingsReady = false, settingsLoading = false, settingsGeneration = 0;
@@ -40,18 +67,6 @@
         detail:{mode, showDrafts:settings.showDrafts, showRead:settings.showRead, accountCount}
     }));
 
-    const decode = candidate => {
-        let encoded = String(candidate || '').replace(/-/g, '+').replace(/_/g, '/');
-        encoded += '='.repeat((4 - encoded.length % 4) % 4);
-        const binary = atob(encoded), bytes = Uint8Array.from(binary, character => character.charCodeAt(0));
-        return JSON.parse(new TextDecoder().decode(bytes));
-    };
-    const encode = candidate => {
-        const bytes = new TextEncoder().encode(JSON.stringify(candidate));
-        let binary = '';
-        bytes.forEach(byte => { binary += String.fromCharCode(byte); });
-        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-    };
     const markPath = (action, path) => {
         if (action !== 'MessageList' || !path) return path;
         const separator = path.lastIndexOf('/');
@@ -574,9 +589,9 @@
         refreshGlobal: () => renderGlobal(true)
     };
 
-    // A deliberate account-menu choice always opens that account's Feed. The
-    // global Feed remains its own explicit menu destination and never leaks as
-    // a remembered per-account mode.
+    // A deliberate account-menu choice keeps the current mailbox context. A
+    // system folder is resolved from the target account's own settings, and a
+    // message route is reduced to its folder because UIDs are account-local.
     addEventListener('rl-view-model.create',({detail:vm}) => {
         if (vm.viewModelTemplateID !== 'SystemDropDown' || vm.pwAccountFeedSwitch || typeof vm.accountClick !== 'function') return;
         vm.pwAccountFeedSwitch = true;
@@ -584,7 +599,16 @@
         vm.accountClick = function(account,event) {
             const email = String(account?.email || '');
             if (email && email !== String(value(this.accountEmail) || '')) {
-                setSession(accountSwitchKey,JSON.stringify({email}));
+                const folder = currentFolder();
+                let role = isInbox(folder) ? 'inbox' : 'custom';
+                for (const [candidate, setting] of Object.entries(folderSettings)) {
+                    if (folder && folder === String(window.rl?.settings?.get?.(setting) || '')) role = candidate;
+                }
+                const inMailbox = !location.hash || /^#\/mailbox(?:\/|$)/.test(location.hash);
+                const switchMode = mode === 'global' ? 'feed' : mode;
+                setSession(accountSwitchKey,JSON.stringify(inMailbox && folder
+                    ? {email, mode:validMode(switchMode) || 'inbox', folder, role}
+                    : {email}));
             }
             return native.apply(this,arguments);
         };

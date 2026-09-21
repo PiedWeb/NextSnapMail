@@ -65,7 +65,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   navigates through the tab-local opaque account URL before opening a foreign source. Since 1.10.0,
   All accounts lives in the account menu and adds frozen server search, explicit page/all-results
   selection, quick actions and reversible cross-account Trash over exact account/folder/
-  UIDVALIDITY/UID identities. See `FEEDS.md`.
+  UIDVALIDITY/UID identities. Since 1.10.6, an account-menu switch keeps Feed/Inbox context or the
+  equivalent target-account system folder. It drops an open source message UID before loading the
+  target because UIDs are account-local. See `FEEDS.md`.
 - Since 1.8.5, the working `INBOX`-backed view also has an independent per-account mixed-order preference.
   Since 1.8.9, the first page gathers every unread received row, followed by the first
   native page's read rows newest-first; later pages suppress gathered unread duplicates

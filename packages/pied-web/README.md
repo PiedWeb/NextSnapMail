@@ -47,7 +47,8 @@ Independent customization, not an official NextSnapMail or Nextcloud release.
 - A dedicated working Feed for each account, separate from the restored native Inbox. With
   several accounts, **All my accounts** adds an account-labelled overview and becomes the default;
   with one account, that global entry does not exist and the sole account Feed opens directly.
-  Choosing an account always opens its own Feed.
+  Choosing an account keeps the current mailbox context. Feed and Inbox remain distinct; native
+  system folders such as Sent resolve to the selected account's own configured folder.
 - One server-side search spans authorized accounts and eligible folders from the native search
   field; its frozen result token supports stable pagination and selecting every matching page.
   A pending or refused search keeps the previous rows visible, muted and non-interactive instead
@@ -77,7 +78,7 @@ app installed the composer refuses to schedule.
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.10.5**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.6**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.14**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

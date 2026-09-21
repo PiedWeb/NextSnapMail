@@ -1,5 +1,16 @@
 # Releases
 
+## 1.10.6, 2026-09-21
+
+Changing accounts from the account menu now keeps the current mailbox context instead of always
+forcing the selected account's Feed. Feed and native Inbox remain distinct, while Sent, Drafts,
+Junk, Trash and Archive resolve through the target account's own system-folder settings. A custom
+folder keeps its full name.
+
+If the source account had a message open, the switch opens the target folder's list instead of
+reusing that message UID in another mailbox. The fictional Feed browser suite now covers the
+cross-account Sent path, different configured Sent folder names and removal of the foreign UID.
+
 ## 1.10.5, 2026-09-21
 
 The remaining global-Feed mailbox actions now acknowledge input before the network round trip.

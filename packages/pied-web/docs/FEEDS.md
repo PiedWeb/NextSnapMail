@@ -10,8 +10,10 @@ restores **Inbox / Boîte de réception** as the ordinary native folder.
   requested. The sole account Feed is the default.
 - With two or more accounts, **All my accounts** is shown and is the default. The account Feed
   remains available beside it.
-- Choosing an individual account from the account menu always opens that account's Feed. The
-  remembered Inbox state cannot override this explicit account choice.
+- Choosing an individual account from the account menu keeps the current mailbox context. Feed
+  stays Feed, native Inbox stays Inbox, and Sent, Drafts, Junk, Trash and Archive resolve through
+  the target account's own system-folder settings. An open message becomes that folder's list
+  because its UID belongs only to the source account. A same-named custom folder is preserved.
 - Inbox is always available as a separate native entry. Its request has no Pied Web Feed marker,
   so its native order and pagination are not enriched by the working workflow.
 
@@ -79,7 +81,8 @@ account is active.
 - The server-reported account count remains authoritative while SnappyMail's account store is
   temporarily empty during bootstrap; otherwise the multi-account default can be lost in a race.
 - A pending cross-account target is kept in session storage only until the target account consumes
-  it. A late settings response must not replace that target's account-Feed mode with the default.
+  it. It carries only the view/folder intent needed for navigation. A late settings response must
+  not replace that target mode with its configured default.
 - Search, page and action tokens are server-side snapshots bound to the authenticated user and
   bounded by TTL, row count and byte quota; never encode the private query or mailbox identities
   into the browser-visible token.
@@ -96,5 +99,6 @@ account is active.
 `tests/feed.php` covers settings scopes, defaults, account isolation, UID collisions, Drafts,
 Conversations and endpoint validation. `tests/mailbox-operations.php` covers multi-account search,
 tokens, quotas, UIDVALIDITY, batches, MOVE/COPYUID, Undo and reminders with mocked mail transport.
-The fictional browser tests cover navigation, native Inbox isolation, search pagination, selection,
-actions, Undo, keyboard behavior, responsive geometry and cross-account opening.
+The fictional browser tests cover navigation, native Inbox isolation, system-folder continuity,
+foreign-message UID removal, search pagination, selection, actions, Undo, keyboard behavior,
+responsive geometry and cross-account opening.

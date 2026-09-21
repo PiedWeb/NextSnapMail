@@ -140,8 +140,9 @@ rows and mocked preference/mail endpoints.
 account has no visible All accounts entry or global request, while multiple accounts default
 to the labelled overview. It also covers the native Inbox request boundary, the four priority
 groups, per-account display settings, hidden cross-account bulk controls, mobile containment and
-the native switch-before-open path. All accounts and messages are fictional and transport is
-mocked. `tests/feed.php` separately covers settings scopes, account isolation, row identity,
+the native switch-before-open path. Account-menu coverage keeps Sent across accounts, maps each
+account's own Sent folder and removes the source account's message UID. All accounts and messages
+are fictional and transport is mocked. `tests/feed.php` separately covers settings scopes, account isolation, row identity,
 Drafts and Conversations without opening a mailbox.
 
 `test-send-now.js` builds the outgoing notice from the markup `background-send.js`

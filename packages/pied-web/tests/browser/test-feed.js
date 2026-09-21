@@ -160,7 +160,7 @@ await page.evaluate(() => {
 });
 await page.goto(base+'&accounts=2&account='+'a'.repeat(40)+'&feedDefault=inbox&persistView=1');
 await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'feed');
-check('Choosing an account always opens that account Feed, even if its remembered view was Inbox',await page.evaluate(() =>
+check('Choosing an account keeps the source Feed even if the target remembered Inbox',await page.evaluate(() =>
     rl.settings.get('Email')==='alex@example.test'
     &&PiedWebUx.feed.mode()==='feed'
     &&sessionStorage.getItem('pw-mail-feed-account-switch')===null));
@@ -176,9 +176,29 @@ await page.evaluate(() => {
 });
 await page.goto(base+'&accounts=2&account='+'b'.repeat(40)+'&feedDefault=global&persistView=1');
 await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'feed');
-check('Choosing an account opens its Feed before a global default when it has no remembered view',await page.evaluate(() =>
+check('Choosing an account keeps the source Feed before the target global default',await page.evaluate(() =>
     rl.settings.get('Email')==='hello@example.test'
     &&PiedWebUx.feed.mode()==='feed'
+    &&sessionStorage.getItem('pw-mail-feed-account-switch')===null));
+
+await fresh(base+'&accounts=2&folder=Sent&persistView=1#/mailbox/Sent/m42');
+await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'inbox');
+await page.evaluate(() => {
+    const vm={viewModelTemplateID:'SystemDropDown',accountEmail:ko.observable('alex@example.test'),
+        accountClick(){return true;}};
+    dispatchEvent(new CustomEvent('rl-view-model.create',{detail:vm}));
+    vm.accountClick({email:'hello@example.test'},{button:0});
+});
+check('The account switch records Sent as a system-folder intent',await page.evaluate(() => {
+    const intent=JSON.parse(sessionStorage.getItem('pw-mail-feed-account-switch'));
+    return intent.email==='hello@example.test'&&intent.mode==='inbox'&&intent.folder==='Sent'&&intent.role==='sent';
+}));
+await page.goto(base+'&accounts=2&account='+'b'.repeat(40)+'&folder=INBOX.Sent&persistView=1#/mailbox/Sent/m42');
+await page.waitForFunction(() => window.PiedWebUx?.feed?.mode() === 'inbox');
+check('Switching accounts keeps Sent, maps the target system folder and drops the foreign message UID',await page.evaluate(() =>
+    rl.settings.get('Email')==='hello@example.test'
+    &&location.hash==='#/mailbox/INBOX.Sent'
+    &&PiedWebUx.feed.mode()==='inbox'
     &&sessionStorage.getItem('pw-mail-feed-account-switch')===null));
 
 console.log(JSON.stringify({passed:checks.length, checks}, null, 2));
