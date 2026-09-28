@@ -9,6 +9,16 @@ This project is now maintained as a dedicated Nextcloud app. The repository root
 is the installable app directory that belongs in a Nextcloud `apps/` folder as
 `nextsnapmail`.
 
+## Looking for a standalone webmail client?
+
+NextSnapMail is maintained specifically as a Nextcloud app.
+
+If you are looking for a more broadly developed SnappyMail-based project with
+standalone installation and additional deployment options, you may also want to
+look at [Tachyon](https://github.com/kimusan/Tachyon).
+
+Tachyon is an independent project and is not affiliated with NextSnapMail.
+
 ## About this project
 
 I maintain NextSnapMail primarily for my own private use, because I wanted to
