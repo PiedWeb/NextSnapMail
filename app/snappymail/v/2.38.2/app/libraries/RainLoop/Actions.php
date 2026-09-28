@@ -17,7 +17,7 @@ class Actions
 
 	use \MailSo\Log\Inherit;
 
-	const AUTH_MAILTO_TOKEN_KEY = 'smmailtoauth';
+	const AUTH_MAILTO_TOKEN_KEY = 'nsmmailtoauth';
 
 	/**
 	 * This 30 days cookie contains decrypt data,
@@ -25,19 +25,19 @@ class Actions
 	 * /_data_/.../storage/DOMAIN/LOCAL/.sign_me/*
 	 * Gets refreshed on each login
 	 */
-	const AUTH_SIGN_ME_TOKEN_KEY = 'smremember';
+	const AUTH_SIGN_ME_TOKEN_KEY = 'nsmremember';
 
 	/**
 	 * This session cookie contains a \RainLoop\Model\Account
 	 * Value is Base64 EncryptToJSON
 	 */
-	const AUTH_SPEC_TOKEN_KEY = 'smaccount';
+	const AUTH_SPEC_TOKEN_KEY = 'nsmaccount';
 
 	/**
 	 * This session cookie optionally contains a \RainLoop\Model\AdditionalAccount
 	 * Value is Base64 EncryptToJSON
 	 */
-	const AUTH_ADDITIONAL_TOKEN_KEY = 'smadditional';
+	const AUTH_ADDITIONAL_TOKEN_KEY = 'nsmadditional';
 
 	const APP_DUMMY = '********';
 
@@ -594,6 +594,8 @@ class Actions
 						'simpleAttachmentsList' => false,
 						'listGrouped' => $oConfig->Get('defaults', 'mail_list_grouped', false),
 						'MessagesPerPage' => \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 25)) ?: 25),
+						'MessagesPerPageMax' => \max(10, \intval($oConfig->Get('webmail', 'messages_per_page_max', 1000)) ?: 1000),
+						'MessagesPerPageEnforced' => (bool) $oConfig->Get('webmail', 'messages_per_page_enforced', false),
 						'messageNewWindow' => false,
 						'markdown' => false,
 						'messageReadAuto' => true, // (bool) $oConfig->Get('webmail', 'message_read_auto', true),
@@ -664,9 +666,10 @@ class Actions
 */
 					$aResult['hourCycle'] = $oSettings->GetConf('hourCycle', '');
 
-					if (!$oSettings->GetConf('MessagesPerPage')) {
-						$oSettings->SetConf('MessagesPerPage', $oSettings->GetConf('MPP', $aResult['MessagesPerPage']));
-					}
+					$iMessagesPerPageDefault = \max(10, (int) $aResult['MessagesPerPage']);
+					$iMessagesPerPageMax = \max(10, (int) $aResult['MessagesPerPageMax']);
+					$iMessagesPerPageDefault = \min($iMessagesPerPageMax, $iMessagesPerPageDefault);
+					$bMessagesPerPageEnforced = (bool) $aResult['MessagesPerPageEnforced'];
 
 					$aResult['EditorDefaultType'] = \str_replace('Forced', '', $oSettings->GetConf('EditorDefaultType', $aResult['EditorDefaultType']));
 					$aResult['editorWysiwyg'] = $oSettings->GetConf('editorWysiwyg', $aResult['editorWysiwyg']);
@@ -690,7 +693,10 @@ class Actions
 					$aResult['simpleAttachmentsList'] = (bool)$oSettings->GetConf('simpleAttachmentsList', $aResult['simpleAttachmentsList']);
 					$aResult['listGrouped'] = (bool)$oSettings->GetConf('listGrouped', $aResult['listGrouped']);
 					$aResult['ContactsAutosave'] = (bool)$oSettings->GetConf('ContactsAutosave', $aResult['ContactsAutosave']);
-					$aResult['MessagesPerPage'] = \max(10, \intval($oSettings->GetConf('MessagesPerPage', $aResult['MessagesPerPage']) ?: $aResult['MessagesPerPage']));
+					$iMessagesPerPageUser = \intval($oSettings->GetConf('MessagesPerPage', $oSettings->GetConf('MPP', 0)));
+					$aResult['MessagesPerPage'] = $bMessagesPerPageEnforced || !$iMessagesPerPageUser
+						? $iMessagesPerPageDefault
+						: \min($iMessagesPerPageMax, \max(10, $iMessagesPerPageUser));
 					$aResult['messageNewWindow'] = (bool)$oSettings->GetConf('messageNewWindow', $aResult['messageNewWindow']);
 					$aResult['markdown'] = (bool)$oSettings->GetConf('markdown', $aResult['markdown']);
 					$aResult['messageReadAuto'] = (int)$oSettings->GetConf('messageReadAuto', $aResult['messageReadAuto']);
@@ -777,8 +783,14 @@ class Actions
 		$bAppJsDebug = $this->oConfig->Get('debug', 'javascript', false)
 			|| $this->oConfig->Get('debug', 'enable', false);
 
-		$aResult['StaticLibsJs'] = Utils::WebStaticPath('js/' . ($bAppJsDebug ? '' : 'min/') .
-			'libs' . ($bAppJsDebug ? '' : '.min') . '.js');
+		$sStaticJsPath = 'js/' . ($bAppJsDebug ? '' : 'min/');
+		$sStaticLibsJs = $sStaticJsPath . 'libs' . ($bAppJsDebug ? '' : '.min') . '.js';
+		$sStaticAppJs = $sStaticJsPath . ($bAdmin ? 'admin' : 'app') . ($bAppJsDebug ? '' : '.min') . '.js';
+		$iStaticJsVersion = \max(
+			\filemtime(APP_VERSION_ROOT_PATH . 'static/' . $sStaticLibsJs) ?: 0,
+			\filemtime(APP_VERSION_ROOT_PATH . 'static/' . $sStaticAppJs) ?: 0
+		);
+		$aResult['StaticLibsJs'] = Utils::WebStaticPath($sStaticLibsJs) . '?v=' . $iStaticJsVersion;
 
 		$this->oPlugins->InitAppData($bAdmin, $aResult, $oAccount);
 

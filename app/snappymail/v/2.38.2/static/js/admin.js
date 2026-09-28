@@ -1671,9 +1671,14 @@
 			this.attachmentLimit = ko
 				.observable(SettingsGet('attachmentLimit') / (1024 * 1024))
 				.extend({ debounce: 500 });
+			this.messagesPerPageDefault = ko.observable(pInt(SettingsGet('messagesPerPageDefault'))).extend({ debounce: 500 });
+			this.messagesPerPageMax = ko.observable(pInt(SettingsGet('messagesPerPageMax'))).extend({ debounce: 500 });
+			this.messagesPerPageEnforced = ko.observable(!!SettingsGet('messagesPerPageEnforced'));
 
 			this.addSetting('language');
 			this.addSetting('attachmentLimit');
+			this.addSetting('messagesPerPageDefault');
+			this.addSetting('messagesPerPageMax');
 			this.addSetting('Theme', value => changeTheme(value, this.themeTrigger));
 
 			this.uploadData = SettingsGet('phpUploadSizes');
@@ -1715,6 +1720,8 @@
 				capaIdentities: fSaveHelper('CapaIdentities'),
 
 				capaAttachmentThumbnails: fSaveHelper('CapaAttachmentThumbnails'),
+
+				messagesPerPageEnforced: fSaveHelper('messagesPerPageEnforced'),
 
 				capaThemes: fSaveHelper('CapaThemes'),
 

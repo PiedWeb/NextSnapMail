@@ -156,8 +156,13 @@ trait User
 //			$oSettingsLocal->SetConf('Theme', $this->ValidateTheme($oConfig->Get('webmail', 'theme', 'Default')));
 		}
 
-		$this->setSettingsFromParams($oSettings, 'MessagesPerPage', 'int', function ($iValue) {
-			return \min(100, \max(10, $iValue));
+		$oConfig = $this->Config();
+		$this->setSettingsFromParams($oSettings, 'MessagesPerPage', 'int', function ($iValue) use ($oConfig) {
+			$iMax = \max(10, \intval($oConfig->Get('webmail', 'messages_per_page_max', 1000)) ?: 1000);
+			if ($oConfig->Get('webmail', 'messages_per_page_enforced', false)) {
+				return \min($iMax, \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 25)) ?: 25));
+			}
+			return \min($iMax, \max(10, $iValue));
 		});
 
 		$this->setSettingsFromParams($oSettings, 'Layout', 'int', function ($iValue) {
@@ -286,7 +291,7 @@ trait User
 				case 'int':
 					$iValue = (int) $sValue;
 					if ($cCallback) {
-						$sValue = $cCallback($iValue);
+						$iValue = (int) $cCallback($iValue);
 					}
 					$oSettings->SetConf($sConfigName, $iValue);
 					break;

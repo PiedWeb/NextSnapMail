@@ -9,13 +9,13 @@ class Utils
 		 * 30 days cookie
 		 * Used by: ServiceProxyExternal, compileLogParams, GetCsrfToken
 		 */
-		CONNECTION_TOKEN = 'smtoken',
+		CONNECTION_TOKEN = 'nsmtoken',
 
 		/**
 		 * Session cookie
 		 * Used by: EncodeKeyValuesQ, DecodeKeyValuesQ
 		 */
-		SESSION_TOKEN = 'smsession';
+		SESSION_TOKEN = 'nsmsession';
 
 	/**
 	 * @param mixed $value

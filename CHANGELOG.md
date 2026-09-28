@@ -1,3 +1,31 @@
+## 0.1.12 – 2026-09-12
+
+### Changed
+
+- Use NextSnapMail-specific browser cookie names to avoid session collisions
+  with SnappyMail or related forks running on the same Nextcloud domain.
+- Treat a valid empty plugin repository as reachable instead of showing a
+  repository access warning.
+- Clear the new NextSnapMail cookie names during reset.
+- Avoid PHP 8.5 `curl_close()` deprecation warnings in bundled legacy plugin
+  clients.
+- Add administrator-controlled messages-per-page defaults, maximum values and
+  an enforced mode that locks the user setting when required.
+
+### Fixed
+
+- Persist validated integer settings instead of the originally submitted value,
+  fixing messages-per-page values above the old UI limit being accepted but not
+  applied consistently.
+
+### Security
+
+- Mark stored password parameters as sensitive so they are masked in exception
+  traces on supported PHP versions.
+- Guard Nextcloud login, logout and impersonation event handlers so a
+  NextSnapMail session cleanup/preparation problem cannot block the surrounding
+  Nextcloud action.
+
 ## 0.1.11 – 2026-09-12
 
 ### Added

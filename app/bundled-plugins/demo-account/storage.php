@@ -31,11 +31,11 @@ class DemoStorage extends \RainLoop\Providers\Storage\FileStorage
 			}
 		}
 
-		// $_COOKIE['smtoken']
-		if (empty($_COOKIE['smctoken'])) {
-			\SnappyMail\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
+		// $_COOKIE['nsmtoken']
+		if (empty($_COOKIE['nsmctoken'])) {
+			\SnappyMail\Cookies::set('nsmctoken', \base64_encode(\random_bytes(16)), 0, false);
 		}
-		$sDataPath .= '/' . \MailSo\Base\Utils::SecureFileName($_COOKIE['smctoken']);
+		$sDataPath .= '/' . \MailSo\Base\Utils::SecureFileName($_COOKIE['nsmctoken']);
 		if (!\is_dir($sDataPath) && \mkdir($sDataPath, 0700, true)) {
 			\file_put_contents("{$sDataPath}/settings",'{"RemoveColors":true,"ListInlineAttachments":true,"listGrouped":true}');
 			\file_put_contents("{$sDataPath}/settings_local",'{"UseThreads":true}');

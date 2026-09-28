@@ -15,7 +15,7 @@
 					// Access IMAP and SMTP through OAUTH
 					'https://mail.google.com/'
 				].join(' '),
-				state: 'gmail', // + rl.settings.app('token') + localStorage.getItem('smctoken')
+				state: 'gmail', // + rl.settings.app('token') + localStorage.getItem('nsmctoken')
 				// Force authorize screen, so we always get a refresh_token
 				access_type: 'offline',
 				prompt: 'consent'
