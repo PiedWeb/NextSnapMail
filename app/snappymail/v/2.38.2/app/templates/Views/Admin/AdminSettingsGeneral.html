@@ -93,6 +93,33 @@
 		</div>
 	</div>
 	<div class="control-group">
+		<label data-i18n="TAB_GENERAL/LABEL_MESSAGES_PER_PAGE_DEFAULT"></label>
+		<div>
+			<input type="number" min="10" step="1" class="span1" data-bind="textInput: messagesPerPageDefault">
+			&nbsp;
+			<span data-bind="saveTrigger: messagesPerPageDefaultTrigger"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label data-i18n="TAB_GENERAL/LABEL_MESSAGES_PER_PAGE_MAX"></label>
+		<div>
+			<input type="number" min="10" step="1" class="span1" data-bind="textInput: messagesPerPageMax">
+			&nbsp;
+			<span data-bind="saveTrigger: messagesPerPageMaxTrigger"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<div>
+			<div data-bind="component: {
+				name: 'Checkbox',
+				params: {
+					label: 'TAB_GENERAL/LABEL_MESSAGES_PER_PAGE_ENFORCED',
+					value: messagesPerPageEnforced
+				}
+			}"></div>
+		</div>
+	</div>
+	<div class="control-group">
 		<div>
 			<div data-bind="component: {
 				name: 'Checkbox',

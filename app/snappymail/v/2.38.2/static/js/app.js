@@ -1276,6 +1276,8 @@
 			const self = this;
 
 			self.messagesPerPage = ko.observable(25).extend({ debounce: 999 });
+			self.messagesPerPageMax = 1000;
+			self.messagesPerPageEnforced = ko.observable(false);
 			self.checkMailInterval = ko.observable(15).extend({ debounce: 999 });
 			self.messageReadDelay = ko.observable(5).extend({ debounce: 999 });
 
@@ -1426,6 +1428,8 @@
 			self.messageReadDelay(pInt(SettingsGet('MessageReadDelay')));
 			self.autoLogout(pInt(SettingsGet('AutoLogout')));
 			self.keyPassForget(pInt(SettingsGet('keyPassForget')));
+			self.messagesPerPageMax = pInt(SettingsGet('MessagesPerPageMax'), 1000);
+			self.messagesPerPageEnforced(!!SettingsGet('MessagesPerPageEnforced'));
 		}
 	};
 
@@ -15364,6 +15368,7 @@ body > * {
 			['useThreads', 'threadAlgorithm',
 			 // These use addSetting()
 			 'layout', 'messageReadDelay', 'messagesPerPage', 'checkMailInterval',
+			 'messagesPerPageMax', 'messagesPerPageEnforced',
 			 'editorDefaultType', 'editorWysiwyg', 'msgDefaultAction', 'maxBlockquotesLevel',
 			 // These are in addSettings()
 			 'requestReadReceipt', 'requestDsn', 'requireTLS', 'pgpSign', 'pgpEncrypt',
@@ -15380,6 +15385,9 @@ body > * {
 			this.identities = IdentityUserStore;
 
 			this.wysiwygs = WYSIWYGS;
+
+			this.messagesPerPageTrigger = ko.observable(SaveSettingStatus.Idle);
+			this.messagesPerPageError = ko.observable('');
 
 			addComputablesTo(this, {
 				languageFullName: () => convertLangName(this.language()),
@@ -15414,14 +15422,15 @@ body > * {
 						{ id: LayoutSideView, name: i18n('SETTINGS_GENERAL/LAYOUT_VERTICAL_SPLIT') },
 						{ id: LayoutBottomView, name: i18n('SETTINGS_GENERAL/LAYOUT_HORIZONTAL_SPLIT') }
 					];
-				}
+				},
+				messagesPerPageMaxText: () => i18n('SETTINGS_GENERAL/MESSAGE_PER_PAGE_MAX', {COUNT: this.messagesPerPageMax}),
+				messagesPerPageLockedText: () => i18n('SETTINGS_GENERAL/MESSAGE_PER_PAGE_LOCKED')
 			});
 
 			this.addSetting('EditorDefaultType');
 			this.addSetting('editorWysiwyg');
 			this.addSetting('MsgDefaultAction');
 			this.addSetting('MessageReadDelay');
-			this.addSetting('MessagesPerPage');
 			this.addSetting('CheckMailInterval');
 			this.addSetting('Layout');
 			this.addSetting('MaxBlockquotesLevel');
@@ -15465,10 +15474,59 @@ body > * {
 					Remote.saveSetting('threadAlgorithm', value);
 				},
 
+				messagesPerPage: (value => {
+					if (this.messagesPerPageEnforced()) {
+						this.messagesPerPage(pInt(SettingsGet('MessagesPerPage'), 20));
+						return;
+					}
+
+					let max = Math.max(10, pInt(this.messagesPerPageMax, 1000)),
+						submitted = pInt(value, 10),
+						normalized = Math.min(max, Math.max(10, submitted));
+
+					if (submitted > max) {
+						this.messagesPerPageError(i18n('SETTINGS_GENERAL/MESSAGE_PER_PAGE_MAX_ALLOWED', {COUNT: max}));
+						this.messagesPerPage(max);
+						return;
+					}
+
+					if (normalized !== submitted) {
+						this.messagesPerPage(normalized);
+					}
+
+					this.messagesPerPageTrigger(SaveSettingStatus.Saving);
+					Remote.saveSetting('MessagesPerPage', normalized, iError => {
+						this.messagesPerPageTrigger(iError ? SaveSettingStatus.Failed : SaveSettingStatus.Success);
+						setTimeout(() => this.messagesPerPageTrigger(SaveSettingStatus.Idle), 1000);
+					});
+				}).debounce(999),
+
 				checkMailInterval: () => {
 					setRefreshFoldersInterval(SettingsUserStore.checkMailInterval());
 				}
 			});
+		}
+
+		validateMessagesPerPageInput(viewModel, event) {
+			if (this.messagesPerPageEnforced()) {
+				return false;
+			}
+
+			setTimeout(() => {
+				let input = event?.target,
+					max = Math.max(10, pInt(this.messagesPerPageMax, 1000)),
+					submitted = pInt(input?.value, 10);
+
+				if (submitted > max) {
+					this.messagesPerPageError(i18n('SETTINGS_GENERAL/MESSAGE_PER_PAGE_MAX_ALLOWED', {COUNT: max}));
+					input.value = max;
+					this.messagesPerPage(max);
+				} else {
+					this.messagesPerPageError('');
+				}
+			});
+
+			return true;
 		}
 
 		editMainIdentity() {

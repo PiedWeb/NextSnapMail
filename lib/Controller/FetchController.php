@@ -722,7 +722,11 @@ class FetchController extends Controller {
 		}
 	}
 
-	private function decryptSnappyMailUrlSafeWithSalt(string $encryptedValue, string $key, string $appSalt) {
+	private function decryptSnappyMailUrlSafeWithSalt(
+		#[\SensitiveParameter] string $encryptedValue,
+		#[\SensitiveParameter] string $key,
+		string $appSalt
+	) {
 		$parts = \explode('.', $encryptedValue);
 		if (3 !== \count($parts)) {
 			return null;
@@ -783,7 +787,7 @@ class FetchController extends Controller {
 			. ($subFolder ? \MailSo\Base\Utils::SecureFileName($subFolder) . '/' : '');
 	}
 
-	private function getOldMainAccountCryptKey(string $email, string $password, string $oldAppSalt): ?string {
+	private function getOldMainAccountCryptKey(string $email, #[\SensitiveParameter] string $password, string $oldAppSalt): ?string {
 		$paths = $this->getAppDataImportPaths();
 		$cryptKeyFile = $this->getStorageFilePath($paths['source'], $email, '.cryptkey');
 
@@ -805,7 +809,11 @@ class FetchController extends Controller {
 		return \is_string($derived) ? $derived : null;
 	}
 
-	private function decryptSnappyMailJsonWithSalt(string $encryptedJson, string $key, string $appSalt) {
+	private function decryptSnappyMailJsonWithSalt(
+		#[\SensitiveParameter] string $encryptedJson,
+		#[\SensitiveParameter] string $key,
+		string $appSalt
+	) {
 		try {
 			$parts = \json_decode($encryptedJson, true, 512, JSON_THROW_ON_ERROR);
 		} catch (\Throwable $e) {
@@ -833,7 +841,7 @@ class FetchController extends Controller {
 		}
 	}
 
-	private function writeNextSnapMailMainCryptKey(string $email, string $password): void {
+	private function writeNextSnapMailMainCryptKey(string $email, #[\SensitiveParameter] string $password): void {
 		SnappyMailHelper::loadApp();
 
 		$paths = $this->getAppDataImportPaths();
@@ -853,7 +861,7 @@ class FetchController extends Controller {
 		);
 	}
 
-	private function getNextSnapMailMainAccountCryptKey(string $email, string $password): ?string {
+	private function getNextSnapMailMainAccountCryptKey(string $email, #[\SensitiveParameter] string $password): ?string {
 		SnappyMailHelper::loadApp();
 
 		$paths = $this->getAppDataImportPaths();
@@ -877,7 +885,7 @@ class FetchController extends Controller {
 		return null;
 	}
 
-	private function prepareNextSnapMailMainCryptKey(string $email, string $password): array {
+	private function prepareNextSnapMailMainCryptKey(string $email, #[\SensitiveParameter] string $password): array {
 		$existingCryptKey = $this->getNextSnapMailMainAccountCryptKey($email, $password);
 		if (\is_string($existingCryptKey)) {
 			return [
@@ -926,7 +934,7 @@ class FetchController extends Controller {
 		\RainLoop\Utils::saveFile($targetFile, \json_encode($accounts));
 	}
 
-	private function getValidExistingAdditionalAccounts(array $accounts, string $newCryptKey): array {
+	private function getValidExistingAdditionalAccounts(array $accounts, #[\SensitiveParameter] string $newCryptKey): array {
 		$validAccounts = [];
 
 		foreach ($accounts as $accountEmail => $account) {
@@ -942,7 +950,12 @@ class FetchController extends Controller {
 		return $validAccounts;
 	}
 
-	private function migrateAdditionalAccounts(string $email, string $password, string $newCryptKey, bool $reuseExistingCryptKey): array {
+	private function migrateAdditionalAccounts(
+		string $email,
+		#[\SensitiveParameter] string $password,
+		#[\SensitiveParameter] string $newCryptKey,
+		bool $reuseExistingCryptKey
+	): array {
 		SnappyMailHelper::loadApp();
 
 		$paths = $this->getAppDataImportPaths();
@@ -1067,7 +1080,11 @@ class FetchController extends Controller {
 		];
 	}
 
-	private function decryptOldPgpBackupKeyFile(string $sourceFile, string $oldCryptKey, string $oldAppSalt): ?string {
+	private function decryptOldPgpBackupKeyFile(
+		string $sourceFile,
+		#[\SensitiveParameter] string $oldCryptKey,
+		string $oldAppSalt
+	): ?string {
 		try {
 			$key = \json_decode((string) \file_get_contents($sourceFile), true, 512, JSON_THROW_ON_ERROR);
 		} catch (\Throwable $e) {
@@ -1101,7 +1118,11 @@ class FetchController extends Controller {
 		}
 	}
 
-	private function writeNextSnapMailPgpBackupKeyFile(string $targetFile, string $plainKey, string $newCryptKey): void {
+	private function writeNextSnapMailPgpBackupKeyFile(
+		string $targetFile,
+		#[\SensitiveParameter] string $plainKey,
+		#[\SensitiveParameter] string $newCryptKey
+	): void {
 		$encryptedKey = \SnappyMail\Crypt::Encrypt($plainKey, $newCryptKey);
 		$encryptedKey[1] = \base64_encode($encryptedKey[1]);
 		$encryptedKey[2] = \base64_encode($encryptedKey[2]);
@@ -1115,7 +1136,7 @@ class FetchController extends Controller {
 		\RainLoop\Utils::saveFile($targetFile, \json_encode($encryptedKey));
 	}
 
-	private function isNextSnapMailPgpBackupKeyFileValid(string $targetFile, string $newCryptKey): bool {
+	private function isNextSnapMailPgpBackupKeyFileValid(string $targetFile, #[\SensitiveParameter] string $newCryptKey): bool {
 		if (!\is_file($targetFile)) {
 			return false;
 		}
@@ -1133,7 +1154,12 @@ class FetchController extends Controller {
 			&& \hash_equals((string) $key[3], \hash_hmac('sha1', (string) $key[2], $newCryptKey));
 	}
 
-	private function migratePgpBackups(string $email, string $password, string $newCryptKey, bool $reuseExistingCryptKey): array {
+	private function migratePgpBackups(
+		string $email,
+		#[\SensitiveParameter] string $password,
+		#[\SensitiveParameter] string $newCryptKey,
+		bool $reuseExistingCryptKey
+	): array {
 		SnappyMailHelper::loadApp();
 
 		$oldAppSalt = $this->getOldSnappyMailAppSalt();
@@ -1191,7 +1217,13 @@ class FetchController extends Controller {
 		];
 	}
 
-	private function decryptSnappyMailValueWithSalt(string $method, string $data, string $nonceOrIv, string $key, string $appSalt): ?string {
+	private function decryptSnappyMailValueWithSalt(
+		string $method,
+		#[\SensitiveParameter] string $data,
+		#[\SensitiveParameter] string $nonceOrIv,
+		#[\SensitiveParameter] string $key,
+		string $appSalt
+	): ?string {
 		$passphrase = \sha1($key . $appSalt, true);
 
 		try {
@@ -1376,8 +1408,12 @@ class FetchController extends Controller {
 			if (\class_exists('\\SnappyMail\\Cookies')) {
 				\SnappyMail\Cookies::clear(\RainLoop\Utils::SESSION_TOKEN);
 				\SnappyMail\Cookies::clear(\RainLoop\Utils::CONNECTION_TOKEN);
+				\SnappyMail\Cookies::clear(\RainLoop\Actions::AUTH_SPEC_TOKEN_KEY);
+				\SnappyMail\Cookies::clear(\RainLoop\Actions::AUTH_ADDITIONAL_TOKEN_KEY);
 				\SnappyMail\Cookies::clear(\RainLoop\Actions::AUTH_SIGN_ME_TOKEN_KEY);
 				\SnappyMail\Cookies::clear(\RainLoop\Actions::AUTH_MAILTO_TOKEN_KEY);
+				\SnappyMail\Cookies::clear('nsmadmin');
+				\SnappyMail\Cookies::clear('nsmctoken');
 			}
 		} catch (\Throwable $e) {
 			// The data folder may already be incomplete while resetting; that is OK.

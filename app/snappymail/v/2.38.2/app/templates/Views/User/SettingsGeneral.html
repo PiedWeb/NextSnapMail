@@ -60,9 +60,15 @@
 	<div class="control-group">
 		<label data-i18n="SETTINGS_GENERAL/MESSAGE_PER_PAGE"></label>
 		<div>
-			<input type="number" min="10" max="50" step="1" class="span1" data-bind="textInput: messagesPerPage">
+			<input type="number" min="10" step="1" class="span1" data-bind="visible: !messagesPerPageEnforced(), textInput: messagesPerPage, attr: {max: messagesPerPageMax}, event: {input: validateMessagesPerPageInput, change: validateMessagesPerPageInput}">
+			<span class="help-inline" data-bind="visible: messagesPerPageEnforced">
+				<span data-bind="text: messagesPerPage"></span>
+			</span>
 			&nbsp;
-			<span data-bind="saveTrigger: messagesPerPageTrigger"></span>
+			<span data-bind="visible: !messagesPerPageEnforced(), saveTrigger: messagesPerPageTrigger"></span>
+			<span class="help-inline" data-bind="visible: messagesPerPageEnforced, text: messagesPerPageLockedText"></span>
+			<span class="help-inline" data-bind="text: messagesPerPageMaxText"></span>
+			<div class="text-error" data-bind="visible: messagesPerPageError, text: messagesPerPageError"></div>
 		</div>
 	</div>
 	<div class="control-group">
@@ -97,7 +103,7 @@
 			}"></div>
 		</div>
 	</div>
-	<div class="control-group" data-bind="visible: threadsAllowed() && useThreads()">
+	<div class="control-group" data-bind="visible: threadsAllowed() && useThreads() && threadAlgorithms().length">
 		<label data-i18n="SETTINGS_GENERAL/THREAD_ALGORITHM"></label>
 		<select data-bind="options: threadAlgorithms, value: threadAlgorithm"></select>
 	</div>
