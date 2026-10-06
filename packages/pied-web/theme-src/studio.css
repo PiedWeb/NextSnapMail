@@ -27,7 +27,7 @@
 #rl-app .messageList .checkboxCheckAll { margin:0 var(--pw-space-0-5) 0 0; flex:0 0 20px; }
 #rl-app .messageList .btn.buttonMoreSearch { width:28px; min-width:28px; margin:0; padding:0; border:0!important; color:var(--pw-muted); font-size:var(--pw-text-xs); }
 #rl-app .messageList .search-input-wrp { flex:1; min-width:0; }
-#rl-app .messageList .inputSearch {width:100%;height:36px;min-height:36px;padding:0 var(--pw-space-3);border:1px solid var(--pw-line);border-radius:7px;color:var(--nc-color-main-text);font-size:var(--pw-text-sm);box-shadow:none;}
+#rl-app .messageList .inputSearch {width:100%;height:36px;min-height:36px;padding:0 var(--pw-space-3);border:1px solid var(--pw-line);border-radius:var(--pw-radius-md);color:var(--nc-color-main-text);font-size:var(--pw-text-sm);box-shadow:none;}
 #rl-app .messageList .inputSearch:focus { border-color:var(--nc-color-primary-element); outline:1px solid var(--pw-focus); }
 #rl-app .messageList .b-content { padding:0; }
 #rl-app .messageListItem {margin:0;padding:var(--pw-space-4) var(--pw-space-4) var(--pw-space-4) var(--pw-space-4);box-sizing:border-box;border:0!important;font-size:var(--pw-text-sm);background:transparent;}
@@ -173,7 +173,7 @@
 #rl-app .messageListItem .messageCheckbox { flex-basis:24px; }
 #rl-app .messageListItem .checkboxMessage, #rl-app .checkboxCheckAll { font-size:0!important; position:relative; }
 #rl-app .messageListItem .checkboxMessage { display:block; width:16px; height:16px; line-height:0; }
-#rl-app .messageListItem .checkboxMessage::before, #rl-app .checkboxCheckAll::before {content:'';display:block;box-sizing:border-box;border:1px solid var(--pw-grey-500);border-radius:3px;}
+#rl-app .messageListItem .checkboxMessage::before, #rl-app .checkboxCheckAll::before {content:'';display:block;box-sizing:border-box;border:1px solid var(--pw-grey-500);border-radius:var(--pw-radius-sm);}
 #rl-app .messageListItem.checked .checkboxMessage::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
 #rl-app .messageListItem.checked .checkboxMessage::after { content:''; position:absolute; box-sizing:border-box; left:4px; top:4px; width:8px; height:5px; border:solid var(--nc-color-primary-element-text); border-width:0 0 2px 2px; transform:rotate(-45deg); }
 #rl-app #V-MailMessageList:has(.btn-toolbar.hasChecked) .checkboxCheckAll::before { background:var(--nc-color-primary-element); border-color:var(--nc-color-primary-element); }
@@ -397,7 +397,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem :is(.flagParent,.a
 #rl-app .messageListItem time { font-weight:var(--pw-weight-regular); }
 
 #rl-app .b-folders .b-toolbar .buttonCompose { border-radius:6px; }
-#rl-app .b-folders li a.selectable.selected { border-radius:5px; }
+#rl-app .b-folders li a.selectable.selected { border-radius:var(--pw-radius-sm); }
 @media(max-width:799px) {
  #rl-app #rl-right > .pw-mobile-header > button.pw-threads { display:flex; align-items:center; justify-content:center; }
  #rl-app #rl-right > .pw-mobile-header > button.btn[data-pw-icon="compose"] { border-radius:6px; }
@@ -453,7 +453,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { grid
 /* Iteration 13: deliberate density and contextual folder actions. */
 
 html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padding:0; }
-#rl-app .messageListItem { min-height:60px; margin-inline:var(--pw-space-2); width:auto; border-radius:5px; }
+#rl-app .messageListItem { min-height:60px; margin-inline:var(--pw-space-2); width:auto; border-radius:var(--pw-radius-sm); }
 #rl-app .pw-folder-section { display:flex; align-items:center; justify-content:space-between; padding-block:var(--pw-space-4) var(--pw-space-1); }
 #rl-app .pw-folder-section h2 { font:inherit; letter-spacing:inherit; text-transform:inherit; margin:0; }
 #rl-app .pw-folder-actions { display:flex; gap:0; }
@@ -866,7 +866,7 @@ html.pw-theme #rl-app #V-MailMessageView .pw-reader-tags > #tags-dropdown-id:foc
 html.pw-theme #rl-app #V-MailMessageView .pw-native-addresses { display:none; }
 #rl-app #V-MailMessageView .pw-addresses a.pw-address { color:inherit; }
 #rl-app #V-MailMessageView a.pw-address {
- padding:0; border-radius:3px; text-decoration:none; overflow-wrap:anywhere; cursor:pointer;
+ padding:0; border-radius:var(--pw-radius-sm); text-decoration:none; overflow-wrap:anywhere; cursor:pointer;
 }
 #rl-app #V-MailMessageView a.pw-address:hover {
  color:var(--nc-color-primary-element); text-decoration:underline; text-underline-offset:3px;

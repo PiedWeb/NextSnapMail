@@ -46,7 +46,7 @@ check('A followed row carries an edge accent, not a full surface, and never outs
  return getComputedStyle(flagged).backgroundColor===getComputedStyle(plain).backgroundColor
   &&clear(getComputedStyle(flagged).backgroundColor)
   &&open.classList.contains('selected')&&!clear(getComputedStyle(open).backgroundColor)
-  &&accent.content==='""'&&accent.position==='absolute'&&parseFloat(accent.width)===3
+  &&accent.content==='""'&&accent.position==='absolute'&&parseFloat(accent.width)===1
   &&!clear(accent.backgroundColor)&&getComputedStyle(plain,'::before').content==='none';
 }));
 check('The star keeps one glyph size whether or not the message is followed',await p.evaluate(()=>{
@@ -77,7 +77,7 @@ check('Labels follow the interface language',await p.evaluate(()=>document.query
 await p.evaluate(()=>{document.querySelector('link[href*="theme/style.css"]').disabled=true;document.documentElement.classList.remove('pw-theme');});await p.waitForFunction(()=>!document.querySelector('.threads-len').hasAttribute('data-pw-total'));
 check('Leaving the theme restores native attributes and removes desktop read controls',await p.evaluate(()=>!document.querySelector('.threads-len').hasAttribute('role')&&!document.querySelector('.messageListItem .flagParent').hasAttribute('tabindex')&&!document.querySelector('.pw-read-toggle')));
 await p.evaluate(()=>{document.documentElement.lang='fr';document.querySelector('link[href*="theme/style.css"]').disabled=false;document.documentElement.classList.add('pw-theme');demoMessages.forEach((m,i)=>{m.checked(false);m.flagged=i===1;demoRows[i].classList.toggle('msgflag-\\flagged',m.flagged);});const b=document.querySelector('.threads-len');b.textContent='13/4';b.dataset.unseen='4';});await p.waitForSelector('.threads-len[data-pw-total]');
-await p.locator('.threads-len').first().blur();await p.screenshot({path:'list-metadata-desktop.png'});
+await p.locator('.threads-len').first().blur();await p.bringToFront();await p.screenshot({animations:'disabled',timeout:10000,path:'list-metadata-desktop.png'});
 for(const [width,dark] of [[390,false],[320,false],[390,true]]){
  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:dark?'dark':'light'});
  await p.evaluate(dark=>{document.documentElement.dataset.themes=dark?'dark':'light';document.getElementById('V-MailMessageView').hidden=true;document.getElementById('rl-right').classList.remove('message-selected');},dark);
@@ -100,7 +100,7 @@ for(const [width,dark] of [[390,false],[320,false],[390,true]]){
   return clip>sender&&plainStar>sender&&dot(withCount)==='none'&&dot(withoutPill)!=='none';
  }));
  if(width===320)check('Narrow phones keep the sender above conversation metadata',await p.evaluate(()=>{const row=document.querySelector('.messageListItem');return row.querySelector('.senderParent').getBoundingClientRect().width>=100&&row.querySelector('.threads-len').getBoundingClientRect().top>=row.querySelector('.subjectParent').getBoundingClientRect().bottom;}));
- await p.screenshot({path:'list-metadata-'+(dark?'dark':width===320?'320':'mobile')+'.png'});
+ await p.bringToFront();await p.screenshot({animations:'disabled',timeout:10000,path:'list-metadata-'+(dark?'dark':width===320?'320':'mobile')+'.png'});
 }
 check('No runtime errors',await p.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:results.length,results},null,2));

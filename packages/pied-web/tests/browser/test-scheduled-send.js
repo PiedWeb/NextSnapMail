@@ -99,6 +99,7 @@ check('The panel rests on its own surface, above the composer, with no button bo
   &&[...panel.querySelectorAll('button')].every(node=>
    ['Top','Right','Bottom','Left'].every(side=>parseFloat(getComputedStyle(node)['border'+side+'Width'])===0));
 }));
+await p.mouse.move(2,2);
 check('The confirm is the one filled control; the offered times rest on nothing',await p.evaluate(()=>{
  const empty=colour=>/rgba\(0, 0, 0, 0\)|transparent/.test(colour);
  // A late-Sunday panel can have a single deduplicated preset, so explicitly
@@ -114,7 +115,7 @@ await p.keyboard.press('Tab');
 check('Keyboard movement inside the panel shows a visible ring',await p.evaluate(()=>{
  const focused=document.activeElement,style=getComputedStyle(focused);
  return document.querySelector('.pw-schedule-panel').contains(focused)&&focused.matches(':focus-visible')
-  &&parseFloat(style.outlineWidth)>=2&&style.outlineStyle==='solid';
+  &&parseFloat(style.outlineWidth)===1&&style.outlineStyle==='solid';
 }));
 await p.locator('.pw-schedule-option').first().press('Escape');
 check('Escape closes the panel and gives the focus back to the control',await p.evaluate(()=>

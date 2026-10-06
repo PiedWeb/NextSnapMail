@@ -71,6 +71,7 @@ dev-browser-agent --timeout 45 < tests/browser/test-elevation.js
 dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
 dev-browser-agent --timeout 45 < tests/browser/test-empty-state.js
 dev-browser-agent --timeout 50 < tests/browser/test-native-controls.js
+dev-browser-agent --timeout 60 < tests/browser/test-native-components.js
 dev-browser-agent --timeout 50 < tests/browser/test-font-delivery.js
 dev-browser-agent --timeout 45 < tests/browser/test-selection-mode.js
 dev-browser-agent --timeout 35 < tests/browser/test-conversation-toggle.js
@@ -86,7 +87,7 @@ dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
 dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
 
-The curated suite currently contains 39 scripts. `test-mailbox-workspace.js`
+The curated suite currently contains 40 scripts. `test-mailbox-workspace.js`
 exercises scoped server search, thread-safe quick actions, multi-page selection
 and Undo with fictional data. `test-conversation-performance.js` is a synthetic
 200-message comparison; `benchmark-live-feed.js` is a separate authenticated,
@@ -229,3 +230,9 @@ the guard that keeps a whole message visible when its Outlook-shaped header come
 also checks the Outlook forwarding shape with a broad `dir="ltr"` wrapper and a ruled inner
 header, where the current note stays visible and only the forwarded message is folded,
 using fictional content only.
+
+`test-native-components.js` uses native templates and the engine's exported
+binding-accessor API with fictional accounts and no remote transport. It checks
+names, focus contrast, borders, internal overflow, late mounting, save feedback,
+keyboard edit/confirmation and Alt+Arrow order. Phone widths are simulated;
+coarse-pointer hardware and cryptographic/provider submissions remain separate.

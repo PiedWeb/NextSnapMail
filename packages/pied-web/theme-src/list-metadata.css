@@ -8,7 +8,7 @@
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {
     display:inline-flex;align-items:center;justify-content:center;flex:0 0 32px;
     width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:0;
-    opacity:1;border:0;border-radius:5px;cursor:pointer;font-size:0;line-height:1;
+    opacity:1;border:0;border-radius:var(--pw-radius-sm);cursor:pointer;font-size:0;line-height:1;
     color:var(--pw-grey-700);
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent::after {

@@ -212,6 +212,7 @@ html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.squire-wysiwyg,.squi
     background: var(--nc-color-main-background, #fff);
     color: var(--nc-color-main-text, #202827);
     box-shadow: var(--pw-elevation-5);
+    filter: none;
     font: var(--pw-text-md)/1.5 system-ui, sans-serif;
 }
 #rl-app .pw-bulk-dialog::backdrop { background: #0006; }
@@ -226,7 +227,7 @@ html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.squire-wysiwyg,.squi
     color: var(--nc-color-primary-element-text, #fff);
     border-color: transparent !important;
 }
-#rl-app dialog.pw-bulk-dialog.pw-permanent button.pw-bulk-delete { background: #b3261e; color: #fff; }
+#rl-app dialog.pw-bulk-dialog.pw-permanent button.pw-bulk-delete { background: var(--pw-danger-fill); color: var(--pw-on-danger); }
 html:not(.pw-theme) #rl-app :is(.pw-list-title,.pw-mobile-header,.pw-mobile-folder-label) { display:none!important; }
 html:not(.pw-theme) .pw-desktop-identity, html:not(.pw-theme) .pw-reading-actions, html:not(.pw-theme) .pw-mobile-refresh { display:none!important; }
 html:not(.pw-theme) .pw-folder-section { display:none!important; }
@@ -249,7 +250,7 @@ html.pw-theme #rl-app .pw-sender > span:last-child { flex-wrap:wrap; }
 html.pw-theme #rl-app .pw-sender-address { overflow-wrap:anywhere; }
 html.pw-theme #rl-app .pw-from a.pw-unsubscribe {
     display:inline-flex; align-items:center; min-height:32px; flex:0 0 auto;
-    padding:0 var(--pw-space-0-5); border:0; border-radius:3px; background:transparent;
+    padding:0 var(--pw-space-0-5); border:0; border-radius:var(--pw-radius-sm); background:transparent;
     font:var(--pw-weight-regular) var(--pw-text-xs)/1.4 var(--pw-font,system-ui); color:var(--pw-muted);
     text-decoration:underline; text-underline-offset:3px;
 }
@@ -279,7 +280,7 @@ html.pw-theme #rl-app .pw-swipe-hint {
     font:var(--pw-weight-medium) var(--pw-text-xs)/1.2 var(--pw-font,system-ui); pointer-events:none;
 }
 html.pw-theme #rl-app .pw-swipe-hint i { font-size:var(--pw-text-xl); }
-html.pw-theme #rl-app .pw-swipe-ready .pw-swipe-hint { color:white; background:#b3261e; }
+html.pw-theme #rl-app .pw-swipe-ready .pw-swipe-hint { color:var(--pw-on-danger); background:var(--pw-danger-fill); }
 @media(max-width:359px) {
     html.pw-theme #rl-app #V-MailMessageView.pw-enhanced > .top-toolbar .btn[data-pw-icon] {
         width:28px; min-width:28px; padding-inline:0;
@@ -399,7 +400,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .pw-compose-main > #
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn {
     box-sizing:border-box; display:inline-flex; justify-content:center; align-items:center;
     min-width:34px; width:34px; min-height:34px; height:34px; padding:var(--pw-space-2);
-    margin:0; border:0!important; border-radius:5px!important; background:transparent; box-shadow:none;
+    margin:0; border:0!important; border-radius:var(--pw-radius-sm)!important; background:transparent; box-shadow:none;
     color:inherit; font:var(--pw-weight-medium) var(--pw-text-sm)/20px var(--pw-font,system-ui,sans-serif); text-shadow:none;
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn svg {
@@ -471,7 +472,7 @@ html.pw-theme #V-PopupsCompose .pw-image-tools {
 html.pw-theme #V-PopupsCompose .pw-image-tools button,
 html.pw-theme #V-PopupsCompose .pw-attachment-compression button {
   min-height:34px;padding:var(--pw-space-2) var(--pw-space-3);margin:0;background:transparent;color:inherit;
-  border:0!important;border-radius:5px!important;font:inherit;cursor:pointer;
+  border:0!important;border-radius:var(--pw-radius-sm)!important;font:inherit;cursor:pointer;
 }
 html.pw-theme #V-PopupsCompose .pw-image-tools button:hover,
 html.pw-theme #V-PopupsCompose .pw-attachment-compression button:hover {
@@ -548,7 +549,7 @@ html.pw-theme #V-MailMessageList .pw-draft-row:disabled {opacity:.6;cursor:progr
 html.pw-theme #V-MailMessageList .pw-draft-icon {grid-column:1;color:var(--nc-color-text-maxcontrast);font-size:15px;}
 html.pw-theme #V-MailMessageList .pw-draft-recipient {grid-column:2;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--pw-text-sm);}
 html.pw-theme #V-MailMessageList .pw-draft-row time {grid-column:4;font-size:var(--pw-text-xs);color:var(--nc-color-text-maxcontrast);white-space:nowrap;}
-html.pw-theme #V-MailMessageList .pw-draft-badge {grid-column:3;font-size:var(--pw-text-xs);line-height:1.5;padding:var(--pw-space-0-5) var(--pw-space-1);border:1px solid var(--nc-color-border);border-radius:3px;color:var(--nc-color-text-maxcontrast);}
+html.pw-theme #V-MailMessageList .pw-draft-badge {grid-column:3;font-size:var(--pw-text-xs);line-height:1.5;padding:var(--pw-space-0-5) var(--pw-space-1);border:1px solid var(--nc-color-border);border-radius:var(--pw-radius-sm);color:var(--nc-color-text-maxcontrast);}
 html.pw-theme #V-MailMessageList .pw-draft-subject {grid-column:2/5;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--pw-weight-strong);}
 html.pw-theme #V-MailMessageList .pw-drafts-more {margin:var(--pw-space-1) var(--pw-space-3);min-height:36px;padding:var(--pw-space-2) var(--pw-space-2);border:0!important;background:transparent;color:var(--nc-color-main-text);font:inherit;font-size:var(--pw-text-xs);cursor:pointer;}
 html.pw-theme #V-MailMessageList .pw-drafts-more[hidden],

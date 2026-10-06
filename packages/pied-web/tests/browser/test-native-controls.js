@@ -11,7 +11,7 @@ await list.goto(base+'?mode=list&side=1&shell=1&listOnly=1');
 await list.waitForSelector('#top-system-dropdown-id');
 check('The account switcher uses the theme chevron, not the text glyph',await list.evaluate(()=>{
  const s=getComputedStyle(document.querySelector('#top-system-dropdown-id'),'::after');
- return s.maskImage!=='none'&&s.content==='""'&&parseFloat(s.width)===14
+ return s.maskImage!=='none'&&s.content==='""'&&parseFloat(s.width)===12
   &&s.backgroundColor!=='rgba(0, 0, 0, 0)';
 }));
 

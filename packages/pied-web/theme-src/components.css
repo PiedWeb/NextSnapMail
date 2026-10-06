@@ -1,0 +1,176 @@
+/* Shared native primitives, after the feature sheets. Scope to application
+ * chrome: received message HTML, editor content and third-party frames are not
+ * restyled. Geometry of the main list/reader/composer remains feature-owned. */
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose),#V-Login) {
+  font:var(--pw-weight-regular) var(--pw-text-sm)/var(--pw-leading-snug) var(--pw-font,system-ui);
+  color:var(--nc-color-main-text);
+}
+html.pw-theme #rl-app #V-SettingsPane {
+  min-width:0;
+  padding:var(--pw-space-6);
+  border:0;
+  border-radius:0;
+}
+html.pw-theme #rl-app #V-SettingsPane .b-content { min-width:0;max-width:100%; }
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .legend {
+  font:var(--pw-weight-strong) var(--pw-text-lg)/var(--pw-leading-tight) var(--pw-font,system-ui);
+  padding-block:var(--pw-space-3);
+  margin-block:var(--pw-space-6) var(--pw-space-4);
+  border-color:var(--pw-line);
+}
+html.pw-theme #rl-app #V-SettingsPane .legend:first-child { margin-block-start:0; }
+html.pw-theme #rl-app #rl-popups > dialog:not(.pw-inline-reply) {
+  border:0;
+  border-radius:var(--pw-radius-lg);
+  box-shadow:var(--pw-elevation-5);
+  filter:none;
+  background:var(--pw-paper);
+}
+html.pw-theme #rl-app #rl-popups > dialog > header h3 {
+  font:var(--pw-weight-strong) var(--pw-text-xl)/var(--pw-leading-tight) var(--pw-font,system-ui);
+}
+html.pw-theme #rl-app #rl-popups > dialog > :is(header,footer) { border-color:var(--pw-line); }
+html.pw-theme #rl-app #rl-popups > dialog > footer { gap:var(--pw-space-2);flex-wrap:wrap; }
+html.pw-theme #rl-app #rl-popups > dialog > footer :is(.btn+ .btn,button+button) { margin:0; }
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose),#V-Login) :is(input:not([type=checkbox]):not([type=radio]),select,textarea,.select) {
+  box-sizing:border-box;
+  min-width:0;
+  max-width:100%;
+  min-height:var(--pw-control-height);
+  font:var(--pw-weight-regular) var(--pw-text-sm)/var(--pw-leading-snug) var(--pw-font,system-ui);
+  border:1px solid var(--pw-line);
+  border-radius:var(--pw-radius-md);
+  background-color:var(--pw-paper);
+  color:var(--nc-color-main-text);
+  box-shadow:none;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose),#V-Login) :is(input:not([type=checkbox]):not([type=radio]),select,textarea,.select):focus {
+  border-color:var(--pw-focus);
+  outline:none;
+  box-shadow:none;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) :is(.btn,button) {
+  box-sizing:border-box;
+  min-height:var(--pw-control-height);
+  height:auto;
+  padding:var(--pw-space-1) var(--pw-space-3);
+  font:var(--pw-weight-medium) var(--pw-text-sm)/var(--pw-leading-snug) var(--pw-font,system-ui);
+  border-width:1px !important;
+  border-radius:var(--pw-radius-md);
+  white-space:normal;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .btn-danger {
+  background:var(--pw-danger-fill);
+  color:var(--pw-on-danger);
+  border-color:transparent !important;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group {
+  display:flex;
+  align-items:flex-start;
+  gap:var(--pw-space-3);
+  min-width:0;
+  margin-block-end:var(--pw-space-4);
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group > label {
+  flex:0 0 140px;
+  width:140px;
+  min-width:0;
+  padding-block-start:var(--pw-space-2);
+  white-space:normal;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group > :not(label) {
+  min-width:0;
+  max-width:100%;
+  margin-inline:0;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .e-component {
+  min-width:0;
+  max-width:100%;
+  white-space:normal;
+}
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) { width:100%;table-layout:fixed; }
+html.pw-theme #rl-app #V-SettingsPane :is(.account-name,.identity-name,.key-user,.key-id) { overflow-wrap:anywhere;white-space:normal;max-width:100%; }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td { white-space:normal;padding-inline:var(--pw-space-1); }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td:first-child { width:var(--pw-control-touch); }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td:nth-last-child(-n+2) { width:var(--pw-control-touch); }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) .button-confirm-delete { padding-inline:var(--pw-space-0-5);min-width:0;max-width:100%;overflow-wrap:anywhere; }
+html.pw-theme #rl-app .button-confirm-delete { transition:opacity 150ms ease-out,transform 150ms ease-out; }
+html.pw-theme #rl-app #V-SettingsPane [role=button] { cursor:pointer; }
+html.pw-theme #rl-app #V-SettingsPane :is(span,div,i)[role=button]:not(.select) {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:var(--pw-control-height);
+  min-height:var(--pw-control-height);
+  border-radius:var(--pw-radius-sm);
+}
+html.pw-theme #rl-app #V-SettingsPane [role=button]:hover { background:var(--pw-grey-100); }
+html.pw-theme #rl-app #V-SettingsPane [role=button][aria-pressed=true] { color:var(--pw-primary-ink);background:var(--pw-selected); }
+html.pw-theme #rl-app [data-i18n="SETTINGS_GENERAL/CHROME_NOTIFICATION_DESC_DENIED"] { color:var(--pw-muted) !important; }
+html.pw-theme #rl-app .settings-save-trigger.success::after { color:var(--pw-success-ink); }
+html.pw-theme #rl-app .settings-save-trigger.error::after { color:var(--pw-danger-ink); }
+html.pw-theme #rl-app .settings-save-trigger-input.success { border-color:var(--pw-success-ink); }
+html.pw-theme #rl-app .settings-save-trigger-input.error { border-color:var(--pw-danger-ink); }
+html.pw-theme #rl-app .settings-save-trigger-input:is(.success,.error):focus { border-color:var(--pw-focus); }
+html.pw-theme #rl-app .control-group.error :is(input,select,textarea) { color:var(--nc-color-main-text);border-color:var(--pw-danger-ink);box-shadow:none; }
+html.pw-theme #rl-app .control-group.error > label { color:var(--pw-danger-ink); }
+html.pw-theme #rl-app .alert-error { color:var(--pw-danger-ink);background:var(--pw-danger-tint);border-color:var(--pw-danger-ink); }
+html.pw-theme #rl-app .alert-info { color:var(--pw-info-ink);background:var(--pw-info-tint);border-color:var(--pw-info-ink); }
+html.pw-theme #rl-app .alert-success { color:var(--pw-success-ink);background:var(--pw-success-tint);border-color:var(--pw-success-ink); }
+html.pw-theme #rl-app #V-PopupsCompose .b-attachment-place { border-width:1px;border-color:var(--pw-focus); }
+html.pw-theme #rl-app #V-PopupsContacts .e-contact-item { border-inline-start-width:1px;border-radius:0; }
+html.pw-theme #rl-app .pw-native-status-text { position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap; }
+@media(max-width:799px) {
+  html.pw-theme #rl-app #V-SettingsPane { padding:var(--pw-space-4); }
+  html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group:has(> label) { flex-direction:column;gap:var(--pw-space-1); }
+  html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group > label { flex:0 0 auto;width:100%;text-align:start;padding:0; }
+  html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .form-horizontal .control-group > :not(label) { width:100%; }
+  html.pw-theme #rl-app .pw-search-scope-field select { width:100%;flex:none; }
+  html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) :is(select,input:not([type=checkbox]):not([type=radio]),textarea,.select) { font-size:var(--pw-text-md); }
+}
+
+/* One SVG vocabulary for recurring native chrome actions. */
+html.pw-theme #rl-app {
+  --pw-native-close:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m6%206%2012%2012M6%2018%2018%206%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-menu:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M4%206h16M4%2012h16M4%2018h16%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-trash:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M3%206h18M8%206V4h8v2M5%206l1%2015h12l1-15M10%2010v7M14%2010v7%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-eye:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M2%2012s4-7%2010-7%2010%207%2010%207-4%207-10%207S2%2012%202%2012Z%22%2F%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%223%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-check:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m5%2012%204%204%2010-10%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-play:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m8%205%2011%207-11%207Z%22%2F%3E%3C%2Fsvg%3E");
+  --pw-native-grip:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%205h.01M15%205h.01M9%2012h.01M15%2012h.01M9%2019h.01M15%2019h.01%22%2F%3E%3C%2Fsvg%3E");
+}
+html.pw-theme #rl-app #rl-popups > dialog > header .close {
+  display:inline-flex;align-items:center;justify-content:center;
+  width:var(--pw-control-touch);height:var(--pw-control-touch);
+  margin:0;opacity:1;font-size:0;text-shadow:none;border-radius:var(--pw-radius-sm);
+}
+html.pw-theme #rl-app #rl-popups > dialog > header .close::before {
+  content:'';width:18px;height:18px;background:currentColor;mask:var(--pw-native-close) center/contain no-repeat;
+}
+html.pw-theme #rl-app #rl-popups > dialog > header .close:hover { background:var(--pw-grey-100); }
+html.pw-theme #rl-app #V-SettingsPane .toggleLeft::before {
+  content:'';display:block;width:18px;height:18px;background:currentColor;mask:var(--pw-native-menu) center/contain no-repeat;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) [data-pw-native-icon] { font-size:0;color:var(--pw-muted) !important; }
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) [data-pw-native-icon]::before {
+  content:'';display:inline-block;width:18px;height:18px;background:currentColor;mask:var(--pw-native-action-icon) center/contain no-repeat;
+}
+html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) [data-pw-native-icon][aria-pressed=true] { color:var(--pw-primary-ink) !important; }
+html.pw-theme #rl-app [data-pw-native-icon="trash"] { --pw-native-action-icon:var(--pw-native-trash); }
+html.pw-theme #rl-app [data-pw-native-icon="eye"] { --pw-native-action-icon:var(--pw-native-eye); }
+html.pw-theme #rl-app [data-pw-native-icon="check"] { --pw-native-action-icon:var(--pw-native-check); }
+html.pw-theme #rl-app [data-pw-native-icon="play"] { --pw-native-action-icon:var(--pw-native-play); }
+html.pw-theme #rl-app [data-pw-native-icon="grip"] { --pw-native-action-icon:var(--pw-native-grip); }
+
+html.pw-theme #rl-app #V-SettingsPane .identity-default { color:var(--pw-muted); }
+html.pw-theme #rl-app #V-PopupsContacts :is(.listEmptyList,.listEmptySearchList) { color:var(--pw-muted);font-size:var(--pw-text-md); }
+html.pw-theme #rl-app #V-SettingsPane :is(.account-name,.identity-name) { word-break:normal; }
+
+html.pw-theme #rl-app #rl-popups > dialog:not(#V-PopupsCompose) > footer :is(button[form],.buttonSave):not(.btn-danger) {
+  background:var(--nc-color-primary-element);
+  color:var(--nc-color-primary-element-text);
+  border-color:transparent !important;
+}
+html.pw-theme #rl-app #rl-popups > dialog:not(#V-PopupsCompose) > footer :is(button[form],.buttonSave):not(.btn-danger):hover { background:var(--pw-primary-600); }
+html.pw-theme #rl-app [data-pw-native-icon="edit"] { --pw-native-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m16%203%205%205-12%2012-6%201%201-6Z%20M13%206l5%205%22%2F%3E%3C%2Fsvg%3E"); }
+html.pw-theme #rl-app [data-pw-native-icon="add"] { --pw-native-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205v14M5%2012h14%22%2F%3E%3C%2Fsvg%3E"); }

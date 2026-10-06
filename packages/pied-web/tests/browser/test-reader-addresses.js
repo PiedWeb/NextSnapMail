@@ -45,7 +45,7 @@ check('Ctrl+Enter copies the focused address without composing',await p.evaluate
 check('A focused address shows a visible focus ring',await p.evaluate(selector=>{
     const link=document.querySelector(selector+' a.pw-address'),style=getComputedStyle(link);
     return document.activeElement===link && link.matches(':focus-visible')
-        && parseFloat(style.outlineWidth)>=2 && style.outlineStyle==='solid';
+        && parseFloat(style.outlineWidth)===1 && style.outlineStyle==='solid';
 },row(2)));
 await p.locator(row(2)+' a.pw-address:first-of-type').press('Enter');
 check('Enter alone opens a new message for the focused address',await p.evaluate(()=>

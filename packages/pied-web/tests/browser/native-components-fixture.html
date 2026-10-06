@@ -1,0 +1,79 @@
+<!doctype html><html lang="fr" class="pw-theme" data-themes="light"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="/app/snappymail/v/2.38.2/static/css/app.css">
+<link rel="stylesheet" href="/.local-work/theme/style.css">
+<link rel="stylesheet" href="/.local-work/pied-web-ux/ux.css">
+<style>:root{--color-primary-element:#107b76;--color-primary-element-text:#fff}*,*::before,*::after{box-sizing:border-box}body{margin:0}#rl-app{position:absolute;inset:0;display:flex}#rl-content{display:flex;width:100%;height:100%}#rl-right{flex:1;min-width:0;position:relative}#V-SettingsPane{height:100%;margin:0;overflow:auto}#fixture-partial{padding:24px;overflow:auto;max-height:100vh}</style>
+</head><body><div id="rl-app"><div id="rl-content"><div id="rl-right"></div></div><div id="rl-popups"></div></div>
+<script src="/app/snappymail/v/2.38.2/static/js/libs.js"></script>
+<script src="/.local-work/pied-web-ux/native-components.js"></script>
+<script>
+// Real templates and Knockout, fictional values and no remote transport.
+window.fixtureReady=(async()=>{
+ const base='/app/snappymail/v/2.38.2/app/';
+ const lang=await(await fetch(base+'localization/fr/user.json')).json();
+ const translate=key=>lang[key.split('/')[0]]?.[key.split('/')[1]]||key.split('/')[1]||key;
+ const template=async name=>await(await fetch(base+'templates/Views/'+name+'.html')).text();
+ const checkbox=await template('Components/Checkbox'),select=await template('Components/Select');
+ window.fixtureCalls={edit:0,delete:0,sort:0,action:0};
+ window.fixtureRender=async name=>{
+  document.querySelectorAll('dialog[open]').forEach(e=>e.close());
+  for(const host of [document.getElementById('rl-right'),document.getElementById('rl-popups')]){while(host.firstChild)ko.removeNode(host.firstChild);}
+  const stem=name.split('/')[1],root=document.createElement(stem.startsWith('Popups')?'dialog':'div');
+  root.id=stem.startsWith('Settings')?'V-Settings-'+stem.slice(8):'V-'+stem;
+  root.className=stem.startsWith('Settings')?'b-content':'animate';
+  const host=document.getElementById(stem.startsWith('Popups')?'rl-popups':'rl-right');
+  if(stem.startsWith('Settings')){const pane=document.createElement('div');pane.id='V-SettingsPane';host.append(pane);pane.append(root);}else host.append(root);
+  root.innerHTML=stem==='SettingsFolderItem'?'<table><tbody>'+await template(name)+'</tbody></table>':await template(name);
+  const vm={viewModelDom:root,viewModelTemplateID:stem};
+  if(stem==='SettingsAccounts'){
+   const account=(label,additional)=>({displayName:ko.observable(label),isAdditional:ko.observable(additional),askDelete:ko.observable(false)});
+   vm.accounts=ko.observableArray([account('Compte principal',false),account('Compte de démonstration avec une adresse très longue pour le téléphone',true),account('Second compte fictif',true)]);
+   vm.identities=ko.observableArray([]);vm.allowAdditionalAccount=vm.allowIdentities=true;vm.loading=ko.observable(false);vm.showUnread=ko.observable(true);
+   vm.addNewAccount=vm.addNewIdentity=()=>fixtureCalls.action++;
+   vm.deleteAccount=item=>{if(item.askDelete()){fixtureCalls.delete++;}else item.askDelete(true);};
+   vm.accountForDeletion=item=>item.askDelete(true);vm.identityForDeletion=vm.deleteIdentity=()=>{};
+   vm.accountsAndIdentitiesAfterMove=()=>fixtureCalls.sort++;
+   // Use the engine's exported binding-accessor API, not removed Knockout APIs.
+   root.querySelectorAll('[data-bind]').forEach(node=>node.removeAttribute('data-bind'));
+   root.querySelector('.identities-list tbody').innerHTML='';
+   const body=root.querySelector('.accounts-list tbody'),sample=document.createElement('template');
+   sample.innerHTML='<tr draggable="true"><td><i class="fontastic drag-handle">⬍</i></td><td class="e-action"><span class="account-name"></span></td><td><a class="btn btn-small btn-danger button-confirm-delete" data-i18n="GLOBAL/ARE_YOU_SURE" data-bind="click: deleteAccount"></a></td><td><span class="delete fontastic" data-bind="click: accountForDeletion">🗑</span></td></tr>';
+   ko.computed(()=>{
+    while(body.firstChild)ko.removeNode(body.firstChild);
+    vm.accounts().forEach(item=>{
+     const row=sample.content.firstElementChild.cloneNode(true);body.append(row);
+     ko.applyBindingAccessorsToNode(row,{attr:()=>({draggable:item.isAdditional()})},item);
+     ko.applyBindingAccessorsToNode(row.querySelector('.e-action'),{attr:()=>({})},item);
+     ko.applyBindingAccessorsToNode(row.querySelector('.account-name'),{text:()=>item.displayName},item);
+     ko.applyBindingAccessorsToNode(row.querySelector('.delete'),{visible:()=>!item.askDelete(),click:()=>()=>vm.accountForDeletion(item)},item);
+     ko.applyBindingAccessorsToNode(row.querySelector('.button-confirm-delete'),{css:()=>({'delete-access':item.askDelete()}),click:()=>()=>vm.deleteAccount(item)},item);
+     row.querySelector('.button-confirm-delete').textContent=translate('GLOBAL/ARE_YOU_SURE');
+     if(!item.isAdditional()){row.querySelector('.e-action').className='';row.querySelector('.drag-handle').remove();row.querySelector('.delete').remove();row.querySelector('.button-confirm-delete').remove();}
+    });
+   },null,{disposeWhenNodeIsRemoved:root});
+   root.addEventListener('click',event=>{const cell=event.target.closest('.accounts-list .e-action');if(cell&&ko.dataFor(cell))fixtureCalls.edit++;});
+   window.fixtureVM=vm;
+  }else{
+   root.querySelectorAll('[data-bind*="component:"]').forEach(node=>{
+    const binding=node.dataset.bind,kind=binding.match(/name:\s*['"](Checkbox|Select)['"]/)?.[1];
+    if(!kind)return;
+    node.innerHTML=kind==='Checkbox'?checkbox:select;
+    if(kind==='Checkbox'){const label=binding.match(/label:\s*['"]([^'"]+)/)?.[1];node.querySelector('span').textContent=label?translate(label):'Option fictive';}
+   });
+   root.querySelectorAll('[data-bind]').forEach(node=>{
+    const binding=node.dataset.bind;
+    if(/(?:^|[,\s])click\s*:/.test(binding))node.addEventListener('click',event=>{event.preventDefault();fixtureCalls.action++;});
+    else node.removeAttribute('data-bind');
+   });
+   root.querySelectorAll('select').forEach(node=>{if(!node.options.length)node.innerHTML='<option>Option de démonstration longue</option>';});
+  }
+  root.querySelectorAll('[data-i18n]').forEach(node=>{const key=node.dataset.i18n,m=key.match(/^\[([^\]]+)\](.*)$/);if(m)node.setAttribute(m[1],translate(m[2]));else node.textContent=translate(key);});
+  root.querySelectorAll('form').forEach(node=>node.addEventListener('submit',event=>event.preventDefault()));
+  dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));
+  if(root.tagName==='DIALOG')root.showModal();
+  window.fixtureRoot=root;return root.id;
+ };
+ return true;
+})();
+</script></body></html>

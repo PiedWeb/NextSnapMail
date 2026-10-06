@@ -51,6 +51,12 @@
   --pw-radius-lg: 8px;
   --pw-radius-pill: 999px;
 
+  /* Shared control roles. Small icon tools can explicitly use compact. */
+  --pw-control-compact: 32px;
+  --pw-control-standard: 36px;
+  --pw-control-touch: 44px;
+  --pw-control-height: var(--pw-control-standard);
+
   /* Grey ramp: the instance foreground mixed into the instance background.
    * 200 draws lines, 400 draws inactive glyphs, 600 and 700 carry quiet text. */
   --pw-grey-50: color-mix(in oklch, var(--nc-color-main-text) 4%, var(--nc-color-main-background));
@@ -88,7 +94,18 @@
   --pw-flag: color-mix(in oklch, oklch(0.68 0.15 75) 72%, var(--nc-color-main-text));
   --pw-flag-tint: color-mix(in oklch, oklch(0.68 0.15 75) 16%, var(--nc-color-main-background));
   --pw-danger: var(--nc-color-error, #b3261e);
-  --pw-danger-tint: color-mix(in oklch, var(--nc-color-error, #b3261e) 12%, var(--nc-color-main-background));
+  --pw-danger-ink: color-mix(in oklch, var(--pw-danger) 65%, var(--nc-color-main-text));
+  --pw-danger-tint: color-mix(in oklch, var(--pw-danger) 12%, var(--nc-color-main-background));
+  --pw-danger-fill: color-mix(in oklch, var(--pw-danger) 80%, oklch(.25 .06 25));
+  --pw-on-danger: oklch(.99 .003 25);
+  --pw-success: var(--nc-color-success, oklch(.55 .12 145));
+  --pw-success-ink: color-mix(in oklch, var(--pw-success) 60%, var(--nc-color-main-text));
+  --pw-success-tint: color-mix(in oklch, var(--pw-success) 12%, var(--nc-color-main-background));
+  --pw-warning: oklch(.65 .13 75);
+  --pw-warning-ink: color-mix(in oklch, var(--pw-warning) 55%, var(--nc-color-main-text));
+  --pw-warning-tint: color-mix(in oklch, var(--pw-warning) 12%, var(--nc-color-main-background));
+  --pw-info-ink: var(--pw-primary-ink);
+  --pw-info-tint: var(--pw-primary-50);
 
   /* Named surfaces, each one decision rather than a value repeated in a rule.
    * The rail is deliberately a touch deeper than the reading surface: at 6 %
@@ -113,3 +130,5 @@
   --pw-elevation-4: var(--pw-ring), 0 2px 4px rgb(0 0 0 / .03), 0 14px 32px rgb(0 0 0 / .11);
   --pw-elevation-5: var(--pw-ring), 0 24px 56px rgb(0 0 0 / .16);
 }
+
+@media (pointer:coarse) { :root { --pw-control-height:var(--pw-control-touch); } }

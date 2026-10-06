@@ -33,3 +33,14 @@ the text and following rows stationary when controls appear. Mobile and touch
 layouts retain visible controls.
 
 Use the existing Nextcloud app-menu button, icon and popover by mounting the original app-menu node inside the filter row, within Calendar’s mobile focus trap. Restore it to its header placeholder on exit. Preserve native translations, permissions, focus and keyboard behavior. Keep a visible focus ring and native hover state. Do not add decorative animation.
+
+## Shared native components
+
+Settings and native popups share 14 px fields on desktop, 16 px on narrow screens,
+18 px section legends and 20 px task titles; buttons use weight 500. Field/control
+radius is 6 px, small actions 4 px, modal surfaces 8 px. Compact/standard/touch
+control roles are 32/36/44 px; close targets stay 44 px. A floating surface has
+one tokenized elevation and no added border/filter. Search labels stack above
+full-width controls below 800 px. Native account tables wrap within their panel.
+Accent ink is distinct from primary fill; danger/success/warning/info have
+separate ink and tint roles. Keep all visible component borders and focus at 1 px.

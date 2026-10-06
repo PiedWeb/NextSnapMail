@@ -84,7 +84,7 @@ await p.locator('.pw-outgoing-now').press('ArrowDown');
 check('A focused Send now shows a visible ring and takes on the action tint',await p.evaluate(()=>{
  const now=document.querySelector('.pw-outgoing-now'),style=getComputedStyle(now);
  return document.activeElement===now&&now.matches(':focus-visible')
-  &&parseFloat(style.outlineWidth)>=2&&style.outlineStyle==='solid'
+  &&parseFloat(style.outlineWidth)===1&&style.outlineStyle==='solid'
   &&!/rgba\(0, 0, 0, 0\)|transparent/.test(style.backgroundColor);
 }));
 

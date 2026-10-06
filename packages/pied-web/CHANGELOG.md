@@ -1,5 +1,21 @@
 # Releases
 
+## 1.10.23, 2026-10-06
+
+Native settings and dialogs now share the Mail field, button, title, radius,
+focus and elevation contracts. Borders remain at most one pixel, including
+attachment drop zones and native contact rows. Mobile search scope gets a
+full row; long account names wrap within their panel. Text accents use ink
+rather than fill colours, and save/danger feedback uses semantic tokens.
+
+The native post-binding hook associates field labels, names icon actions,
+adds keyboard activation without replacing commands, announces save feedback
+and gives account/identity ordering an Alt+Arrow alternative. Main list,
+reader, editor content and mailbox workflows retain their existing ownership.
+Tests now follow the accepted one-pixel focus/stripe and scoped chevron;
+new native-component coverage exercises late mounting and confirmations.
+See [design system](docs/DESIGN_SYSTEM.md) for roles and limits.
+
 ## 1.10.22, 2026-10-06
 
 The native editor mode select keeps its one-pixel border as its sole focus

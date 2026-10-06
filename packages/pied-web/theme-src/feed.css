@@ -11,7 +11,7 @@
 #rl-app .pw-list-scope { display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:4px 16px;border-bottom:1px solid var(--pw-line); }
 #rl-app .pw-list-scope-label { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--pw-weight-strong) var(--pw-text-sm)/1.4 var(--pw-font); }
 html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
-#rl-app .pw-search-scope-field > label { flex-shrink:0; }
+#rl-app .pw-search-scope-field > label { flex:0 0 140px; }
 #rl-app .pw-search-scope-field select { width:100%;min-width:0;min-height:36px; }
 @media(min-width:800px) {
   #rl-app .pw-list-scope { padding-inline-start:0; }
@@ -40,7 +40,7 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
 #rl-app .pw-global-selection { display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:4px 16px; }
 #rl-app .pw-global-selection label { display:flex;align-items:center;gap:6px;min-height:36px; }
 #rl-app .pw-global-selection input { width:18px;height:18px; }
-#rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:36px;padding:6px 10px;border:0!important;border-radius:var(--pw-radius-md);background:transparent;color:var(--nc-color-primary-element);font:var(--pw-weight-medium) var(--pw-text-xs)/1.4 var(--pw-font);cursor:pointer; }
+#rl-app .pw-global-selection button,#rl-app .pw-global-pager button,#rl-app .pw-feed-return { min-height:var(--pw-control-height);padding:var(--pw-space-1) var(--pw-space-3);border:0!important;border-radius:var(--pw-radius-md);background:transparent;color:var(--pw-primary-ink);font:var(--pw-weight-medium) var(--pw-text-xs)/1.4 var(--pw-font);cursor:pointer; }
 #rl-app .pw-global-selection [hidden],#rl-app .pw-global-pager[hidden],#rl-app .pw-feed-return[hidden] { display:none!important; }
 #rl-app .pw-global-selection button:focus-visible,#rl-app .pw-global-pager button:focus-visible,#rl-app .pw-feed-return:focus-visible { outline:1px solid var(--pw-focus);outline-offset:-2px; }
 #rl-app .pw-global-selection button:disabled,#rl-app .pw-global-pager button:disabled { cursor:progress;opacity:.55; }
@@ -106,12 +106,12 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
   font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 var(--pw-font);
 }
 #rl-app #V-MailMessageList .pw-global-refresh {
-  min-height:36px;
+  min-height:var(--pw-control-height);
   padding:0 var(--pw-space-3);
   border:0!important;
   border-radius:var(--pw-radius-md);
   background:transparent;
-  color:var(--nc-color-primary-element);
+  color:var(--pw-primary-ink);
   font:var(--pw-weight-medium) var(--pw-text-xs)/1 var(--pw-font);
   cursor:pointer;
 }
@@ -191,7 +191,7 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
   white-space:nowrap;
 }
 #rl-app #V-MailMessageList .pw-global-draft .pw-global-account {
-  color:var(--nc-color-primary-element);
+  color:var(--pw-primary-ink);
   background:var(--pw-primary-100);
 }
 #rl-app #V-MailMessageList.pw-feed-unread-only .messageList > .b-footer { display:none!important; }

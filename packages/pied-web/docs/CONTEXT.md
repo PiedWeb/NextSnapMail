@@ -268,6 +268,22 @@ restoration placeholder. A fixed launcher outside the trap breaks mobile pointer
 access. Collapsed navigation reveals the grid through its native drawer button. No event
 data/settings are changed. See `deployments/calendar-1.0.1.md`.
 
+## Native design-system primitives
+
+Since 1.10.23, `native-components.js` consumes the existing post-binding
+`rl-view-model` event for native settings, Login and popups. Keep native bound
+nodes, translations and click/command ownership. Per-view observers only handle
+late components, rows and save-state classes, and are disposed with Knockout.
+Do not observe the whole mail workspace or relabel received messages/editor HTML.
+
+Fields associate adjacent native labels by stable IDs; wrapped checkbox labels
+retain their ownership. Non-button native actions use role/Tab/Enter/Space, while
+anchors and existing onEnter/onSpace bindings retain their own activation.
+Account/identity Alt+Arrow ordering calls the native observable list and existing
+sort-persistence method, never moving an additional account above the principal.
+Save feedback gets polite text, and errors retain a described state alongside
+strong one-pixel focus. See DESIGN_SYSTEM.md for native styling boundaries.
+
 ## Deployment runtime contract
 
 The live URL is nc.robin-d.fr. On n0c, web LiteSpeed OPcache can retain old plugin PHP

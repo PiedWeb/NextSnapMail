@@ -62,7 +62,7 @@ const focusState=await p.evaluate(()=>{
  return {inside:document.querySelector('.pw-reminder-panel').contains(node),visible:node.matches(':focus-visible'),
   width:parseFloat(style.outlineWidth),style:style.outlineStyle,tag:node.outerHTML.slice(0,100)};
 });
-check('Keyboard focus is visibly located inside the picker',focusState.inside&&focusState.visible&&focusState.width>=2&&focusState.style==='solid');
+check('Keyboard focus is visibly located inside the picker',focusState.inside&&focusState.visible&&focusState.width===1&&focusState.style==='solid');
 await p.locator('.pw-reminder-option').first().press('Escape');
 check('Escape closes the picker and returns focus to its action',await p.evaluate(()=>
  !document.querySelector('.pw-reminder-panel')&&document.activeElement===document.querySelector('.pw-remind-message')
