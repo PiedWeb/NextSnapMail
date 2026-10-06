@@ -1,6 +1,7 @@
 const p=await browser.getPage('nextsnapmail-list-polish');p.setDefaultTimeout(15000);
 await p.setViewportSize({width:1440,height:950});await p.emulateMedia({colorScheme:'light'});
 await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?drafts=1&mode=reader&side=1');await p.waitForSelector('.pw-draft-row');
+await p.mouse.move(0,0);
 await p.evaluate(async()=>{
  const source=await(await fetch('/app/snappymail/v/2.38.2/static/js/app.js')).text();
  const start=source.indexOf("this.selector.on('click', (event, currentMessage) => {");
@@ -25,6 +26,18 @@ await p.evaluate(async()=>{
 await p.waitForSelector('.threads-len[data-pw-total]');
 const results=[];const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
 check('Native count text is preserved; accessible label explains total and unread',await p.evaluate(()=>{const b=document.querySelector('.threads-len');return b.textContent==='13/4'&&b.dataset.pwTotal==='13'&&b.dataset.pwUnread==='4 non lus'&&b.getAttribute('aria-label').includes('13 messages, dont 4 non lus');}));
+const compactBadges=()=>p.evaluate(()=>{
+ const badges=[...document.querySelectorAll('.threads-len')];
+ return badges.every(b=>{
+  const total=getComputedStyle(b,'::before'),dot=getComputedStyle(b,'::after');
+  if(!b.dataset.pwUnread)return dot.content==='none';
+  return total.content==='"'+b.dataset.pwTotal+'"'&&dot.content==='""'
+   &&dot.width==='6px'&&dot.height==='6px'&&dot.borderRadius==='50%'
+   &&dot.backgroundColor!=='rgba(0, 0, 0, 0)'&&dot.backgroundColor!=='transparent'
+   &&b.getBoundingClientRect().width<60;
+ });
+});
+check('Desktop badges show only the total and a dot for unread threads',await compactBadges());
 check('A followed row carries an edge accent, not a full surface, and never outshines the open message',await p.evaluate(()=>{
  const rows=document.querySelectorAll('.messageListItem');
  const flagged=rows[1],plain=rows[2],open=rows[0];
@@ -42,10 +55,10 @@ check('The star keeps one glyph size whether or not the message is followed',awa
  const b=getComputedStyle(rows[1].querySelector('.flagParent'),'::after');
  return a.width===b.width&&a.height===b.height&&parseFloat(a.width)===19;
 }));
-check('Desktop keeps the flagged star visible and reserves the unflagged hit area',await p.evaluate(()=>{const rows=document.querySelectorAll('.messageListItem'),plain=rows[0].querySelector('.flagParent'),flagged=rows[1].querySelector('.flagParent');return getComputedStyle(plain).opacity==='0'&&getComputedStyle(flagged).opacity==='1'&&plain.getBoundingClientRect().width>=31.9;}));
+check('Desktop row action groups keep both native stars present and reserve their hit areas',await p.evaluate(()=>{const rows=document.querySelectorAll('.messageListItem'),plain=rows[0].querySelector('.flagParent'),flagged=rows[1].querySelector('.flagParent');return plain.parentElement.matches('.pw-row-actions')&&getComputedStyle(plain).opacity==='1'&&getComputedStyle(flagged).opacity==='1'&&plain.getBoundingClientRect().width>=31.9;}));
 await p.locator('.messageListItem').first().hover();
 await p.waitForFunction(()=>getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1');
-check('Hover reveals the unflagged star',await p.evaluate(()=>getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1'));
+check('Hover reveals the action group with its unflagged star',await p.evaluate(()=>getComputedStyle(document.querySelector('.messageListItem .pw-row-actions')).opacity==='1'&&getComputedStyle(document.querySelector('.messageListItem .flagParent')).opacity==='1'));
 await p.locator('.messageListItem .flagParent').first().click();await p.waitForFunction(()=>document.querySelector('.messageListItem .flagParent').getAttribute('aria-pressed')==='true');
 check('Pointer click uses the original native flag dispatcher once',await p.evaluate(()=>metadataActions.length===1&&metadataActions[0].action==='set'&&metadataActions[0].uids.join(',')==='1'));
 await p.locator('.messageListItem .flagParent').first().press('Space');
@@ -56,6 +69,7 @@ await p.evaluate(()=>{demoMessages[0].checked(true);demoMessages[1].checked(true
 check('Native multi-selection flag semantics remain unchanged',await p.evaluate(()=>metadataActions[2].uids.join(',')==='1,2'));
 await p.evaluate(()=>{const b=document.querySelector('.threads-len');b.textContent='13';b.removeAttribute('data-unseen');});await p.waitForFunction(()=>document.querySelector('.threads-len').dataset.pwUnread==='');
 check('Reading the conversation clears its unread label',await p.evaluate(()=>!document.querySelector('.threads-len').title.includes('non lu')));
+check('Reading the conversation removes the dot and preserves its total',await p.evaluate(()=>{const b=document.querySelector('.threads-len');return getComputedStyle(b,'::after').content==='none'&&getComputedStyle(b,'::before').content==='"13"';}));
 await p.evaluate(()=>document.querySelector('.threads-len').style.display='none');
 check('Native hidden counts remain hidden',await p.evaluate(()=>document.querySelector('.threads-len').getClientRects().length===0));
 await p.evaluate(()=>{document.querySelector('.threads-len').style.display='';document.documentElement.lang='en';});await p.waitForFunction(()=>document.querySelector('.threads-len').title.startsWith('Open conversation'));
@@ -68,7 +82,8 @@ for(const [width,dark] of [[390,false],[320,false],[390,true]]){
  await p.setViewportSize({width,height:900});await p.emulateMedia({colorScheme:dark?'dark':'light'});
  await p.evaluate(dark=>{document.documentElement.dataset.themes=dark?'dark':'light';document.getElementById('V-MailMessageView').hidden=true;document.getElementById('rl-right').classList.remove('message-selected');},dark);
  check('Mobile geometry '+width+(dark?' dark':''),await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth&&[...document.querySelectorAll('.messageListItem .flagParent')].every(b=>{const r=b.getBoundingClientRect();return r.width>=43.9&&r.height>=43.9&&r.right<=innerWidth;})));
- if(width===390&&!dark)check('Phone metadata steps behind the sender, and the unread dot yields to the spelled-out count',await p.evaluate(()=>{
+ check('Compact thread badges '+width+(dark?' dark':''),await compactBadges());
+ if(width===390&&!dark)check('Phone metadata steps behind the sender, and the row unread dot yields to the badge dot',await p.evaluate(()=>{
   const ctx=document.createElement('canvas').getContext('2d',{willReadFrequently:true});
   const lum=c=>{ctx.clearRect(0,0,1,1);ctx.fillStyle=c;ctx.fillRect(0,0,1,1);
    const [r,g,b]=ctx.getImageData(0,0,1,1).data;
