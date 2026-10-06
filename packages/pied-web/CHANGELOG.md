@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.11, 2026-10-06
+
+Cancelling Advanced search restores its committed scope through the native
+dialog's `open` attribute. SnappyMail does not hide that popup with a style or
+`hidden` change. The browser regression now exercises the actual close contract,
+and the scope label retains the same width as the other native form labels.
+
 ## 1.10.10, 2026-10-06
 
 Search scope now lives in the native Advanced search popup. Its choice applies

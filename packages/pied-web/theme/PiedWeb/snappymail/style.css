@@ -5588,6 +5588,7 @@ html:not(.pw-theme) #rl-app .pw-unread-order-setting { display:none!important; }
 #rl-app .pw-list-scope { display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:4px 16px;border-bottom:1px solid var(--pw-line); }
 #rl-app .pw-list-scope-label { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--pw-weight-strong) var(--pw-text-sm)/1.4 var(--pw-font); }
 html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
+#rl-app .pw-search-scope-field > label { flex-shrink:0; }
 #rl-app .pw-search-scope-field select { width:100%;min-width:0;min-height:36px; }
 @media(min-width:800px) {
   #rl-app .pw-list-scope #V-SystemDropDown.pw-scoped-account { margin:0;max-width:100%; }

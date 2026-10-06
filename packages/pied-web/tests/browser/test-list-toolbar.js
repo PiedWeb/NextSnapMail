@@ -46,7 +46,7 @@ await page.evaluate(async () => {
     popup.querySelectorAll('[data-i18n]').forEach(n => n.textContent = rl.i18n(n.dataset.i18n));
     // Use the native submission boundary: the form passes its built query to mainSearch's hook.
     popup.querySelector('form').addEventListener('submit',event => {
-        event.preventDefault(); rl.mailUi.onSearch('subject=projet&unseen'); popup.close(); popup.hidden = true;
+        event.preventDefault(); rl.mailUi.onSearch('subject=projet&unseen'); popup.close();
     });
     window.toolbarSearchPopup = popup;
     dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));
@@ -59,10 +59,10 @@ check('The late native advanced-search template owns the labelled scope select',
 const before = await page.evaluate(() => mailboxFixtureCalls.length);
 await page.locator('#pw-search-scope').selectOption('account');
 check('Choosing a scope waits for form submission',await page.evaluate(n => mailboxFixtureCalls.length === n,before));
-await page.evaluate(() => { toolbarSearchPopup.close(); toolbarSearchPopup.hidden = true; });
+await page.evaluate(() => { toolbarSearchPopup.close(); });
 await page.waitForFunction(() => document.querySelector('#pw-search-scope').value === 'global');
 check('Cancelling restores the committed search scope without a request',await page.evaluate(n => mailboxFixtureCalls.length === n,before));
-await page.evaluate(() => { toolbarSearchPopup.hidden = false; toolbarSearchPopup.showModal(); });
+await page.evaluate(() => { toolbarSearchPopup.showModal(); });
 await page.locator('#pw-search-scope').selectOption('account');
 await page.locator('.buttonAdvSearch').click();
 await page.waitForFunction(() => mailboxFixtureCalls.some(call => call.operation === 'search'));
@@ -92,12 +92,14 @@ check('Mobile restores its existing account header and leaves the scope in the p
     && getComputedStyle(document.querySelector('.pw-account-label')).display !== 'none'
     && !!document.querySelector('#V-PopupsAdvancedSearch #pw-search-scope')));
 await page.setViewportSize({width:1440,height:900});
+await page.waitForFunction(() => document.querySelector('.pw-list-scope #top-system-dropdown-id .pw-list-scope-label'));
 await page.evaluate(() => { document.documentElement.dataset.themes = 'dark'; });
 check('Dark desktop keeps the single account trigger',await page.evaluate(() =>
     !!document.querySelector('.pw-list-scope #top-system-dropdown-id .pw-list-scope-label')
     && getComputedStyle(document.querySelector('.pw-account-label')).display === 'none'));
 await page.evaluate(() => { document.querySelector('#app-theme-style').dataset.name = 'Default'; });
-await page.waitForFunction(() => !document.documentElement.classList.contains('pw-theme'));
+await page.waitForFunction(() => !document.documentElement.classList.contains('pw-theme')
+    && !document.querySelector('#top-system-dropdown-id .pw-list-scope-label'));
 check('Leaving Pied Web restores the native identity and hides its optional search scope',await page.evaluate(() =>
     !document.querySelector('#top-system-dropdown-id .pw-list-scope-label')
     && getComputedStyle(document.querySelector('.pw-search-scope-field')).display === 'none'));

@@ -42,7 +42,7 @@
             searchForm = form; form.querySelector(':scope > div')?.prepend(scopeField);
             form.addEventListener('submit',commitScope,true);
             popupObserver = new MutationObserver(() => { searchScope.value = searchScopeValue; });
-            popupObserver.observe(popup,{attributes:true,attributeFilter:['hidden','style']});
+            popupObserver.observe(popup,{attributes:true,attributeFilter:['open','hidden','style']});
         };
         const onSearchPopup = ({detail:popup}) => {
             if (popup.viewModelTemplateID === 'PopupsAdvancedSearch') mountSearchScope(popup.viewModelDom);
