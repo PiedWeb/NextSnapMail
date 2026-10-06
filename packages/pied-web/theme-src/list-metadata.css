@@ -1,4 +1,4 @@
-/* List metadata: a quiet total, explicit unread count, and native flag controls. */
+/* List metadata: a quiet total, an unread dot, and native flag controls. */
 #rl-app {
     --pw-list-metadata-version:1.7.14;
     --pw-flag-ink:var(--pw-flag);
@@ -37,8 +37,8 @@
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-total]::before {content:attr(data-pw-total);font:500 12px/1 var(--pw-font);}
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len::after {content:none;}
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
-    content:attr(data-pw-unread);font:600 10px/1 var(--pw-font);color:var(--pw-flag-ink);
-    padding-inline-start:var(--pw-space-1);border-inline-start:1px solid var(--pw-line);
+    content:'';flex:0 0 6px;width:6px;height:6px;border-radius:50%;
+    background:var(--pw-primary-ink);
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len:hover {background:var(--pw-selected);}
 #rl-app #rl-right #V-MailMessageList .messageListItem :is(.flagParent,.threads-len):focus-visible {
@@ -84,11 +84,6 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
     color:var(--pw-flag-ink);
 }
 /* The star keeps one size in both states so the row never shifts under the pointer. */
-/* Unread counts retain teal; amber is reserved for followed messages. */
-#rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
-    color:var(--pw-primary-ink);
-}
-
 /* Phone rows: four signals, not seven.
  *
  * A row carried the sender, an attachment glyph, a conversation pill, an unread
@@ -96,7 +91,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
  * (from whom, when). Nothing is removed, because every one of them is reachable
  * by touch and only by touch; they are put back in their place instead. The
  * sender, the subject and the hour keep full contrast, the rest steps back, and
- * the unread dot gives way when the pill already spells the count out.
+ * the row's unread dot gives way when the pill already carries that signal.
  */
 @media(max-width:799px) {
     #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-grey-400);}
@@ -108,9 +103,6 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
     }
     #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len {
         background:var(--pw-grey-100);color:var(--pw-grey-700);
-    }
-    #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len[data-pw-unread]:not([data-pw-unread=""])::after {
-        border-inline-start:0;
     }
     #rl-app #rl-right #V-MailMessageList .messageListItem.unseen:has(.threads-len[data-pw-unread]:not([data-pw-unread=""])) time::before {
         display:none;

@@ -23,6 +23,11 @@ This follows Schoger/Wathan, *Refactoring UI*, “Give each element just the spa
 it needs” (p. 77) and “Avoid ambiguous spacing” (pp. 96–99). Browser regressions
 measure the recovered width, rest metadata, hover/focus masking and row stability.
 
+Conversation badges show a compact total with a teal dot when any message in the
+thread is unread. The exact unread count stays in the French/English tooltip and
+accessible label. Fully read threads show the total alone. Native bindings,
+keyboard activation and phone hit areas remain intact in light and dark mode.
+
 ## 1.10.14, 2026-10-06
 
 The desktop account/list trigger uses square corners, including its neutral

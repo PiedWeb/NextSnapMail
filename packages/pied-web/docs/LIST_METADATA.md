@@ -1,8 +1,10 @@
 # Conversation counts and stars
 
-Pied Web replaces the dense native `13/4 ›` badge with a quiet total and an explicit
-French/English unread label: **13 · 4 non lus**. The accessible label and tooltip explain
-both values. SnappyMail still owns the underlying text and `data-unseen` binding, so counts
+Since 1.10.15, Pied Web replaces the dense native `13/4 ›` badge with a quiet total
+and a 6 px teal dot when the conversation contains unread messages: **13 ●**.
+Fully read conversations show the total alone. The French/English accessible label
+and tooltip retain the exact total and unread count. The dot uses the existing
+unread color in light and dark mode. SnappyMail still owns the underlying text and `data-unseen` binding, so counts
 update with native read/unread actions and disappear in expanded conversations as before.
 
 Stars remain visible at rest. An outlined star means the message is not followed; a filled

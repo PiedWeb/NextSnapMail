@@ -43,7 +43,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are the keyboard equivalent. Persist stable identifiers per active account, cache them only for
   first paint, ignore missing entries and append new ones. Expanding must restore the native
   hierarchy and order. See `FOLDER_RAIL.md`.
-- Conversation totals and unread counts are visually distinct; list stars use an
+- Since 1.10.15, conversation badges show only the total and a teal dot when any
+  member is unread. The tooltip and accessible label retain the exact unread count.
+  Keep SnappyMail's bound text and native read/unread updates intact.
+  List stars use an
   outlined/filled pair and preserve native folder/selection commands.
   Since 1.7.2 followed messages use an amber star and row tint. Metadata CSS belongs to the
   theme and works before plugin initialization; theme changes and late DOM mounting are tested.
