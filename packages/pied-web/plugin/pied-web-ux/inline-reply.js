@@ -10,6 +10,9 @@
     const messageKey = message => message?.folder && Number(message.uid) > 0
         ? String(message.folder) + '\u0000' + Number(message.uid) : '';
     const activeHost = () => readerVM?.viewModelDom?.querySelector('.b-message.pw-conversation-active');
+    // The reader gutters leave at least 720px of composing space in an 800px
+    // pane. Smaller panes and short screens need the full native composer.
+    const fitsInline = host => !!host && host.getBoundingClientRect().width >= 800 && innerHeight >= 720;
     const sourceMessage = value => Array.isArray(value) ? value[0] : value;
     const restoreAttribute = (node, name, value) => value == null
         ? node.removeAttribute(name) : node.setAttribute(name, value);
@@ -80,6 +83,7 @@
     function leaveInline(state) {
         state.inline = false;
         state.hostObserver?.disconnect(); state.hostObserver = null; state.host = null;
+        state.hostResizeObserver?.disconnect(); state.hostResizeObserver = null;
         state.dialog.classList.remove('pw-inline-reply');
         restoreAttribute(state.dialog,'role',state.role);
         restoreAttribute(state.dialog,'aria-label',state.label);
@@ -114,7 +118,7 @@
     function dock(vm, intent) {
         const state = states.get(vm), dialog = state?.dialog, host = activeHost();
         const currentKey = messageKey(readerVM?.message?.());
-        if (!state || state.ticket !== intent.ticket || !vm.modalVisible?.() || !host
+        if (!state || state.ticket !== intent.ticket || !vm.modalVisible?.() || !fitsInline(host)
             || !document.documentElement.classList.contains('pw-theme')
             || intent.sourceKey && currentKey && intent.sourceKey !== currentKey
             || vm.aDraftInfo?.[0] !== 'reply') return;
@@ -133,6 +137,10 @@
             if (state.inline && (!host.isConnected || !host.classList.contains('pw-conversation-active'))) expand(vm);
         });
         state.hostObserver.observe(host,{attributes:true,attributeFilter:['class']});
+        state.hostResizeObserver = new ResizeObserver(() => {
+            if (state.inline && !fitsInline(host)) expand(vm);
+        });
+        state.hostResizeObserver.observe(host);
         dialog.classList.add('pw-inline-reply','animate');
         dialog.setAttribute('role','region');
         dialog.setAttribute('aria-label',t('Rédiger une réponse', 'Write a reply'));
@@ -144,7 +152,7 @@
 
     function wantsInline(type, message) {
         const host = activeHost(), sourceKey = messageKey(message), currentKey = messageKey(readerVM?.message?.());
-        return replyTypes.has(Number(type)) && !!host
+        return replyTypes.has(Number(type)) && fitsInline(host)
             && document.documentElement.classList.contains('pw-theme')
             && (!sourceKey || !currentKey || sourceKey === currentKey);
     }
@@ -153,7 +161,7 @@
         if (vm.viewModelTemplateID !== 'PopupsCompose' || states.has(vm)) return;
         composeVM = vm;
         const dialog = vm.viewModelDom, state = {
-            dialog, inline:false, slot:null, marker:null, host:null, hostObserver:null, locked:[], ticket:0,
+            dialog, inline:false, slot:null, marker:null, host:null, hostObserver:null, hostResizeObserver:null, locked:[], ticket:0,
             role:dialog.getAttribute('role'), label:dialog.getAttribute('aria-label'),
             editorFocus:null, expandFocus:null
         };
@@ -220,6 +228,10 @@
         const state = composeVM && states.get(composeVM);
         if (state?.inline && (!document.documentElement.classList.contains('pw-theme') || !activeHost())) expand(composeVM);
     }).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+    addEventListener('resize', () => {
+        const state = composeVM && states.get(composeVM);
+        if (state?.inline && !fitsInline(state.host)) expand(composeVM);
+    });
     queueMicrotask(bootstrap);
     api.inlineReply = {active:() => !!(composeVM && states.get(composeVM)?.inline), expand:() => expand(composeVM)};
 })();

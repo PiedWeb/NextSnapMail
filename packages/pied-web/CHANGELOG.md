@@ -1,5 +1,19 @@
 # Releases
 
+## 1.10.8, 2026-10-06
+
+Reply and Reply all now open the full native composer when the reading pane is
+narrower than 800 px or the viewport is shorter than 720 px. On roomier screens,
+the integrated reply fills the reading pane and reserves at least 320 px for the
+message itself, below the formatting toolbar. Wrapped Cc recipients and expanded
+formatting controls can no longer consume that writing space.
+
+Shrinking an integrated reply promotes the same native draft to the full
+composer, preserving its fields, attachments and editor selection. The browser
+regression now uses the complete native editor and recipient chips, rather than
+a bare editable element, and covers desktop, phone and dark mode without mail
+transport.
+
 ## 1.10.7, 2026-09-21
 
 NextSnapMail 0.1.15 now starts with new-mail sound notifications disabled. The

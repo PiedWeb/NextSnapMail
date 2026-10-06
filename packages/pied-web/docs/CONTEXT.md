@@ -138,6 +138,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   fields, attachments, editor selection and cursor intact. New, Forward, Draft and replies
   outside the active conversation stay modal. On theme/conversation exit, promote the live
   draft instead of concealing it. See `INLINE_REPLY.md`.
+- Since 1.10.8, docking requires a reader pane at least 800 px wide and a viewport
+  at least 720 px high. Smaller layouts keep the full native modal from the start;
+  shrinking a docked reply promotes the same draft. Roomy inline replies use the
+  full pane width and reserve at least 320 px for the editor below its toolbar.
 - Since 1.8.8, prefer Reply all only when its native-shaped recipient set contains more than
   one address after excluding the active account. Move that bound command first and tint it
   in the reader toolbar; below the message, show one icon-labeled primary Reply or Reply all
