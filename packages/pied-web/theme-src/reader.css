@@ -26,8 +26,8 @@
  * The body was capped at 640 px while the header, the attachment block and the
  * reply row still ran the full width of the pane — so their rules crossed 1 120 px
  * under a 568 px column and drew attention to the empty half instead of absorbing
- * it. Every block of the reading column now stops where the text stops, and the
- * margin to its right is simply left alone.
+ * it. Every block of the reading column now stops where the text stops. Center
+ * the column in the pane with equal inline margins, keeping its text alignment.
  */
 #rl-app #V-MailMessageView {
   --pw-measure: 640px;   /* border box: 576 px of text between two gutters */
@@ -89,9 +89,10 @@
     .pw-conversation-before,
     .pw-conversation-after
   ) {
+    width:100%;
     max-width: var(--pw-measure);
     box-sizing: border-box;
-    margin-inline:0;
+    margin-inline:auto;
     padding-inline:var(--pw-gutter);
   }
 }

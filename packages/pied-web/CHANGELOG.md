@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.20, 2026-10-06
+
+Center the desktop reading column with equal inline margins for the subject,
+metadata, body, attachments, reply actions and conversation history. Keep the
+existing 640 px maximum width, gutters and left-aligned text. The change applies
+from 800 px; narrow layouts retain their existing geometry.
+
 ## 1.10.19, 2026-10-06
 
 The desktop list identity hover starts at the list pane edge, including with
