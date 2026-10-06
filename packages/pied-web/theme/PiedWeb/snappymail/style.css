@@ -5599,7 +5599,7 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
   #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id {
     width:auto;height:40px;min-height:40px;max-width:100%;gap:var(--pw-space-3);
     padding:var(--pw-space-1) var(--pw-space-2);
-    border:0!important;border-radius:var(--pw-radius-md)!important;
+    border:0!important;border-radius:0!important;
     background:transparent!important;color:var(--nc-color-main-text)!important;box-shadow:none!important;
   }
   #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id:is(:hover,[aria-expanded="true"]) { background:var(--pw-grey-100)!important; }

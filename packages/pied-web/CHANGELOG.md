@@ -1,5 +1,11 @@
 # Releases
 
+## 1.10.14, 2026-10-06
+
+The desktop account/list trigger uses square corners, including its neutral
+hover and open states. Its typography, native menu and keyboard focus remain
+unchanged.
+
 ## 1.10.13, 2026-10-06
 
 The desktop list identity now puts the current folder above the account. The
