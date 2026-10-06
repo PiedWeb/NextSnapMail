@@ -105,6 +105,43 @@ check('Leaving Pied Web restores the native identity and hides its optional sear
     && getComputedStyle(document.querySelector('.pw-search-scope-field')).display === 'none'));
 await page.setViewportSize({width:1440,height:900});
 await fresh('');
+await page.locator('.b-folders-system a.selectable:not(.pw-feed-link)').first().click();
+await page.waitForFunction(() => PiedWebUx.feed.mode() === 'inbox');
+await page.evaluate(() => document.fonts.ready);
+check('Desktop prioritizes the translated folder above a quiet account without a coloured container',await page.evaluate(() => {
+    const trigger = document.querySelector('#top-system-dropdown-id');
+    const context = trigger.querySelector('.pw-list-scope-context'), account = trigger.querySelector('.pw-list-scope-account');
+    return context.textContent === 'Boîte de réception'
+        && context.getBoundingClientRect().bottom < account.getBoundingClientRect().top
+        && context.scrollWidth <= context.clientWidth && account.scrollWidth <= account.clientWidth
+        && getComputedStyle(account).fontWeight === '400'
+        && getComputedStyle(trigger).backgroundColor === 'rgba(0, 0, 0, 0)'
+        && getComputedStyle(trigger.closest('.btn-toolbar')).backgroundColor === 'rgba(0, 0, 0, 0)';
+}));
+await page.locator('#top-system-dropdown-id').hover();
+check('Account hover uses the neutral grey token',await page.evaluate(() => {
+    const trigger = document.querySelector('#top-system-dropdown-id'), probe = document.createElement('span');
+    probe.style.backgroundColor = 'var(--pw-grey-100)'; trigger.append(probe);
+    const neutral = getComputedStyle(probe).backgroundColor; probe.remove();
+    return getComputedStyle(trigger).backgroundColor === neutral;
+}));
+await page.evaluate(() => {
+    systemVM.accountName = () => 'alexandrine.martin.' + 'service-'.repeat(12) + '@atelier.example.test';
+    document.documentElement.lang = 'en';
+    document.querySelector('.pw-feed-link[data-pw-feed="account"]').click();
+    document.querySelector('.b-folders-system a.selectable:not(.pw-feed-link)').click();
+});
+await page.setViewportSize({width:800,height:620});
+check('A long account truncates inside the list while retaining its full accessible label',await page.evaluate(() => {
+    const trigger = document.querySelector('#top-system-dropdown-id'), account = trigger.querySelector('.pw-list-scope-account');
+    const a = trigger.getBoundingClientRect(), list = document.querySelector('#V-MailMessageList').getBoundingClientRect();
+    return trigger.querySelector('.pw-list-scope-context').textContent === 'Inbox'
+        && account.scrollWidth > account.clientWidth && a.right <= list.right
+        && trigger.getAttribute('aria-label').includes(account.textContent)
+        && trigger.querySelector('.pw-list-scope-label').title.includes(account.textContent);
+}));
+await page.setViewportSize({width:1440,height:900});
+await page.evaluate(() => { document.documentElement.lang = 'fr'; });
 await page.evaluate(() => {
     const popup = document.createElement('div'); popup.id = 'V-PopupsAdvancedSearch';
     popup.innerHTML = '<form id="advancedsearchform"><div></div></form>'; document.getElementById('rl-app').append(popup);

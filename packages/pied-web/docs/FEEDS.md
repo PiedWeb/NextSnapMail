@@ -50,7 +50,12 @@ then opens the exact folder and UID. Drafts resume in native Draft compose mode.
 
 Since 1.10.10, the desktop list scope itself opens the original account menu;
 the folder rail no longer repeats the active account. Mobile retains its account
-header. **Search scope / Portée de la recherche** lives in the native Advanced
+header. Since 1.10.13, the desktop control puts the folder on its first line
+and a muted, regular-weight account on its second line. It has no filled
+background at rest and a neutral hover/open state. The full identity remains
+available to assistive technology and in its tooltip. This follows the hierarchy
+and tertiary-action principles in Schoger/Wathan, *Refactoring UI* (pp. 38–40,
+46, 56, 60). **Search scope / Portée de la recherche** lives in the native Advanced
 search popup, with folder, account and (for multiple accounts) All my accounts
 choices. Submitting commits the choice before the native query reaches the
 search hook; cancelling leaves the current query and scope unchanged.

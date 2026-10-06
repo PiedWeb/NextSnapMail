@@ -5591,10 +5591,25 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
 #rl-app .pw-search-scope-field > label { flex-shrink:0; }
 #rl-app .pw-search-scope-field select { width:100%;min-width:0;min-height:36px; }
 @media(min-width:800px) {
-  #rl-app .pw-list-scope #V-SystemDropDown.pw-scoped-account { margin:0;max-width:100%; }
+  #rl-app .pw-list-scope { padding-inline-start:var(--pw-space-2); }
+  #rl-app .pw-list-scope #V-SystemDropDown.pw-scoped-account { margin:0;min-width:0;max-width:100%; }
   #rl-app #V-SystemDropDown.pw-scoped-account :is(.pw-account-label,.accountPlace) { display:none; }
   #rl-app #V-SystemDropDown.pw-scoped-account :is(.btn-toolbar,.btn-group) { height:auto;margin:0;max-width:100%; }
-  #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id { height:36px;min-height:36px;padding:0;max-width:100%;background:transparent; }
+  #rl-app #V-SystemDropDown.pw-scoped-account .btn-toolbar { background:transparent!important; }
+  #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id {
+    width:auto;height:40px;min-height:40px;max-width:100%;gap:var(--pw-space-3);
+    padding:var(--pw-space-1) var(--pw-space-2);
+    border:0!important;border-radius:var(--pw-radius-md)!important;
+    background:transparent!important;color:var(--nc-color-main-text)!important;box-shadow:none!important;
+  }
+  #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id:is(:hover,[aria-expanded="true"]) { background:var(--pw-grey-100)!important; }
+  #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id:focus-visible { outline:2px solid var(--nc-color-primary-element);outline-offset:2px; }
+  #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id::after { flex-basis:12px;width:12px;height:12px;background:var(--pw-grey-600); }
+  #rl-app #V-SystemDropDown.pw-scoped-account .pw-list-scope-label { display:flex;flex-direction:column;flex:0 1 auto;gap:var(--pw-space-0-5);text-align:start; }
+  #rl-app #V-SystemDropDown.pw-scoped-account .pw-list-scope-label > span { min-width:0;overflow:hidden;text-overflow:ellipsis; }
+  #rl-app #V-SystemDropDown.pw-scoped-account .pw-list-scope-context { order:-1;line-height:1.2; }
+  #rl-app #V-SystemDropDown.pw-scoped-account .pw-list-scope-account { color:var(--pw-grey-600);font:var(--pw-weight-regular) var(--pw-text-xs)/1.2 var(--pw-font); }
+  #rl-app #V-SystemDropDown.pw-scoped-account .pw-list-scope-separator { display:none; }
   #rl-app #V-SystemDropDown.pw-scoped-account #top-system-dropdown-id > i:not(.icon-spinner) { display:none; }
   #rl-app #V-SystemDropDown.pw-scoped-account .dropdown-menu { inset-inline-start:0;inset-inline-end:auto; }
   #rl-app #V-MailMessageList:has(#V-SystemDropDown .dropdown.show) { z-index:150;overflow:visible; }

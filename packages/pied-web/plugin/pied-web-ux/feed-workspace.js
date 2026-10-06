@@ -21,7 +21,11 @@
         const nodes = new Map(), headings = new Map(), desktopActions = matchMedia('(min-width:800px)');
         let sharedRowActions = null, actionRow = null;
         const scopeBar = document.createElement('div'); scopeBar.className = 'pw-list-scope';
-        const scopeLabel = document.createElement('strong'); scopeLabel.className = 'pw-list-scope-label';
+        const scopeLabel = document.createElement('span'); scopeLabel.className = 'pw-list-scope-label';
+        const scopeAccount = document.createElement('span'); scopeAccount.className = 'pw-list-scope-account';
+        const scopeSeparator = document.createElement('span'); scopeSeparator.className = 'pw-list-scope-separator';
+        const scopeContext = document.createElement('span'); scopeContext.className = 'pw-list-scope-context';
+        scopeLabel.append(scopeAccount,scopeSeparator,scopeContext);
         const searchScope = document.createElement('select'); searchScope.setAttribute('aria-label',t('Portée de la recherche','Search scope'));
         searchScope.id = 'pw-search-scope';
         let searchScopeValue = 'folder';
@@ -222,8 +226,12 @@
         };
         const updateScope = () => {
             const global = options.mode() === 'global';
-            scopeLabel.textContent = searchState ? t('Résultats de recherche','Search results') : global ? t('Tous mes comptes','All my accounts')
-                : [options.accountLabel(), options.mode() === 'feed' ? t('Flux','Feed') : options.folderLabel()].filter(Boolean).join(' · ');
+            scopeAccount.textContent = searchState || global ? '' : options.accountLabel();
+            scopeContext.textContent = searchState ? t('Résultats de recherche','Search results') : global ? t('Tous mes comptes','All my accounts')
+                : options.mode() === 'feed' ? t('Flux','Feed') : options.folderLabel();
+            scopeSeparator.textContent = scopeAccount.textContent && scopeContext.textContent ? ' · ' : '';
+            scopeAccount.hidden = !scopeAccount.textContent;
+            scopeLabel.title = scopeLabel.textContent;
             searchScope.querySelector('option[value="global"]').hidden = options.accountCount() < 2;
             if (!searchState && searchScope.dataset.mode !== options.mode()) {
                 searchScopeValue = searchScope.value = global ? 'global' : 'folder'; searchScope.dataset.mode = options.mode();

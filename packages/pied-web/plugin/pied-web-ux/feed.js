@@ -404,7 +404,8 @@
             primary:item => addressText(item,item._pwKind === 'draft' ? 'to' : 'from') || t('Sans destinataire ou expéditeur','No recipient or sender'),
             accountHash,accountCount:() => accountCount,mode:() => mode,folder:currentFolder,
             accountLabel:() => String(value(systemView?.accountName) || currentEmail()),
-            folderLabel:() => String(value(value(folderView?.currentFolder)?.localName) || currentFolder()),
+            folderLabel:() => isInbox(currentFolder()) ? t('Boîte de réception','Inbox')
+                : String(value(value(folderView?.currentFolder)?.localName) || currentFolder()),
             refresh:() => loadGlobal(true),render:renderGlobal,open:openGlobalItem,
             beforeOpen:state => setSession(returnKey,JSON.stringify({...state,accountHash:accountHash(),mode}))});
         const list = vm.messageList;

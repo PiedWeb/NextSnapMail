@@ -1,5 +1,14 @@
 # Releases
 
+## 1.10.13, 2026-10-06
+
+The desktop list identity now puts the current folder above the account. The
+account uses regular, muted text, while a smaller chevron opens the original
+native menu. Its toolbar container is transparent; hover and open states use a
+neutral surface. Long names truncate without losing their accessible label or
+full tooltip. Inbox has a French/English label even before its native model is
+available. Mobile retains the existing single-line scope and account header.
+
 ## 1.10.12, 2026-10-06
 
 Native row quick actions keep their star visible whenever the group is shown,
