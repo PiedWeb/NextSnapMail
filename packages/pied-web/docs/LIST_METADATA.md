@@ -1,6 +1,6 @@
 # Conversation counts and stars
 
-Since 1.10.15, Pied Web replaces the dense native `13/4 ›` badge with a quiet total
+Since 1.10.17, Pied Web replaces the dense native `13/4 ›` badge with a quiet total
 and a 6 px teal dot when the conversation contains unread messages: **13 ●**.
 Fully read conversations show the total alone. The French/English accessible label
 and tooltip retain the exact total and unread count. The dot uses the existing

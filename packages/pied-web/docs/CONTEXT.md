@@ -43,7 +43,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are the keyboard equivalent. Persist stable identifiers per active account, cache them only for
   first paint, ignore missing entries and append new ones. Expanding must restore the native
   hierarchy and order. See `FOLDER_RAIL.md`.
-- Since 1.10.15, conversation badges show only the total and a teal dot when any
+- Since 1.10.17, conversation badges show only the total and a teal dot when any
   member is unread. The tooltip and accessible label retain the exact unread count.
   Keep SnappyMail's bound text and native read/unread updates intact.
   List stars use an
@@ -286,6 +286,11 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 - Native row quick-action groups own the visibility of their relocated star, including
   `.focused` keyboard rows. Override its original row ordering/hiding rules inside the
   group and reset button margins inherited from Nextcloud's global controls.
+- Since 1.10.17, desktop rows give hidden quick-action space back to the text.
+  Float the controls over a trailing content fade on hover/focus, without changing
+  subject width or row height. The global Feed uses a presentation wrapper for
+  this mask and keeps its one shared desktop action group. Touch/mobile retain
+  their existing layout; never animate padding or make subjects rewrap on approach.
 - Since 1.10.10, dock the native account trigger/menu at the desktop list scope and hide its
   original account label only in that placement. Restore the mobile header and theme-exit
   placement. Search scope belongs to the ready native AdvancedSearch form, commits on submit

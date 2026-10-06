@@ -18,4 +18,9 @@ Remove the outer Nextcloud header, margin and rounded frame. Keep Calendar's mon
 
 ## Interaction
 
+Desktop Mail quick actions float over a faded trailing edge only on hover or
+keyboard approach. At rest, sender, subject and metadata use that width. Keep
+the text and following rows stationary when controls appear. Mobile and touch
+layouts retain visible controls.
+
 Use the existing Nextcloud app-menu button, icon and popover by mounting the original app-menu node inside the filter row, within Calendar’s mobile focus trap. Restore it to its header placeholder on exit. Preserve native translations, permissions, focus and keyboard behavior. Keep a visible focus ring and native hover state. Do not add decorative animation.

@@ -153,7 +153,8 @@
             const account = document.createElement('span'); account.className = 'pw-global-account';
             const time = document.createElement('time'); time.className = 'pw-global-time';
             [main,subject,account,time].forEach(cell => cell.setAttribute('role','gridcell'));
-            node.append(main,subject,account,time);
+            const content = document.createElement('div'); content.className = 'pw-global-content'; content.setAttribute('role','presentation');
+            content.append(main,subject,account,time); node.append(content);
             node.addEventListener('click',event => {
                 if (loading || stale || busy || event.target.closest('button')) return;
                 const current = node.pwItem, id = key(current); focused = id;
