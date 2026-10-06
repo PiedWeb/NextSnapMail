@@ -46,6 +46,7 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
 #rl-app .pw-global-selection button:disabled,#rl-app .pw-global-pager button:disabled { cursor:progress;opacity:.55; }
 #rl-app .pw-global-pager { display:flex;align-items:center;justify-content:center;gap:12px;padding:12px; }
 #rl-app #V-MailMessageList .pw-global-row { position:relative; }
+#rl-app #V-MailMessageList .pw-global-content { display:contents; }
 #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions { grid-area:actions;align-self:center;justify-self:end;opacity:0;pointer-events:none; }
 #rl-app #V-MailMessageList .pw-global-row:is(:hover,:focus-within,.focused) > .pw-row-actions { opacity:1;pointer-events:auto; }
 #rl-app #V-MailMessageList .pw-global-row.focused { outline:2px solid var(--nc-color-primary-element);outline-offset:-2px; }

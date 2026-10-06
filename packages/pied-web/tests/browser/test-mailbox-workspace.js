@@ -139,13 +139,24 @@ check('A refused bulk read restores the prior unread state and selection',await 
 await page.evaluate(() => { mailboxFixtureFailure=''; mailboxFixtureDelay=20; });
 await page.getByRole('button',{name:'Terminer',exact:true}).click();
 const threadedRow=page.locator('.pw-global-row').filter({hasText:'Conversation à reprendre'});
+await page.locator('.inputSearch').hover();
+await page.evaluate(()=>document.activeElement?.blur());
+check('Global rows have no empty action column at rest',await threadedRow.evaluate(row=>{
+ const content=row.querySelector('.pw-global-content'),subject=row.querySelector('.pw-global-subject').getBoundingClientRect();
+ const box=row.getBoundingClientRect();
+ window.globalActionRest={height:box.height,subjectWidth:subject.width};
+ return getComputedStyle(content).display==='grid'&&getComputedStyle(content).maskImage==='none'
+  &&content.getBoundingClientRect().right===box.right-24&&getComputedStyle(row).gridTemplateColumns.split(' ').length===1;
+}));
 await threadedRow.hover();
-check('Flag, Trash and Reminder form one reserved action rail without covering row text',await threadedRow.evaluate(row => {
+check('Global actions replace the faded trailing metadata without moving the row',await threadedRow.evaluate(row => {
     const group=row.querySelector('.pw-row-actions'),subject=row.querySelector('.pw-global-subject');
     const buttons=[...group.querySelectorAll('button')];
     return buttons.length===3&&buttons[0].classList.contains('pw-flag-action')
         &&buttons[1].dataset.pwRowIcon==='trash-2'&&buttons[2].classList.contains('pw-remind-action')
-        &&subject.getBoundingClientRect().right<=group.getBoundingClientRect().left;
+        &&getComputedStyle(row.querySelector('.pw-global-content')).maskImage!=='none'
+        &&group.getBoundingClientRect().right<=row.getBoundingClientRect().right
+        &&row.getBoundingClientRect().height===globalActionRest.height&&subject.getBoundingClientRect().width===globalActionRest.subjectWidth;
 }));
 await page.evaluate(() => { mailboxFixtureDelay=300; });
 await threadedRow.locator('.pw-flag-action').click();

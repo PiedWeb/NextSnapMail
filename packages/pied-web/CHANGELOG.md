@@ -1,5 +1,19 @@
 # Releases
 
+## 1.10.15, 2026-10-06
+
+Desktop message rows no longer reserve a blank column for hidden quick actions.
+Native rows recover 104 px of text width, and the global Feed drops its fixed
+106 px action column. On hover or keyboard approach, the existing controls float
+over a faded trailing edge. Text geometry and following row positions stay
+stable. The fade follows two or three visible actions and the text direction;
+mobile and touch layouts retain their visible controls. The global Feed still
+reuses one desktop action group.
+
+This follows Schoger/Wathan, *Refactoring UI*, “Give each element just the space
+it needs” (p. 77) and “Avoid ambiguous spacing” (pp. 96–99). Browser regressions
+measure the recovered width, rest metadata, hover/focus masking and row stability.
+
 ## 1.10.14, 2026-10-06
 
 The desktop account/list trigger uses square corners, including its neutral

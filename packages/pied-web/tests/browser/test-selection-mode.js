@@ -13,13 +13,23 @@ check('Only the page-wide checkbox appears at rest',await p.evaluate(()=>{
    &&list.querySelector('.checkboxCheckAll').getAttribute('aria-label')==='Sélectionner les éléments de cette page'
    &&!list.querySelector('.pw-select-results').getClientRects().length;
 }));
+await p.locator('.inputSearch').hover();
+check('Native rows use the trailing space for text while actions are hidden',await p.evaluate(()=>{
+ const row=document.querySelector('.messageListItem'),content=row.querySelector(':scope > div:not(.messageCheckbox)'),group=row.querySelector('.pw-row-actions');
+ const box=row.getBoundingClientRect(),subject=row.querySelector('.subjectParent').getBoundingClientRect();
+ window.rowActionRest={height:box.height,subjectWidth:subject.width,nextTop:row.nextElementSibling.getBoundingClientRect().top};
+ return getComputedStyle(row).paddingInlineEnd==='24px'&&getComputedStyle(content).maskImage==='none'
+  &&getComputedStyle(group).opacity==='0'&&subject.right>group.getBoundingClientRect().left;
+}));
 await p.locator('.messageListItem').first().hover();
-check('Native Flag, Trash and Reminder share a reserved rail with a real bin icon',await p.evaluate(()=>{
+check('Native Flag, Trash and Reminder float over a faded edge without rewrapping text',await p.evaluate(()=>{
  const row=document.querySelector('.messageListItem'),group=row.querySelector(':scope > .pw-row-actions');
- const trash=group?.querySelector('[data-pw-row-icon="trash-2"]'),subject=row.querySelector('.subjectParent');
+ const trash=group?.querySelector('[data-pw-row-icon="trash-2"]'),subject=row.querySelector('.subjectParent'),content=row.querySelector(':scope > div:not(.messageCheckbox)');
  return group?.firstElementChild?.classList.contains('flagParent')&&group.children.length===3
   &&trash&&!trash.textContent.trim()&&getComputedStyle(trash,'::before').maskImage!=='none'
-  &&subject.getBoundingClientRect().right<=group.getBoundingClientRect().left;
+  &&getComputedStyle(content).maskImage!=='none'&&getComputedStyle(group).opacity==='1'
+  &&row.getBoundingClientRect().height===rowActionRest.height&&subject.getBoundingClientRect().width===rowActionRest.subjectWidth
+  &&row.nextElementSibling.getBoundingClientRect().top===rowActionRest.nextTop;
 }));
 await p.locator('.inputSearch').hover();
 await p.locator('.messageListItem').first().evaluate(row=>row.classList.add('focused'));
@@ -27,6 +37,7 @@ check('Keyboard-focused native quick actions keep the star visible in the first 
  const group=document.querySelector('.messageListItem > .pw-row-actions'),star=group.firstElementChild;
  const boxes=[...group.children].map(button=>button.getBoundingClientRect());
  return getComputedStyle(group).opacity==='1'&&getComputedStyle(star).opacity==='1'
+  &&getComputedStyle(group.parentElement.querySelector(':scope > div:not(.messageCheckbox)')).maskImage!=='none'
   &&boxes[0].left<boxes[1].left&&boxes[1].left<boxes[2].left;
 }));
 await p.locator('.messageListItem').first().evaluate(row=>row.classList.remove('focused'));
