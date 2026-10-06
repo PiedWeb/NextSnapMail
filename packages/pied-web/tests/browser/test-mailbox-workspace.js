@@ -17,7 +17,7 @@ await page.keyboard.press('ArrowDown');
 check('Global keyboard navigation moves focus immediately with a visible outline',await page.evaluate(() => {
     const rows=[...document.querySelectorAll('.pw-global-row')],focused=document.activeElement;
     return focused===rows[1] && focused.classList.contains('focused')
-        && getComputedStyle(focused).outlineWidth==='2px';
+        && getComputedStyle(focused).outlineWidth==='1px';
 }));
 await page.keyboard.press('Space');
 check('Space toggles only the focused global message',await page.evaluate(() =>

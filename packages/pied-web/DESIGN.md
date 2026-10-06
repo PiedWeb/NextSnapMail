@@ -18,6 +18,11 @@ Remove the outer Nextcloud header, margin and rounded frame. Keep Calendar's mon
 
 ## Interaction
 
+Mail borders, selection edges and keyboard focus use at most 1 px. Focus uses
+a solid primary/foreground blend for contrast, with no second ring around the
+composer editor. Sender text uses the muted neutral in both native and global
+lists, including selected and checked rows; unread emphasis belongs to the subject.
+
 Desktop Mail quick actions float over a faded trailing edge only on hover or
 keyboard approach. At rest, sender, subject and metadata use that width. Keep
 the text and following rows stationary when controls appear. Mobile and touch

@@ -1,5 +1,14 @@
 # Releases
 
+## 1.10.16, 2026-10-06
+
+Focus outlines now use one pixel and a solid, stronger primary/foreground colour
+in light and dark mode. Native keyboard controls share that indicator. The
+composer editor signals focus through its existing border alone; composer tab
+lines, followed-row accents and global checked-row edges also use one pixel.
+Sender text uses the quieter muted neutral in native and global lists, including
+selected and checked rows, so the subject keeps its visual priority.
+
 ## 1.10.15, 2026-10-06
 
 Desktop message rows no longer reserve a blank column for hidden quick actions.

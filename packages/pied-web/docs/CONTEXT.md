@@ -130,6 +130,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are captured before that handler. The confirmation is a page-level live region, because
   the recipient rows are clipped and scrollable. See READER_ADDRESSES.md.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
+  Since 1.10.16, senders stay in the quieter muted neutral even on selected/checked
+  rows. Borders and focus indicators use at most 1 px; a solid primary/foreground
+  focus colour replaces diluted two-pixel rings. The editor uses its own border
+  for focus instead of accumulating a border and an outer ring.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
 - Since 1.8.7, Reply and Reply all dock the one native composer at the bottom of an active
@@ -163,7 +167,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 - Composer tabs use two equal columns when Mailvelope is hidden and three when it is available;
   panels always span the complete grid. Keep a 44 px non-wrapping tab row, arrow-key navigation
   and one accent line for selection. The Squire editor rests on a one-pixel neutral border and
-  receives the primary border plus soft ring only on focus.
+  receives a stronger one-pixel border only on focus.
 - Contacts navigates to Nextcloud Contacts. The redundant Calendar shortcut was removed;
   calendar invitation import uses the native integration.
 - Swipes and plain Delete act on the intended list messages through native Trash commands.

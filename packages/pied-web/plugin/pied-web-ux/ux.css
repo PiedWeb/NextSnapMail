@@ -60,7 +60,7 @@ html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand:is(:hov
     color:var(--nc-color-main-text,#202827);
 }
 html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand:focus-visible {
-    outline:2px solid var(--nc-color-primary-element,#087c75);
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor));
     outline-offset:2px;
 }
 html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply .pw-inline-expand svg {
@@ -171,12 +171,12 @@ html.pw-theme #rl-app #V-PopupsCompose.pw-inline-reply :is(.squire-wysiwyg,.squi
  * these two sit on a card that carries no border of its own. */
 #rl-app .pw-outgoing-notices button { border: 0 !important; }
 #rl-app .pw-outgoing-notices button:disabled { opacity: .65; cursor: default; }
-#rl-app .pw-outgoing-notices button:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+#rl-app .pw-outgoing-notices button:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset: -3px; }
 @media (max-width: 600px) {
     #rl-app .pw-outgoing-notices { inset-inline: 12px; bottom: max(12px, env(safe-area-inset-bottom)); width: auto; margin:-10px; }
 }
 #rl-app :is(.pw-threads, .pw-unread-order, .pw-message-actions .btn, .pw-message-extras .btn, .pw-select-results, .pw-bulk-dialog button):focus-visible {
-    outline: 2px solid var(--nc-color-primary-element, #087c75);
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor));
     outline-offset: 2px;
 }
 #rl-app .pw-filtered-selection {
@@ -254,7 +254,7 @@ html.pw-theme #rl-app .pw-from a.pw-unsubscribe {
     text-decoration:underline; text-underline-offset:3px;
 }
 html.pw-theme #rl-app .pw-from a.pw-unsubscribe:hover { color:var(--nc-color-main-text); }
-html.pw-theme #rl-app .pw-from a.pw-unsubscribe:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:2px; }
+html.pw-theme #rl-app .pw-from a.pw-unsubscribe:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:2px; }
 @media(max-width:799px) {
     html.pw-theme #rl-app .pw-from a.pw-unsubscribe { min-height:44px; }
     html.pw-theme #rl-app .messageView .informationShort:has(.pw-from) { align-items:flex-start; }
@@ -332,7 +332,7 @@ html.pw-theme #rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.fla
     width:44px; height:44px; flex:0 0 44px; opacity:1; border-radius:6px;
 }
 html.pw-theme #rl-app #V-MailMessageView .messageItemHeader :is(.infoParent,.flagParent):focus-visible {
-    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:2px;
 }
 html.pw-theme #rl-app #V-MailMessageView .messageItemHeader .flagParent.flagOn::before {
     mask-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20d%3D%22m12%203%202.8%205.8%206.4.9-4.6%204.5%201.1%206.3-5.7-3-5.7%203%201.1-6.3-4.6-4.5%206.4-.9Z%22%2F%3E%3C%2Fsvg%3E");
@@ -366,7 +366,7 @@ html.pw-theme #rl-app #messageItem .pw-quote > summary:hover {
     background:color-mix(in oklch,currentColor 8%,transparent);
 }
 html.pw-theme #rl-app #messageItem .pw-quote > summary:focus-visible {
-    outline:2px solid currentColor; outline-offset:2px;
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:2px;
 }
 html.pw-theme #rl-app #messageItem .pw-quote > blockquote {
     margin-block:0 var(--pw-space-3); border-inline-start-color:currentColor;
@@ -414,7 +414,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:disabled { opacity:.35; cursor:default; }
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar .btn:focus-visible {
-    outline:2px solid var(--nc-color-primary-element); outline-offset:1px;
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:1px;
 }
 /* The editing-mode menu is the last system control in a redrawn toolbar: give it
    the theme's own chevron instead of the platform one. The element stays a
@@ -484,7 +484,7 @@ html.pw-theme #V-PopupsCompose .pw-image-tools button[aria-pressed="true"] {
 html.pw-theme #V-PopupsCompose .pw-image-tools button:focus-visible,
 html.pw-theme #V-PopupsCompose .pw-image-handle:focus-visible,
 html.pw-theme #V-PopupsCompose .pw-attachment-compression button:focus-visible {
-  outline:2px solid var(--nc-color-primary-element);outline-offset:2px;
+  outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor));outline-offset:2px;
 }
 html.pw-theme #V-PopupsCompose .pw-image-tools .pw-image-remove {color:var(--nc-color-error, #ad302c);}
 html.pw-theme #V-PopupsCompose .pw-image-sizes,
@@ -543,7 +543,7 @@ html.pw-theme #V-MailMessageList .pw-draft-row {
 }
 html.pw-theme #V-MailMessageList .pw-draft-row:hover {background:var(--nc-color-background-hover);}
 html.pw-theme #V-MailMessageList .pw-draft-row:focus-visible,
-html.pw-theme #V-MailMessageList .pw-drafts-more:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:-2px;}
+html.pw-theme #V-MailMessageList .pw-drafts-more:focus-visible {outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor));outline-offset:-2px;}
 html.pw-theme #V-MailMessageList .pw-draft-row:disabled {opacity:.6;cursor:progress;}
 html.pw-theme #V-MailMessageList .pw-draft-icon {grid-column:1;color:var(--nc-color-text-maxcontrast);font-size:15px;}
 html.pw-theme #V-MailMessageList .pw-draft-recipient {grid-column:2;margin:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:var(--pw-text-sm);}
@@ -604,7 +604,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
     background: var(--pw-grey-100);
     color: var(--pw-grey-900);
 }
-#rl-app #V-PopupsCompose button.pw-schedule:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: 2px; }
+#rl-app #V-PopupsCompose button.pw-schedule:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset: 2px; }
 #rl-app .pw-schedule-panel {
     position: absolute;
     z-index: 30;
@@ -678,7 +678,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 }
 #rl-app button.pw-schedule-confirm:is(:hover, :focus-visible) { background: var(--pw-primary-600, var(--nc-color-primary-element-hover)); }
 #rl-app .pw-schedule-panel button:disabled { opacity: .65; cursor: default; }
-#rl-app .pw-schedule-panel button:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: -2px; }
+#rl-app .pw-schedule-panel button:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset: -2px; }
 #rl-app .pw-schedule-note { margin:0; color: var(--pw-grey-700); font-size:var(--pw-text-xs); }
 #rl-app .pw-schedule-note[hidden], #rl-app .pw-schedule-note:empty { display: none; }
 
@@ -732,7 +732,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 }
 #rl-app button.pw-scheduled-back:is(:hover, :focus-visible) { background: var(--pw-grey-100); }
 #rl-app button.pw-scheduled-back:disabled { opacity: .65; cursor: default; }
-#rl-app button.pw-scheduled-back:focus-visible { outline: 2px solid var(--pw-primary-500, currentColor); outline-offset: -2px; }
+#rl-app button.pw-scheduled-back:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset: -2px; }
 @media (max-width: 600px) {
     #rl-app .pw-schedule-panel { position: fixed; inset: auto 12px calc(12px + env(safe-area-inset-bottom)) 12px; width: auto; }
 }
@@ -750,7 +750,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 #rl-app #V-MailMessageList .pw-selection-remind:is(:hover,[aria-expanded="true"]) { background:var(--pw-primary-100); }
 #rl-app #V-MailMessageList .pw-selection-remind:disabled { opacity:.55; cursor:progress; }
 #rl-app #V-MailMessageList .pw-selection-remind:focus-visible {
-    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:2px;
 }
 #rl-app [data-pw-icon="clock"] {
     --pw-icon:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 7v5l3.5 2'/%3E%3C/svg%3E");
@@ -797,7 +797,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 #rl-app .pw-reminder-confirm:is(:hover,:focus-visible) { background:var(--pw-primary-600,var(--nc-color-primary-element-hover)); }
 #rl-app .pw-reminder-panel button:disabled, #rl-app .pw-reminder-panel input:disabled { opacity:.65; cursor:progress; }
 #rl-app .pw-reminder-panel :is(button,input):focus-visible {
-    outline:2px solid var(--pw-primary-500,currentColor); outline-offset:-2px;
+    outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:-2px;
 }
 #rl-app .pw-reminder-note { margin:0; color:var(--pw-grey-700); font-size:var(--pw-text-xs); }
 #rl-app .pw-reminder-note:empty { display:none; }
@@ -827,7 +827,7 @@ html:not(.pw-theme) .pw-addresses { display:none!important; }
 }
 #rl-app .pw-reminder-wake:is(:hover,:focus-visible) { background:var(--pw-grey-100); }
 #rl-app .pw-reminder-wake:disabled { opacity:.65; cursor:default; }
-#rl-app .pw-reminder-wake:focus-visible { outline:2px solid var(--pw-primary-500,currentColor); outline-offset:-2px; }
+#rl-app .pw-reminder-wake:focus-visible { outline:1px solid var(--pw-focus,var(--nc-color-main-text,currentColor)); outline-offset:-2px; }
 .pw-reminder-toast {
     position:fixed; z-index:2220; inset:auto 20px 20px auto; max-width:min(420px,calc(100vw - 24px));
     box-sizing:border-box; padding:var(--pw-space-3) var(--pw-space-4); border:0;

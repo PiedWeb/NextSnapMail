@@ -59,7 +59,7 @@ html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visi
 }
 #rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete):focus-visible,
 #rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):focus-visible {
-  outline: 2px solid var(--pw-primary-500);
+  outline:1px solid var(--pw-focus);
   outline-offset: 2px;
 }
 
@@ -91,7 +91,7 @@ html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.b
 }
 html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > :is(a.btn, .minimize-custom, .close):focus-visible,
 html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .btn-group > a.btn:focus-visible {
-  outline: 2px solid var(--pw-primary-500);
+  outline:1px solid var(--pw-focus);
   outline-offset: 2px;
 }
 html.pw-theme #rl-app #V-PopupsCompose > header > .pull-right > .minimize-custom::before {
@@ -224,7 +224,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn.btn-success {
   color: var(--pw-primary-ink);
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-compose-utilities .btn:focus-visible {
-  outline: 2px solid var(--pw-primary-500);
+  outline:1px solid var(--pw-focus);
   outline-offset: 2px;
 }
 @media (pointer: coarse) {
@@ -260,7 +260,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"] {
   padding: var(--pw-space-2) var(--pw-space-3);
   overflow: hidden;
   border: 0 !important;
-  border-bottom: 2px solid transparent !important;
+  border-bottom: 1px solid transparent !important;
   border-radius: 0;
   background: transparent !important;
   color: var(--pw-grey-600);
@@ -284,7 +284,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > input:checked + label[
   color: var(--pw-grey-900);
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > label[role="tab"]:focus-visible {
-  outline: 2px solid var(--pw-primary-500);
+  outline:1px solid var(--pw-focus);
   outline-offset: -3px;
 }
 html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > .tab-content {
@@ -294,7 +294,7 @@ html.pw-theme #rl-app #V-PopupsCompose .pw-compose-tabs > .tab-content {
 
 /* The editor is the largest surface in the composer. A dark two-pixel frame
  * makes it dominate even before writing; use a hairline at rest and reserve
- * the accent plus a soft ring for actual focus. */
+ * a single strong accent edge for actual focus. */
 html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain) {
   box-sizing: border-box;
   border: 1px solid var(--pw-grey-300);
@@ -304,9 +304,8 @@ html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):hover
   border-color: var(--pw-grey-400);
 }
 html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):focus {
-  border-color: var(--pw-primary-500);
-  outline: 2px solid var(--pw-ring-soft);
-  outline-offset: 1px;
+  border-color: var(--pw-focus);
+  outline: none;
 }
 
 /* Cc and Bcc belong to the recipient decision, not to the global action bar.
@@ -348,7 +347,7 @@ html:not(.pw-theme) #rl-app #V-PopupsCompose .pw-recipient-shortcuts,
   color: var(--pw-grey-800);
 }
 #rl-app #V-PopupsCompose button.pw-recipient-shortcut:focus-visible {
-  outline: 2px solid var(--pw-primary-500);
+  outline:1px solid var(--pw-focus);
   outline-offset: 2px;
   color: var(--pw-grey-800);
 }
