@@ -43,7 +43,7 @@ check('Every tab panel spans the complete composer width',await p.evaluate(()=>{
 }));
 check('The selected tab uses one accent line instead of a filled box',await p.evaluate(()=>{
  const label=document.querySelector('.pw-compose-tabs > input:checked + label'),style=getComputedStyle(label);
- return style.backgroundColor==='rgba(0, 0, 0, 0)'&&parseFloat(style.borderBottomWidth)===2
+ return style.backgroundColor==='rgba(0, 0, 0, 0)'&&parseFloat(style.borderBottomWidth)===1
   &&style.borderBottomColor!=='rgba(0, 0, 0, 0)'&&label.getAttribute('aria-selected')==='true';
 }));
 

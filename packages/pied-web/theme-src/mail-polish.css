@@ -60,7 +60,7 @@
     background:var(--pw-selected);
   }
   #rl-app #V-MailMessageList .messageList .b-content .listThreadUidDesc:focus-visible {
-    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+    outline:1px solid var(--pw-focus); outline-offset:2px;
   }
 }
 
@@ -106,7 +106,7 @@
     background:var(--pw-selected);
   }
   #rl-app #V-MailMessageView .pw-message-extras .pw-import-calendar:focus-visible {
-    outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+    outline:1px solid var(--pw-focus); outline-offset:2px;
   }
   #rl-app #V-MailMessageView #messageItem .attachmentsPlace {
     margin:var(--pw-space-3) var(--pw-space-8) var(--pw-space-6); padding:var(--pw-space-4) 0 var(--pw-space-4); top:auto;

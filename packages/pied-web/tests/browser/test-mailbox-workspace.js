@@ -7,6 +7,11 @@ await page.waitForFunction(() => document.querySelector('.pw-global-rows')?.getA
 const checks=[];
 const check=(name,pass)=>{if(!pass)throw Error(name);checks.push(name);console.log('PASS '+name);};
 
+check('The initial global keyboard cursor does not fade a row without shared actions',await page.evaluate(()=>{
+ const row=document.querySelector('.pw-global-row.focused');
+ return !!row&&!row.querySelector('.pw-row-actions')&&getComputedStyle(row.querySelector('.pw-global-content')).maskImage==='none';
+}));
+
 check('All my accounts lives in the account menu while the folder rail keeps only the account Feed',await page.evaluate(() =>
     document.querySelector('.pw-global-nav')?.parentElement === document.querySelector('#V-SystemDropDown menu')
     && !document.querySelector('.b-folders-system .pw-global-nav')
@@ -17,7 +22,7 @@ await page.keyboard.press('ArrowDown');
 check('Global keyboard navigation moves focus immediately with a visible outline',await page.evaluate(() => {
     const rows=[...document.querySelectorAll('.pw-global-row')],focused=document.activeElement;
     return focused===rows[1] && focused.classList.contains('focused')
-        && getComputedStyle(focused).outlineWidth==='2px';
+        && getComputedStyle(focused).outlineWidth==='1px';
 }));
 await page.keyboard.press('Space');
 check('Space toggles only the focused global message',await page.evaluate(() =>

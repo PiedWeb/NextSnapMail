@@ -25,7 +25,7 @@
   }
   [dir="rtl"] #rl-app #V-MailFolderList .pw-folder-rail-button::before { transform:translate(50%,-50%); }
   #rl-app #V-MailFolderList .pw-folder-rail-button:is(:hover,:focus-visible) { background:var(--pw-grey-100); color:var(--nc-color-main-text); }
-  #rl-app #V-MailFolderList .pw-folder-rail-button:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:-2px; }
+  #rl-app #V-MailFolderList .pw-folder-rail-button:focus-visible { outline:1px solid var(--pw-focus); outline-offset:-2px; }
   #rl-app #V-MailFolderList .pw-folder-rail-button.selected { background:var(--pw-selected); color:var(--nc-color-primary-element); }
   #rl-app #V-MailFolderList .pw-folder-rail-monogram {
     position:absolute; z-index:1; inset-inline-start:50%; top:25px; width:19px;

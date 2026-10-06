@@ -2,7 +2,7 @@
 html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"] .messageListItem .messageCheckbox,
 html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"] .pw-mobile-select {display:none!important;}
 html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"]:not(.pw-global-active) .checkboxCheckAll {display:inline-flex!important;align-items:center;justify-content:center;min-width:36px;min-height:36px;cursor:pointer;}
-html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:-2px;}
+html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outline:1px solid var(--pw-focus);outline-offset:-2px;}
 #rl-app #V-MailMessageList .pw-selection-bar[hidden] {display:none!important;}
 #rl-app #V-MailMessageList .pw-selection-bar {
     display:flex;align-items:center;gap:var(--pw-space-3);flex:0 0 auto;min-height:44px;
@@ -18,7 +18,7 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
     background:var(--nc-color-primary-element);color:var(--nc-color-primary-element-text);font:var(--pw-weight-strong) var(--pw-text-xs)/1 var(--pw-font);cursor:pointer;
 }
 #rl-app #V-MailMessageList .pw-selection-finish:hover {filter:brightness(.94);}
-#rl-app #V-MailMessageList .pw-selection-finish:focus-visible {outline:2px solid var(--nc-color-primary-element);outline-offset:2px;}
+#rl-app #V-MailMessageList .pw-selection-finish:focus-visible {outline:1px solid var(--pw-focus);outline-offset:2px;}
 @media(max-width:799px) {
     html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"]:not(.pw-global-active) .checkboxCheckAll {min-width:44px;min-height:44px;}
     #rl-app #V-MailMessageList .pw-selection-bar {min-height:52px;padding-inline:var(--pw-space-4);}

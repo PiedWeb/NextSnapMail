@@ -9,15 +9,46 @@ await p.evaluate(()=>fixtureReady);
 const checks=[];
 const check=(name,pass)=>{if(!pass)throw Error(name);checks.push(name);console.log('PASS '+name);};
 const heights=()=>p.evaluate(()=>[...document.querySelectorAll('.messageListItem,.pw-global-row')].map(node=>node.getBoundingClientRect().height));
+const hierarchy=()=>p.evaluate(()=>{
+ const ctx=document.createElement('canvas').getContext('2d');
+ const luminance=color=>{
+  ctx.clearRect(0,0,1,1);ctx.fillStyle=color;ctx.fillRect(0,0,1,1);
+  return [...ctx.getImageData(0,0,1,1).data].slice(0,3).map(value=>value/255)
+   .map(value=>value<=.04045?value/12.92:((value+.055)/1.055)**2.4)
+   .reduce((sum,value,index)=>sum+value*[.2126,.7152,.0722][index],0);
+ };
+ const contrast=(a,b)=>(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+ const base=luminance(getComputedStyle(document.documentElement).getPropertyValue('--nc-color-main-background'));
+ const checked=document.querySelectorAll('.messageListItem')[1];
+ checked.classList.add('checked');
+ const rows=[...document.querySelectorAll('.messageListItem,.pw-global-row')].map(row=>{
+  const sender=luminance(getComputedStyle(row.querySelector('.senderParent,.pw-global-primary')).color);
+  const subject=luminance(getComputedStyle(row.querySelector('.subjectParent,.pw-global-subject')).color);
+  const background=getComputedStyle(row).backgroundColor;
+  const surface=background==='rgba(0, 0, 0, 0)'?base:luminance(background);
+  return {sender:contrast(sender,surface),subject:contrast(subject,surface)};
+ });
+ checked.classList.remove('checked');
+ const focused=getComputedStyle(document.querySelector('.focused'));
+ return {rows,focus:contrast(luminance(focused.outlineColor),base),width:focused.outlineWidth};
+});
+const lightHierarchy=await hierarchy();
+check('Light senders stay readable and quieter than subjects on plain, selected and checked rows',lightHierarchy.rows.every(row=>row.sender>=4.5&&row.subject>row.sender));
+check('Light focus is one pixel with strong contrast',lightHierarchy.width==='1px'&&lightHierarchy.focus>=3);
 const comfortable=await heights();
 check('Comfort mode remains the default',comfortable.every(height=>height>=60));
 await p.locator('#compact').check();
 check('Compact native/global rows are 50–54 px including long subjects and thread counts',(await heights()).every(height=>height>=50&&height<=54));
-check('Keyboard focus has an immediate shape cue',await p.evaluate(()=>getComputedStyle(document.querySelector('.focused')).outlineWidth==='2px'));
+check('Keyboard focus has an immediate shape cue',await p.evaluate(()=>getComputedStyle(document.querySelector('.focused')).outlineWidth==='1px'));
 check('Compact subjects retain readable type and ellipsis',await p.evaluate(()=>[...document.querySelectorAll('.messageListItem .subjectParent')].every(node=>parseFloat(getComputedStyle(node).fontSize)>=14&&getComputedStyle(node).whiteSpace==='nowrap')));
 await p.evaluate(()=>document.documentElement.dataset.themes='dark');
+await p.emulateMedia({colorScheme:'dark'});
+const darkHierarchy=await hierarchy();
+check('Dark senders stay readable and quieter than subjects on plain, selected and checked rows',darkHierarchy.rows.every(row=>row.sender>=4.5&&row.subject>row.sender));
+check('Dark focus is one pixel with strong contrast',darkHierarchy.width==='1px'&&darkHierarchy.focus>=3);
 check('Dark mode keeps native row geometry',(await heights()).every(height=>height>=50&&height<=54));
 await p.evaluate(()=>document.documentElement.dataset.themes='light');
+await p.emulateMedia({colorScheme:'light'});
 await p.setViewportSize({width:900,height:900});
 check('Medium desktop rows remain compact',(await heights()).every(height=>height>=50&&height<=54));
 await p.setViewportSize({width:390,height:844});

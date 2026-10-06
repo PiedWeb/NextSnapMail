@@ -79,6 +79,8 @@
    * they keep working over a tinted row. Two strengths are enough. */
   --pw-ring-soft: color-mix(in oklch, var(--nc-color-primary-element) 20%, transparent);
   --pw-ring-strong: color-mix(in oklch, var(--nc-color-primary-element) 40%, transparent);
+  /* Solid focus ink: one pixel stays visible on light and dark surfaces. */
+  --pw-focus: color-mix(in oklch, var(--nc-color-primary-element) 50%, var(--nc-color-main-text));
   --pw-scrollbar: color-mix(in oklch, var(--pw-grey-700) 24%, transparent);
 
   /* Accents. Amber marks a followed message and nothing else; red is reserved
@@ -96,6 +98,8 @@
   --pw-rail: color-mix(in oklch, var(--nc-color-main-background) 88%, var(--nc-color-primary-element));
   --pw-line: var(--pw-grey-200);
   --pw-muted: var(--pw-grey-600);
+  /* Quieter than subject ink, with enough contrast on the checked-row tint. */
+  --pw-sender: color-mix(in oklch, var(--nc-color-main-text) 68%, var(--nc-color-main-background));
   --pw-selected: var(--pw-primary-50);
 
   /* Elevation. Each level carries a hairline ring so a surface keeps its edge

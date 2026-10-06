@@ -21,8 +21,16 @@ html.pw-theme #rl-popups > dialog:not(.pw-inline-reply):not(.animate) {
 }
 /* Focus is a navigation cursor, not the delayed reader selection. Keep the
  * current native opened/checked backgrounds and add a synchronous shape cue. */
+html.pw-theme #rl-app :focus-visible {
+  outline:1px solid var(--pw-focus);
+}
+/* The editor already uses its one-pixel border as its focus indicator. */
+html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):focus-visible {
+  outline:none;
+}
+html.pw-theme #rl-app .messageListItem [data-unseen] { border-width:1px; }
 html.pw-theme #rl-app #V-MailMessageList .messageListItem.focused {
-  outline:2px solid var(--nc-color-primary-element);
+  outline:1px solid var(--pw-focus);
   outline-offset:-2px;
   transition:none;
 }

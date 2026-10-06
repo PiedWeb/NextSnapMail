@@ -42,7 +42,7 @@
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len:hover {background:var(--pw-selected);}
 #rl-app #rl-right #V-MailMessageList .messageListItem :is(.flagParent,.threads-len):focus-visible {
-    outline:2px solid var(--nc-color-primary-element);outline-offset:2px;
+    outline:1px solid var(--pw-focus);outline-offset:2px;
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent {color:var(--pw-muted);margin:0;min-width:16px;font-size:14px;}
 html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
@@ -75,7 +75,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 #rl-app #rl-right #V-MailMessageList .messageListItem {position:relative;}
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage)::before {
     content:'';position:absolute;inset-block:0;inset-inline-start:0;z-index:1;
-    width:3px;border-start-end-radius:2px;border-end-end-radius:2px;
+    width:1px;
     background:var(--pw-flag);pointer-events:none;
 }
 #rl-app #rl-right #V-MailMessageList .messageListItem:is(.msgflag-\5c flagged,.hasFlaggedSubMessage) .flagParent,

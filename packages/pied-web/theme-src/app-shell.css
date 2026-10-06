@@ -35,6 +35,6 @@ html.pw-mail-shell #rl-app {--pw-shell-version:1.7.3;}
  background:var(--pw-primary-100)!important;
  box-shadow:inset 0 0 0 1px var(--pw-ring-soft)!important;
 }
-#rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.selected) .senderParent {color:var(--nc-color-main-text);}
+#rl-app #rl-right #V-MailMessageList .messageListItem:is(.checked,.selected) .senderParent {color:var(--pw-sender);}
 
 @media(max-width:360px){html.pw-mail-shell #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent {grid-row:1 / -1;}}

@@ -41,7 +41,7 @@
 #rl-app #V-MailMessageView .pw-conversation-card-toggle:focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-preview-toggle:focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-full:focus-visible {
- outline:2px solid var(--nc-color-primary-element); outline-offset:2px;
+ outline:1px solid var(--pw-focus); outline-offset:2px;
 }
 #rl-app #V-MailMessageView .pw-conversation-before > p {
  margin:0 var(--pw-space-2) var(--pw-space-3); color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font);

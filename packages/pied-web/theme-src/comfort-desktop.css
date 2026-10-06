@@ -37,7 +37,7 @@
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:var(--pw-primary-500); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:hover { background:var(--pw-selected); }
-  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:2px solid var(--nc-color-primary-element); outline-offset:1px; }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:1px solid var(--pw-focus); outline-offset:1px; }
   #rl-app #V-MailMessageList .messageListItem.unseen time::before { display:none; }
   #rl-app #V-MailMessageList .messageListItem .senderParent {
     font-size:var(--pw-text-sm);
