@@ -9,26 +9,18 @@ focus and the native account menu are retained.
 
 ## 1.10.18, 2026-10-06
 
-Only fade a global row while it actually holds the shared action group.
-The initial keyboard cursor and a formerly focused row remain fully readable
-when the controls are elsewhere. This completes the 1.10.15 layout adjustment;
-the browser regression covers the initial cursor before any pointer approach.
+Focus outlines use one pixel and a stronger solid primary/foreground colour.
+Sender text uses a quieter neutral than subjects, including selected/checked
+rows. The editor changes its existing border without adding an outer ring.
+Composer tab lines, global selection edges and followed-row accents also use
+one pixel. The shared quick-action fade is limited to its current owning row.
 
 ## 1.10.17, 2026-10-06
 
-Combines the one-pixel focus and quieter sender hierarchy with the concurrent
-compact conversation badges and recovered desktop row width. The payload keeps
-all three refinements together instead of letting parallel publications replace
-each other's stylesheet.
-
-## 1.10.16, 2026-10-06
-
-Focus outlines now use one pixel and a solid, stronger primary/foreground colour
-in light and dark mode. Native keyboard controls share that indicator. The
-composer editor signals focus through its existing border alone; composer tab
-lines, followed-row accents and global checked-row edges also use one pixel.
-Sender text uses the quieter muted neutral in native and global lists, including
-selected and checked rows, so the subject keeps its visual priority.
+Conversation badges show a compact total with a teal dot when any message in the
+thread is unread. The exact unread count stays in the French/English tooltip and
+accessible label. Fully read threads show the total alone. Native bindings,
+keyboard activation and phone hit areas remain intact in light and dark mode.
 
 ## 1.10.15, 2026-10-06
 
@@ -43,11 +35,6 @@ reuses one desktop action group.
 This follows Schoger/Wathan, *Refactoring UI*, “Give each element just the space
 it needs” (p. 77) and “Avoid ambiguous spacing” (pp. 96–99). Browser regressions
 measure the recovered width, rest metadata, hover/focus masking and row stability.
-
-Conversation badges show a compact total with a teal dot when any message in the
-thread is unread. The exact unread count stays in the French/English tooltip and
-accessible label. Fully read threads show the total alone. Native bindings,
-keyboard activation and phone hit areas remain intact in light and dark mode.
 
 ## 1.10.14, 2026-10-06
 

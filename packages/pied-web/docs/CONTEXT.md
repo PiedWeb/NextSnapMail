@@ -43,7 +43,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are the keyboard equivalent. Persist stable identifiers per active account, cache them only for
   first paint, ignore missing entries and append new ones. Expanding must restore the native
   hierarchy and order. See `FOLDER_RAIL.md`.
-- Since 1.10.15, conversation badges show only the total and a teal dot when any
+- Since 1.10.17, conversation badges show only the total and a teal dot when any
   member is unread. The tooltip and accessible label retain the exact unread count.
   Keep SnappyMail's bound text and native read/unread updates intact.
   List stars use an
@@ -133,7 +133,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are captured before that handler. The confirmation is a page-level live region, because
   the recipient rows are clipped and scrollable. See READER_ADDRESSES.md.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
-  Since 1.10.16, senders stay in the quieter muted neutral even on selected/checked
+  Since 1.10.18, senders stay in the quieter muted neutral even on selected/checked
   rows. Borders and focus indicators use at most 1 px; a solid primary/foreground
   focus colour replaces diluted two-pixel rings. The editor uses its own border
   for focus instead of accumulating a border and an outer ring.
@@ -290,7 +290,7 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 - Native row quick-action groups own the visibility of their relocated star, including
   `.focused` keyboard rows. Override its original row ordering/hiding rules inside the
   group and reset button margins inherited from Nextcloud's global controls.
-- Since 1.10.15, desktop rows give hidden quick-action space back to the text.
+- Since 1.10.17, desktop rows give hidden quick-action space back to the text.
   Float the controls over a trailing content fade on hover/focus, without changing
   subject width or row height. The global Feed uses a presentation wrapper for
   this mask and keeps its one shared desktop action group. Touch/mobile retain

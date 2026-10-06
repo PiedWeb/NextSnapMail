@@ -101,7 +101,7 @@ check('Select all results freezes every page and states the exact message count'
         && document.querySelector('.pw-global-selection input[type="checkbox"]').checked
         && document.querySelector('.pw-global-status').textContent.includes('125 messages, toutes pages incluses');
 }));
-await page.getByRole('button',{name:'Supprimer',exact:true}).first().click();
+await page.locator('.pw-global-selection').getByRole('button',{name:'Supprimer',exact:true}).click();
 await page.waitForFunction(() => document.querySelector('.pw-mailbox-notice')?.hidden===false
     && document.querySelector('.pw-mailbox-notice button')?.hidden===false);
 check('Confirmed multi-page Trash exposes Undo only after the server reports completion',await page.evaluate(() => {
