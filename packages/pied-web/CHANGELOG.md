@@ -1,5 +1,11 @@
 # Releases
 
+## 1.10.22, 2026-10-06
+
+The native editor mode select keeps its one-pixel border as its sole focus
+indicator. Override its inherited important button border and toolbar outline
+so focus uses the same stronger colour as the composer fields.
+
 ## 1.10.21, 2026-10-06
 
 Native form fields now use one-pixel borders, including From, To, Cc, Bcc,

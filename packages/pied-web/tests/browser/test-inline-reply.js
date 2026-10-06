@@ -54,6 +54,15 @@ await p.evaluate(async()=>{
 });
 await p.waitForSelector('#V-PopupsCompose.pw-inline-reply');
 const checks=[];const check=(label,ok)=>{if(!ok)throw new Error(label);checks.push(label);console.log('PASS '+label);};
+check('The native editor mode select focuses with one stronger border and no second contour',await p.evaluate(()=>{
+ const select=document.querySelector('#V-PopupsCompose .squire-toolbar select');
+ const probe=document.createElement('span');probe.style.color='var(--pw-focus)';select.parentElement.append(probe);
+ const expected=getComputedStyle(probe).color;probe.remove();
+ select.focus();getComputedStyle(select).borderTopColor;select.getAnimations().forEach(a=>a.finish());
+ const style=getComputedStyle(select);
+ return document.activeElement===select&&style.outlineStyle==='none'&&style.borderTopColor===expected
+  &&['Top','Right','Bottom','Left'].every(side=>style['border'+side+'Width']==='1px');
+}));
 check('Reply docks the one native composer at the bottom of the active conversation',await p.evaluate(()=>{
  const dialog=document.getElementById('V-PopupsCompose'),slot=dialog.parentElement;
  return dialog.open&&inlineCompose.modalVisible()&&slot.classList.contains('pw-inline-reply-slot')

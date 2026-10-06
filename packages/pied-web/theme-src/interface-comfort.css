@@ -36,6 +36,12 @@ html.pw-theme #rl-app .emailaddresses:is(:focus-within, .emailaddresses-focused)
   border-color:var(--pw-focus);
   outline:none;
 }
+/* Native editor mode selects also carry .btn, whose border is !important. */
+html.pw-theme #rl-app :is(select, .select):focus,
+html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn:focus {
+  border-color:var(--pw-focus) !important;
+  outline:none !important;
+}
 html.pw-theme #rl-app input[type="checkbox"]:not(:checked),
 html.pw-theme #rl-app .e-checkbox.material-design input:not(:checked) + div,
 html.pw-theme #rl-app .messageView .messageItemHeader .hasVirus {
