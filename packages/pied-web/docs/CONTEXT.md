@@ -133,7 +133,7 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   are captured before that handler. The confirmation is a page-level live region, because
   the recipient rows are clipped and scrollable. See READER_ADDRESSES.md.
 - Only unread subjects are bold. Sender and subject have separate visual hierarchy.
-  Since 1.10.16, senders stay in the quieter muted neutral even on selected/checked
+  Since 1.10.18, senders stay in the quieter muted neutral even on selected/checked
   rows. Borders and focus indicators use at most 1 px; a solid primary/foreground
   focus colour replaces diluted two-pixel rings. The editor uses its own border
   for focus instead of accumulating a border and an outer ring.

@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.18, 2026-10-06
+
+Focus outlines use one pixel and a stronger solid primary/foreground colour.
+Sender text uses a quieter neutral than subjects, including selected/checked
+rows. The editor changes its existing border without adding an outer ring.
+Composer tab lines, global selection edges and followed-row accents also use
+one pixel. The shared quick-action fade is limited to its current owning row.
+
 ## 1.10.17, 2026-10-06
 
 Conversation badges show a compact total with a teal dot when any message in the
