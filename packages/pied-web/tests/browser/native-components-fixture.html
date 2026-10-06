@@ -49,7 +49,11 @@ window.fixtureReady=(async()=>{
      ko.applyBindingAccessorsToNode(row.querySelector('.delete'),{visible:()=>!item.askDelete(),click:()=>()=>vm.accountForDeletion(item)},item);
      ko.applyBindingAccessorsToNode(row.querySelector('.button-confirm-delete'),{css:()=>({'delete-access':item.askDelete()}),click:()=>()=>vm.deleteAccount(item)},item);
      row.querySelector('.button-confirm-delete').textContent=translate('GLOBAL/ARE_YOU_SURE');
-     if(!item.isAdditional()){row.querySelector('.e-action').className='';row.querySelector('.drag-handle').remove();row.querySelector('.delete').remove();row.querySelector('.button-confirm-delete').remove();}
+     if(!item.isAdditional()){
+      const nameCell=row.querySelector('.e-action');nameCell.className='';nameCell.colSpan=3;
+      row.querySelector('.drag-handle').remove();
+      [...row.cells].slice(2).forEach(cell=>cell.remove());
+     }
     });
    },null,{disposeWhenNodeIsRemoved:root});
    root.addEventListener('click',event=>{const cell=event.target.closest('.accounts-list .e-action');if(cell&&ko.dataFor(cell))fixtureCalls.edit++;});

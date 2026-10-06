@@ -42,6 +42,15 @@ for(const scheme of ['light','dark']){
   }
  }
 }
+for(const scheme of ['light','dark']){
+ await p.emulateMedia({colorScheme:scheme});await p.evaluate(s=>document.documentElement.dataset.themes=s,scheme);
+ await p.setViewportSize({width:320,height:950});await render('SettingsAccounts');
+ check(`Accounts ${scheme} 320: the native principal colspan keeps names inside the table`,!(await metrics()).overflow);
+ check(`Accounts ${scheme} 320: the drag column preserves room for the account name`,await p.evaluate(()=>{
+  const row=fixtureRoot.querySelector('.accounts-list tr[draggable=true]');
+  return row.cells[0].getBoundingClientRect().width===44&&row.cells[1].getBoundingClientRect().width>=140;
+ }));
+}
 await p.setViewportSize({width:390,height:950});await render('SettingsAccounts');
 await p.waitForSelector('.accounts-list .e-action[role=button]');
 check('Long account names wrap without an internal table overflow',!(await metrics()).overflow);

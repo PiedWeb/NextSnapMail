@@ -80,7 +80,7 @@ The [shared design system](docs/DESIGN_SYSTEM.md) also covers native settings an
 [Nextcloud Calendar](integrations/calendar/README.md) also has a full-window workspace,
 with the native app grid beside the event filter. It is installed and versioned separately.
 
-Release **1.10.23**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.15**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.24**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.15**, embedded SnappyMail **2.38.2**. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

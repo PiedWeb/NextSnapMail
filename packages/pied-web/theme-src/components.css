@@ -88,11 +88,12 @@ html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .e-compo
   max-width:100%;
   white-space:normal;
 }
-html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) { width:100%;table-layout:fixed; }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) { width:100%;table-layout:auto; }
 html.pw-theme #rl-app #V-SettingsPane :is(.account-name,.identity-name,.key-user,.key-id) { overflow-wrap:anywhere;white-space:normal;max-width:100%; }
 html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td { white-space:normal;padding-inline:var(--pw-space-1); }
 html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td:first-child { width:var(--pw-control-touch); }
 html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td:nth-last-child(-n+2) { width:var(--pw-control-touch); }
+html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) td[colspan] { width:auto;overflow-wrap:anywhere; }
 html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) .button-confirm-delete { padding-inline:var(--pw-space-0-5);min-width:0;max-width:100%;overflow-wrap:anywhere; }
 html.pw-theme #rl-app .button-confirm-delete { transition:opacity 150ms ease-out,transform 150ms ease-out; }
 html.pw-theme #rl-app #V-SettingsPane [role=button] { cursor:pointer; }

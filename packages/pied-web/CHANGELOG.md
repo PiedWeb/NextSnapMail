@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.24, 2026-10-06
+
+Complete native account-table sizing at 320px, including the principal account's
+three-column span. Preserve 44px action columns and space for wrapping names.
+The bound fixture now reproduces that native span in both themes. Bump the
+plugin version to rotate SnappyMail's CSS cache after the final live correction;
+a stylesheet-only replacement with the same plugin hash retained older CSS.
+
 ## 1.10.23, 2026-10-06
 
 Native settings and dialogs now share the Mail field, button, title, radius,

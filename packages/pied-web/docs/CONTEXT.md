@@ -286,6 +286,13 @@ strong one-pixel focus. See DESIGN_SYSTEM.md for native styling boundaries.
 
 ## Deployment runtime contract
 
+Native account tables have a principal row with one empty cell and a cell
+spanning three columns. Use automatic table layout with 44px action widths;
+fixed layout derives the wrong columns from that first row. Browser fixtures
+must retain the principal span. CSS changes also require a plugin version bump:
+ServiceCss caches by Plugins()->Hash(), theme and engine version, not the theme
+file fingerprint. Native compilation alone does not rotate this cache.
+
 The live URL is nc.robin-d.fr. On n0c, web LiteSpeed OPcache can retain old plugin PHP
 with `opcache.validate_timestamps=0`, even after successful CLI/hash checks. Version
 1.7.2 only became visible after targeted web invalidation of the old 1.6.4 index.
