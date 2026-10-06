@@ -157,8 +157,20 @@
             && (!sourceKey || !currentKey || sourceKey === currentKey);
     }
 
+    function mountExpandButton(state) {
+        // The native create event precedes Knockout's template rendering.
+        // Attach the control when the ready event supplies the real header.
+        const controls = state.dialog.querySelector(':scope > header .pull-right')
+            || state.dialog.querySelector(':scope > header');
+        if (controls && !controls.contains(state.expandButton)) {
+            controls.insertBefore(state.expandButton,controls.querySelector('.minimize-custom,.close'));
+        }
+    }
+
     function mountCompose(vm) {
-        if (vm.viewModelTemplateID !== 'PopupsCompose' || states.has(vm)) return;
+        if (vm.viewModelTemplateID !== 'PopupsCompose') return;
+        const existing = states.get(vm);
+        if (existing) { mountExpandButton(existing); return; }
         composeVM = vm;
         const dialog = vm.viewModelDom, state = {
             dialog, inline:false, slot:null, marker:null, host:null, hostObserver:null, hostResizeObserver:null, locked:[], ticket:0,
@@ -173,8 +185,8 @@
         expandButton.setAttribute('aria-label',expandButton.title);
         expandButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M8 3H3v5M16 3h5v5M3 16v5h5M21 16v5h-5M9 3 3 9m12-6 6 6M9 21l-6-6m12 6 6-6"/></svg><span>'
             + t('Agrandir', 'Expand') + '</span>';
-        const controls = dialog.querySelector(':scope > header .pull-right') || dialog.querySelector(':scope > header');
-        controls?.insertBefore(expandButton,controls.querySelector('.minimize-custom,.close'));
+        state.expandButton = expandButton;
+        mountExpandButton(state);
         expandButton.addEventListener('pointerdown', event => {
             state.expandFocus = captureFocus(dialog) || state.editorFocus;
             event.preventDefault(); // Keep the editor selection until showModal() has moved focus.

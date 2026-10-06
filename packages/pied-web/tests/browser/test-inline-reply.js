@@ -10,7 +10,15 @@ await p.evaluate(async()=>{
  document.querySelector('#V-MailMessageView .b-message').classList.add('pw-conversation-active');
  dispatchEvent(new CustomEvent('rl-view-model',{detail:readerVM}));
  const markup=await (await fetch('/app/snappymail/v/2.38.2/app/templates/Views/User/PopupsCompose.html')).text();
- const dialog=document.createElement('dialog');dialog.id='V-PopupsCompose';dialog.innerHTML=markup;
+ const dialog=document.createElement('dialog');dialog.id='V-PopupsCompose';
+ const originalParent=document.getElementById('rl-app');originalParent.append(dialog);
+ const vm={viewModelTemplateID:'PopupsCompose',viewModelDom:dialog,modalVisible:ko.observable(false),aDraftInfo:null,
+  onShow(type,message){this.initOnShow({mode:type,message});},
+  initOnShow(options){this.aDraftInfo=options.mode===1||options.mode===2?['reply',options.message.uid,options.message.folder]:['forward',options.message.uid,options.message.folder];},
+  oEditor:null};
+ // Native buildViewModel announces creation before rendering its template.
+ dispatchEvent(new CustomEvent('rl-view-model.create',{detail:vm}));
+ dialog.innerHTML=markup;
  dialog.querySelectorAll('[data-bind]').forEach(node=>node.removeAttribute('data-bind'));
  dialog.querySelectorAll('[data-i18n]').forEach(node=>{
   const key=node.dataset.i18n;
@@ -30,14 +38,8 @@ await p.evaluate(async()=>{
   }
   const item=document.createElement('li');item.className='emailaddresses-input';item.append(input);box.append(item);
  }
- const originalParent=document.getElementById('rl-app');originalParent.append(dialog);
- const vm={viewModelTemplateID:'PopupsCompose',viewModelDom:dialog,modalVisible:ko.observable(false),aDraftInfo:null,
-  onShow(type,message){this.initOnShow({mode:type,message});},
-  initOnShow(options){this.aDraftInfo=options.mode===1||options.mode===2?['reply',options.message.uid,options.message.folder]:['forward',options.message.uid,options.message.folder];},
-  oEditor:null};
  vm.modalVisible.subscribe(value=>{if(value){dialog.showModal();requestAnimationFrame(()=>dialog.classList.add('animate'));}else{dialog.classList.remove('animate');setTimeout(()=>dialog.open&&dialog.close(),210);}});
  window.inlineCompose=vm;window.inlineOriginalParent=originalParent;
- dispatchEvent(new CustomEvent('rl-view-model.create',{detail:vm}));
  dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));
  await new Promise(resolve=>{
   vm.oEditor=new NativeHtmlEditor(dialog.querySelector('.textAreaParent'),()=>{

@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.9, 2026-10-06
+
+The **Expand / Agrandir** control now mounts after the native template renders.
+SnappyMail announces composer creation while its dialog is still empty; the
+control previously missed its header at that point and was never attached.
+The reply regression now follows that actual creation-before-template lifecycle.
+
 ## 1.10.8, 2026-10-06
 
 Reply and Reply all now open the full native composer when the reading pane is
@@ -9,8 +16,8 @@ message itself, below the formatting toolbar. Wrapped Cc recipients and expanded
 formatting controls can no longer consume that writing space.
 
 Shrinking an integrated reply promotes the same native draft to the full
-composer, preserving its fields, attachments and editor selection. The browser
-regression now uses the complete native editor and recipient chips, rather than
+composer, preserving its fields, attachments and editor selection.
+The browser regression now uses the complete native editor and recipient chips, rather than
 a bare editable element, and covers desktop, phone and dark mode without mail
 transport.
 

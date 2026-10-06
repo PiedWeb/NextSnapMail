@@ -23,7 +23,9 @@ background send and scheduled send therefore keep the same view model and comman
 dialog must not be displayed with CSS as an inline substitute: browsers keep its descendants
 inert even when they look visible.
 
-**Expand** closes the non-modal state and calls `showModal()` on the same node. Input selection
+The **Expand** control mounts on the ready event: SnappyMail's creation event
+precedes its template. It closes the non-modal state and calls `showModal()` on
+the same node. Input selection
 or the contenteditable range is captured as node/offset pairs before the move and restored
 after it; a live `Range` cannot be retained because moving its ancestor can retarget it. While
 the composer is inline, duplicate reader Reply/Forward controls are inert. Leaving the theme
