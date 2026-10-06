@@ -21,6 +21,15 @@ check('Native Flag, Trash and Reminder share a reserved rail with a real bin ico
   &&trash&&!trash.textContent.trim()&&getComputedStyle(trash,'::before').maskImage!=='none'
   &&subject.getBoundingClientRect().right<=group.getBoundingClientRect().left;
 }));
+await p.locator('.inputSearch').hover();
+await p.locator('.messageListItem').first().evaluate(row=>row.classList.add('focused'));
+check('Keyboard-focused native quick actions keep the star visible in the first slot',await p.evaluate(()=>{
+ const group=document.querySelector('.messageListItem > .pw-row-actions'),star=group.firstElementChild;
+ const boxes=[...group.children].map(button=>button.getBoundingClientRect());
+ return getComputedStyle(group).opacity==='1'&&getComputedStyle(star).opacity==='1'
+  &&boxes[0].left<boxes[1].left&&boxes[1].left<boxes[2].left;
+}));
+await p.locator('.messageListItem').first().evaluate(row=>row.classList.remove('focused'));
 await p.locator('.checkboxCheckAll').press('Space');
 check('Keyboard Space selects the current page immediately',await p.evaluate(()=>demoMessages.every(message=>message.checked())
  &&document.querySelector('.checkboxCheckAll').getAttribute('aria-checked')==='true'

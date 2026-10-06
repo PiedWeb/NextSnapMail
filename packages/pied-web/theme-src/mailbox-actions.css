@@ -2,7 +2,9 @@
 #rl-app .pw-row-actions { display:flex;align-items:center;gap:2px;padding:2px;border:1px solid var(--pw-line);border-radius:7px;background:var(--pw-paper);box-shadow:var(--pw-elevation-1); }
 #rl-app .messageListItem > .pw-row-actions { position:absolute;z-index:2;inset-inline-end:12px;top:50%;transform:translateY(-50%);opacity:0;pointer-events:none; }
 #rl-app .messageListItem:is(:hover,:focus-within,.focused) > .pw-row-actions { opacity:1;pointer-events:auto; }
-#rl-app .pw-row-action { display:inline-flex;align-items:center;justify-content:center;width:32px;min-width:32px;height:32px;min-height:32px;padding:5px;border:0!important;border-radius:5px;background:transparent;color:var(--pw-grey-700);cursor:pointer; }
+#rl-app .pw-row-action { display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;width:32px;min-width:32px;height:32px;min-height:32px;margin:0;padding:5px;border:0!important;border-radius:5px;background:transparent;color:var(--pw-grey-700);cursor:pointer; }
+/* The group owns visibility; the relocated native star must not leave a blank slot. */
+#rl-app #rl-right #V-MailMessageList .messageListItem > .pw-row-actions .flagParent { order:0;opacity:1; }
 #rl-app .pw-row-action svg { width:18px;height:18px;pointer-events:none; }
 #rl-app .pw-row-action[data-pw-row-icon]::before { content:'';display:block;width:18px;height:18px;background:currentColor; }
 #rl-app .pw-row-action[data-pw-row-icon="trash-2"]::before { mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 6h18M8 6V4h8v2M5 6l1 15h12l1-15M10 10v7M14 10v7'/%3E%3C/svg%3E") center/contain no-repeat; }

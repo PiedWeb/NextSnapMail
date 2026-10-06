@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.12, 2026-10-06
+
+Native row quick actions keep their star visible whenever the group is shown,
+including keyboard-focused rows. The relocated star stays before Trash and
+Reminder instead of leaving an empty trailing slot. Explicit button margins
+prevent Nextcloud's global controls from inflating the action group.
+
 ## 1.10.11, 2026-10-06
 
 Cancelling Advanced search restores its committed scope through the native

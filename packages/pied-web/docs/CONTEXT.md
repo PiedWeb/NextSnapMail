@@ -280,6 +280,9 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
   Block send/save during replacement; never resurrect a removed attachment or insert in another draft.
 - Preserve native quote `details` with `blockquote` as last element for reply/print cleanup.
 - Toolbar rearrangement must retain bound nodes, native command references and cursor selection.
+- Native row quick-action groups own the visibility of their relocated star, including
+  `.focused` keyboard rows. Override its original row ordering/hiding rules inside the
+  group and reset button margins inherited from Nextcloud's global controls.
 - Since 1.10.10, dock the native account trigger/menu at the desktop list scope and hide its
   original account label only in that placement. Restore the mobile header and theme-exit
   placement. Search scope belongs to the ready native AdvancedSearch form, commits on submit
