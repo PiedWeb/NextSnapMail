@@ -793,6 +793,10 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 }
 
 /* Keep the docked account menu above the neighbouring mail panes. */
+html.pw-theme #rl-app #V-MailMessageList .dropdown-menu.pw-list-more-menu {
+ position:fixed; inset:auto; margin:0; left:var(--pw-list-menu-left,12px); top:var(--pw-list-menu-top,48px);
+ box-sizing:border-box; max-width:calc(100vw - 24px); max-height:var(--pw-list-menu-height,65vh); overflow:auto;
+}
 @media(min-width:800px) {
  #rl-app #rl-left:has(#V-SystemDropDown .dropdown.show) { z-index:150; overflow:visible; }
 }

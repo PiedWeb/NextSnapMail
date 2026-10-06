@@ -23,9 +23,32 @@
         const scopeBar = document.createElement('div'); scopeBar.className = 'pw-list-scope';
         const scopeLabel = document.createElement('strong'); scopeLabel.className = 'pw-list-scope-label';
         const searchScope = document.createElement('select'); searchScope.setAttribute('aria-label',t('Portée de la recherche','Search scope'));
+        searchScope.id = 'pw-search-scope';
+        let searchScopeValue = 'folder';
         [['folder',t('Ce dossier','This folder')],['account',t('Tous les dossiers du compte','All folders in this account')],['global',t('Tous mes comptes','All my accounts')]]
             .forEach(([value,label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; searchScope.append(option); });
-        scopeBar.append(scopeLabel,searchScope); dom.querySelector(':scope > .btn-toolbar')?.after(scopeBar);
+        scopeBar.append(scopeLabel); dom.querySelector(':scope > .btn-toolbar')?.after(scopeBar);
+        // Keep one scope control in the native popup. Choosing a scope is staged
+        // until its form submits, so Cancel cannot rerun the existing search.
+        const scopeField = document.createElement('div'); scopeField.className = 'control-group pw-search-scope-field';
+        const scopeFieldLabel = document.createElement('label'); scopeFieldLabel.htmlFor = searchScope.id;
+        scopeFieldLabel.textContent = searchScope.getAttribute('aria-label'); scopeField.append(scopeFieldLabel,searchScope);
+        let popupObserver, searchForm;
+        const commitScope = () => { if (active()) searchScopeValue = searchScope.value; };
+        const mountSearchScope = popup => {
+            const form = popup?.querySelector('#advancedsearchform');
+            if (!form || form === searchForm) return;
+            searchForm?.removeEventListener('submit',commitScope,true); popupObserver?.disconnect();
+            searchForm = form; form.querySelector(':scope > div')?.prepend(scopeField);
+            form.addEventListener('submit',commitScope,true);
+            popupObserver = new MutationObserver(() => { searchScope.value = searchScopeValue; });
+            popupObserver.observe(popup,{attributes:true,attributeFilter:['hidden','style']});
+        };
+        const onSearchPopup = ({detail:popup}) => {
+            if (popup.viewModelTemplateID === 'PopupsAdvancedSearch') mountSearchScope(popup.viewModelDom);
+        };
+        addEventListener('rl-view-model',onSearchPopup);
+        mountSearchScope(document.getElementById('V-PopupsAdvancedSearch'));
         const controls = document.createElement('div'); controls.className = 'pw-global-selection';
         const allLabel = document.createElement('label'), all = document.createElement('input'); all.type = 'checkbox';
         all.setAttribute('aria-label',t('Sélectionner les messages de cette page','Select messages on this page'));
@@ -91,7 +114,7 @@
             focused = id; keyboardEntered = true; selectChanged(); const node = nodes.get(id); node?.focus({preventScroll:true}); node?.scrollIntoView({block:'nearest'});
         };
         const toggle = id => { snapshot = null; selected.has(id) ? selected.delete(id) : selected.add(id); anchor = id; selectChanged(); };
-        const open = item => { options.beforeOpen?.({search:searchState?.query || '',scope:searchScope.value,offset:searchState?.offset || 0,key:key(item),scroll:section.parentElement?.scrollTop || 0}); options.open(item); };
+        const open = item => { options.beforeOpen?.({search:searchState?.query || '',scope:searchScopeValue,offset:searchState?.offset || 0,key:key(item),scroll:section.parentElement?.scrollTop || 0}); options.open(item); };
         const createRowActions = (node,allowReminder) => {
             const group = api.mailbox.rowActions(() => rowScope(node.pwItem),() => refreshResults(),{
                 reminder:allowReminder,
@@ -203,16 +226,18 @@
                 : [options.accountLabel(), options.mode() === 'feed' ? t('Flux','Feed') : options.folderLabel()].filter(Boolean).join(' · ');
             searchScope.querySelector('option[value="global"]').hidden = options.accountCount() < 2;
             if (!searchState && searchScope.dataset.mode !== options.mode()) {
-                searchScope.value = global ? 'global' : 'folder'; searchScope.dataset.mode = options.mode();
+                searchScopeValue = searchScope.value = global ? 'global' : 'folder'; searchScope.dataset.mode = options.mode();
             }
+            const trigger = scopeLabel.closest('#top-system-dropdown-id');
+            trigger?.setAttribute('aria-label',t('Choisir un compte : ','Choose an account: ') + scopeLabel.textContent);
         };
         const search = async (query,offset = 0,reuse = false) => {
             query = String(query).trim();
             if (!query) { searchState = null; loading = stale = false; ++generation; resetSelection(); options.render(true); return; }
             const current = ++generation, previousState = searchState;
             searchState = {query,offset,limit:50,total:previousState?.total || 0,token:reuse ? previousState?.token : ''};
-            const params = {operation:'search',search:query,scope:searchScope.value === 'folder' ? 'folder' : 'all',folder:options.folder(),offset,limit:50};
-            if (searchScope.value !== 'global') params.accountHashes = JSON.stringify([options.accountHash()]);
+            const params = {operation:'search',search:query,scope:searchScopeValue === 'folder' ? 'folder' : 'all',folder:options.folder(),offset,limit:50};
+            if (searchScopeValue !== 'global') params.accountHashes = JSON.stringify([options.accountHash()]);
             if (reuse && searchState.token) params.searchToken = searchState.token;
             loading = true; stale = !!items.length; resetSelection(); options.render(); paint();
             try {
@@ -230,10 +255,9 @@
         };
         previous.addEventListener('click',() => search(searchState.query,Math.max(0,searchState.offset-searchState.limit),true));
         next.addEventListener('click',() => search(searchState.query,searchState.offset+searchState.limit,true));
-        searchScope.addEventListener('change',() => { ++generation; resetSelection(); const input = dom.querySelector('.inputSearch,input[type="search"]'); if (input?.value.trim()) search(input.value); else if (searchState) search(''); });
         const mailUi = window.rl.mailUi = window.rl.mailUi || {}, priorSearch = mailUi.onSearch;
         const onSearch = query => {
-            if (active() && section.isConnected && (options.mode() === 'global' || searchState || searchScope.value !== 'folder')) {
+            if (active() && section.isConnected && (options.mode() === 'global' || searchState || searchScopeValue !== 'folder')) {
                 void search(query); return true;
             }
             return priorSearch?.(query) || false;
@@ -241,7 +265,7 @@
         mailUi.onSearch = onSearch;
         dom.addEventListener('keydown',event => {
             if (event.key !== 'Enter' || !event.target.matches?.('.inputSearch,input[type="search"]') || event.isComposing) return;
-            if (options.mode() !== 'global' && searchScope.value === 'folder' && !searchState) return;
+            if (options.mode() !== 'global' && searchScopeValue === 'folder' && !searchState) return;
             event.preventDefault(); event.stopImmediatePropagation(); search(event.target.value);
         },true);
         dom.querySelector('.inputSearch,input[type="search"]')?.addEventListener('search',event => { if (!event.target.value && searchState) search(''); });
@@ -312,7 +336,7 @@
                 && !document.querySelector('#V-MailFolderList.focused,#V-MailMessageView.focused');
             if (!inList && !bodyFocus) return;
             if (event.target.closest?.('button,a,[role="button"]') && ['Enter',' '].includes(event.key)) {
-                event.stopImmediatePropagation(); return; // preserve the button's own default activation
+                return; // Let the control's own keyboard handler and default activation run.
             }
             const ids = items.map(key), index = Math.max(0,ids.indexOf(focused)); let target;
             const modifier = event.ctrlKey || event.metaKey, lower = event.key.toLowerCase();
@@ -352,12 +376,14 @@
         window.ko?.utils?.domNodeDisposal?.addDisposeCallback(dom,() => {
             ++generation; removeEventListener('keydown',onKey,true); removeEventListener('focusin',focusScope,true);
             desktopActions.removeEventListener?.('change',resetRowActions);
+            removeEventListener('rl-view-model',onSearchPopup); popupObserver?.disconnect();
+            searchForm?.removeEventListener('submit',commitScope,true); scopeField.remove();
             if (mailUi.onSearch === onSearch) mailUi.onSearch = priorSearch;
         });
         const active = () => document.documentElement.classList.contains('pw-theme');
         return {isSearch:() => !!searchState,reset:() => { searchState = null; loading = stale = false; ++generation; resetSelection(); },updateScope,
             refresh:refreshResults,search,restore:async state => {
-                searchScope.value = state.scope || 'global';
+                searchScopeValue = searchScope.value = state.scope || 'global';
                 if (state.search) await search(state.search,Number(state.offset || 0));
                 if (state.key && nodes.has(state.key)) focus(state.key);
                 if (section.parentElement) section.parentElement.scrollTop = Number(state.scroll || 0);

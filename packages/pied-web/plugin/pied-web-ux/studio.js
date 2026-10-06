@@ -354,6 +354,24 @@
                 adaptSearch();
             }
             const moreMenu = dom.querySelector('[aria-labelledby="more-list-dropdown-id"]');
+            const moreTrigger = dom.querySelector('#more-list-dropdown-id');
+            if (moreMenu && moreTrigger) {
+                moreMenu.classList.add('pw-list-more-menu');
+                const positionMore = () => {
+                    if (!document.documentElement.classList.contains('pw-theme') || !moreTrigger.parentNode.classList.contains('show')) return;
+                    const anchor = moreTrigger.getBoundingClientRect();
+                    const below = innerHeight - anchor.bottom - 12, above = anchor.top - 12;
+                    const upwards = moreMenu.scrollHeight > below && above > below;
+                    const height = Math.max(80,upwards ? above : below);
+                    moreMenu.style.setProperty('--pw-list-menu-height',height + 'px');
+                    const menu = moreMenu.getBoundingClientRect();
+                    const start = getComputedStyle(dom).direction === 'rtl' ? anchor.right - menu.width : anchor.left;
+                    moreMenu.style.setProperty('--pw-list-menu-left',Math.max(12,Math.min(start,innerWidth - menu.width - 12)) + 'px');
+                    moreMenu.style.setProperty('--pw-list-menu-top',(upwards ? Math.max(12,anchor.top - Math.min(menu.height,height) - 4) : anchor.bottom + 4) + 'px');
+                };
+                new MutationObserver(positionMore).observe(moreTrigger.parentNode,{attributes:true,attributeFilter:['class']});
+                addEventListener('resize',positionMore); addEventListener('scroll',positionMore,true);
+            }
             const sortMenu = dom.querySelector('[aria-labelledby="sort-list-dropdown-id"]');
             const sortEntries = sortMenu ? Array.from(sortMenu.children) : [];
             const sortHeading = document.createElement('li'); sortHeading.className = 'pw-menu-heading'; sortHeading.setAttribute('role','presentation');
@@ -383,7 +401,7 @@
                 dom.querySelector('#sort-list-dropdown-id')?.closest('.btn-group').classList.toggle('pw-sort-in-menu',piedWeb);
                 movable.forEach(([node, marker]) => {
                     if (mobile) {
-                        const group=dom.querySelector('.pw-day-label,.groupLabel');
+                        const group=Array.from(dom.querySelectorAll('.pw-day-label,.groupLabel')).find(group=>group.getBoundingClientRect().height);
                         (group || searchbar).append(mobileTools); mobileTools.append(node);
                         dom.classList.toggle('pw-tools-fallback',!group);
                     }

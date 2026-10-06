@@ -1,5 +1,19 @@
 # Releases
 
+## 1.10.10, 2026-10-06
+
+Search scope now lives in the native Advanced search popup. Its choice applies
+when submitting the form; cancelling keeps the existing search intact. The
+desktop list scope opens the original account menu, replacing the repeated
+account label in the folder rail. Mobile keeps its existing account header.
+
+The list More menu follows its trigger on desktop and mobile, stays within the
+viewport and scrolls when space is limited. Mobile global views use the visible
+search row instead of attaching this control to a hidden native day heading.
+Keyboard activation reaches the account control's own handler. Fictional browser
+checks cover popup lifecycle, cancellation, scoped submission, menu geometry,
+single/multiple accounts, mobile, dark mode and theme restoration.
+
 ## 1.10.9, 2026-10-06
 
 The **Expand / Agrandir** control now mounts after the native template renders.

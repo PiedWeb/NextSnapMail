@@ -158,7 +158,8 @@
             dom.classList.add('pw-account-ready');
             const account = dom.querySelector('.accountPlace');
             const button = dom.querySelector('#top-system-dropdown-id');
-            if (button) button.tabIndex = 0;
+            makeButtonLike(button,t('Choisir un compte','Choose an account'));
+            button?.setAttribute('aria-haspopup','menu');
             if (account) {
                 account.classList.add('pw-account-original');
                 const label = document.createElement('span');
@@ -278,8 +279,8 @@
         }
     });
 
-    // Let the account share the desktop toolbar; keep the mobile account header.
-    let headerFrame, accountHome;
+    // Reuse the native account menu at the list identity; keep the mobile header.
+    let headerFrame, accountHome, scopeHome;
     const dockAccount = () => {
         headerFrame = 0;
         const account = document.getElementById('V-SystemDropDown');
@@ -294,14 +295,25 @@
         const mobileIdentity = !desktop && active() && (visible(reader) || visible(list)) && document.querySelector('.pw-mobile-identity');
         const identity = document.querySelector('.pw-desktop-identity');
         const desktopIdentity = desktop && visible(document.getElementById('V-MailFolderList')) && visible(identity) && identity;
-        const target = mobileIdentity || desktopIdentity || desktop && (visible(reader) && (side || !visible(list))
+        const scope = desktop && visible(list) && list.querySelector('.pw-list-scope');
+        const scopeLabel = list?.querySelector('.pw-list-scope-label');
+        const trigger = account.querySelector('#top-system-dropdown-id');
+        if (scope && scopeLabel && trigger) {
+            if (!scopeHome) { scopeHome = document.createComment('List identity'); scopeLabel.before(scopeHome); }
+            if (scopeLabel.parentNode !== trigger) trigger.prepend(scopeLabel);
+            trigger.setAttribute('aria-label',t('Choisir un compte : ','Choose an account: ') + scopeLabel.textContent);
+        } else if (scopeHome && scopeLabel?.previousSibling !== scopeHome) {
+            scopeHome.after(scopeLabel);
+            trigger?.setAttribute('aria-label',t('Compte actif : ','Active account: ') + (account.querySelector('.pw-account-label')?.title || ''));
+        }
+        account.classList.toggle('pw-scoped-account',!!scope);
+        const target = scope || mobileIdentity || desktopIdentity || desktop && (visible(reader) && (side || !visible(list))
             ? reader.querySelector('.top-toolbar') : visible(list) && list.querySelector(':scope > .btn-toolbar'));
         const parent = target || accountHome;
         if (account.parentNode !== parent) parent.append(account);
         const docked = !!target;
         if (right.classList.contains('pw-compact-header') !== docked) right.classList.toggle('pw-compact-header', docked);
         if (account.classList.contains('pw-docked-account') !== docked) account.classList.toggle('pw-docked-account', docked);
-        const trigger = account.querySelector('#top-system-dropdown-id');
         if (trigger) {
             const top = Math.max(8, Math.min(innerHeight - 160, trigger.getBoundingClientRect().bottom + 6)) + 'px';
             if (account.style.getPropertyValue('--pw-account-menu-top') !== top) account.style.setProperty('--pw-account-menu-top', top);

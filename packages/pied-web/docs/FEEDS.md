@@ -48,6 +48,13 @@ account menu and the list names its current scope. Selecting a row from the acti
 its real source. Selecting a row from another account first loads that tab-local account context,
 then opens the exact folder and UID. Drafts resume in native Draft compose mode.
 
+Since 1.10.10, the desktop list scope itself opens the original account menu;
+the folder rail no longer repeats the active account. Mobile retains its account
+header. **Search scope / Portée de la recherche** lives in the native Advanced
+search popup, with folder, account and (for multiple accounts) All my accounts
+choices. Submitting commits the choice before the native query reaches the
+search hook; cancelling leaves the current query and scope unchanged.
+
 The native search field can ask the server for matching headers across every authorized account
 and eligible folder. Trash, Junk, Drafts, Reminders and scheduled-mail folders are excluded unless
 they are the explicit active scope. The first response freezes exact message identities under a
