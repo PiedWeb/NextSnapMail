@@ -5930,7 +5930,7 @@ html.pw-folder-dragging, html.pw-folder-dragging * { cursor:grabbing!important; 
   #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions {
     position:absolute;z-index:2;inset-inline-end:var(--pw-space-6);top:50%;transform:translateY(-50%);
   }
-  #rl-app #V-MailMessageList .pw-global-row:is(:hover,:focus-within,.focused) > .pw-global-content {
+  #rl-app #V-MailMessageList .pw-global-row:has(> .pw-row-actions):is(:hover,:focus-within,.focused) > .pw-global-content {
     mask-image:linear-gradient(to var(--pw-row-fade-direction),black calc(100% - var(--pw-row-actions-width) - 12px),transparent calc(100% - var(--pw-row-actions-width)));
   }
   #rl-app #V-MailMessageList .messageListItem > .pw-row-actions .flagParent { width:32px!important;min-width:32px!important;height:32px!important;min-height:32px!important; }

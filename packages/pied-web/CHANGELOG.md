@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.18, 2026-10-06
+
+Only fade a global row while it actually holds the shared action group.
+The initial keyboard cursor and a formerly focused row remain fully readable
+when the controls are elsewhere. This completes the 1.10.15 layout adjustment;
+the browser regression covers the initial cursor before any pointer approach.
+
 ## 1.10.17, 2026-10-06
 
 Combines the one-pixel focus and quieter sender hierarchy with the concurrent
