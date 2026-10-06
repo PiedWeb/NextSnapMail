@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.17, 2026-10-06
+
+Combines the one-pixel focus and quieter sender hierarchy with the concurrent
+compact conversation badges and recovered desktop row width. The payload keeps
+all three refinements together instead of letting parallel publications replace
+each other's stylesheet.
+
 ## 1.10.16, 2026-10-06
 
 Focus outlines now use one pixel and a solid, stronger primary/foreground colour
