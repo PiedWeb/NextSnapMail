@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.19, 2026-10-06
+
+The desktop list identity hover starts at the list pane edge, including with
+the folder rail collapsed. Its label keeps a 16 px inset. Native button/span
+margins no longer add a small horizontal offset; square corners, keyboard
+focus and the native account menu are retained.
+
 ## 1.10.18, 2026-10-06
 
 Only fade a global row while it actually holds the shared action group.
