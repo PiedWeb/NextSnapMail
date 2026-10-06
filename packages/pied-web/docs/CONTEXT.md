@@ -159,6 +159,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   to its end edge. Each shortcut disappears when its native field is open and focuses that
   field when chosen. Preserve the native observables, inputs and advanced-fields menu; the
   original header links return unchanged when Pied Web is not active.
+- Since 1.10.21, native form fields retain a one-pixel border at rest and focus;
+  focus strengthens its colour without a second outline. Recipient lists own the
+  boundary, so their inner text input remains borderless.
 - The composer's From, recipient and Subject controls share a 36 px single-line height and one
   right edge. Override SnappyMail's unconditional From reservation without removing the native
   identity picker, and keep recipient lists auto-growing up to two lines rather than assigning

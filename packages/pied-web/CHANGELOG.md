@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.21, 2026-10-06
+
+Native form fields now use one-pixel borders, including From, To, Cc, Bcc,
+Subject and editor selects. Focus strengthens the existing border colour
+without an additional outline. Recipient lists own the focus boundary, while
+their inner text inputs remain borderless. Native unchecked checkbox, alert
+and virus-warning contours also respect the one-pixel maximum.
+
 ## 1.10.20, 2026-10-06
 
 Center the desktop reading column with equal inline margins for the subject,

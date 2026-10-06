@@ -166,6 +166,13 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddre
   height: 32px;
   min-width: 0;
   max-width: 100%;
+  border: 0;
+  outline: none;
+}
+/* The recipient list owns focus; its text entry must not add another box. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type="text"]:focus {
+  border: 0;
+  outline: none;
 }
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li[draggable] {
   min-height: 28px;

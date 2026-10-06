@@ -5165,6 +5165,13 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddre
   height: 32px;
   min-width: 0;
   max-width: 100%;
+  border: 0;
+  outline: none;
+}
+/* The recipient list owns focus; its text entry must not add another box. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type="text"]:focus {
+  border: 0;
+  outline: none;
 }
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li[draggable] {
   min-height: 28px;
@@ -5966,6 +5973,26 @@ html.pw-theme #rl-popups > dialog:not(.pw-inline-reply):not(.animate) {
  * current native opened/checked backgrounds and add a synchronous shape cue. */
 html.pw-theme #rl-app :focus-visible {
   outline:1px solid var(--pw-focus);
+}
+/* The preserved Nextcloud theme gives native fields two-pixel borders, even
+ * when the focus outline is thin. Keep one existing boundary for form controls
+ * and strengthen its colour on focus instead of drawing a second contour. */
+html.pw-theme #rl-app :is(input:not([type="checkbox"]), select, .select, .emailaddresses, textarea, div[contenteditable="true"], .squire-wysiwyg, .squire-plain) {
+  border-width:1px;
+}
+html.pw-theme #rl-app :is(input:not([type="checkbox"]), select, .select, .emailaddresses, textarea, div[contenteditable="true"], .squire-wysiwyg, .squire-plain):focus,
+html.pw-theme #rl-app .emailaddresses:is(:focus-within, .emailaddresses-focused) {
+  border-width:1px;
+  border-color:var(--pw-focus);
+  outline:none;
+}
+html.pw-theme #rl-app input[type="checkbox"]:not(:checked),
+html.pw-theme #rl-app .e-checkbox.material-design input:not(:checked) + div,
+html.pw-theme #rl-app .messageView .messageItemHeader .hasVirus {
+  border-width:1px;
+}
+html.pw-theme #rl-app .alert {
+  border-inline-start-width:1px;
 }
 /* The editor already uses its one-pixel border as its focus indicator. */
 html.pw-theme #rl-app #V-PopupsCompose :is(.squire-wysiwyg, .squire-plain):focus-visible {

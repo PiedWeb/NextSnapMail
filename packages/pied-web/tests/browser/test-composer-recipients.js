@@ -15,7 +15,7 @@ await p.evaluate(async()=>{
   const key=node.dataset.i18n;if(!key.startsWith('['))node.textContent=rl.i18n(key);
  });
  dialog.querySelectorAll('.b-header tr').forEach(row=>{
-  const key=row.querySelector('label[data-i18n]')?.dataset.i18n;
+  const key=row.querySelector('[data-i18n]')?.dataset.i18n;
   if(!['GLOBAL/TO','GLOBAL/CC','GLOBAL/BCC','GLOBAL/REPLY_TO'].includes(key))return;
   const input=row.querySelector('input[type="text"]');if(!input)return;
   const box=document.createElement('ul');box.className='emailaddresses';
@@ -99,6 +99,47 @@ await p.waitForFunction(()=>document.activeElement===document.querySelector('.bc
 check('Opening Cci hides the last shortcut without changing the native fields',await p.evaluate(()=>
  recipientCompose.showBcc()&&!document.querySelector('.bcc-row').hidden
  &&document.querySelector('.pw-recipient-shortcuts').hidden));
+// Measure the native controls themselves: a thin outline does not prove that
+// the preserved Nextcloud border is thin, and recipient entry is nested.
+for (const scheme of ['light','dark']) {
+ await p.emulateMedia({colorScheme:scheme});
+ for (const width of [1440,390]) {
+  await p.setViewportSize({width,height:950});
+  check(scheme+' '+width+'px: all composer fields keep one border at rest and focus',await p.evaluate(async()=>{
+   recipientCompose.showCc(true);recipientCompose.showBcc(true);
+   const dialog=document.getElementById('V-PopupsCompose');
+   const fields=[...dialog.querySelectorAll('.b-header td > input[type="text"], .b-header td > .emailaddresses, select')]
+    .filter(node=>node.getClientRects().length);
+   const thin=node=>['Top','Right','Bottom','Left'].every(side=>getComputedStyle(node)['border'+side+'Width']==='1px');
+   const noOutline=node=>getComputedStyle(node).outlineStyle==='none';
+   const settle=node=>{getComputedStyle(node).borderTopColor;node.getAnimations().forEach(animation=>animation.finish());};
+   if(fields.length<5)return false;
+   for(const field of fields){
+    document.activeElement.blur();field.classList.remove('emailaddresses-focused');
+    settle(field);
+    if(!thin(field))return false;
+    const rest=getComputedStyle(field).borderTopColor;
+    const input=field.matches('.emailaddresses')?field.querySelector('input'):field;
+    input.focus();
+    if(document.activeElement!==input)return false;
+    // Finish native colour transitions before comparing the target state.
+    settle(field);
+    const focused=getComputedStyle(field).borderTopColor;
+    if(!thin(field)||!noOutline(input)||focused===rest)return false;
+    if(field.matches('.emailaddresses')){
+     if(['Top','Right','Bottom','Left'].some(side=>getComputedStyle(input)['border'+side+'Width']!=='0px'))return false;
+     input.blur();field.classList.add('emailaddresses-focused');
+     settle(field);
+     if(!thin(field)||getComputedStyle(field).borderTopColor!==focused)return false;
+     field.classList.remove('emailaddresses-focused');
+    }
+   }
+   return true;
+  }));
+ }
+}
+await p.emulateMedia({colorScheme:'light'});
+await p.setViewportSize({width:1440,height:950});
 await p.evaluate(()=>recipientCompose.showCc(false));
 check('Closing one optional field makes its nearby shortcut available again',await p.evaluate(()=>{
  const group=document.querySelector('.pw-recipient-shortcuts');
@@ -110,7 +151,7 @@ await p.locator('.pw-recipient-shortcuts').locator('xpath=preceding-sibling::*[1
 check('Keyboard focus remains plainly visible',await p.evaluate(()=>{
  const style=getComputedStyle(document.activeElement);
  return document.activeElement.matches('.pw-recipient-shortcut:focus-visible')
-  &&style.outlineStyle==='solid'&&parseFloat(style.outlineWidth)>=2;
+  &&style.outlineStyle==='solid'&&parseFloat(style.outlineWidth)===1;
 }));
 
 await p.setViewportSize({width:390,height:844});
