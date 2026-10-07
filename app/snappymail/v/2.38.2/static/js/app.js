@@ -7024,13 +7024,28 @@ body > * {
 		},
 
 		listCheckedOrSelectedUidsWithSubMails: () => {
-			let result = new Set;
+			let result = new Set,
+				folder = '';
 			MessagelistUserStore.listCheckedOrSelected().forEach(message => {
+				folder = folder && folder !== message.folder ? null : (null === folder ? null : message.folder);
 				result.add(message.uid);
-				result.folder = message.folder;
 				if (1 < message.threadsLen()) {
 					message.threads().forEach(result.add, result);
 				}
+			});
+			result.folder = folder || '';
+			return result;
+		},
+
+		listCheckedOrSelectedUidsByFolder: () => {
+			const result = new Map;
+			MessagelistUserStore.listCheckedOrSelected().forEach(message => {
+				const uids = result.get(message.folder) || new Set;
+				uids.add(message.uid);
+				if (1 < message.threadsLen()) {
+					message.threads().forEach(uids.add, uids);
+				}
+				result.set(message.folder, uids);
 			});
 			return result;
 		}
@@ -7242,10 +7257,11 @@ body > * {
 			params = {};
 		}
 
+		const crossFolderSearch = /(?:^|&)in=(?:all|subtree)(?:&|$)/.test(MessagelistUserStore.listSearch());
 		Remote.abort('MessageList', 'reload').request('MessageList',
 			fCallback,
 			params,
-			60000, // 60 seconds before aborting
+			crossFolderSearch ? 180000 : 60000,
 			sGetAdd
 		);
 	};
@@ -8634,6 +8650,10 @@ body > * {
 						ko.dataFor(doc.elementFromPoint(e.clientX, e.clientY))?.checked?.(true);
 
 						const uids = MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails();
+						if (!uids.folder) {
+							e.preventDefault();
+							return;
+						}
 						dragImage.querySelector('.text').textContent = uids.size;
 
 						// Make sure Chrome shows it
@@ -13294,11 +13314,51 @@ body > * {
 		}
 	}
 
+	const
+		structuredSearchKeys = [
+			'simple', 'from', 'to', 'subject', 'text', 'keyword', 'in', 'since', 'before',
+			'attachment', 'unseen', 'flagged', 'answered', 'unanswered'
+		],
+		searchScopeOptions = () => [
+			{ id: '', name: i18n('SEARCH/SCOPE_CURRENT') },
+			{ id: 'all', name: i18n('SEARCH/SCOPE_ALL') },
+			{ id: 'subtree', name: i18n('SEARCH/SCOPE_SUBTREE') }
+		],
+		searchScopeFromValue = search => {
+			const scope = new URLSearchParams(search).get('in');
+			return ['all', 'subtree'].includes(scope) ? scope : '';
+		},
+		simpleSearchDisplayValue = search => {
+			const params = new URLSearchParams(search),
+				keys = [...params.keys()];
+			return params.has('simple') && keys.every(key => ['simple', 'in'].includes(key))
+				? pString(params.get('simple'))
+				: search;
+		},
+		searchWithScope = (search, scope) => {
+			search = pString(search).trim();
+			if (!search) {
+				return '';
+			}
+			let params = new URLSearchParams(search);
+			const structured = [...params.keys()].some(key => structuredSearchKeys.includes(key));
+			if (!structured) {
+				if (!scope) {
+					return search;
+				}
+				params = new URLSearchParams;
+				params.set('simple', search);
+			}
+			scope ? params.set('in', scope) : params.delete('in');
+			return params.toString();
+		};
+
 	class AdvancedSearchPopupView extends AbstractViewPopup {
 		constructor() {
 			super('AdvancedSearch');
 
 			addObservablesTo(this, {
+				simple: '',
 				from: '',
 				to: '',
 				subject: '',
@@ -13314,8 +13374,6 @@ body > * {
 			});
 
 			addComputablesTo(this, {
-				showMultisearch: () => FolderUserStore.hasCapability('MULTISEARCH'),
-
 				// Almost the same as MessageModel.tagOptions
 				keywords: () => {
 					const keywords = [{value:'',label:''}];
@@ -13366,12 +13424,7 @@ body > * {
 
 				selectedTree: () => {
 					translateTrigger();
-					let prefix = 'SEARCH/SUBFOLDERS_';
-					return [
-						{ id: '', name: i18n(prefix + 'NONE') },
-						{ id: 'subtree-one', name: i18n(prefix + 'SUBTREE_ONE') },
-						{ id: 'subtree', name: i18n(prefix + 'SUBTREE') }
-					];
+					return searchScopeOptions();
 				}
 			});
 		}
@@ -13391,6 +13444,7 @@ body > * {
 				data = new FormData(),
 				append = (key, value) => value.length && data.append(key, value);
 
+			append('simple', self.simple().trim());
 			append('from', self.from().trim());
 			append('to', self.to().trim());
 			append('subject', self.subject().trim());
@@ -13432,6 +13486,8 @@ body > * {
 		onShow(search) {
 			const self = this,
 				params = new URLSearchParams('?'+search);
+			self.simple(pString(params.get('simple')) ||
+				(search && !search.includes('=') && !search.includes('&') ? search : ''));
 			self.from(pString(params.get('from')));
 			self.to(pString(params.get('to')));
 			self.subject(pString(params.get('subject')));
@@ -13459,14 +13515,34 @@ body > * {
 		 * @param {Array=} aMessages = null
 		 * @returns {void}
 		 */
-		listAction = (...args) => MessagelistUserStore.setAction(...args),
+		listAction = (folder, action, messages) => {
+			messages = messages || MessagelistUserStore.listChecked();
+			const groups = new Map;
+			messages.forEach(message => {
+				const items = groups.get(message.folder) || [];
+				items.push(message);
+				groups.set(message.folder, items);
+			});
+			if (groups.size) {
+				groups.forEach((items, messageFolder) =>
+					MessagelistUserStore.setAction(messageFolder, action, items)
+				);
+			} else {
+				MessagelistUserStore.setAction(folder, action, messages);
+			}
+		},
 
 		moveMessagesToFolderType = (toFolderType, bDelete) => {
-			let messages = MessagelistUserStore.listCheckedOrSelectedUidsWithSubMails();
-			messages.size && rl.app.moveMessagesToFolderType(
+			const groups = MessagelistUserStore.listCheckedOrSelectedUidsByFolder();
+			if (1 < groups.size) {
+				alert(i18n('MESSAGE_LIST/SELECT_SINGLE_FOLDER'));
+				return;
+			}
+			const entry = groups.entries().next().value;
+			entry && rl.app.moveMessagesToFolderType(
 				toFolderType,
-				messages.folder,
-				messages,
+				entry[0],
+				entry[1],
 				bDelete
 			);
 		},
@@ -13518,7 +13594,8 @@ body > * {
 			this.hideDeleted = SettingsUserStore.hideDeleted;
 
 			addObservablesTo(this, {
-				focusSearch: false
+				focusSearch: false,
+				simpleSearchScope: ''
 			});
 
 			// append drag and drop
@@ -13529,12 +13606,27 @@ body > * {
 			this.attachmentsActions = ko.observableArray(arrayLength(attachmentsActions) ? attachmentsActions : []);
 
 			addComputablesTo(this, {
+				simpleSearchScopes: () => {
+					translateTrigger();
+					return [
+						{ id: '', name: i18n('SEARCH/SCOPE_CURRENT') },
+						{ id: 'all', name: i18n('SEARCH/SCOPE_ALL') },
+						{ id: 'subtree', name: i18n('SEARCH/SCOPE_SUBTREE_SHORT') }
+					];
+				},
 
 				sortSupported: () => FolderUserStore.hasCapability('SORT') && !MessagelistUserStore.threadUid(),
 
 				messageListSearchDesc: () => {
 					const value = MessagelistUserStore().search;
-					return value ? i18n('MESSAGE_LIST/SEARCH_RESULT_FOR', { SEARCH: value }) : ''
+					if (!value) {
+						return '';
+					}
+					const scope = searchScopeFromValue(value),
+						scopeOption = searchScopeOptions().find(option => option.id === scope);
+					return i18n('MESSAGE_LIST/SEARCH_RESULT_FOR', {
+						SEARCH: simpleSearchDisplayValue(value)
+					}) + (scopeOption ? ' — ' + scopeOption.name : '');
 				},
 
 				messageListPaginator: computedPaginatorHelper(MessagelistUserStore.page, MessagelistUserStore.pageCount),
@@ -13548,7 +13640,7 @@ body > * {
 				},
 
 				inputSearch: {
-					read: MessagelistUserStore.mainSearch,
+					read: () => simpleSearchDisplayValue(MessagelistUserStore.mainSearch()),
 					write: value => sLastSearchValue = value
 				},
 
@@ -13560,14 +13652,30 @@ body > * {
 				listGrouped: () => {
 					let uid = MessagelistUserStore.threadUid(),
 						sort = FolderUserStore.sortMode() || 'DATE';
-					return SettingsUserStore.listGrouped() && (sort.includes('DATE') || sort.includes('FROM')) && !uid;
+					return !!MessagelistUserStore().searchScope
+						|| (SettingsUserStore.listGrouped() && (sort.includes('DATE') || sort.includes('FROM')) && !uid);
 				},
 
 				timeFormat: () => (FolderUserStore.sortMode() || '').includes('FROM') ? 'AUTO' : 'LT',
 
 				groupedList: () => {
 					let list = [], current, sort = FolderUserStore.sortMode() || 'DATE';
-					if (sort.includes('FROM')) {
+					if (MessagelistUserStore().searchScope) {
+						MessagelistUserStore.forEach(msg => {
+							if (!current || msg.folder !== current.id) {
+								const folder = getFolderFromCacheList(msg.folder);
+								current = {
+									id: msg.folder,
+									label: folder ? folder.detailedName() : msg.folder,
+									search: '',
+									title: msg.folder,
+									messages: []
+								};
+								list.push(current);
+							}
+							current.messages.push(msg);
+						});
+					} else if (sort.includes('FROM')) {
 						MessagelistUserStore.forEach(msg => {
 							let email = msg.from[0]?.email;
 							if (!current || email != current.id) {
@@ -13575,6 +13683,7 @@ body > * {
 									id: email,
 									label: msg.from[0]?.toLine(),
 									search: 'from=' + email,
+									title: i18n('GLOBAL/SEARCH'),
 									messages: []
 								};
 								list.push(current);
@@ -13605,6 +13714,7 @@ body > * {
 									id: ymd,
 									label: date,
 									search: 'on=' + dt.getFullYear() + '-' + pad2(1 + dt.getMonth()) + '-' + pad2(dt.getDate()),
+									title: i18n('GLOBAL/SEARCH'),
 									messages: []
 								};
 								list.push(current);
@@ -13647,6 +13757,13 @@ body > * {
 					MessageUserStore.message(null);
 				}
 			});
+
+			const syncSimpleSearch = search => {
+				this.simpleSearchScope(searchScopeFromValue(search));
+				sLastSearchValue = simpleSearchDisplayValue(search);
+			};
+			syncSimpleSearch(MessagelistUserStore.listSearch());
+			MessagelistUserStore.listSearch.subscribe(syncSimpleSearch);
 
 			this.selector.on('MiddleClick', message => populateMessageBody(message, true));
 
@@ -13848,6 +13965,10 @@ body > * {
 
 		moveOrCopy(vm, event, mode) {
 			if (canBeMovedHelper()) {
+				if (1 < MessagelistUserStore.listCheckedOrSelectedUidsByFolder().size) {
+					alert(i18n('MESSAGE_LIST/SELECT_SINGLE_FOLDER'));
+					return;
+				}
 				if (vm && event?.preventDefault) {
 					stopEvent(event);
 				}
@@ -14096,7 +14217,7 @@ body > * {
 
 			addShortcut('enter,open', '', ScopeMessageList, () => {
 				if (formFieldFocused()) {
-					MessagelistUserStore.mainSearch(sLastSearchValue);
+					this.submitSimpleSearch();
 					return false;
 				}
 				if (MessageUserStore.message() && MessagelistUserStore.canSelect()) {
@@ -14227,6 +14348,22 @@ body > * {
 
 		advancedSearchClick() {
 			showScreenPopup(AdvancedSearchPopupView, [MessagelistUserStore.mainSearch()]);
+		}
+
+		submitSimpleSearch() {
+			const current = MessagelistUserStore.listSearch(),
+				currentDisplay = simpleSearchDisplayValue(current),
+				search = sLastSearchValue === currentDisplay ? current : sLastSearchValue;
+			MessagelistUserStore.mainSearch(searchWithScope(search, this.simpleSearchScope()));
+		}
+
+		applySimpleSearchScope(self, event) {
+			const scope = event?.target?.value ?? this.simpleSearchScope(),
+				current = MessagelistUserStore.listSearch();
+			this.simpleSearchScope(scope);
+			if (current && sLastSearchValue === simpleSearchDisplayValue(current)) {
+				MessagelistUserStore.mainSearch(searchWithScope(current, scope));
+			}
 		}
 
 		groupSearch(group) {

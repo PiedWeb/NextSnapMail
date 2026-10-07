@@ -72,6 +72,12 @@
 		"SINCE_3_MONTHS": "Up to 3 months old",
 		"SINCE_6_MONTHS": "Up to 6 months old",
 		"SINCE_YEAR": "Up to 1 year old",
+		"SCOPE": "Search in",
+		"SCOPE_CURRENT": "Current folder",
+		"SCOPE_ALL": "All folders",
+		"SCOPE_SUBTREE": "Current folder including subfolders",
+		"SCOPE_SUBTREE_SHORT": "Current folder incl. subfolders",
+		"TERM": "Search term",
 		"SUBFOLDERS": "Subfolders",
 		"SUBFOLDERS_NONE": "None",
 		"SUBFOLDERS_SUBTREE": "All",
@@ -86,7 +92,8 @@
 		"SENT_NAME": "Sent",
 		"DRAFTS_NAME": "Drafts",
 		"TRASH_NAME": "Trash",
-		"ARCHIVE_NAME": "Archive"
+		"ARCHIVE_NAME": "Archive",
+		"SHOW_ONLY_UNREAD_FOLDERS": "Show only folders with unread messages"
 	},
 	"IMAP": {
 		"ACL_RIGHTS": "Rights",
@@ -122,6 +129,7 @@
 		"EMPTY_LIST": "Empty list.",
 		"EMPTY_SEARCH_LIST": "No messages matched your search.",
 		"SEARCH_RESULT_FOR": "Search results for \"%SEARCH%\"",
+		"SELECT_SINGLE_FOLDER": "For moving, copying or deleting, select messages from one folder at a time.",
 		"BACK_TO_MESSAGE_LIST": "Back to message list",
 		"PUT_MESSAGE_HERE": "Drop message here to view it in the list",
 		"TODAY_AT": "today at %TIME%",

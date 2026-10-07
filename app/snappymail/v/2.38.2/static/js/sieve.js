@@ -565,7 +565,32 @@
 		}
 	}
 
-	const SIEVE_FILE_NAME = 'rainloop.user';
+	const
+		SIEVE_FILE_NAME = 'nextsnapmail.user',
+		LEGACY_SIEVE_FILE_NAME = 'rainloop.user',
+		NEXTSNAPMAIL_VACATION_BLOCK_REGEX = /^# BEGIN:NEXTSNAPMAIL:VACATION\s*$[\s\S]*?^# END:NEXTSNAPMAIL:VACATION\s*$/gm;
+
+	const managedVacationBlock = script => {
+		const match = (script || '').match(NEXTSNAPMAIL_VACATION_BLOCK_REGEX);
+		return match?.[0] || '';
+	};
+
+	const addSieveRequirements = (script, requirements) => {
+		let match = script.match(/^\s*require\s+(\[[\s\S]*?\]|"(?:\\.|[^"])*")\s*;/m),
+			values = [];
+		if (match) {
+			for (const item of match[1].matchAll(/"((?:\\.|[^"])*)"/g)) {
+				values.push(item[1].replace(/\\([\\"])/g, '$1'));
+			}
+		}
+		values.push(...requirements);
+		values = [...new Set(values)].sort();
+		const quote = value => '"' + value.replace(/(\\|")/g, '\\$1') + '"',
+			declaration = 'require [' + values.map(quote).join(',') + '];';
+		return match
+			? script.replace(match[0], declaration)
+			: declaration + '\r\n\r\n' + script;
+	};
 
 	// collectionToFileString
 	function filtersToSieveScript(filters)
@@ -574,9 +599,9 @@
 			split = /.{0,74}/g,
 			require = {},
 			parts = [
-				'# This is SnappyMail sieve script.',
-				'# Please don\'t change anything here.',
-				'# RAINLOOP:SIEVE',
+				'# This is a NextSnapMail Sieve script.',
+				'# Please do not edit managed sections manually.',
+				'# NEXTSNAPMAIL:SIEVE',
 				''
 			];
 
@@ -797,7 +822,7 @@
 			filters = [],
 			json,
 			filter;
-		if (script.length && script.includes('RAINLOOP:SIEVE')) {
+		if (script.length && (script.includes('NEXTSNAPMAIL:SIEVE') || script.includes('RAINLOOP:SIEVE'))) {
 			while ((json = regex.exec(script))) {
 				json = decodeURIComponent(escape(atob(json[1].replace(/\s+/g, ''))));
 				if (json && json.length && (json = JSON.parse(json))) {
@@ -837,7 +862,14 @@
 		}
 
 		filtersToRaw() {
-			return filtersToSieveScript(this.filters);
+			let generated = filtersToSieveScript(this.filters);
+			const
+				vacation = managedVacationBlock(this.body());
+			if (vacation) {
+				generated = addSieveRequirements(generated, ['date', 'relational', 'vacation']);
+				return generated.replace(/\s+$/, '') + '\r\n\r\n' + vacation + '\r\n';
+			}
+			return generated;
 	//		this.body(filtersToSieveScript(this.filters));
 		}
 
@@ -856,9 +888,13 @@
 		}
 
 		/**
-		 * Only 'rainloop.user' script supports filters
+		 * NextSnapMail's script and the legacy RainLoop script support filters.
 		 */
 		allowFilters() {
+			return [SIEVE_FILE_NAME, LEGACY_SIEVE_FILE_NAME].includes(this.name());
+		}
+
+		isPreferredFiltersScript() {
 			return SIEVE_FILE_NAME === this.name();
 		}
 
@@ -3938,10 +3974,18 @@
 							data.Result.Scripts.map(aItem => SieveScriptModel.reviveFromJson(aItem)).filter(v => v)
 						);
 	*/
+						const loadedScripts = [];
 						forEachObjectValue(data.Result.Scripts, value => {
 							value = SieveScriptModel.reviveFromJson(value);
-							value && (value.allowFilters() ? scripts.unshift(value) : scripts.push(value));
+							value && loadedScripts.push(value);
 						});
+						loadedScripts.sort((left, right) => {
+							const rank = script => script.isPreferredFiltersScript()
+								? 0
+								: (LEGACY_SIEVE_FILE_NAME === script.name() ? 1 : 2);
+							return rank(left) - rank(right) || left.name().localeCompare(right.name());
+						});
+						scripts(loadedScripts);
 					}
 				});
 			}

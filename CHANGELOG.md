@@ -1,3 +1,22 @@
+## 0.1.13 – 2026-10-07
+
+### Added
+
+- Add selectable search scopes below the regular search field and in Advanced
+  Search: the current folder, every folder in the account, or the current
+  folder including all subfolders.
+- Add a dedicated multilingual out-of-office settings page that creates
+  date-limited Sieve vacation responses per account identity, automatically
+  uses the identity name and address, reports missing server capabilities and
+  offers full-period, daily, weekly or custom per-sender reply intervals.
+
+### Changed
+
+- Present the unread-folder control as a clearly labeled filter button in the
+  folder sidebar so it is no longer mistaken for a parent folder.
+- Use `nextsnapmail.user` for newly managed Sieve filters while retaining and
+  safely migrating existing `rainloop.user` filters without deleting them.
+
 ## 0.1.12 – 2026-09-12
 
 ### Changed

@@ -32,6 +32,8 @@ class MessageCollection extends \MailSo\Base\Collection
 
 	public string $Search = '';
 
+	public string $SearchScope = '';
+
 	public string $Sort = '';
 
 	public int $ThreadUid = 0;
@@ -68,6 +70,7 @@ class MessageCollection extends \MailSo\Base\Collection
 			'offset' => $this->Offset,
 			'limit' => $this->Limit,
 			'search' => $this->Search,
+			'searchScope' => $this->SearchScope,
 			'sort' => $this->Sort,
 			'limited' => $this->Limited,
 			'folder' => $this->FolderInfo
