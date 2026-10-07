@@ -128,6 +128,7 @@ class SearchCriterias
 
 	private array $criterias = [];
 	public bool $fuzzy = false;
+	public string $folderScope = '';
 
 	function prepend(string $rule)
 	{
@@ -148,6 +149,29 @@ class SearchCriterias
 		return $sCriteriasResult ?: 'ALL';
 	}
 
+	private static function appendSimpleSearchCriteria(
+		array &$aCriteriasResult,
+		\MailSo\Imap\ImapClient $oImapClient,
+		string $sSearch
+	) : void
+	{
+		$sValue = static::escapeSearchString($oImapClient, $sSearch);
+		if ($oImapClient->Settings->fast_simple_search) {
+			$aCriteriasResult[] = 'OR OR OR';
+			$aCriteriasResult[] = 'FROM';
+			$aCriteriasResult[] = $sValue;
+			$aCriteriasResult[] = 'TO';
+			$aCriteriasResult[] = $sValue;
+			$aCriteriasResult[] = 'CC';
+			$aCriteriasResult[] = $sValue;
+			$aCriteriasResult[] = 'SUBJECT';
+			$aCriteriasResult[] = $sValue;
+		} else {
+			$aCriteriasResult[] = 'TEXT';
+			$aCriteriasResult[] = $sValue;
+		}
+	}
+
 	public static function fromString(\MailSo\Imap\ImapClient $oImapClient, string $sFolderName, string $sSearch, bool $bHideDeleted, bool &$bUseCache = true) : self
 	{
 		$iTimeFilter = 0;
@@ -160,25 +184,19 @@ class SearchCriterias
 				: static::parseQueryString($sSearch);
 
 			if (!$aLines) {
-				$sValue = static::escapeSearchString($oImapClient, $sSearch);
-
-				if ($oImapClient->Settings->fast_simple_search) {
-					$aCriteriasResult[] = 'OR OR OR';
-					$aCriteriasResult[] = 'FROM';
-					$aCriteriasResult[] = $sValue;
-					$aCriteriasResult[] = 'TO';
-					$aCriteriasResult[] = $sValue;
-					$aCriteriasResult[] = 'CC';
-					$aCriteriasResult[] = $sValue;
-					$aCriteriasResult[] = 'SUBJECT';
-					$aCriteriasResult[] = $sValue;
-				} else {
-					$aCriteriasResult[] = 'TEXT';
-					$aCriteriasResult[] = $sValue;
-				}
+				static::appendSimpleSearchCriteria($aCriteriasResult, $oImapClient, $sSearch);
 			} else {
-				if (isset($aLines['IN']) && $oImapClient->hasCapability('MULTISEARCH') && \in_array($aLines['IN'], ['subtree','subtree-one','mailboxes'])) {
-					$aCriteriasResult[] = "IN ({$aLines['IN']} \"{$sFolderName}\")";
+				if (isset($aLines['IN']) && \in_array($aLines['IN'], ['all', 'subtree'], true)) {
+					$folderScope = $aLines['IN'];
+					unset($aLines['IN']);
+				}
+				if (isset($aLines['SIMPLE'])) {
+					static::appendSimpleSearchCriteria(
+						$aCriteriasResult,
+						$oImapClient,
+						(string) $aLines['SIMPLE']
+					);
+					unset($aLines['SIMPLE']);
 				}
 
 				if (isset($aLines['EMAIL'])) {
@@ -364,6 +382,7 @@ class SearchCriterias
 
 		$search = new self;
 		$search->criterias = $aCriteriasResult;
+		$search->folderScope = $folderScope ?? '';
 		return $search;
 	}
 
@@ -429,6 +448,7 @@ class SearchCriterias
 				case 'FROM':
 				case 'TO':
 				case 'SUBJECT':
+				case 'SIMPLE':
 				case 'KEYWORD':
 				case 'IN':
 				case 'SMALLER':

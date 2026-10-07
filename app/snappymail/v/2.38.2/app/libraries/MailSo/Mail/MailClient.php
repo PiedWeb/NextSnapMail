@@ -588,17 +588,7 @@ class MailClient
 		array &$aAllThreads = [], array &$aUnseenUIDs = []) : void
 	{
 		if (\count($oRange)) {
-			$aFetchItems = array(
-				FetchType::UID,
-				FetchType::RFC822_SIZE,
-				FetchType::INTERNALDATE,
-				FetchType::FLAGS,
-				FetchType::BODYSTRUCTURE
-			);
-			if ($this->oImapClient->hasCapability('PREVIEW')) {
-				$aFetchItems[] = FetchType::PREVIEW; // . ' (LAZY)';
-			}
-			$aFetchItems[] = $this->getEnvelopeOrHeadersRequestString();
+			$aFetchItems = $this->messageListFetchItems();
 			$aFetchIterator = $this->oImapClient->FetchIterate($aFetchItems, (string) $oRange, $oRange->UID);
 			// FETCH does not respond in the id order of the SequenceSet, so we prefill $aCollection for the right sort order.
 			$aCollection = \array_fill_keys($oRange->getArrayCopy(), null);
@@ -625,6 +615,22 @@ class MailClient
 			}
 			$oMessageCollection->exchangeArray(\array_values(\array_filter($aCollection)));
 		}
+	}
+
+	private function messageListFetchItems() : array
+	{
+		$aFetchItems = array(
+			FetchType::UID,
+			FetchType::RFC822_SIZE,
+			FetchType::INTERNALDATE,
+			FetchType::FLAGS,
+			FetchType::BODYSTRUCTURE
+		);
+		if ($this->oImapClient->hasCapability('PREVIEW')) {
+			$aFetchItems[] = FetchType::PREVIEW;
+		}
+		$aFetchItems[] = $this->getEnvelopeOrHeadersRequestString();
+		return $aFetchItems;
 	}
 
 	/**
@@ -774,6 +780,18 @@ class MailClient
 		$oMessageCollection->FolderInfo = $oInfo;
 		$oMessageCollection->totalEmails = $oInfo->MESSAGES;
 
+		if (\strlen($sSearch)) {
+			$oSearchCriterias = \MailSo\Imap\SearchCriterias::fromString(
+				$this->oImapClient,
+				$oParams->sFolderName,
+				$sSearch,
+				$oParams->bHideDeleted
+			);
+			if (\strlen($oSearchCriterias->folderScope)) {
+				return $this->MessageListAcrossFolders($oParams, $oMessageCollection, $oSearchCriterias);
+			}
+		}
+
 		$oParams->bUseThreads = $oParams->bUseThreads && $this->oImapClient->CapabilityValue('THREAD');
 //			&& ($this->oImapClient->hasCapability('THREAD=REFS') || $this->oImapClient->hasCapability('THREAD=REFERENCES') || $this->oImapClient->hasCapability('THREAD=ORDEREDSUBJECT'));
 		if ($oParams->iThreadUid && !$oParams->bUseThreads) {
@@ -909,6 +927,130 @@ class MailClient
 		}
 
 		return $oMessageCollection;
+	}
+
+	/**
+	 * Search either the complete account or the selected folder and all of its
+	 * descendants. Each mailbox is searched separately so this works without
+	 * optional IMAP MULTISEARCH support.
+	 */
+	protected function MessageListAcrossFolders(
+		MessageListParams $oParams,
+		MessageCollection $oMessageCollection,
+		\MailSo\Imap\SearchCriterias $oSearchCriterias
+	) : MessageCollection
+	{
+		$oMessageCollection->SearchScope = $oSearchCriterias->folderScope;
+		$aMatches = array();
+
+		foreach ($this->SearchFolderNames($oParams->sFolderName, $oSearchCriterias->folderScope) as $sFolderName) {
+			try
+			{
+				$this->oImapClient->FolderExamine($sFolderName);
+				$aUids = $this->oImapClient->MessageSearch((string) $oSearchCriterias, true);
+				\rsort($aUids, SORT_NUMERIC);
+				foreach ($aUids as $iUid) {
+					$aMatches[] = array($sFolderName, $iUid);
+				}
+			}
+			catch (\Throwable $oException)
+			{
+				$this->logWrite(
+					'Cross-folder search skipped "'.$sFolderName.'": '.$oException->getMessage(),
+					\LOG_WARNING
+				);
+			}
+		}
+
+		$oMessageCollection->totalEmails = \count($aMatches);
+		if ($aMatches) {
+			$this->MessageListAcrossFoldersFetch(
+				$oMessageCollection,
+				\array_slice($aMatches, $oParams->iOffset, $oParams->iLimit)
+			);
+		}
+
+		return $oMessageCollection;
+	}
+
+	/**
+	 * Resolve the selectable mailboxes for a cross-folder search. The selected
+	 * folder itself is included when searching its descendants.
+	 */
+	protected function SearchFolderNames(string $sCurrentFolder, string $sScope) : array
+	{
+		$oFolders = $this->oImapClient->FolderList('', '*');
+		$sDelimiter = null;
+		foreach ($oFolders as $oFolder) {
+			if ($oFolder->FullName === $sCurrentFolder) {
+				$sDelimiter = $oFolder->Delimiter();
+				break;
+			}
+		}
+
+		$aFolderNames = array();
+		$sPrefix = null !== $sDelimiter && '' !== $sDelimiter
+			? $sCurrentFolder.$sDelimiter
+			: '';
+		foreach ($oFolders as $oFolder) {
+			if (!$oFolder->Selectable()) {
+				continue;
+			}
+			$sFolderName = $oFolder->FullName;
+			if ('all' === $sScope
+			 || $sFolderName === $sCurrentFolder
+			 || ('' !== $sPrefix && \str_starts_with($sFolderName, $sPrefix))) {
+				$aFolderNames[] = $sFolderName;
+			}
+		}
+
+		\natcasesort($aFolderNames);
+		$aFolderNames = \array_values($aFolderNames);
+		if ('subtree' === $sScope && false !== ($iCurrent = \array_search($sCurrentFolder, $aFolderNames, true))) {
+			unset($aFolderNames[$iCurrent]);
+			\array_unshift($aFolderNames, $sCurrentFolder);
+		}
+		return $aFolderNames;
+	}
+
+	/**
+	 * IMAP FETCH operates on one selected mailbox. Group the current result
+	 * page by mailbox and restore the requested UID order after each fetch.
+	 */
+	protected function MessageListAcrossFoldersFetch(MessageCollection $oMessageCollection, array $aMatches) : void
+	{
+		$aByFolder = array();
+		foreach ($aMatches as $aMatch) {
+			$aByFolder[$aMatch[0]][] = $aMatch[1];
+		}
+
+		$aMessages = array();
+		$aFetchItems = $this->messageListFetchItems();
+		foreach ($aByFolder as $sFolderName => $aUids) {
+			try
+			{
+				$this->oImapClient->FolderExamine($sFolderName);
+				$oRange = new SequenceSet($aUids);
+				$aFolderMessages = \array_fill_keys($aUids, null);
+				foreach ($this->oImapClient->FetchIterate($aFetchItems, (string) $oRange, true) as $oFetchResponse) {
+					$iUid = (int) $oFetchResponse->GetFetchValue(FetchType::UID);
+					$oMessage = Message::fromFetchResponse($sFolderName, $oFetchResponse);
+					if ($oMessage) {
+						$aFolderMessages[$iUid] = $oMessage;
+					}
+				}
+				$aMessages = \array_merge($aMessages, \array_values(\array_filter($aFolderMessages)));
+			}
+			catch (\Throwable $oException)
+			{
+				$this->logWrite(
+					'Cross-folder result fetch skipped "'.$sFolderName.'": '.$oException->getMessage(),
+					\LOG_WARNING
+				);
+			}
+		}
+
+		$oMessageCollection->exchangeArray($aMessages);
 	}
 
 	public function FindMessageUidByMessageId(string $sFolderName, string $sMessageId) : ?int

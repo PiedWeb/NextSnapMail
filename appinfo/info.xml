@@ -3,7 +3,7 @@
 	<id>nextsnapmail</id>
 	<name>NextSnapMail</name>
 	<summary>A SnappyMail fork focused on integration with Nextcloud</summary>
-	<version>0.1.12</version>
+	<version>0.1.13</version>
 	<licence>AGPL-3.0-only</licence>
 	<author homepage="https://github.com/oe79">Erhard Scharf</author>
 	<author homepage="https://github.com/the-djmaze/snappymail">SnappyMail contributors</author>
@@ -26,6 +26,13 @@ risk.
 - **Dark mode**
 - **Responsive design**
 - **Full Sieve filtering support**
+- **Date-limited out-of-office messages per account and identity**, with names
+  and addresses loaded automatically from the selected account and flexible
+  per-sender reply intervals for the full absence, daily, weekly or custom use
+- **Safe multi-instance Sieve handling** that detects and preserves vacation
+  settings created by another NextSnapMail instance and allows explicit removal
+- **Automatic migration of existing managed Sieve filters** from
+  `rainloop.user` to `nextsnapmail.user` while retaining the old script as a backup
 - **Almost all IMAP features** including advanced searching
 - **Integration with Nextcloud Unified Search**
 - **Integration with other Nextcloud apps** (Contacts, Files and Calendar)

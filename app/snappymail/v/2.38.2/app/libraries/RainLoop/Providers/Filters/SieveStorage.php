@@ -6,7 +6,8 @@ class SieveStorage implements FiltersInterface
 {
 	use \MailSo\Log\Inherit;
 
-	const SIEVE_FILE_NAME = 'rainloop.user';
+	const SIEVE_FILE_NAME = 'nextsnapmail.user';
+	const LEGACY_SIEVE_FILE_NAME = 'rainloop.user';
 
 	/**
 	 * @var \RainLoop\Plugins\Manager

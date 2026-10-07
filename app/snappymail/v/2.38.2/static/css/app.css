@@ -635,6 +635,20 @@ textarea[readonly] {
   color: #fff;
   background-color: var(--btn-danger-bg-clr, #ee5f5b);
 }
+/* The NextcloudV25+ theme is cached separately. Keep active destructive
+ * actions visible even while an older compiled theme is still cached. */
+html body #rl-app .btn.btn-danger:not(.disabled):not([disabled]) {
+  background-color: #d9322d !important;
+  border-color: #b52b27 !important;
+  color: #fff !important;
+  opacity: 1 !important;
+}
+html body #rl-app .btn.btn-danger:not(.disabled):not([disabled]):hover,
+html body #rl-app .btn.btn-danger:not(.disabled):not([disabled]):focus {
+  background-color: #b52b27 !important;
+  border-color: #8f211e !important;
+  color: #fff !important;
+}
 .btn-success {
   background-color: var(--btn-success-bg-clr, #84AB04);
   color: #fff;
@@ -1727,9 +1741,41 @@ html.rl-left-panel-disabled #rl-left .hide-on-panel-disabled {
   width: 100%;
 }
 /* https://github.com/the-djmaze/snappymail/issues/1427 */
-#V-MailFolderList .e-checkbox {
-  margin: 0 4px;
+#V-MailFolderList .folder-list-filter {
+  align-items: flex-start;
+  background: #fff !important;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  font-size: 11px;
+  font-weight: normal;
+  gap: 5px;
+  justify-content: flex-start;
+  line-height: 1.3;
+  margin: 6px 4px 10px;
+  padding: 4px 8px;
+  text-align: start;
+  text-shadow: none;
+  white-space: normal;
   width: calc(100% - 8px);
+}
+#V-MailFolderList .folder-list-filter span {
+  display: block;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+#V-MailFolderList .folder-list-filter.active {
+  background: #fff !important;
+  border-color: var(--folders-selected-bg-color, #333);
+  color: #333;
+}
+#V-MailFolderList .folder-list-filter input {
+  flex: 0 0 auto;
+  margin: 1px 0 0;
 }
 #V-MailFolderList .unreadOnly li a:not(.unread-sub):not([data-unread]) {
   display: none;
@@ -2231,6 +2277,35 @@ html.rl-left-panel-disabled #rl-left .buttonCompose {
 }
 .messageList .search-input-wrp {
   flex-grow: 1;
+  min-width: 0;
+}
+.messageList .simple-search-scope {
+  align-items: center;
+  display: flex;
+  font-size: 10px;
+  flex-wrap: wrap;
+  gap: 3px 10px;
+  line-height: 14px;
+  margin: 3px 0 0;
+  max-width: 100%;
+  min-height: 16px;
+  width: 100%;
+}
+.messageList .simple-search-scope label {
+  align-items: center;
+  cursor: pointer;
+  display: inline-flex;
+  gap: 3px;
+  font-size: 10px;
+  margin: 0;
+  white-space: nowrap;
+}
+.messageList .simple-search-scope input[type="radio"] {
+  align-self: center;
+  height: 11px;
+  margin: 0;
+  vertical-align: middle;
+  width: 11px;
 }
 .messageList .inputSearch {
   width: 100%;

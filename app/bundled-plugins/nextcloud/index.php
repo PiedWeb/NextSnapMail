@@ -4,8 +4,8 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Nextcloud',
-		VERSION = '2.38.3',
-		RELEASE  = '2026-06-19',
+		VERSION = '2.38.10',
+		RELEASE  = '2026-10-07',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '2.38.0';
@@ -34,6 +34,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 			$this->addJs('js/webdav.js');
 			$this->addJs('js/gmail-oauth.js');
+			$this->addJs('js/vacation.js');
 
 			$this->addJs('js/message.js');
 			$this->addHook('json.attachments', 'DoAttachmentsActions');
@@ -46,6 +47,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 			$this->addTemplate('templates/PopupsNextcloudFiles.html');
 			$this->addTemplate('templates/PopupsNextcloudCalendars.html');
+			$this->addTemplate('templates/NextSnapMailVacationUserSettings.html');
 
 //			$this->addHook('login.credentials.step-2', 'loginCredentials2');
 //			$this->addHook('login.credentials', 'loginCredentials');

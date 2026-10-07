@@ -410,18 +410,19 @@
 
 #rl-app .btn.btn-danger,
 #rl-app button.btn-danger {
-	color: var(--nc-color-primary-element-text);
-	background-color: var(--nc-color-error);
-	border-color: var(--nc-color-error) !important;
+	color: #fff !important;
+	background-color: #d9322d !important;
+	border-color: #b52b27 !important;
+	opacity: 1;
 }
 
 #rl-app .btn.btn-danger:hover,
 #rl-app .btn.btn-danger:focus,
 #rl-app button.btn-danger:hover,
 #rl-app button.btn-danger:focus {
-	color: var(--nc-color-primary-element-text);
-	background-color: var(--nc-color-error-hover);
-	border-color: var(--nc-color-error-hover) !important;
+	color: #fff !important;
+	background-color: #b52b27 !important;
+	border-color: #8f211e !important;
 }
 
 #rl-app .btn.btn-success,
