@@ -1,15 +1,11 @@
 # Working on Pied Web for NextSnapMail
 
 This directory is the product package inside the canonical
-`PiedWeb/NextSnapMail` monorepo. The owner explicitly asks that every change
-remain recoverable after an upstream update. The former standalone repository
-is historical and may receive reviewed subtree exports, but it is no longer the
-working source of truth. Its redundant local clone was removed after the
-monorepo migration.
+`PiedWeb/NextSnapMail` monorepo. Every change must remain recoverable after an
+upstream update.
 
 - Read `docs/CONTEXT.md`, `docs/MAINTENANCE.md` and the current `release.json` before changing behavior.
 - Edit `plugin/pied-web-ux/` and `theme-src/` here. Rebuild the theme with `tools/build-theme.py`.
-  Do not continue development in the historical `../NextSnapMail/.local-work/` copies.
 - Keep changes, rationale, compatibility limits and verification in this repository:
   update `CHANGELOG.md`, feature documentation and the release fingerprint manifest.
   Record each actual deployment and rollback location under `docs/deployments/`.
@@ -31,21 +27,3 @@ monorepo migration.
   after changed PHP (including rollback), then verify the actual web bundle and DOM.
 - Retain French/English labels, keyboard support, visible focus, mobile and dark-mode behavior.
 
-## Dev-browser startup
-
-Use `dev-browser-agent` for browser work so the persistent Chrome profile and
-authenticated Nextcloud session are reused. Do not use bare `dev-browser --connect`,
-the old `chrome-live` browser name or `dev-browser stop` for routine work. Use
-`dev-browser --browser agent-dedicated` only for a test that explicitly requires
-an isolated browser. If `dev-browser-agent` fails, try the isolated browser once
-only when the task does not need the authenticated profile; otherwise report the
-blocker without repeated connection attempts.
-
-## Local layout
-
-Canonical source: `~/localhost/Nextcloud/PiedWeb-NextSnapMail/packages/pied-web`.
-Upstream source for native fixtures: `../../apps/nextsnapmail`.
-Historical standalone source: remote repository `RobinDev/nextsnapmail-pied-web`;
-there is no longer a local working clone.
-Historical design report: `~/localhost/Nextcloud/nextsnapmail/report.html`.
-The former `.local-work` directory contains historical private artifacts, not the current source.

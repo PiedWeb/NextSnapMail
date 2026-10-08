@@ -1,13 +1,7 @@
 # Keeping every customization recoverable
 
-The canonical working copy is now
-`~/localhost/Nextcloud/PiedWeb-NextSnapMail/packages/pied-web`, published from
-the `PiedWeb/NextSnapMail` monorepo. The former
-`RobinDev/nextsnapmail-pied-web` repository remains a historical remote release
-source and an optional reviewed subtree export; its redundant local clone was
-removed after the monorepo migration. It was created private and made public
-after a repository and release-asset audit. Source, documentation, checks and
-releases live together; private runtime configuration lives only on the server.
+The source of truth is `packages/pied-web` in the `PiedWeb/NextSnapMail` monorepo;
+private runtime configuration lives only on the server.
 
 For every change:
 
@@ -21,9 +15,10 @@ For every change:
    then compile JS/CSS with the real Nextcloud/SnappyMail runtime. Restore on failure.
 5. Record the actual installed version, compatibility matrix, plugin cache hash, backup/
    rollback location and test boundaries under `docs/deployments/`. Keep credentials out.
-6. Commit and push the source; tag the release; build a payload archive with `tools/package.py`
-   and attach it and its SHA-256 checksum to the GitHub release. Never replace a published tag
-   silently. `tools/check-install.py` compares the install against the selected release.
+6. Commit and push the source; tag the release; from the monorepo root, run
+   `python3 tools/package-release.py` and attach the archives and `release-manifest.json`
+   from `dist/` to the GitHub release. Never replace a published tag silently.
+   `tools/check-install.py` compares the install against the selected release.
 
 The release archive contains runtime files, source, licenses, instructions and tests. Keep a copy
 outside the Nextcloud installation. This makes restoration possible even if an app update

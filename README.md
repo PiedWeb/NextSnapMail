@@ -42,10 +42,8 @@ déploie jamais automatiquement.
 
 ## Dépôts historiques
 
-Les dépôts `RobinDev/NextSnapMail` et `RobinDev/nextsnapmail-pied-web` restent
-des sources historiques et des destinations d’export possibles. Le monorepo
-est désormais la source de vérité. `tools/export-splits.sh` prépare des branches
-séparées sans les pousser ni réécrire un dépôt distant.
+`RobinDev/NextSnapMail` et `RobinDev/nextsnapmail-pied-web` ne reçoivent plus de
+développement ; `tools/export-splits.sh` prépare des exports séparés sans les pousser.
 
 ## Documentation
 

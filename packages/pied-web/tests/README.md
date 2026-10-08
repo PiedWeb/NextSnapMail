@@ -9,23 +9,14 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 
 The diagnostic tests simulate a preserved install, changed files, a new version, a disabled plugin and an app update overwriting just the core patch. They verify that inspection leaves files unchanged.
 
-## Native filtered-selection checks
+## Native checks
 
-Use a separate source checkout of the NextSnapMail revision recorded in `release.json`, with PHP 8.1+:
+`./tools/test.sh` at the monorepo root runs `tests/*.php` and
+`integrations/scheduler/tests/*.php` against `apps/nextsnapmail` (PHP 8.1+).
+To run one alone from this directory:
 
 ```sh
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/filtered-selection.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/attachment-image.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-drafts.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/unread-order.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/feed.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/folder-order.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/virtual-conversation-search.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/conversation.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/scheduled-send.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/reminders.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php ../integrations/scheduler/tests/sender.php
-NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php ../integrations/scheduler/tests/reminders.php
+NEXTSNAPMAIL_SOURCE=../../apps/nextsnapmail php tests/mailbox-operations.php
 ```
 
 IMAP transport is mocked. The tests use the actual native IMAP parsing/classes and the plugin endpoint; they do not connect to a mailbox or delete mail.
@@ -35,7 +26,7 @@ They verify login/POST requirements, account isolation, format/size/path rejecti
 ## Browser fixtures
 
 ```sh
-python3 tools/serve-fixtures.py --upstream /path/to/NextSnapMail
+python3 tools/serve-fixtures.py --upstream ../../apps/nextsnapmail
 ```
 
 Open `http://127.0.0.1:8876/.local-work/images-native-preview.html`. The server binds only localhost and exposes curated fixture/plugin/theme paths and the upstream `app/` static files. Never point it at a production installation containing private data.
@@ -61,6 +52,7 @@ dev-browser-agent --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser-agent --timeout 60 < tests/browser/test-nextcloud-images.js
 dev-browser-agent --timeout 60 < tests/browser/test-unread-drafts.js
 dev-browser-agent --timeout 40 < tests/browser/test-list-metadata.js
+dev-browser-agent --timeout 45 < tests/browser/test-list-toolbar.js
 dev-browser-agent --timeout 25 < tests/browser/test-list-metadata-fallback.js
 dev-browser-agent --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser-agent --timeout 45 < tests/browser/test-mail-polish.js
@@ -87,7 +79,7 @@ dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
 dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
 
-The curated suite currently contains 40 scripts. `test-mailbox-workspace.js`
+The curated suite currently contains 41 scripts. `test-mailbox-workspace.js`
 exercises scoped server search, thread-safe quick actions, multi-page selection
 and Undo with fictional data. `test-conversation-performance.js` is a synthetic
 200-message comparison; `benchmark-live-feed.js` is a separate authenticated,

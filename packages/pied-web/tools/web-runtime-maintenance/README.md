@@ -13,7 +13,8 @@ NextSnapMail account-context files listed in `index.php`; it accepts no path.
 It does not reset all OPcache, create credentials, alter mail or change host PHP settings.
 The temporary directory carries a version suffix because LiteSpeed can retain the helper's own
 deleted PHP path in OPcache. Bump that suffix whenever this helper changes; otherwise a future
-run can execute its former fixed-file list.
+run can execute its former fixed-file list. Commit the suffix you used and record it in the
+deployment record.
 
 1. Copy these three PHP files to a **new private staging directory** on the host.
 2. Run `php install.php` there over SSH. It refuses an existing backup/plugin, saves

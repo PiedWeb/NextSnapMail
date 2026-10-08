@@ -15,6 +15,11 @@ This monorepo is the source of truth for the Pied Web mail product.
   change.
 - Run `./tools/test.sh` before committing. Run `python3 tools/package-release.py`
   for a release candidate.
+- Write commit messages as `type(mail): subject` (Conventional Commits: `feat`,
+  `fix`, `style`, `perf`, `docs`, `build`, …).
+- Commit on `main` or on a short `feature/*` branch. Assign a version number
+  only when the change lands on `main`; never move a published tag. Remove the
+  branch and its worktree once merged.
 - Upstream synchronization must arrive through a reviewed pull request. Never
   auto-deploy an upstream commit.
 - Preserve French/English labels, keyboard access, mobile and dark mode.

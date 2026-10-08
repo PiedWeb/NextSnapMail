@@ -331,42 +331,11 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
   full account/folder accessible label and mobile single-line scope.
 - Restore relocated account menus and Nextcloud shell styling when leaving the theme.
 
-## Historical milestones
+## History and scope limits
 
-| Version | Main change |
-| --- | --- |
-| 1.10.5 | Make global Flag and read state optimistic with rollback, stage reminders, preserve inert stale search results and standardize busy controls. |
-| 1.10.4 | Stage Trash rows out of view immediately and restore their accessibility and focus state after refusal. |
-| 1.10.2 | Reuse one desktop Feed quick-action group on the hovered/focused row instead of rendering hidden controls for every result. |
-| 1.10.1 | Expand Feed thread actions, bind native mutations to the rendered UIDVALIDITY and remove redundant forced IMAP mailbox selections. |
-| 1.10.0 | Turn All accounts into a keyboard-complete, server-searched workspace with scoped multi-page selection, reversible Trash, compact mode and stable conversation excerpts. |
-| 1.9.0 | Split the working workflow into per-account and multi-account Feeds while restoring native Inbox; omit All accounts entirely for one account. |
-| 1.8.12 | Preserve the current forwarding note and fold from the real ruled Outlook header inside broad mail wrappers. |
-| 1.8.11 | Keep a whole Outlook-shaped message visible when its four-field header starts the body. |
-| 1.8.10 | Keep visibly unread roots together before read-root conversations that still contain an unread member. |
-| 1.8.9 | Gather every unread Inbox row on page one through the existing native request, with cached IMAP work and later-page deduplication. |
-| 1.8.8 | Prefer Reply all for multi-correspondent messages in the reader toolbar and footer while keeping direct replies unchanged. |
-| 1.8.7 | Dock Reply/Reply all in the active conversation and expand the same native editor back to its popup without losing the draft or cursor. |
-| 1.8.6.1 | Add the account-scoped choice to keep a newly read row in place or reclassify it after leaving the message. |
-| 1.8.6 | Add an opt-in upstream Squire 2.4.9 editor, Tailwind 600 color suggestions and immediate feed/reader synchronization after a sent reply. |
-| 1.3 | Shell/list/reader redesign; 30 screenshot-only critique attempts. Final 8.2/10, best 8.3, stopped at requested cap; never claimed 9/10. |
-| 1.7.4 | Copy the open reader body as Markdown from the action bar, including collapsed quotes. |
-| 1.7.5 | Flatten common table-based signatures in copied Markdown without changing compose HTML. |
-| 1.7.6 | Show a brief visible success or failure state on the reader copy button. |
-| 1.4.0–1.4.1 | Swipe/Delete, labeled reader menu, unsubscribe placement, checkbox geometry, account stacking and compact rail alignment. |
-| 1.5.1–1.5.2 | Markdown editor/paste and native flag ancestor/pressed-state repair. |
-| 1.6.0–1.6.2 | Background Undo Send, direct native flag action, Lucide settings icon and functional Nextcloud Contacts link. |
-| 1.6.3–1.6.4 | Interleaved quote readability and native compose toolbar redesign. |
-| 1.6.5 | Inline resize/alt/remove, compression on clipboard/local attachments; first standalone GitHub release of all accumulated changes. |
-| 1.7.2 | Theme-owned metadata styling, late initialization and amber followed rows. |
-| 1.7.1 | Clear conversation metadata and always-visible, accessible stars. |
-| 1.7.0 | Actual unread drafts in the Inbox feed; account-safe native draft resume. |
-| 1.6.6 | Nextcloud image picker, compression for Nextcloud/restored attachments and embedded HTML image paste; repository maintenance memory. |
-
-Earlier critique screenshots used native-template fixtures with fictional mail, not an authenticated
-live mailbox. Original private reports remain in the historical local workspace. Git tags preserve
-the standalone distributions from 1.6.5 onward. `CHANGELOG.md` and deployment records supersede
-historical notes for current installed behavior.
+Release history is in [`CHANGELOG.md`](../CHANGELOG.md); deployment records under
+`deployments/` describe what is installed. Standalone releases from 1.6.5 to 1.8.19
+are tagged in `RobinDev/nextsnapmail-pied-web`.
 
 The global Feed is an account-safe workspace, not a unified IMAP folder. Its cross-account actions
 operate only on frozen exact identities and never create a merged mailbox. A new vacation responder

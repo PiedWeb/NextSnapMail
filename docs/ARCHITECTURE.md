@@ -19,14 +19,8 @@ dans `apps/nextsnapmail`, puis consommé par Pied Web.
 
 ## Historique importé
 
-- `apps/nextsnapmail` part du commit amont verrouillé, puis porte les deux
-  commits du correctif des compteurs de comptes liés.
-- `packages/pied-web` conserve l’historique de sa branche `main` jusqu’à
-  `b4305f1`, puis un commit séparé capture le travail local 1.9.2 qui n’était pas
-  encore publié au moment de la migration.
-- Les dépôts GitHub historiques ne sont ni effacés ni réécrits. Leurs clones
-  locaux redondants ont été retirés après vérification de l'import et publication
-  du monorepo ; ils restent récupérables depuis leurs remotes et la corbeille locale.
+Les dépôts d’origine (`RobinDev/NextSnapMail`, `RobinDev/nextsnapmail-pied-web`)
+ont été importés avec leur historique ; ils restent sur GitHub, sans développement.
 
 ## Synchronisation de NextSnapMail
 
@@ -46,10 +40,17 @@ copie d’un bundle minifié ou par un `push --force` sur `main`.
 
 ## Branches et publication
 
-- `main` : état produit intégrable ; protégée sur GitHub.
-- `feature/*` : une capacité produit ou un contrat natif.
-- `automation/nextsnapmail-*` : propositions générées depuis l’amont.
-- tags `piedweb-mail-v*` : artefacts déployables et reproductibles.
+- `main` : état produit intégrable, non protégé ; on y commite directement ou
+  on y fusionne une branche `feature/*` courte.
+- `feature/*` : une capacité produit ou un contrat natif. Après fusion, la
+  branche et son worktree sont supprimés.
+- `automation/nextsnapmail-*` : propositions générées depuis l’amont, intégrées
+  par pull request revue.
+- tags `piedweb-mail-v*` : artefacts déployables et reproductibles. Le numéro de
+  version n’est attribué qu’à l’intégration sur `main`, et un tag publié n’est
+  jamais déplacé.
+
+La CI tourne sur ces trois familles de branches et sur les pull requests.
 
 La publication fabrique deux archives depuis le même commit : l’application
 Nextcloud `nextsnapmail` et le paquet Pied Web. Le manifeste placé dans `dist/`
