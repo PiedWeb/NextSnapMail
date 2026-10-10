@@ -1,4 +1,4 @@
-## Unreleased
+## 0.1.16 – 2026-10-10
 
 Merge upstream through `99dcb2828c02`, including account-wide search scopes,
 Sieve out-of-office settings, namespaced cookies and validated page-size limits.

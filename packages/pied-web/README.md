@@ -79,7 +79,7 @@ The [shared design system](docs/DESIGN_SYSTEM.md) also covers native settings an
 
 ## Install and maintain
 
-Release **1.10.24**, tested with Nextcloud **34.0.4**, NextSnapMail **0.1.15**, embedded SnappyMail **2.38.2**. Other versions are unverified.
+Release **1.10.25** targets Nextcloud **34.0.4**, NextSnapMail **0.1.16** and embedded SnappyMail **2.38.2**. Offline tests and package checks pass; production validation remains pending. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

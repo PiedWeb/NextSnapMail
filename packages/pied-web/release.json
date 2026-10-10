@@ -1,8 +1,8 @@
 {
-  "version": "1.10.24",
+  "version": "1.10.25",
   "tested": {
     "nextcloud": "34.0.4",
-    "nextsnapmail": "0.1.15",
+    "nextsnapmail": "0.1.16",
     "snappymail": "2.38.2"
   },
   "files": {
@@ -35,7 +35,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "f5088d0a30281b091bab08b15af2b7191af1400baf9fae6478bf2db73127597e",
+    "plugin/pied-web-ux/index.php": "28a04e2f0737f5ccbc152bbf34404133ba70354cdcef670a6361b11a80fe2df1",
     "plugin/pied-web-ux/inline-reply.js": "56e7c77bc46bad4b5ba18384dc5c7d8fa6f360439fb2177b798e233dee920676",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",
