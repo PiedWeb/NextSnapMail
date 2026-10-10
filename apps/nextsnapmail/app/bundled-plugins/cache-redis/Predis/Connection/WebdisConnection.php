@@ -76,7 +76,9 @@ class WebdisConnection implements NodeConnectionInterface
      */
     public function __destruct()
     {
-        curl_close($this->resource);
+        if (\PHP_VERSION_ID < 80500) {
+            curl_close($this->resource);
+        }
         phpiredis_reader_destroy($this->reader);
     }
 

@@ -4,8 +4,8 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
 	const
 		NAME = 'Nextcloud',
-		VERSION = '2.38.3',
-		RELEASE  = '2026-06-19',
+		VERSION = '2.38.10',
+		RELEASE  = '2026-10-07',
 		CATEGORY = 'Integrations',
 		DESCRIPTION = 'Integrate with Nextcloud v20+',
 		REQUIRED = '2.38.0';
@@ -34,6 +34,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 			$this->addJs('js/webdav.js');
 			$this->addJs('js/gmail-oauth.js');
+			$this->addJs('js/vacation.js');
 
 			$this->addJs('js/message.js');
 			$this->addHook('json.attachments', 'DoAttachmentsActions');
@@ -46,6 +47,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 
 			$this->addTemplate('templates/PopupsNextcloudFiles.html');
 			$this->addTemplate('templates/PopupsNextcloudCalendars.html');
+			$this->addTemplate('templates/NextSnapMailVacationUserSettings.html');
 
 //			$this->addHook('login.credentials.step-2', 'loginCredentials2');
 //			$this->addHook('login.credentials', 'loginCredentials');
@@ -319,7 +321,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return [];
 	}
 
-	private function refreshGmailOauthToken(array $auth) : array
+	private function refreshGmailOauthToken(#[\SensitiveParameter] array $auth) : array
 	{
 		$client = $this->gmailOauthClient();
 		if (!$client) {
@@ -343,7 +345,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return $auth;
 	}
 
-	private function persistGmailOauthAuth(\RainLoop\Model\Account $oAccount, array $auth) : void
+	private function persistGmailOauthAuth(\RainLoop\Model\Account $oAccount, #[\SensitiveParameter] array $auth) : void
 	{
 		$storedAuth = $this->encodeGmailOauthStoredToken($auth);
 		if ($oAccount instanceof \RainLoop\Model\AdditionalAccount && $this->isGmailOauthStoredToken((string) $oAccount->ImapPass())) {
@@ -379,7 +381,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		}
 	}
 
-	private function storeGmailMainAccount(string $email, array $auth) : void
+	private function storeGmailMainAccount(string $email, #[\SensitiveParameter] array $auth) : void
 	{
 		$user = \OC::$server->get(\OCP\IUserSession::class)->getUser();
 		if (!$user) {
@@ -398,7 +400,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		$config->deleteUserValue($user->getUID(), 'nextsnapmail', 'nextsnapmail-password');
 	}
 
-	private function createOrUpdateGmailAdditionalAccount(string $email, array $auth) : void
+	private function createOrUpdateGmailAdditionalAccount(string $email, #[\SensitiveParameter] array $auth) : void
 	{
 		$oActions = \RainLoop\Api::Actions();
 		if (!$oActions->GetCapa(\RainLoop\Enumerations\Capa::ADDITIONAL_ACCOUNTS)) {
@@ -548,7 +550,7 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return $secret ? (string) $secret : '';
 	}
 
-	private function successfulGmailOauthResponse(array $response, string $defaultMessage) : array
+	private function successfulGmailOauthResponse(#[\SensitiveParameter] array $response, string $defaultMessage) : array
 	{
 		if (200 === (int) ($response['code'] ?? 0) && \is_array($response['result'] ?? null)) {
 			return $response['result'];
@@ -568,12 +570,12 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		throw new \RuntimeException($message);
 	}
 
-	private function encodeGmailOauthStoredToken(array $auth) : string
+	private function encodeGmailOauthStoredToken(#[\SensitiveParameter] array $auth) : string
 	{
 		return static::GMAIL_OAUTH_TOKEN_PREFIX . \rtrim(\strtr(\base64_encode(\json_encode($auth)), '+/', '-_'), '=');
 	}
 
-	private function decodeGmailOauthStoredToken(string $value) : array
+	private function decodeGmailOauthStoredToken(#[\SensitiveParameter] string $value) : array
 	{
 		$prefix = $this->gmailOauthStoredTokenPrefix($value);
 		if ('' === $prefix) {
@@ -586,12 +588,12 @@ class NextcloudPlugin extends \RainLoop\Plugins\AbstractPlugin
 		return \is_array($data) ? $data : [];
 	}
 
-	private function isGmailOauthStoredToken(string $value) : bool
+	private function isGmailOauthStoredToken(#[\SensitiveParameter] string $value) : bool
 	{
 		return '' !== $this->gmailOauthStoredTokenPrefix($value);
 	}
 
-	private function gmailOauthStoredTokenPrefix(string $value) : string
+	private function gmailOauthStoredTokenPrefix(#[\SensitiveParameter] string $value) : string
 	{
 		foreach ([static::GMAIL_OAUTH_TOKEN_PREFIX, static::GMAIL_OAUTH_LEGACY_TOKEN_PREFIX] as $prefix) {
 			if (\str_starts_with($value, $prefix)) {

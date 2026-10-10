@@ -23,7 +23,7 @@
 					'https://outlook.office.com/IMAP.AccessAsUser.All'
 */
 				].join(' '),
-				state: 'o365', // + rl.settings.app('token') + localStorage.getItem('smctoken')
+				state: 'o365', // + rl.settings.app('token') + localStorage.getItem('nsmctoken')
 				// Force authorize screen, so we always get a refresh_token
 				access_type: 'offline',
 				prompt: 'consent'

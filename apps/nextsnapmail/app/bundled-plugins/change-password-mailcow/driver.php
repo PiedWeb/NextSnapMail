@@ -60,9 +60,12 @@ class ChangePasswordMailcowDriver
         curl_setopt($ch, CURLOPT_HTTPHEADER, array_map(function($k, $v) {return "$k: $v";}, array_keys($headers), $headers));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         $result = curl_exec($ch);
-        curl_close($ch);
 
         $status = curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        if (\PHP_VERSION_ID < 80500) {
+            curl_close($ch);
+        }
 
         if ($status === 200 && $result && ($res = json_decode($result, true)) && $res[0]['type'] === 'success') {
             return true;

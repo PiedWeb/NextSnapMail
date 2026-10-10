@@ -1,0 +1,120 @@
+<div class="nextsnapmail-vacation-settings">
+	<div class="legend">
+		<span data-i18n="NEXTCLOUD_VACATION/TITLE"></span>
+		<i class="icon-spinner animated" data-bind="visible: loading" style="margin-left: 8px"></i>
+	</div>
+
+	<div class="alert" data-bind="visible: !sieveEnabled">
+		<span data-i18n="NEXTCLOUD_VACATION/SIEVE_DISABLED"></span>
+	</div>
+
+	<div data-bind="visible: sieveEnabled">
+		<div class="alert alert-error" data-bind="visible: error, text: error"></div>
+		<div class="alert alert-success" data-bind="visible: success">
+			<span data-i18n="NEXTCLOUD_VACATION/SAVED"></span>
+		</div>
+		<div class="alert" data-bind="visible: loaded() && missingCapabilities().length">
+			<span data-i18n="NEXTCLOUD_VACATION/CAPABILITIES_MISSING"></span>
+			<strong data-bind="text: missingCapabilities().join(', ')"></strong>
+		</div>
+		<div class="alert" data-bind="visible: conflictingVacation">
+			<span data-i18n="NEXTCLOUD_VACATION/EXISTING_VACATION"></span>
+		</div>
+		<div class="alert" data-bind="visible: usingLegacyScript">
+			<span data-i18n="NEXTCLOUD_VACATION/LEGACY_MIGRATION"></span>
+		</div>
+		<div class="alert" data-bind="visible: preservedProfiles().length, i18nUpdate: preservedProfiles">
+			<span data-i18n="NEXTCLOUD_VACATION/PRESERVED_IDENTITIES"></span>
+			<ul data-bind="foreach: preservedProfiles">
+				<li>
+					<span data-bind="text: senderName ? senderName + ' <' + email + '>' : email"></span>
+					<button type="button" class="btn btn-small" data-bind="click: $root.removePreservedProfile, enable: !$root.busy()">
+						<span data-i18n="NEXTCLOUD_VACATION/REMOVE"></span>
+					</button>
+				</li>
+			</ul>
+			<div class="help-block" data-i18n="NEXTCLOUD_VACATION/PRESERVED_REMOVE_HELP"></div>
+		</div>
+
+		<form class="form-horizontal" data-bind="visible: serverSupported">
+			<div class="control-group">
+				<label class="control-label" for="nextsnapmail-vacation-identity" data-i18n="NEXTCLOUD_VACATION/IDENTITY"></label>
+				<div class="controls">
+					<select id="nextsnapmail-vacation-identity" class="span5" data-bind="options: profiles, optionsText: 'label', value: selectedProfile, enable: !busy()"></select>
+					<div class="help-block" data-i18n="NEXTCLOUD_VACATION/IDENTITY_HELP"></div>
+				</div>
+			</div>
+			<div data-bind="i18nUpdate: selectedProfile">
+			<div data-bind="with: selectedProfile">
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-enabled" data-i18n="NEXTCLOUD_VACATION/ENABLED"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-enabled" type="checkbox" data-bind="checked: enabled, enable: !$parent.busy()">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-address" data-i18n="NEXTCLOUD_VACATION/ADDRESS"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-address" class="span5" type="text" readonly data-bind="value: email">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-sender-name" data-i18n="NEXTCLOUD_VACATION/SENDER_NAME"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-sender-name" class="span5" type="text" data-bind="value: senderName, enable: !$parent.busy()">
+						<div class="help-block" data-i18n="NEXTCLOUD_VACATION/SENDER_NAME_HELP"></div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-from" data-i18n="NEXTCLOUD_VACATION/FROM"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-from" type="date" data-bind="value: startDate, enable: !$parent.busy()">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-until" data-i18n="NEXTCLOUD_VACATION/UNTIL"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-until" type="date" data-bind="value: endDate, enable: !$parent.busy()">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-interval" data-i18n="NEXTCLOUD_VACATION/INTERVAL"></label>
+					<div class="controls">
+						<select id="nextsnapmail-vacation-interval" class="span5" data-bind="value: replyIntervalMode, enable: !$parent.busy()">
+							<option value="whole" data-i18n="NEXTCLOUD_VACATION/INTERVAL_WHOLE"></option>
+							<option value="daily" data-i18n="NEXTCLOUD_VACATION/INTERVAL_DAILY"></option>
+							<option value="weekly" data-i18n="NEXTCLOUD_VACATION/INTERVAL_WEEKLY"></option>
+							<option value="custom" data-i18n="NEXTCLOUD_VACATION/INTERVAL_CUSTOM"></option>
+						</select>
+						<div data-bind="visible: replyIntervalMode() === 'custom'" style="margin-top: 8px">
+							<input class="span2" type="number" min="1" step="1" data-bind="value: customReplyInterval, enable: !$parent.busy()">
+							<span class="help-inline" data-i18n="NEXTCLOUD_VACATION/DAYS"></span>
+						</div>
+						<div class="help-block" data-i18n="NEXTCLOUD_VACATION/INTERVAL_HELP"></div>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-subject" data-i18n="NEXTCLOUD_VACATION/SUBJECT"></label>
+					<div class="controls">
+						<input id="nextsnapmail-vacation-subject" class="span5" type="text" data-bind="value: subject, enable: !$parent.busy()">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="nextsnapmail-vacation-message" data-i18n="NEXTCLOUD_VACATION/MESSAGE"></label>
+					<div class="controls">
+						<textarea id="nextsnapmail-vacation-message" class="span5" rows="8" data-bind="value: message, enable: !$parent.busy()"></textarea>
+					</div>
+				</div>
+			</div>
+			</div>
+			<div class="control-group">
+				<div class="controls">
+					<button type="button" class="btn" data-bind="click: save, enable: !busy() && !conflictingVacation()">
+						<i data-bind="css: {'icon-floppy': !saving(), 'icon-spinner animated': saving()}"></i>
+						<span data-i18n="NEXTCLOUD_VACATION/SAVE"></span>
+					</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

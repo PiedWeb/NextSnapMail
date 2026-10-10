@@ -1,3 +1,10 @@
+## Unreleased
+
+Merge upstream through `99dcb2828c02`, including account-wide search scopes,
+Sieve out-of-office settings, namespaced cookies and validated page-size limits.
+Preserve Pied Web's tab-local account context, shared unread counters and quiet
+notification default. Rebuild both runtime bundles from the merged sources.
+
 ## 0.1.15 – 2026-09-21
 
 ### Changed
@@ -23,6 +30,53 @@
   for clients that do not send an explicit URL context.
 - Reject an unknown explicit account context instead of silently applying an
   operation to the browser-wide cookie account.
+
+## Upstream 0.1.13 – 2026-10-07
+
+### Added
+
+- Add selectable search scopes below the regular search field and in Advanced
+  Search: the current folder, every folder in the account, or the current
+  folder including all subfolders.
+- Add a dedicated multilingual out-of-office settings page that creates
+  date-limited Sieve vacation responses per account identity, automatically
+  uses the identity name and address, reports missing server capabilities and
+  offers full-period, daily, weekly or custom per-sender reply intervals.
+
+### Changed
+
+- Present the unread-folder control as a clearly labeled filter button in the
+  folder sidebar so it is no longer mistaken for a parent folder.
+- Use `nextsnapmail.user` for newly managed Sieve filters while retaining and
+  safely migrating existing `rainloop.user` filters without deleting them.
+
+## Upstream 0.1.12 – 2026-09-12
+
+### Changed
+
+- Use NextSnapMail-specific browser cookie names to avoid session collisions
+  with SnappyMail or related forks running on the same Nextcloud domain.
+- Treat a valid empty plugin repository as reachable instead of showing a
+  repository access warning.
+- Clear the new NextSnapMail cookie names during reset.
+- Avoid PHP 8.5 `curl_close()` deprecation warnings in bundled legacy plugin
+  clients.
+- Add administrator-controlled messages-per-page defaults, maximum values and
+  an enforced mode that locks the user setting when required.
+
+### Fixed
+
+- Persist validated integer settings instead of the originally submitted value,
+  fixing messages-per-page values above the old UI limit being accepted but not
+  applied consistently.
+
+### Security
+
+- Mark stored password parameters as sensitive so they are masked in exception
+  traces on supported PHP versions.
+- Guard Nextcloud login, logout and impersonation event handlers so a
+  NextSnapMail session cleanup/preparation problem cannot block the surrounding
+  Nextcloud action.
 
 ## 0.1.11 – 2026-09-12
 

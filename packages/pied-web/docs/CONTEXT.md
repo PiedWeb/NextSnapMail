@@ -338,8 +338,8 @@ Release history is in [`CHANGELOG.md`](../CHANGELOG.md); deployment records unde
 are tagged in `RobinDev/nextsnapmail-pied-web`.
 
 The global Feed is an account-safe workspace, not a unified IMAP folder. Its cross-account actions
-operate only on frozen exact identities and never create a merged mailbox. A new vacation responder
-is not implemented.
+operate only on frozen exact identities and never create a merged mailbox. The bundled Nextcloud
+plugin provides per-account out-of-office replies through Sieve, including existing identities.
 Sieve availability/settings and existing calendar options are configuration concerns; never overwrite
 them while deploying this theme/plugin. The linked-account unread change is preserved separately
 as upstream PR #41 and the version-specific patch.

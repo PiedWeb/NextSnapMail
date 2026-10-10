@@ -9,7 +9,7 @@ use RainLoop\Utils;
 
 trait Admin
 {
-	protected static string $AUTH_ADMIN_TOKEN_KEY = 'smadmin';
+	protected static string $AUTH_ADMIN_TOKEN_KEY = 'nsmadmin';
 
 	public function IsAdminLoggined(bool $bThrowExceptionOnFalse = true) : bool
 	{

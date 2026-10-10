@@ -474,7 +474,9 @@ class Client
         } else {
             $json_decode = json_decode($result, true);
         }
-        curl_close($ch);
+        if (\PHP_VERSION_ID < 80500) {
+            curl_close($ch);
+        }
 
         return array(
             'result' => (null === $json_decode) ? $result : $json_decode,

@@ -5,8 +5,13 @@
 <form id="advancedsearchform" class="modal-body form-horizontal" action="#/" autocomplete="off" spellcheck="false" data-bind="submit: submitForm">
 	<div>
 		<div class="control-group">
-			<label data-i18n="GLOBAL/FROM"></label>
+			<label data-i18n="SEARCH/TERM"></label>
 			<input type="text" autofocus="" autocomplete="off" autocorrect="off" autocapitalize="off"
+				data-bind="value: simple">
+		</div>
+		<div class="control-group">
+			<label data-i18n="GLOBAL/FROM"></label>
+			<input type="text" autocomplete="off" autocorrect="off" autocapitalize="off"
 				data-bind="value: from">
 		</div>
 		<div class="control-group">
@@ -64,9 +69,8 @@
 				}
 			}"></div>
 		</div>
-		<!-- ko if: showMultisearch -->
 		<div class="control-group">
-			<label data-i18n="SEARCH/SUBFOLDERS"></label>
+			<label data-i18n="SEARCH/SCOPE"></label>
 			<div data-bind="component: {
 				name: 'Select',
 				params: {
@@ -77,7 +81,6 @@
 				}
 			}"></div>
 		</div>
-		<!-- /ko -->
 		<div class="control-group">
 			<label></label>
 			<div>

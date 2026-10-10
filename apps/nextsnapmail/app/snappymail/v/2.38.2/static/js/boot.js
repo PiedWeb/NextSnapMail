@@ -30,15 +30,15 @@ const
 		}) : Promise.reject('src is empty');
 
 try {
-	let smctoken = doc.cookie.match(/(^|;) ?smctoken=([^;]+)/);
-	smctoken = smctoken ? smctoken[2] : localStorage.getItem('smctoken');
-	if (!smctoken) {
+	let nsmctoken = doc.cookie.match(/(^|;) ?nsmctoken=([^;]+)/);
+	nsmctoken = nsmctoken ? nsmctoken[2] : localStorage.getItem('nsmctoken');
+	if (!nsmctoken) {
 		let data = new Uint8Array(16);
 		crypto.getRandomValues(data);
-		smctoken = encodeURIComponent(btoa(String.fromCharCode(...data)));
+		nsmctoken = encodeURIComponent(btoa(String.fromCharCode(...data)));
 	}
-	localStorage.setItem('smctoken', smctoken);
-	doc.cookie = 'smctoken='+smctoken+";path=/;samesite=strict";
+	localStorage.setItem('nsmctoken', nsmctoken);
+	doc.cookie = 'nsmctoken='+nsmctoken+";path=/;samesite=strict";
 } catch (e) {
 	console.error(e);
 }

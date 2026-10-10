@@ -192,6 +192,9 @@ namespace {
         $fullFetch = array_filter(array_merge($a->calls, $b->calls), static fn($call) => $call[0] === 'fetch');
         check(!array_filter($fullFetch, static fn($call) => array_diff($call[2], ['UID', 'INTERNALDATE'])), 'Full-result enumeration fetches only UID/date; envelopes belong to page fetch');
         check($call(['operation' => 'search', 'scope' => 'all', 'search' => ''])['error'] === 'scope', 'Empty all-mail scope requires narrowing rather than implicit entire-mailbox selection');
+        $multiFolder = $call(['operation' => 'search', 'scope' => 'inbox', 'search' => 'in:all subject:needle']);
+        check($multiFolder['partial'] && $multiFolder['total'] === 0,
+            'A query with its own multi-folder scope cannot create single-folder result identities');
         check($call(['operation' => 'search', 'search' => 'needle', 'accountHashes' => '["foreign"]'])['error'] === 'scope', 'Unlinked opaque account identifiers are rejected');
         $actions->offline = ['work'];
         $partial = $call(['operation' => 'search', 'scope' => 'inbox', 'search' => 'subject:needle']);

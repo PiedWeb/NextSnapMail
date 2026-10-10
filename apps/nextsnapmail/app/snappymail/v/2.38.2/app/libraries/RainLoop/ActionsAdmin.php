@@ -70,6 +70,19 @@ class ActionsAdmin extends Actions
 		$this->setConfigFromParams($oConfig, 'allowLanguagesOnSettings', 'webmail', 'allow_languages_on_settings', 'bool');
 		$this->setConfigFromParams($oConfig, 'allowLanguagesOnLogin', 'login', 'allow_languages_on_login', 'bool');
 		$this->setConfigFromParams($oConfig, 'attachmentLimit', 'webmail', 'attachment_size_limit', 'int');
+		$this->setConfigFromParams($oConfig, 'messagesPerPageDefault', 'webmail', 'messages_per_page', 'int', function ($iValue) use ($oConfig) {
+			$iValue = \max(10, $iValue);
+			$iMax = \max(10, \intval($oConfig->Get('webmail', 'messages_per_page_max', 1000)) ?: 1000);
+			if ($iValue > $iMax) {
+				$oConfig->Set('webmail', 'messages_per_page_max', $iValue);
+			}
+			return $iValue;
+		});
+		$this->setConfigFromParams($oConfig, 'messagesPerPageMax', 'webmail', 'messages_per_page_max', 'int', function ($iValue) use ($oConfig) {
+			$iDefault = \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 20)) ?: 20);
+			return \max($iDefault, $iValue);
+		});
+		$this->setConfigFromParams($oConfig, 'messagesPerPageEnforced', 'webmail', 'messages_per_page_enforced', 'bool');
 
 		$this->setConfigFromParams($oConfig, 'loginDefaultDomain', 'login', 'default_domain', 'string');
 
@@ -405,6 +418,9 @@ class ActionsAdmin extends Actions
 
 				case 'int':
 					$iValue = (int)$sValue;
+					if ($mStringCallback && is_callable($mStringCallback)) {
+						$iValue = (int) $mStringCallback($iValue);
+					}
 					$oConfig->Set($sConfigSector, $sConfigName, $iValue);
 					break;
 
@@ -450,6 +466,9 @@ class ActionsAdmin extends Actions
 			$aResult['contactsSuggestionsLimit'] = (int)$oConfig->Get('contacts', 'suggestions_limit', 20);
 
 			$aResult['faviconUrl'] = $oConfig->Get('webmail', 'favicon_url', '');
+			$aResult['messagesPerPageDefault'] = \max(10, \intval($oConfig->Get('webmail', 'messages_per_page', 20)) ?: 20);
+			$aResult['messagesPerPageMax'] = \max($aResult['messagesPerPageDefault'], \intval($oConfig->Get('webmail', 'messages_per_page_max', 1000)) ?: 1000);
+			$aResult['messagesPerPageEnforced'] = (bool) $oConfig->Get('webmail', 'messages_per_page_enforced', false);
 
 			$aResult['weakPassword'] = \is_file(APP_PRIVATE_DATA.'admin_password.txt');
 
