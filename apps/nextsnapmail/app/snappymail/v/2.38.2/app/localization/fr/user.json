@@ -77,7 +77,13 @@
 		"SUBFOLDERS_SUBTREE": "Tous",
 		"SUBFOLDERS_SUBTREE_ONE": "Un niveau",
 		"REPLIED": "Répondu",
-		"KEYWORD": "Étiquette"
+		"KEYWORD": "Étiquette",
+		"SCOPE": "Rechercher dans",
+		"SCOPE_CURRENT": "Dossier actuel",
+		"SCOPE_ALL": "Tous les dossiers",
+		"SCOPE_SUBTREE": "Dossier actuel et ses sous-dossiers",
+		"SCOPE_SUBTREE_SHORT": "Dossier et sous-dossiers",
+		"TERM": "Termes recherchés"
 	},
 	"FOLDER_LIST": {
 		"BUTTON_COMPOSE": "Nouveau message",
@@ -86,7 +92,8 @@
 		"SENT_NAME": "Envoyés",
 		"DRAFTS_NAME": "Brouillons",
 		"TRASH_NAME": "Corbeille",
-		"ARCHIVE_NAME": "Archive"
+		"ARCHIVE_NAME": "Archive",
+		"SHOW_ONLY_UNREAD_FOLDERS": "Afficher uniquement les dossiers contenant des messages non lus"
 	},
 	"IMAP": {
 		"ACL_RIGHTS": "Droits",
@@ -137,7 +144,8 @@
 		"SORT_SUBJECT_ASC": "Sujet A-Z",
 		"SORT_SUBJECT_DESC": "Sujet Z-A",
 		"SORT_FROM_ASC": "De A-Z",
-		"SORT_FROM_DESC": "De Z-A"
+		"SORT_FROM_DESC": "De Z-A",
+		"SELECT_SINGLE_FOLDER": "Pour déplacer, copier ou supprimer des messages, sélectionnez-les dans un seul dossier à la fois."
 	},
 	"MESSAGE": {
 		"BUTTON_EDIT": "Modifier",
@@ -482,6 +490,9 @@
 		"REMOVE_COLORS": "Supprimer les couleurs d'arrière-plan et de texte du message",
 		"ALLOW_STYLES": "Autoriser <style> CSS",
 		"MESSAGE_PER_PAGE": "Messages par page",
+		"MESSAGE_PER_PAGE_MAX": "Maximum: %COUNT%",
+		"MESSAGE_PER_PAGE_MAX_ALLOWED": "Only values up to %COUNT% are allowed.",
+		"MESSAGE_PER_PAGE_LOCKED": "Locked by administrator",
 		"CHECK_MAIL_INTERVAL": "Intervalle de relevé des messages",
 		"MARK_MESSAGE_READ_AFTER": "Marquer le message comme lu après",
 		"MSG_DEFAULT_ACTION": "Action par défaut",

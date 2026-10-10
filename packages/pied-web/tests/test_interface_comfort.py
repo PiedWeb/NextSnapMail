@@ -89,8 +89,9 @@ assert.equal(ui.folderLabel({fullName:'INBOX.Scheduled',delimiter:'.'},'Schedule
         french = json.loads((active / 'fr.json').read_text())
         english = json.loads((active / 'en.json').read_text())
         self.assertEqual(french.keys(), english.keys())
-        self.assertEqual(french['NEXTCLOUD'].keys(), english['NEXTCLOUD'].keys())
-        self.assertTrue(all(french['NEXTCLOUD'].values()))
+        for section, translations in english.items():
+            self.assertEqual(french[section].keys(), translations.keys())
+            self.assertTrue(all(french[section].values()))
         self.assertEqual((active / 'fr.json').read_text(), (legacy / 'fr.json').read_text())
 
     def test_compact_mode_is_opt_in_and_desktop_only(self):
@@ -100,6 +101,15 @@ assert.equal(ui.folderLabel({fullName:'INBOX.Scheduled',delimiter:'.'},'Schedule
         self.assertIn('min-height:52px;', css)
         self.assertNotIn('height:52px;', css.replace('min-height:52px;', ''))
         self.assertNotIn('font-size:', css, 'compact must not make text smaller')
+
+    def test_native_french_covers_all_english_sections(self):
+        locales = APP / 'app/snappymail/v/2.38.2/app/localization'
+        english = json.loads((locales / 'en/user.json').read_text())
+        french = json.loads((locales / 'fr/user.json').read_text())
+        for section, translations in english.items():
+            if isinstance(translations, dict):
+                self.assertTrue(translations.keys() <= french[section].keys(), section)
+                self.assertTrue(all(french[section][key] for key in translations), section)
 
 
 if __name__ == '__main__':

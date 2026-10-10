@@ -204,11 +204,14 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
                 if (!$trash || $trash === '__UNUSE__') throw new \RuntimeException('trash');
                 if (!$imap->hasCapability($folder === $trash ? 'UIDPLUS' : 'MOVE')) throw new \RuntimeException('capability');
                 $cache = false;
-                $criteria = (string) \MailSo\Imap\SearchCriterias::fromString(
+                $parsedCriteria = \MailSo\Imap\SearchCriterias::fromString(
                     $imap, $folder, $search, (bool) $settings->GetConf('HideDeleted', 1), $cache
                 );
+                $criteria = (string) $parsedCriteria;
                 // A snapshot always describes a single folder, never MULTISEARCH results.
-                if (str_starts_with($criteria, 'IN (')) throw new \RuntimeException('scope');
+                if (($parsedCriteria->folderScope ?? '') !== '' || str_starts_with($criteria, 'IN (')) {
+                    throw new \RuntimeException('scope');
+                }
                 $info = $imap->FolderExamine($folder, true);
                 $uids = $imap->MessageSearch($criteria, true);
                 $result = $store->prepare($folder, $search, (int) $info->UIDVALIDITY, $uids, $trash);

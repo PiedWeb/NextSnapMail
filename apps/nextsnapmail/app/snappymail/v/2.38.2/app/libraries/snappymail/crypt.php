@@ -41,7 +41,7 @@ abstract class Crypt
 	}
 
 	/**
-	 * When $key is empty, it will use the smctoken.
+	 * When $key is empty, it will use the nsmtoken.
 	 */
 	private static function Passphrase(
 		#[\SensitiveParameter]
@@ -49,11 +49,11 @@ abstract class Crypt
 	) : string
 	{
 		if (!$key) {
-			if (empty($_COOKIE['smctoken'])) {
-				\SnappyMail\Cookies::set('smctoken', \base64_encode(\random_bytes(16)), 0, false);
-//				throw new \RuntimeException('Missing smctoken');
+			if (empty($_COOKIE['nsmctoken'])) {
+				\SnappyMail\Cookies::set('nsmctoken', \base64_encode(\random_bytes(16)), 0, false);
+//				throw new \RuntimeException('Missing nsmctoken');
 			}
-			$key = $_COOKIE['smctoken'] . APP_VERSION;
+			$key = $_COOKIE['nsmctoken'] . APP_VERSION;
 		}
 		return \sha1($key . APP_SALT, true);
 	}

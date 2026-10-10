@@ -193,6 +193,8 @@ class Application extends \RainLoop\Config\AbstractConfig
 				'popup_identity' => array(true, 'When identity is not set yet, open identity popup after login'),
 
 				'messages_per_page'           => array(20, 'Number of messages displayed on page by default'),
+				'messages_per_page_max'       => array(1000, 'Maximum number of messages users may display on one page'),
+				'messages_per_page_enforced'  => array(false, 'Force the default messages_per_page value for all users'),
 				'message_read_delay'          => array(5, 'Mark message read after N seconds'),
 
 				'min_refresh_interval'        => array(5, 'Minimal check for new messages interval in minutes'),

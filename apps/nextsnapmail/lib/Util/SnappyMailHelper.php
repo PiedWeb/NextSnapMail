@@ -20,8 +20,15 @@ class SnappyMailHelper
 
 	public static function loadApp() : void
 	{
+		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
+
 		if (\class_exists('RainLoop\\Api')) {
-			return;
+			$expected = \realpath($app_dir);
+			$actual = \defined('APP_INDEX_ROOT_PATH') ? \realpath(APP_INDEX_ROOT_PATH) : false;
+			if ($expected && $actual && $expected === $actual) {
+				return;
+			}
+			throw new \RuntimeException('NextSnapMail cannot start because another SnappyMail-compatible app is already loaded in the same request.');
 		}
 
 		// Nextcloud the default spl_autoload_register() not working
@@ -39,7 +46,6 @@ class SnappyMailHelper
 //		include APP_INDEX_ROOT_PATH.'snappymail/v/'.APP_VERSION.'/include.php';
 //		define('APP_DATA_FOLDER_PATH', \rtrim(\trim(\OC::$server->getSystemConfig()->getValue('datadirectory', '')), '\\/').'/appdata_nextsnapmail/');
 
-		$app_dir = \dirname(\dirname(__DIR__)) . '/app';
 		require_once $app_dir . '/index.php';
 	}
 
@@ -64,7 +70,7 @@ class SnappyMailHelper
 					if ($oActions->Cacher(null, true)->Set(\RainLoop\KeyPathHelper::SessionAdminKey($sRand), \time())) {
 						$sToken = \RainLoop\Utils::EncodeKeyValuesQ(array('token', $sRand));
 //						$oActions->setAdminAuthToken($sToken);
-						\SnappyMail\Cookies::set('smadmin', $sToken);
+						\SnappyMail\Cookies::set('nsmadmin', $sToken);
 					}
 				}
 			} else {
@@ -226,13 +232,13 @@ class SnappyMailHelper
 		return $sUrl;
 	}
 
-	public static function encodePassword(string $sPassword, string $sSalt) : string
+	public static function encodePassword(#[\SensitiveParameter] string $sPassword, string $sSalt) : string
 	{
 		static::loadApp();
 		return \SnappyMail\Crypt::EncryptUrlSafe($sPassword, $sSalt);
 	}
 
-	public static function decodePassword(string $sPassword, string $sSalt) : ?\SnappyMail\SensitiveString
+	public static function decodePassword(#[\SensitiveParameter] string $sPassword, string $sSalt) : ?\SnappyMail\SensitiveString
 	{
 		static::loadApp();
 		$result = \SnappyMail\Crypt::DecryptUrlSafe($sPassword, $sSalt);

@@ -26,6 +26,13 @@ risk.
 - **Dark mode**
 - **Responsive design**
 - **Full Sieve filtering support**
+- **Date-limited out-of-office messages per account and identity**, with names
+  and addresses loaded automatically from the selected account and flexible
+  per-sender reply intervals for the full absence, daily, weekly or custom use
+- **Safe multi-instance Sieve handling** that detects and preserves vacation
+  settings created by another NextSnapMail instance and allows explicit removal
+- **Automatic migration of existing managed Sieve filters** from
+  `rainloop.user` to `nextsnapmail.user` while retaining the old script as a backup
 - **Almost all IMAP features** including advanced searching
 - **Integration with Nextcloud Unified Search**
 - **Integration with other Nextcloud apps** (Contacts, Files and Calendar)
@@ -37,6 +44,8 @@ risk.
   stored mailbox credentials, additional accounts and app data
 - **Admin reset option** to remove NextSnapMail account settings and recreate a
   clean NextSnapMail data folder when troubleshooting is needed
+- **Admin-controlled message list size**, including default value, maximum
+  value and an optional enforced setting for all users
 - **Send & receive OpenPGP encrypted/signed emails** (With full HTML support, ECC keys, or plain text with Mailvelope)
 - **Send & receive S/MIME encrypted/signed emails**
 - **Many security features** (Sodium encrypted passwords, Sec-Fetch, TOTP 2FA, DKIM, prevent tracking, etc.)
@@ -90,9 +99,9 @@ troubleshooting.
 		<lib>uuid</lib>
 		<lib>xxtea</lib>
 		<lib>zip</lib>
-		<nextcloud min-version="20" max-version="34" />
+		<nextcloud min-version="20" max-version="35" />
 -->
-		<nextcloud min-version="20" max-version="34" />
+		<nextcloud min-version="20" max-version="35" />
 	</dependencies>
 	<settings>
 		<admin-section>OCA\NextSnapMail\Settings\Section</admin-section>

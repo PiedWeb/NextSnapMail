@@ -159,10 +159,13 @@ final class PiedWebMailboxOperations
                 ++$visitedFolders;
                 try {
                     $cache = false;
-                    $criteria = (string) \MailSo\Imap\SearchCriterias::fromString($imap, $folder, $search,
+                    $parsedCriteria = \MailSo\Imap\SearchCriterias::fromString($imap, $folder, $search,
                         (bool) $settings->GetConf('HideDeleted', true), $cache);
+                    $criteria = (string) $parsedCriteria;
                     // Each result must carry one real folder: never flatten MULTISEARCH.
-                    if (\str_starts_with($criteria, 'IN (')) throw new \RuntimeException('scope');
+                    if (($parsedCriteria->folderScope ?? '') !== '' || \str_starts_with($criteria, 'IN (')) {
+                        throw new \RuntimeException('scope');
+                    }
                     $info = $imap->FolderExamine($folder, true);
                     $validity = (int) $info->UIDVALIDITY;
                     if ($validity < 1) throw new \RuntimeException('changed');

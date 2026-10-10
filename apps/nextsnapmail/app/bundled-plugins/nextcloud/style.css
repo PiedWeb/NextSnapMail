@@ -15,3 +15,13 @@
 #rl-app .squire-wysiwyg a {
 	text-decoration: underline;
 }
+
+.nextsnapmail-vacation-settings .alert {
+	max-width: 720px;
+}
+
+.nextsnapmail-vacation-settings textarea {
+	box-sizing: border-box;
+	min-height: 10em;
+	resize: vertical;
+}

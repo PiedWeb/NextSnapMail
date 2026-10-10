@@ -9,6 +9,7 @@ php tests/account-unread-counts.php
 php tests/account-unread-count-setting.php
 php tests/notification-sound-default.php
 node --test tests/account-url-context.mjs
+node --test tests/upstream-vacation.mjs
 node tests/account-unread-counts.mjs
 
 cd "$repo_root/packages/pied-web"

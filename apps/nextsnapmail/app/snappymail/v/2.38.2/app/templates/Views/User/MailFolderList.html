@@ -24,10 +24,10 @@
 			<input type="search" id="folderSearchInput" data-bind="textInput: foldersFilter" data-i18n="[placeholder]GLOBAL/SEARCH">
 			<a data-bind="click: clearFolderSearch, visible: foldersFilter">✕</a>
 		</div>
-		<div class="e-checkbox" tabindex="0" data-bind="toggle: filterUnseen">
-			<i role="checkbox" class="fontastic" data-bind="text: filterUnseen() ? '☑' : '☐'"></i>
-			<span data-i18n="SEARCH/UNSEEN"></span>
-		</div>
+		<label class="folder-list-filter" data-bind="css: {active: filterUnseen}">
+			<input type="checkbox" data-bind="checked: filterUnseen">
+			<span data-i18n="FOLDER_LIST/SHOW_ONLY_UNREAD_FOLDERS"></span>
+		</label>
 		<ul class="b-folders-user" data-bind="css: {unreadOnly: filterUnseen}, template: { name: 'MailFolderListItem', foreach: folderListVisible }"></ul>
 		<div class="move-action-content-wrapper" data-bind="visible: moveAction"></div>
 	</div>

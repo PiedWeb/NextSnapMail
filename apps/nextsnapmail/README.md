@@ -9,6 +9,16 @@ This project is now maintained as a dedicated Nextcloud app. The repository root
 is the installable app directory that belongs in a Nextcloud `apps/` folder as
 `nextsnapmail`.
 
+## Looking for a standalone webmail client?
+
+NextSnapMail is maintained specifically as a Nextcloud app.
+
+If you are looking for a more broadly developed SnappyMail-based project with
+standalone installation and additional deployment options, you may also want to
+look at [Tachyon](https://github.com/kimusan/Tachyon).
+
+Tachyon is an independent project and is not affiliated with NextSnapMail.
+
 ## About this project
 
 I maintain NextSnapMail primarily for my own private use, because I wanted to
@@ -26,6 +36,20 @@ Newest changes first:
 
 - Scoped the selected mail account to an opaque URL context, so different
   browser tabs can keep different linked mailboxes open without shared state.
+- Added a dedicated multilingual out-of-office settings page with start and
+  end dates, reply intervals and automatic Sieve capability checks.
+- Out-of-office responses can be configured separately for the main address
+  and identities of each Sieve-enabled account. Sender names and addresses are
+  taken from the account identities automatically.
+- Out-of-office settings stored by another NextSnapMail instance on the same
+  Sieve server are detected and preserved. Their addresses are shown and can
+  be removed explicitly when they are no longer needed.
+- New managed Sieve filters use `nextsnapmail.user`; existing `rainloop.user`
+  filters are preserved and can be migrated safely.
+- Added account-wide and subfolder search scopes to both the regular and
+  Advanced Search while keeping the current folder as the default.
+- Clarified the unread-folder control in the folder sidebar by presenting it as
+  a separate filter instead of an apparent parent folder.
 - Integrated Gmail / Google OAuth2 login directly into the Nextcloud app, so
   Gmail accounts can be connected from the personal settings and as additional
   accounts without requiring a separate plugin.
@@ -62,7 +86,8 @@ NextSnapMail can be configured in two places:
 
 - Nextcloud administration settings: instance-wide NextSnapMail settings
 - Nextcloud personal settings: user-specific login credentials for automatic
-  login
+  login and, when supported by the configured mail server, personal
+  out-of-office responses
 
 The embedded NextSnapMail webmail admin panel can be opened from the
 NextSnapMail administration settings in Nextcloud.
@@ -71,6 +96,27 @@ If you previously used the original SnappyMail Nextcloud app, you can use the
 NextSnapMail admin settings to import existing SnappyMail accounts and app data.
 The import is intended to copy data into NextSnapMail. It does not automatically
 overwrite the old SnappyMail installation.
+
+### Out-of-office responses
+
+When Sieve is enabled for the currently selected mail account and the server
+provides the required Sieve capabilities, users can manage out-of-office
+responses in the personal NextSnapMail settings.
+
+The main address and existing identities of the selected account are listed
+automatically. Each address can have its own sender name, active period,
+subject, message and reply interval. The interval can be set to once for the
+entire absence, once per day, once per week or a custom number of days. It is
+applied per sender, so repeated messages from the same sender do not trigger
+another response before the interval has elapsed. Mail servers may impose
+their own limit on very long intervals. Accounts without Sieve support do not
+offer editable out-of-office settings.
+
+Sieve scripts belong to the mail account rather than to a particular
+Nextcloud installation. If the same mailbox is used from multiple NextSnapMail
+instances, settings created by another instance are therefore detected and
+preserved. Such addresses are displayed separately and can be explicitly
+removed before saving if they are no longer required.
 
 ## Relationship to SnappyMail
 

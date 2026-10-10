@@ -4,6 +4,13 @@ Tags `piedweb-mail-v1.10.15` and `piedweb-mail-v1.10.16` predate a renumbering:
 they point to the compact badges (1.10.17) and one-pixel focus (1.10.18) commits.
 Published tags stay in place. 1.10.0, 1.10.1, 1.10.8, 1.10.21 and 1.10.23 have no tag.
 
+## Unreleased
+
+Preserve single-folder identities when the upstream search parser carries its
+scope in `folderScope`: reject account-wide and subtree queries before preparing
+bulk selections or cross-account snapshots. Retain the legacy MULTISEARCH guard.
+French labels now cover upstream search scopes and Sieve out-of-office settings.
+
 ## 1.10.24, 2026-10-06
 
 Complete native account-table sizing at 320px, including the principal account's

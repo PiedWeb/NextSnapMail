@@ -117,6 +117,15 @@
 		<div class="search-input-wrp">
 			<input type="search" class="inputSearch" tabindex="-1" placeholder="Search" autocorrect="off" autocapitalize="off" data-i18n="[placeholder]GLOBAL/SEARCH" data-bind="textInput: inputSearch, hasfocus: focusSearch">
 			<a class="closeSearch" data-bind="click: cancelSearch, visible: messageListSearchDesc()">×</a>
+			<div class="simple-search-scope" data-bind="event: {change: applySimpleSearchScope}">
+				<!-- ko foreach: simpleSearchScopes -->
+				<label>
+					<input type="radio" name="message-list-search-scope"
+						data-bind="value: id, checked: $parent.simpleSearchScope">
+					<span data-bind="text: name"></span>
+				</label>
+				<!-- /ko -->
+			</div>
 		</div>
 		<a class="btn buttonMoreSearch" data-bind="click: advancedSearchClick">▼</a>
 	</div>
@@ -139,7 +148,7 @@
 
 		<!-- ko if: listGrouped -->
 		<div class="messageListPlace" data-bind="dragmessages: 1, i18nUpdate: groupedList, foreach: groupedList" draggable="true">
-			<div class="groupLabel" data-bind="text: label, click: $root.groupSearch" data-i18n="[title]GLOBAL/SEARCH"></div>
+			<div class="groupLabel" data-bind="text: label, click: $root.groupSearch, attr: {title: title}"></div>
 			<!-- ko foreach: messages -->
 			<div class="messageListItem" data-bind="css: lineAsCss(), attr: {title: preview}">
 				<div class="messageCheckbox">
