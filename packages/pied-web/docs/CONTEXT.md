@@ -248,9 +248,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   boundary; keep the current note and signature before it visible and fold from the header.
 - Formatting has a compact main row and More options. Use the existing Lucide icon assets.
 - Since 1.8.6, the native editor color control keeps its built-in greys and custom-color
-  choice, but its 17 suggestions use Tailwind 600 from orange through rose, followed by
-  slate, while Pied Web is active. Restore NextSnapMail's native Tableau 10 suggestions
-  on theme exit; do not replace the browser control.
+  choice. Text ink uses 17 Tailwind 600 suggestions from orange through rose, followed
+  by slate. Since 1.10.27, highlighting uses the matching Tailwind 200 hues to keep
+  black text readable (14.06–18.05:1). Squire shares one input/datalist: switch its
+  suggestions on the colour action's capturing click, before the native picker opens,
+  including keyboard activation. Restore NextSnapMail's native Tableau 10 suggestions
+  on theme exit; do not replace the browser control or recolour existing content.
 - Images paste into the body, with browser compression modeled on Pushword's multi-upload:
   JPEG/PNG/WebP, maximum dimension 1980 px, target 1.8 MB, initial quality 0.85.
   Compression only replaces a smaller result. Animation and transparency are preserved.

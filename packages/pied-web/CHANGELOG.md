@@ -4,6 +4,13 @@ Tags `piedweb-mail-v1.10.15` and `piedweb-mail-v1.10.16` predate a renumbering:
 they point to the compact badges (1.10.17) and one-pixel focus (1.10.18) commits.
 Published tags stay in place. 1.10.0, 1.10.1, 1.10.8, 1.10.21 and 1.10.23 have no tag.
 
+## 1.10.27, 2026-10-11
+
+The highlighter offers 17 light Tailwind 200 suggestions, with 14.06–18.05:1
+contrast against black. Text ink retains its Tailwind 600 palette. Switch the
+shared native picker suggestions before pointer or keyboard activation, without
+changing Squire commands, selected text, custom colours or theme restoration.
+
 ## 1.10.26, 2026-10-11
 
 Reader-toolbar Reply and Reply all are now real links. Right-click Open in new

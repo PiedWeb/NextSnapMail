@@ -2,6 +2,7 @@ const p=await browser.getPage('nextsnapmail-toolbar-actions');await p.setViewpor
 await p.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html');await p.waitForSelector('.pw-compose-more');
 const results=[];const check=(name,ok)=>{if(!ok)throw Error(name);results.push(name);console.log('PASS',name);};
 const expectedPalette='#F54900,#E17100,#D08700,#5EA500,#00A63E,#009966,#009689,#0092B8,#0084D1,#155DFC,#4F39F6,#7F22FE,#9810FA,#C800DE,#E60076,#EC003F,#45556C';
+const highlightPalette='#FFD6A7,#FEE685,#FFF085,#D8F999,#B9F8CF,#A4F4CF,#96F7E4,#A2F4FD,#B8E6FE,#BEDBFF,#C6D2FF,#DDD6FF,#E9D4FF,#F6CFFF,#FCCEE8,#FFCCD3,#E2E8F0';
 const select=()=>p.evaluate(()=>{htmlEditor.setHtml('<div>Texte sélectionné</div>');edit.focus();const r=document.createRange();r.selectNodeContents(edit.wysiwyg.firstChild);edit.squire.setSelection(r);edit.squire.saveUndoState();});
 check('All 26 native controls retained once',await p.evaluate(()=>{const a=[...document.querySelectorAll('.squire-toolbar [data-action]')].map(n=>n.dataset.action);return a.length===26&&new Set(a).size===26;}));
 check('Main toolbar has no horizontal overflow',await p.evaluate(()=>{const n=document.querySelector('.squire-toolbar');return n.scrollWidth<=n.clientWidth+1;}));
@@ -16,8 +17,8 @@ await p.locator('.squire-wysiwyg').focus();
 const editorFocus=await p.evaluate(()=>{const s=getComputedStyle(edit.wysiwyg);return {
  width:s.borderTopWidth,color:s.borderTopColor,outlineWidth:s.outlineWidth,outlineStyle:s.outlineStyle
 };});
-check('Editor reserves the accent and visible ring for focus',parseFloat(editorFocus.width)===1
- &&editorFocus.color!==editorRest.color&&parseFloat(editorFocus.outlineWidth)===2&&editorFocus.outlineStyle==='solid');
+check('Editor strengthens its existing hairline for focus',parseFloat(editorFocus.width)===1
+ &&editorFocus.color!==editorRest.color&&editorFocus.outlineStyle==='none');
 check('Color suggestions use Tailwind 600',await p.evaluate(expected=>[...document.querySelectorAll('#squire-colors option')].map(n=>n.value).join(',')===expected,expectedPalette));
 await select();await p.click('[data-action=bold]');check('Native Bold acts on the selected text',await p.evaluate(()=>edit.wysiwyg.querySelector('b,strong')?.textContent==='Texte sélectionné'));
 await p.click('[data-action=undo]');check('Native Undo removes applied bold',await p.evaluate(()=>!edit.wysiwyg.querySelector('b,strong')));
@@ -29,10 +30,23 @@ await select();await p.click('.pw-compose-more');check('Advanced options expand 
 await p.selectOption('[data-action=fontSize]','20px');check('Font size selection preserves native formatting',await p.evaluate(()=>[...edit.wysiwyg.querySelectorAll('[style]')].some(n=>n.style.fontSize==='20px')));
 await select();await p.evaluate(()=>{window.toolbarPrompt=window.prompt;window.prompt=()=> 'https://example.test/document';});await p.click('[data-action=link]');await p.evaluate(()=>window.prompt=window.toolbarPrompt);
 check('Native link command applies to the selected text',await p.evaluate(()=>edit.wysiwyg.querySelector('a')?.getAttribute('href')==='https://example.test/document'));
-await select();await p.evaluate(()=>{window.toolbarInputClick=HTMLInputElement.prototype.click;HTMLInputElement.prototype.click=function(){if(this.type==='color'){window.clickedColor=this;return;}if(this.type==='file'){window.clickedFile=this;return;}return toolbarInputClick.call(this);};});
+await select();await p.evaluate(()=>{window.toolbarInputClick=HTMLInputElement.prototype.click;HTMLInputElement.prototype.click=function(){if(this.type==='color'){window.clickedColor=this;window.openedPalette=[...document.querySelectorAll('#squire-colors option')].map(o=>o.value);return;}if(this.type==='file'){window.clickedFile=this;return;}return toolbarInputClick.call(this);};});
 await p.click('[data-action=textColor]');await p.waitForFunction(()=>window.clickedColor);
+check('Text color opens the unchanged Tailwind 600 palette',await p.evaluate(expected=>openedPalette.join(',')===expected,expectedPalette));
 await p.evaluate(()=>{clickedColor.value='#245a68';clickedColor.dispatchEvent(new Event('change',{bubbles:true}));});
 check('Native color input and formatting are preserved',await p.evaluate(()=>[...edit.wysiwyg.querySelectorAll('[style]')].some(n=>n.style.color==='rgb(36, 90, 104)')));
+await select();await p.click('[data-action=backgroundColor]');
+await p.waitForFunction(expected=>window.openedPalette?.join(',')===expected,highlightPalette);
+check('Highlight opens Tailwind 200 before the native picker',await p.evaluate(expected=>openedPalette.join(',')===expected,highlightPalette));
+check('Every highlight has AAA contrast with black and dark grey',await p.evaluate(()=>{
+    const luminance=hex=>{const channels=hex.slice(1).match(/../g).map(c=>parseInt(c,16)/255).map(c=>c<=.04045?c/12.92:((c+.055)/1.055)**2.4);return channels.reduce((sum,c,i)=>sum+c*[.2126,.7152,.0722][i],0);};
+    return openedPalette.length===17&&openedPalette.every(hex=>(luminance(hex)+.05)/.05>=14&&(luminance(hex)+.05)/(luminance('#303030')+.05)>=7);
+}));
+await p.evaluate(()=>{clickedColor.value='#fff085';clickedColor.dispatchEvent(new Event('change',{bubbles:true}));});
+check('Native highlighting preserves the selected text and serializes its color',await p.evaluate(()=>[...edit.wysiwyg.querySelectorAll('[style]')].some(n=>n.style.backgroundColor==='rgb(255, 240, 133)'&&n.textContent==='Texte sélectionné')&&htmlEditor.getData().includes('background-color')));
+await p.locator('[data-action=textColor]').focus();await p.locator('[data-action=textColor]').press('Enter');
+await p.waitForFunction(expected=>openedPalette.join(',')===expected,expectedPalette);
+check('Keyboard activation switches back to the ink palette',await p.evaluate(expected=>openedPalette.join(',')===expected,expectedPalette));
 await p.click('[data-action=imageUpload]');check('Image upload still invokes the native file picker',await p.evaluate(()=>clickedFile?.accept==='image/*'));await p.evaluate(()=>HTMLInputElement.prototype.click=toolbarInputClick);
 await p.locator('[data-action=fontSize]').press('Escape');check('Escape closes only the advanced row and returns focus',await p.evaluate(()=>document.querySelector('.pw-compose-extra').hidden&&document.activeElement.classList.contains('pw-compose-more')&&document.querySelector('#V-PopupsCompose').open));
 await p.click('[data-action=source]');check('Source hides formatting but keeps view controls',await p.evaluate(()=>edit.mode==='source'&&!document.querySelector('.pw-compose-more').getClientRects().length&&!!document.querySelector('[data-action=markdown]').getClientRects().length));
@@ -46,6 +60,14 @@ check('Returning to theme restores Tailwind color suggestions',await p.evaluate(
 await p.setViewportSize({width:320,height:900});await p.waitForSelector('.pw-compact-tools');await p.click('.pw-compose-more');
 check('Mobile keeps all actions reachable with 44px targets',await p.evaluate(()=>[...document.querySelectorAll('.squire-toolbar [data-action]')].every(n=>n.getBoundingClientRect().height>=43.9)));
 check('Mobile advanced row remains inside viewport and above editor',await p.evaluate(()=>{const a=document.querySelector('.pw-compose-extra'),r=a.getBoundingClientRect();return r.left>=0&&r.right<=innerWidth&&r.bottom<=edit.wysiwyg.getBoundingClientRect().top+1&&a.scrollWidth<=a.clientWidth+1;}));
+await p.evaluate(()=>{document.documentElement.dataset.themes='dark';HTMLInputElement.prototype.click=function(){if(this.type==='color'){window.openedPalette=[...document.querySelectorAll('#squire-colors option')].map(o=>o.value);return;}return toolbarInputClick.call(this);};});
+await p.click('[data-action=backgroundColor]');await p.waitForFunction(expected=>openedPalette.join(',')===expected,highlightPalette);
+check('Dark mobile uses the same email-safe highlighting palette',await p.evaluate(expected=>openedPalette.join(',')===expected,highlightPalette));
+await p.evaluate(()=>{document.documentElement.classList.remove('pw-theme');});
+check('Leaving the theme after highlighting restores native suggestions',await p.evaluate(()=>document.querySelector('#squire-colors option').value==='#4E79A7'));
+await p.evaluate(()=>{document.documentElement.classList.add('pw-theme');});
+check('Returning to the theme restores the selected highlight palette',await p.evaluate(expected=>[...document.querySelectorAll('#squire-colors option')].map(o=>o.value).join(',')===expected,highlightPalette));
+await p.evaluate(()=>HTMLInputElement.prototype.click=toolbarInputClick);await p.click('.pw-compose-more');
 await select();await p.click('[data-action=ol]');check('Advanced mobile list command is still native',await p.evaluate(()=>!!edit.wysiwyg.querySelector('ol li')));
 check('No runtime errors',await p.evaluate(()=>!fixtureErrors.length));
 console.log(JSON.stringify({passed:results.length,results},null,2));

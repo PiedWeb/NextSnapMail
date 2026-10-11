@@ -4,11 +4,19 @@
     let sequence = 0;
     const icons = window.PiedWebUx?.composerIcons;
     if (!icons) return;
-    const editorPalette = [
+    const textPalette = [
         '#F54900', '#E17100', '#D08700', '#5EA500', '#00A63E', '#009966',
         '#009689', '#0092B8', '#0084D1', '#155DFC', '#4F39F6', '#7F22FE',
         '#9810FA', '#C800DE', '#E60076', '#EC003F', '#45556C'
     ];
+    // Tailwind 200, converted to sRGB hex for the native color input and email HTML.
+    // Every suggestion exceeds 14:1 against black (8.8:1 against #303030).
+    const highlightPalette = [
+        '#FFD6A7', '#FEE685', '#FFF085', '#D8F999', '#B9F8CF', '#A4F4CF',
+        '#96F7E4', '#A2F4FD', '#B8E6FE', '#BEDBFF', '#C6D2FF', '#DDD6FF',
+        '#E9D4FF', '#F6CFFF', '#FCCEE8', '#FFCCD3', '#E2E8F0'
+    ];
+    let paletteAction = 'textColor';
     let nativeEditorPalette;
     const replacePalette = (list, colors) => {
         if (list) list.replaceChildren(...colors.map(color => new Option(color)));
@@ -18,7 +26,8 @@
         const list = document.getElementById('squire-colors');
         if (!list) return;
         nativeEditorPalette ||= [...list.options].map(option => option.value);
-        replacePalette(list, active() ? editorPalette : nativeEditorPalette);
+        const palette = paletteAction === 'backgroundColor' ? highlightPalette : textPalette;
+        replacePalette(list, active() ? palette : nativeEditorPalette);
     };
     new MutationObserver(syncPalette).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
     const fr = () => (document.documentElement.lang || 'fr').startsWith('fr');
@@ -41,6 +50,15 @@
         queueMicrotask(() => {
             const toolbar = container.querySelector('.squire-toolbar');
             if (!toolbar || !actions.views) return;
+            // Squire shares one native input/datalist for ink and highlighting.
+            // Capture both pointer and keyboard clicks before it opens the picker.
+            toolbar.addEventListener('click', event => {
+                const action = event.target.closest('[data-action]')?.dataset.action;
+                if (action === 'textColor' || action === 'backgroundColor') {
+                    paletteAction = action;
+                    syncPalette();
+                }
+            }, true);
             const original = [...toolbar.childNodes];
             const children = original.filter(n=>n.nodeType===1 && n.classList.contains('btn-group')).map(group=>[group,[...group.childNodes]]);
             const controls = [...toolbar.querySelectorAll('[data-action]')];
