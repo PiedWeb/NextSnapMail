@@ -152,7 +152,7 @@
 
     function wantsInline(type, message) {
         const host = activeHost(), sourceKey = messageKey(message), currentKey = messageKey(readerVM?.message?.());
-        return replyTypes.has(Number(type)) && fitsInline(host)
+        return !api.replyLinks?.opening && replyTypes.has(Number(type)) && fitsInline(host)
             && document.documentElement.classList.contains('pw-theme')
             && (!sourceKey || !currentKey || sourceKey === currentKey);
     }

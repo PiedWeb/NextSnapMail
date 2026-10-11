@@ -1,5 +1,5 @@
 {
-  "version": "1.10.25",
+  "version": "1.10.26",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.16",
@@ -35,8 +35,8 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "28a04e2f0737f5ccbc152bbf34404133ba70354cdcef670a6361b11a80fe2df1",
-    "plugin/pied-web-ux/inline-reply.js": "56e7c77bc46bad4b5ba18384dc5c7d8fa6f360439fb2177b798e233dee920676",
+    "plugin/pied-web-ux/index.php": "ffdf2456306cb8384f5496fe2217783599de1eb152dab64aee2c952ce2872f4d",
+    "plugin/pied-web-ux/inline-reply.js": "0c459e8efa15a3b68d9d9b08038fbaa03cce21b4fdae9d65cc96cf83880376f0",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",
     "plugin/pied-web-ux/left-panel-state.js": "f3970d887448903d92d53eb700abad0073da0c8e0967cfbe545be4f8f8356ebd",
@@ -54,6 +54,7 @@
     "plugin/pied-web-ux/native-components.js": "f3f5d14c48d949baec93b050dbd2cf2178da7214137f3ae409d67ed28a02b7e5",
     "plugin/pied-web-ux/quote-readability.js": "313ece139d33c6b9f786937f7f073625db36748bb3a1cb3ed9e7ef7c22ed1f66",
     "plugin/pied-web-ux/reminders.js": "21a1915d5409f5a754b7e50ec3c6107eac2e175546dc2e2a42eac497a4894b6b",
+    "plugin/pied-web-ux/reply-links.js": "d3f950ed4b85ed62422ade9d90c44e06e93602174907fcd66ee938ca34b8c33d",
     "plugin/pied-web-ux/scheduled-send.js": "2f212c85ab12678588d2c528841313ba4864bb7a458f269cbd105a0dbe956c8a",
     "plugin/pied-web-ux/send-delay.js": "282a62c55131fc28ace31069e736733e89e6879fcfe0d00af59e6d811b7db6f7",
     "plugin/pied-web-ux/squire-license.txt": "dfc8ece415ad5f0d71c5d40165465854e087ac3f4e150fa25bd169b4b48cad69",
@@ -61,11 +62,11 @@
     "plugin/pied-web-ux/squire-next-vendor.js": "2fc7ce78b2e3a73bc81d3d143725fea4e424a778434f5982d53db233599ab981",
     "plugin/pied-web-ux/squire-next.js": "939b24b5d857593bbbc150be24535b28b2701909c4abe40453689dec808a96d4",
     "plugin/pied-web-ux/squire-source.json": "cfc21302bd1e07c434164963622b90fb587e864c830377ac3b128a2878151b6c",
-    "plugin/pied-web-ux/studio.js": "9892a5876d07afa61d2a47d3c2bceb98b982fe2f154ad79b822d876aa649bcbb",
+    "plugin/pied-web-ux/studio.js": "fe1679b228c078f1b8b049639b3d8816fecbda08b3beb2bd5ac318d7bce08492",
     "plugin/pied-web-ux/unread-drafts.js": "18c3393a6d66b3484e86009c80d0f93d19595bcb109aa522ea71807d5acf33c7",
     "plugin/pied-web-ux/unread-order.js": "0aedbc92858a47d832a9b2c7ad1ad8d4ba0792ff7df49c24efb0c72533549139",
     "plugin/pied-web-ux/ux.css": "6a1e81ac4adaee2a1cb31944cd90bac57b85116551bcbca88239520cbce4fb35",
-    "plugin/pied-web-ux/ux.js": "d11eb1b01d4ded6a98c9eb7a68744b6fc5cde58224c8708872531bcd4d34e38d",
+    "plugin/pied-web-ux/ux.js": "46c3a9445292b1216ea16e719decf5d78111e4cff18644854dbaceaab1cf3854",
     "theme/PiedWeb/snappymail/pied-web-ui-latin-ext.woff2": "38f1483ab1f20c8fa86347c83dc20fff5e68bc198aaf2cd8679b2a4db233403b",
     "theme/PiedWeb/snappymail/pied-web-ui-latin.woff2": "21831cc7940800de3c8a0c0760cd001d110090fc6f0f7c02387ca1256649a56c",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
@@ -79,17 +80,17 @@
       "Default SoundNotification to false while preserving explicit user settings"
     ],
     "files": {
-      "app/libraries/RainLoop/Actions.php": "fbd39d81ffad23ec96b5be9594dedc8115957ba7b3ed7d3513c9a084007ffcba",
+      "app/libraries/RainLoop/Actions.php": "d7a73e60b8988770bc614e320dbbea70d4fb9242f84b741fc2e8eb49d6e1995a",
       "app/libraries/RainLoop/Actions/Accounts.php": "114b08e8a21398cafd32b4a6a66e16f025fd4d780f9fcb7ca049408f9a44e300",
       "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
-      "app/libraries/RainLoop/Actions/User.php": "f8102dfe66b411964d9e28f6ac693788d4425b82fbcda5bc3d6465d58c0e0c0f",
+      "app/libraries/RainLoop/Actions/User.php": "bf7bc9e8953212f5d86be8a1d498f785cda54b163a250f005dea16d8e7c93aae",
       "app/libraries/RainLoop/ServiceActions.php": "d224923aac286432ccf9f9965cdcca3198194fafa0cb7f2406d2538a18b74741",
-      "static/js/app.js": "b17dc65b693c599dc8ac2daa1b81220bfad141c85e73bf56ef4348f6666aec57",
-      "static/js/boot.js": "1ab8387890f24763a38c6fae03c2c1ccd62b4876a6b945f48498487908e9bf95",
-      "static/js/min/app.min.js": "62b1a0ec1f718445fb207fe0f208229d791bdffec8966ba5d99d31b709a5be88",
-      "static/js/min/app.min.js.gz": "99eee0b4ac4218b06a9cee2ef7ab26702e9a3a59e1fc3c6da57f6f2e30df98b0",
-      "static/js/min/app.min.js.br": "e379becdf1510954be2e99c355d33aacbdfae5e9c87a6031dc3c7c40f4fa7f33",
-      "static/js/min/boot.min.js": "fde762de3ddaffccdd7a880da98b4b3608810824a5ca784feaa252e64b5abd0e"
+      "static/js/app.js": "662946be14c1772d2f20efde158c5d3d56077fc6516dc778c7a329a77b88e9b4",
+      "static/js/boot.js": "290da0fa53a9745da67bb0abaf8ad36cf948ce0ec382d5cfcd0678846d4dbd90",
+      "static/js/min/app.min.js": "551c1153f328b3f4e1aff67f57ef39099a4b048eeaa4964600474c6909820bbf",
+      "static/js/min/app.min.js.gz": "10c96103191d34736f0e1b03e04ce5c120bb2430dc4010fdfc74aeaedee0470e",
+      "static/js/min/app.min.js.br": "97ab97a24b1052a9810670f5973d8fb801d9942eb43d1aebf10c88ab26748953",
+      "static/js/min/boot.min.js": "ff25870af42f2390a54ba86eb668366caff1a3fa20ef5a3f0f3eb4e428225a27"
     }
   }
 }

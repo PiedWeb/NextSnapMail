@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="fr"><meta charset="utf-8"><title>Fictional Nextcloud reply host</title>
+<iframe title="Mail fixture" style="width:100%;height:90vh;border:0"></iframe>
+<script>
+// Match PageController's existing account/target forwarding contract.
+const params=new URLSearchParams(location.search);
+const url=new URL('images-native-preview.html',location.href);
+url.search=new URLSearchParams({mode:'reader',replyFixture:'1',account:params.get('account')||'a'.repeat(40)});
+url.hash=params.get('target')||'';
+document.querySelector('iframe').src=url.href;
+</script></html>

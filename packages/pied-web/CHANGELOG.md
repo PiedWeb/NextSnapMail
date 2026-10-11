@@ -4,6 +4,15 @@ Tags `piedweb-mail-v1.10.15` and `piedweb-mail-v1.10.16` predate a renumbering:
 they point to the compact badges (1.10.17) and one-pixel focus (1.10.18) commits.
 Published tags stay in place. 1.10.0, 1.10.1, 1.10.8, 1.10.21 and 1.10.23 have no tag.
 
+## 1.10.26, 2026-10-11
+
+Reader-toolbar Reply and Reply all are now real links. Right-click Open in new
+tab, middle-click and Ctrl/Cmd+click open the full native composer in a separate
+tab, on the same opaque account and exact source message. Plain click, Enter and
+Space keep the existing native command and inline-reply workflow. Consume the
+startup intent once, wait for the matching loaded body, and preserve Nextcloud's
+iframe shell and native folder hashes. Reloading does not create a second reply.
+
 ## 1.10.25, 2026-10-10
 
 Preserve single-folder identities when the upstream search parser carries its

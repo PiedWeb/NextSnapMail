@@ -245,8 +245,8 @@
             const actions = document.createElement('div');
             actions.className = 'pw-message-actions btn-group';
             actions.innerHTML = `
-                <button type="button" class="btn pw-reply fontastic" data-label="MESSAGE/BUTTON_REPLY" data-bind="command: replyCommand, visible: canBeRepliedOrForwarded"><span aria-hidden="true">←</span></button>
-                <button type="button" class="btn pw-reply-all fontastic" data-label="MESSAGE/BUTTON_REPLY_ALL" data-bind="command: replyAllCommand, visible: canBeRepliedOrForwarded"><span aria-hidden="true">↞</span></button>
+                <a class="btn pw-reply fontastic" data-label="MESSAGE/BUTTON_REPLY" data-bind="pwReply: {command: replyCommand, mode: 'reply'}, visible: canBeRepliedOrForwarded"><span aria-hidden="true">←</span></a>
+                <a class="btn pw-reply-all fontastic" data-label="MESSAGE/BUTTON_REPLY_ALL" data-bind="pwReply: {command: replyAllCommand, mode: 'reply-all'}, visible: canBeRepliedOrForwarded"><span aria-hidden="true">↞</span></a>
                 <button type="button" class="btn pw-mark-unread" data-label="MESSAGE_LIST/MENU_UNSET_SEEN" data-bind="click: setUnseen, enable: messageVisible, visible: messageVisible"><span aria-hidden="true">✉</span></button>`;
             translatedButtons(actions);
             toolbar.querySelector('.buttonUp')?.closest('.btn-group').before(actions);

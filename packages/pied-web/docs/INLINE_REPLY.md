@@ -1,5 +1,20 @@
 # Inline replies
 
+Since 1.10.26, the top reader toolbar's **Reply** and **Reply all** are links.
+The browser's context menu, middle-click and Ctrl/Cmd+click can open a separate
+tab. That tab opens the full native composer; an ordinary click, Enter or Space
+continues to use the existing reply command and the inline rules below.
+
+`reply-links.js` binds the destination to the active message and account.
+The folder's `fullNameHash` comes from `rl.app.folderList`, including nested
+folders and a conversation's Sent source. No message body, subject, recipients
+or credential is placed in the link. The suffix `/pw-reply` or `/pw-reply-all`
+is stripped before native routing, including the outer iframe `target` URL.
+Only the matching account, folder and UID with a loaded body can consume the
+intent. Navigation cancels it; reload cannot create another composer. Disabled
+commands lose their href and keyboard tab stop. Inline reader locking remains
+in place through the original command names in the binding.
+
 Since 1.8.7, **Reply** and **Reply all** opened from an active Inbox conversation use
 the bottom of `.pw-conversation-active`. New messages, forwards, Draft resumes and replies
 outside that reader remain full native popups.
@@ -47,6 +62,7 @@ Validation is fictional and transport-free:
 ```sh
 dev-browser-agent --timeout 45 < tests/browser/test-inline-reply.js
 dev-browser-agent --timeout 30 < tests/browser/test-reply-priority.js
+dev-browser-agent --timeout 45 < tests/browser/test-reply-links.js
 dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
 dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
 ```

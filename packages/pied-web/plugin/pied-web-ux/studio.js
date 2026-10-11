@@ -53,7 +53,7 @@
             }
         });
         const keyboardButton=node=>{
-            if(!node || node.tagName==='BUTTON' || node.dataset.pwKeyboard) return;
+            if(!node || node.tagName==='BUTTON' || node.dataset.pwKeyboard || node.matches('[data-bind*="pwReply:"]')) return;
             node.dataset.pwKeyboard='1';node.setAttribute('role','button');node.tabIndex=0;
             node.addEventListener('keydown',e=>{if(e.key===' ' || (e.key==='Enter' && !node.hasAttribute('href'))){e.preventDefault();node.click();}});
         };

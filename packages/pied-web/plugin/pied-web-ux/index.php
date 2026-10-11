@@ -4,8 +4,8 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.10.25',
-        RELEASE = '2026-10-10',
+        VERSION = '1.10.26',
+        RELEASE = '2026-10-11',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
         DESCRIPTION = 'Accessible message actions for the Pied Web theme, using native mail commands.';
@@ -28,6 +28,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
         $this->addJs('feed.js');
         $this->addJs('folder-rail.js');
         $this->addJs('inbox-conversations.js');
+        $this->addJs('reply-links.js');
         $this->addJs('ux.js');
         $this->addJs('unread-order.js');
         $this->addJs('studio.js');

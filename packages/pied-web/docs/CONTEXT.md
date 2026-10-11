@@ -139,6 +139,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   for focus instead of accumulating a border and an outer ring.
 - Mobile keeps the active account domain visible; use the full address where space permits.
 - Reply/Reply all/Mark unread share the reader toolbar with existing actions. Menus keep labels.
+- Since 1.10.26 the top Reply/Reply all actions are native browser links. Preserve
+  normal command dispatch and inline replies, but let context-menu/modified
+  clicks open the full composer in another tab. Resolve the native folder hash
+  from `rl.app.folderList`; carry the tab's opaque account and source UID. Consume
+  the startup suffix once before routing, also in the iframe's outer `target`.
+  Never initialize from an incomplete body or a different account/folder/UID.
 - Since 1.8.7, Reply and Reply all dock the one native composer at the bottom of an active
   Inbox conversation. Keep `modalVisible` true and use the dialog's non-modal `show()` state;
   a merely styled closed dialog is inert. Expand must promote that exact bound DOM with its
