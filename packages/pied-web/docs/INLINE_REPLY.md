@@ -15,6 +15,23 @@ intent. Navigation cancels it; reload cannot create another composer. Disabled
 commands lose their href and keyboard tab stop. Inline reader locking remains
 in place through the original command names in the binding.
 
+Since 1.10.30, the bottom Reply/Reply all/Forward actions and their More-menu
+entries share these links. Forward uses `/pw-forward` and the same exact-source
+guard. New message, including the mobile header, uses `/pw-compose` on the
+account's Inbox route: it opens a blank native composer without reading a source
+message. Native controls keep their existing KO click/command bindings and
+compose-in-edit state. A capturing handler bypasses those bindings only for
+modified clicks, since the native KO handler otherwise cancels navigation.
+Space activates once; Enter retains the anchor's normal activation.
+
+Every startup composition also waits for SystemDropDown's native `accounts`
+observable to be populated. SnappyMail 2.38.2 starts its screens before
+`loadAccountsAndIdentities()`: constructing Compose on the view-ready event
+alone can fail because `IdentityUserStore()[0]` is still absent. That response
+populates accounts and then identities synchronously; the queued native command
+runs after the callback completes. No extra account request or identity copy is
+needed. Native KO takes disposal options as its second computed argument.
+
 Since 1.8.7, **Reply** and **Reply all** opened from an active Inbox conversation use
 the bottom of `.pw-conversation-active`. New messages, forwards, Draft resumes and replies
 outside that reader remain full native popups.
@@ -63,6 +80,7 @@ Validation is fictional and transport-free:
 dev-browser-agent --timeout 45 < tests/browser/test-inline-reply.js
 dev-browser-agent --timeout 30 < tests/browser/test-reply-priority.js
 dev-browser-agent --timeout 45 < tests/browser/test-reply-links.js
+dev-browser-agent --timeout 45 < tests/browser/test-compose-links.js
 dev-browser-agent --timeout 75 < tests/browser/test-send-now.js
 dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
 ```

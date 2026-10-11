@@ -145,6 +145,13 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   from `rl.app.folderList`; carry the tab's opaque account and source UID. Consume
   the startup suffix once before routing, also in the iframe's outer `target`.
   Never initialize from an incomplete body or a different account/folder/UID.
+- Since 1.10.30, bottom replies, Forward, corresponding More-menu entries and
+  New message also carry browser links. Retain native bound controls and their
+  existing-draft state; only modified clicks bypass KO's native cancellation.
+  Blank compose links use the active account's Inbox and never load a source.
+  Startup compose commands wait for the native SystemDropDown account observable:
+  2.38.2 starts screens before its AccountsAndIdentities response. Its callback
+  fills accounts and identities together; queue the command after that callback.
 - Since 1.8.7, Reply and Reply all dock the one native composer at the bottom of an active
   Inbox conversation. Keep `modalVisible` true and use the dialog's non-modal `show()` state;
   a merely styled closed dialog is inert. Expand must promote that exact bound DOM with its

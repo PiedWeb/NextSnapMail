@@ -53,7 +53,7 @@
             }
         });
         const keyboardButton=node=>{
-            if(!node || node.tagName==='BUTTON' || node.dataset.pwKeyboard || node.matches('[data-bind*="pwReply:"]')) return;
+            if(!node || node.tagName==='BUTTON' || node.dataset.pwKeyboard || node.dataset.pwComposeMode || node.matches('[data-bind*="pwReply:"]')) return;
             node.dataset.pwKeyboard='1';node.setAttribute('role','button');node.tabIndex=0;
             node.addEventListener('keydown',e=>{if(e.key===' ' || (e.key==='Enter' && !node.hasAttribute('href'))){e.preventDefault();node.click();}});
         };
@@ -253,7 +253,7 @@
             const body = dom.querySelector('.bodyText');
             if (body) {
                 const footer = document.createElement('div'); footer.className = 'pw-reading-actions';
-                footer.innerHTML = `<button type="button" class="btn pw-reading-reply pw-reading-reply-all" data-pw-icon="reply-all" data-bind="command: replyAllCommand, visible: canBeRepliedOrForwarded() && pwPreferReplyAll()">${fr() ? 'Répondre à tous' : 'Reply all'}</button><button type="button" class="btn pw-reading-reply pw-reading-reply-one" data-pw-icon="reply" data-bind="command: replyCommand, visible: canBeRepliedOrForwarded() && !pwPreferReplyAll()">${fr() ? 'Répondre' : 'Reply'}</button><button type="button" class="btn pw-reading-forward" data-pw-icon="forward" data-bind="command: forwardCommand, visible: canBeRepliedOrForwarded">${fr() ? 'Transférer' : 'Forward'}</button>`;
+                footer.innerHTML = `<a class="btn pw-reading-reply pw-reading-reply-all" data-pw-icon="reply-all" data-bind="pwReply: {command: replyAllCommand, mode: 'reply-all'}, visible: canBeRepliedOrForwarded() && pwPreferReplyAll()">${fr() ? 'Répondre à tous' : 'Reply all'}</a><a class="btn pw-reading-reply pw-reading-reply-one" data-pw-icon="reply" data-bind="pwReply: {command: replyCommand, mode: 'reply'}, visible: canBeRepliedOrForwarded() && !pwPreferReplyAll()">${fr() ? 'Répondre' : 'Reply'}</a><a class="btn pw-reading-forward" data-pw-icon="forward" data-bind="pwReply: {command: forwardCommand, mode: 'forward'}, visible: canBeRepliedOrForwarded">${fr() ? 'Transférer' : 'Forward'}</a>`;
                 body.after(footer);
                 ko.applyBindingAccessorsToNode(footer,{template:()=>({nodes:Array.from(footer.childNodes)})},vm);
             }
@@ -291,8 +291,8 @@
             scheduleGrouping();
             const header = document.createElement('div');
             header.className = 'pw-mobile-header';
-            const folders = document.createElement('button'), compose = document.createElement('button');
-            folders.type = compose.type = 'button';
+            const folders = document.createElement('button'), compose = document.createElement('a');
+            folders.type = 'button';
             folders.className = compose.className = 'btn';
             folders.dataset.pwIcon = 'menu'; compose.dataset.pwIcon = 'compose';
             folders.setAttribute('aria-label', fr() ? 'Afficher les dossiers' : 'Show folders');
@@ -308,7 +308,8 @@
             });
             new MutationObserver(updateNavigation).observe(document.getElementById('rl-right'),{attributes:true,attributeFilter:['class']});
             updateNavigation();
-            compose.addEventListener('click', () => vm.composeClick());
+            compose.setAttribute('data-bind', "pwReply: {command: composeClick, mode: 'compose'}");
+            ko.applyBindingAccessorsToNode(compose,{pwReply:()=>({command:vm.composeClick, mode:'compose'})},vm);
             const identity = document.createElement('div'); identity.className = 'pw-mobile-identity';
             const searchToggle=document.createElement('button'); searchToggle.type='button'; searchToggle.className='btn pw-search-toggle'; searchToggle.dataset.pwIcon='search';
             searchToggle.textContent=fr() ? 'Chercher' : 'Search';

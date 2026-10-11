@@ -356,7 +356,7 @@ const fixtureSentFolder=()=>fixtureAccountHash()===fixtureHashB?'INBOX.Sent':'Se
 window.rl={settings:{get:key=>({Theme:'PiedWeb@nextcloud',useThreads:new URLSearchParams(location.search).get('threads')==='1',UseThreads:false,Email:fixtureCurrentAccount(),accountHash:fixtureAccountHash(),SentFolder:fixtureSentFolder(),Nextcloud:{CalDAV:true}})[key]},i18n:key=>labels[key]||key,registerWYSIWYG:(name,construct)=>fixtureWysiwygs.push({name,construct}),app:{Remote:{saveSetting:(key,value,cb)=>{actionCalls.push([key,value]);cb(999);},request:(action,callback,requestParams,timeout,path)=>{actionCalls.push(['request',action,requestParams,path]);if(action==='MessageList'&&window.fixtureMessageListResponse&&callback)setTimeout(()=>callback(0,structuredClone(window.fixtureMessageListResponse),false),0);}}}};
 document.querySelectorAll('[data-bind]').forEach(el=>{
   if (/notSpamCommand|undeleteCommand|editCommand/.test(el.dataset.bind)) el.remove();
-  else el.removeAttribute('data-bind');
+  else if(!el.matches('.buttonCompose') && !(el.closest('#V-MailMessageView') && el.matches('a') && /^command: (replyCommand|replyAllCommand|forwardCommand)$/.test(el.dataset.bind)))el.removeAttribute('data-bind');
 });
 document.querySelectorAll('[data-i18n]').forEach(el=>{
  const key=el.dataset.i18n;
@@ -396,7 +396,7 @@ const fixtureAccountRows=[
  {email:'alex@example.test',name:'Personnel',accountHash:fixtureHashA},
  ...(fixtureAccountCount>1?[{email:'hello@example.test',name:'Pied Web',accountHash:fixtureHashB}]:[])
 ];
-const fixtureAccounts=ko.observableArray(new URLSearchParams(location.search).has('accountsLoading')?[]:fixtureAccountRows);
+const fixtureAccounts=ko.observableArray(new URLSearchParams(location.search).has('accountsLoading')||new URLSearchParams(location.search).has('identitiesDelayed')?[]:fixtureAccountRows);
 if(new URLSearchParams(location.search).has('accountsLoading'))setTimeout(()=>fixtureAccounts(fixtureAccountRows),80);
 window.systemVM={viewModelTemplateID:'SystemDropDown',viewModelDom:document.getElementById('V-SystemDropDown'),accountEmail:ko.observable(fixtureCurrentAccount()),accounts:fixtureAccounts};
 const fixtureFolder=new URLSearchParams(location.search).get('folder')||'INBOX';
@@ -450,6 +450,12 @@ if(new URLSearchParams(location.search).has('replyFixture')){
 }
 
 window.folderVM={currentFolder:ko.observable({localName:ko.observable(fixtureFolder==='INBOX'?'Boîte de réception':fixtureFolder),fullName:fixtureFolder,unreadEmails:ko.observable(16)}),viewModelTemplateID:'MailFolderList',viewModelDom:document.getElementById('V-MailFolderList'),filterUnseen:ko.observable(false),toggleLeftPanel:()=>document.documentElement.classList.toggle('rl-left-panel-disabled')};
+folderVM.composeClick=listVM.composeClick;folderVM.composeInEdit=listVM.composeInEdit;
+for(const vm of [folderVM,listVM])vm.viewModelDom.querySelectorAll('.buttonCompose').forEach(node=>ko.applyBindingAccessorsToNode(node,{click:()=>vm.composeClick,css:()=>({'btn-warning':vm.composeInEdit(),'btn-success':!vm.composeInEdit()})},vm));
+readerVM.viewModelDom.querySelectorAll('.dropdown-menu a[data-bind]').forEach(node=>{
+ const match=node.dataset.bind.match(/^command: (replyCommand|replyAllCommand|forwardCommand)$/);
+ if(match)ko.applyBindingAccessorsToNode(node,{command:()=>readerVM[match[1]]},readerVM);
+});
 const params=new URLSearchParams(location.search), mode=params.get('mode')||'reader';
 document.getElementById('rl-right').classList.toggle('message-selected',mode==='reader');
 const mobile=matchMedia('(max-width:799px)');
@@ -529,7 +535,8 @@ window.bindFixtureTagMenu=group=>{
 };
 bindFixtureTagMenu(document.querySelector('.messageTags .btn-group'));
 window.fixtureMenuTemplate=document.querySelector('#more-view-dropdown-id').parentNode.querySelector('[class="dividerbar"]:last-child')?.innerHTML;
-for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));</script></html><script src="/.local-work/app-shell-fixture.js"></script><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
+for(const vm of [systemVM,folderVM,listVM,readerVM,{viewModelTemplateID:'SettingsPane',viewModelDom:document.getElementById('V-SettingsPane')}])dispatchEvent(new CustomEvent('rl-view-model',{detail:vm}));
+if(params.has('startupHashchange'))dispatchEvent(new Event('hashchange'));</script></html><script src="/.local-work/app-shell-fixture.js"></script><script src="/.local-work/images-native.js"></script><script src="/.local-work/markdown-native.js?images=166a"></script>
 <script src="/.local-work/pied-web-ux/markdown-vendors.js?images=166a"></script>
 <script src="/.local-work/pied-web-ux/markdown.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-icons.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-toolbar.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-vendor.js?images=166a"></script><script src="/.local-work/pied-web-ux/image-tools.js?images=166a"></script><script src="/.local-work/pied-web-ux/composer-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/attachment-images.js?images=166a"></script><script src="/.local-work/pied-web-ux/reminders.js"></script>
 <style>

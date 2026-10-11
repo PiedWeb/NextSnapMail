@@ -1,4 +1,4 @@
-/* Native reader commands with browser links and a one-shot reply intent. */
+/* Native compose commands with browser links and a one-shot startup intent. */
 (() => {
     'use strict';
     const api = window.PiedWebUx = window.PiedWebUx || {};
@@ -17,9 +17,15 @@
         return folder && /^[1-9][0-9]*$/.test(String(message.uid))
             ? '/mailbox/' + folder.fullNameHash + '/m' + message.uid : '';
     };
-    const intent = location.hash.match(/^(#\/mailbox\/([a-z0-9.~_-]+)\/m([1-9][0-9]*))\/pw-(reply|reply-all)$/i);
-    let pending = intent && {hash:intent[1], uid:intent[3], mode:intent[4], account:account()};
+    const commands = {reply:'replyCommand', 'reply-all':'replyAllCommand', forward:'forwardCommand', compose:'composeClick'};
+    const messageIntent = location.hash.match(/^(#\/mailbox\/([a-z0-9._-]+)\/m([1-9][0-9]*))\/pw-(reply|reply-all|forward)$/i);
+    const composeIntent = location.hash.match(/^(#\/mailbox\/([a-z0-9._-]+))\/pw-compose$/i);
+    const intent = messageIntent || composeIntent;
+    let pending = intent && {hash:intent[1], uid:messageIntent?.[3], mode:messageIntent?.[4] || 'compose', account:account()};
+    let retry = () => {}, accountRows;
     const links = api.replyLinks = {opening:false};
+    const enabled = command => typeof command === 'function'
+        && (command.canExecute === undefined || !!value(command.canExecute));
 
     // Strip the intent before the native router starts. Reloading a draft must
     // never open another composer, including through Nextcloud's iframe target.
@@ -32,10 +38,16 @@
             parent.history.replaceState(parent.history.state, '', outer.href);
         }
     }
-    addEventListener('hashchange', () => { pending = null; });
+    addEventListener('hashchange', () => {
+        // Native startup may announce the already-normalized route. Only a
+        // different destination cancels the intent; the same one can retry.
+        if (pending && location.hash !== pending.hash) pending = null;
+        else retry();
+    });
 
     const href = (vm, mode) => {
-        const target = route(vm.message?.());
+        // A blank composition does not need to load or mark a source message.
+        const target = mode === 'compose' ? '/mailbox/' + (findFolder('INBOX')?.fullNameHash || 'INBOX') : route(vm.message?.());
         if (!target || !account()) return null;
         const embedded = parent !== window;
         const url = new URL(embedded ? parent.location.href : location.href);
@@ -47,14 +59,21 @@
     };
     ko.bindingHandlers.pwReply = {
         init(node, accessor, _all, vm) {
-            const enabled = () => !!value(accessor().command.canExecute) && node.getAttribute('aria-disabled') !== 'true';
+            node.dataset.pwComposeMode = accessor().mode;
+            const available = () => enabled(accessor().command) && !node.inert && node.getAttribute('aria-disabled') !== 'true';
             node.addEventListener('click', event => {
-                if (!enabled()) { event.preventDefault(); return; }
-                if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+                if (!available()) { event.preventDefault(); event.stopImmediatePropagation(); return; }
+                if (event.button || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) {
+                    // The existing KO click/command binding cancels every click.
+                    // Keep it for plain activation; bypass it for browser links.
+                    if (accessor().native) event.stopImmediatePropagation();
+                    return;
+                }
+                if (accessor().native) return;
                 event.preventDefault();
                 accessor().command.call(vm, vm, event);
-            });
-            node.addEventListener('auxclick', event => { if (!enabled()) event.preventDefault(); });
+            }, !!accessor().native);
+            node.addEventListener('auxclick', event => { if (!available()) event.preventDefault(); });
             node.addEventListener('keydown', event => {
                 if (event.key === ' ' && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) {
                     event.preventDefault(); node.click();
@@ -62,29 +81,52 @@
             });
         },
         update(node, accessor, _all, vm) {
-            const {command, mode} = accessor(), enabled = !!value(command.canExecute);
-            const target = enabled && href(vm, mode);
+            const {command, mode} = accessor(), available = enabled(command);
+            const target = available && href(vm, mode);
             if (target) node.setAttribute('href', target);
             else node.removeAttribute('href');
-            node.classList.toggle('disabled', !enabled);
-            node.setAttribute('aria-disabled', String(!enabled));
-            node.tabIndex = enabled ? 0 : -1;
+            node.classList.toggle('disabled', !available);
+            node.setAttribute('aria-disabled', String(!available));
+            node.tabIndex = available ? 0 : -1;
         }
     };
+    const enhanceExisting = (node, vm, command, mode) => {
+        if (node.dataset.pwComposeMode || typeof vm[command] !== 'function') return;
+        const accessor = () => ({command:vm[command], mode, native:true});
+        ko.bindingHandlers.pwReply.init(node, accessor, null, vm);
+        ko.computed(() => ko.bindingHandlers.pwReply.update(node, accessor, null, vm), {disposeWhenNodeIsRemoved:node});
+    };
     addEventListener('rl-view-model', ({detail:vm}) => {
-        if (!pending || vm.viewModelTemplateID !== 'MailMessageView') return;
-        ko.computed(() => {
-            const message = vm.message?.(), command = pending?.mode === 'reply-all' ? vm.replyAllCommand : vm.replyCommand;
-            if (!pending || !vm.canBeRepliedOrForwarded?.() || !value(command?.canExecute)
-                || !message?.body || String(message.uid) !== pending.uid
-                || '#' + route(message) !== pending.hash || account() !== pending.account) return;
+        if (vm.viewModelTemplateID === 'SystemDropDown') accountRows = vm.accounts;
+        const dom = vm.viewModelDom, reader = vm.viewModelTemplateID === 'MailMessageView';
+        if (['MailFolderList','MailMessageList'].includes(vm.viewModelTemplateID)) {
+            dom?.querySelectorAll('.buttonCompose').forEach(node => enhanceExisting(node, vm, 'composeClick', 'compose'));
+        }
+        if (reader) dom?.querySelectorAll('.dropdown-menu a[data-bind]').forEach(node => {
+            for (const [mode, command] of Object.entries(commands)) {
+                if (mode !== 'compose' && new RegExp('\\bcommand:\\s*' + command + '\\b').test(node.dataset.bind))
+                    enhanceExisting(node, vm, command, mode);
+            }
+        });
+        if (!pending || (pending.mode === 'compose' ? vm.viewModelTemplateID !== 'MailMessageList' : !reader)) return;
+        const start = () => {
+            const message = vm.message?.(), command = vm[commands[pending?.mode]];
+            const matches = () => pending && account() === pending.account && location.hash === pending.hash
+                // AccountsAndIdentities fills this native account observable,
+                // then the identities in the same callback. The microtask below
+                // runs after both; constructing Compose earlier throws.
+                && value(accountRows)?.length && enabled(command) && (pending.mode === 'compose' || (vm.canBeRepliedOrForwarded?.()
+                    && message?.body && String(message.uid) === pending.uid && '#' + route(message) === pending.hash));
+            if (!matches()) return;
             queueMicrotask(() => {
-                if (!pending || vm.message?.() !== message || !value(command.canExecute)) return;
+                if (!matches() || (pending.mode !== 'compose' && vm.message?.() !== message)) return;
                 pending = null;
                 links.opening = true;
                 try { command.call(vm); }
                 finally { links.opening = false; }
             });
-        });
+        };
+        retry = start;
+        ko.computed(start, {disposeWhenNodeIsRemoved:dom});
     });
 })();

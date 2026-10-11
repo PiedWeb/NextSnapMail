@@ -1,5 +1,5 @@
 {
-  "version": "1.10.27",
+  "version": "1.10.30",
   "tested": {
     "nextcloud": "34.0.4",
     "nextsnapmail": "0.1.16",
@@ -35,7 +35,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "43748e1c806f7ca0318fd9fd5aa3ef41a4f5d02cade4cea0e9497370e1e6c5c1",
+    "plugin/pied-web-ux/index.php": "7f563b76935c390a90484c76e3d8ba6ada4b89c22cd6381c712d28a2ccea6664",
     "plugin/pied-web-ux/inline-reply.js": "0c459e8efa15a3b68d9d9b08038fbaa03cce21b4fdae9d65cc96cf83880376f0",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",
@@ -54,7 +54,7 @@
     "plugin/pied-web-ux/native-components.js": "f3f5d14c48d949baec93b050dbd2cf2178da7214137f3ae409d67ed28a02b7e5",
     "plugin/pied-web-ux/quote-readability.js": "313ece139d33c6b9f786937f7f073625db36748bb3a1cb3ed9e7ef7c22ed1f66",
     "plugin/pied-web-ux/reminders.js": "21a1915d5409f5a754b7e50ec3c6107eac2e175546dc2e2a42eac497a4894b6b",
-    "plugin/pied-web-ux/reply-links.js": "d3f950ed4b85ed62422ade9d90c44e06e93602174907fcd66ee938ca34b8c33d",
+    "plugin/pied-web-ux/reply-links.js": "fa07d916b689ff12073637cb9c737b217119be61a7548383a33bde2e4dd2cede",
     "plugin/pied-web-ux/scheduled-send.js": "2f212c85ab12678588d2c528841313ba4864bb7a458f269cbd105a0dbe956c8a",
     "plugin/pied-web-ux/send-delay.js": "282a62c55131fc28ace31069e736733e89e6879fcfe0d00af59e6d811b7db6f7",
     "plugin/pied-web-ux/squire-license.txt": "dfc8ece415ad5f0d71c5d40165465854e087ac3f4e150fa25bd169b4b48cad69",
@@ -62,7 +62,7 @@
     "plugin/pied-web-ux/squire-next-vendor.js": "2fc7ce78b2e3a73bc81d3d143725fea4e424a778434f5982d53db233599ab981",
     "plugin/pied-web-ux/squire-next.js": "939b24b5d857593bbbc150be24535b28b2701909c4abe40453689dec808a96d4",
     "plugin/pied-web-ux/squire-source.json": "cfc21302bd1e07c434164963622b90fb587e864c830377ac3b128a2878151b6c",
-    "plugin/pied-web-ux/studio.js": "fe1679b228c078f1b8b049639b3d8816fecbda08b3beb2bd5ac318d7bce08492",
+    "plugin/pied-web-ux/studio.js": "d18657e3448562c35ce22376ef7c402467f0f3f197da00341e259691009e20dc",
     "plugin/pied-web-ux/unread-drafts.js": "18c3393a6d66b3484e86009c80d0f93d19595bcb109aa522ea71807d5acf33c7",
     "plugin/pied-web-ux/unread-order.js": "0aedbc92858a47d832a9b2c7ad1ad8d4ba0792ff7df49c24efb0c72533549139",
     "plugin/pied-web-ux/ux.css": "6a1e81ac4adaee2a1cb31944cd90bac57b85116551bcbca88239520cbce4fb35",
