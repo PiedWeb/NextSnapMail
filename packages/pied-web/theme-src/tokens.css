@@ -10,13 +10,13 @@
  */
 :root {
   /* Type scale. Seven sizes cover the whole interface; nothing between them. */
-  --pw-text-xs: 12px;
-  --pw-text-sm: 14px;
-  --pw-text-md: 16px;
-  --pw-text-lg: 18px;
-  --pw-text-xl: 20px;
-  --pw-text-2xl: 24px;
-  --pw-text-3xl: 30px;
+  --pw-text-xs: .75rem;
+  --pw-text-sm: .875rem;
+  --pw-text-md: 1rem;
+  --pw-text-lg: 1.125rem;
+  --pw-text-xl: 1.25rem;
+  --pw-text-2xl: 1.5rem;
+  --pw-text-3xl: 1.875rem;
 
   /* Weight. Two weights carry the hierarchy; the third is for quiet labels. */
   --pw-weight-regular: 400;
@@ -114,6 +114,7 @@
   --pw-paper: color-mix(in oklch, var(--nc-color-main-background) 99%, var(--nc-color-primary-element));
   --pw-rail: color-mix(in oklch, var(--nc-color-main-background) 88%, var(--nc-color-primary-element));
   --pw-line: var(--pw-grey-200);
+  --pw-field-border: var(--pw-grey-600);
   --pw-muted: var(--pw-grey-600);
   /* Quieter than subject ink, with enough contrast on the checked-row tint. */
   --pw-sender: color-mix(in oklch, var(--nc-color-main-text) 68%, var(--nc-color-main-background));

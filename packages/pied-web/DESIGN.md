@@ -44,3 +44,12 @@ one tokenized elevation and no added border/filter. Search labels stack above
 full-width controls below 800 px. Native account tables wrap within their panel.
 Accent ink is distinct from primary fill; danger/success/warning/info have
 separate ink and tint roles. Keep all visible component borders and focus at 1 px.
+
+## Scope, fields and text preferences
+
+Mobile scope and account share one native account target, with a separate 44 px
+folder button. Global lists show one scope and refresh, two-line phone subjects,
+complete accessible labels and an explicit unread conversation state. Expose phone
+selection on demand. Use a strong dedicated field boundary without darkening every
+divider. Errors explain recovery near the affected field; the Feed offers refresh or
+clear search. Text scale tokens use rem and chrome wraps at larger default font sizes.

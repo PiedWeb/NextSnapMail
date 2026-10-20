@@ -21,9 +21,9 @@
         if (node.dataset.pwKeyboardControl) return;
         node.dataset.pwKeyboardControl = 'true';
         node.addEventListener('keydown', event => {
-            if (event.key === 'Enter' || event.key === ' ') {
+            if (!event.repeat && !event.altKey && !event.ctrlKey && !event.metaKey && (event.key === 'Enter' || event.key === ' ')) {
                 event.preventDefault();
-                node.click();
+                if (!node.matches('.disabled,[aria-disabled="true"]')) node.click();
             }
         });
     };
@@ -183,10 +183,13 @@
                 const folder = ko.dataFor(link);
                 const label = ko.unwrap(folder?.localName) || ko.unwrap(folder?.name) || link.textContent.trim();
                 if (label) { link.title = label; link.setAttribute('aria-label', label); }
+                if (link.classList.contains('selected')) link.setAttribute('aria-current','page');
+                else link.removeAttribute('aria-current');
+                if (!link.hasAttribute('href')) makeButtonLike(link,label);
             });
             labelFolders();
             const content = dom.querySelector('.b-content');
-            if (content) new MutationObserver(labelFolders).observe(content, {childList: true, subtree: true, characterData: true});
+            if (content) new MutationObserver(labelFolders).observe(content, {childList: true, subtree: true, characterData: true,attributes:true,attributeFilter:['class']});
         }
         if (vm.viewModelTemplateID === 'MailMessageList' && !dom.querySelector('.pw-threads')) {
             const toolbar = dom.querySelector('.btn-toolbar'), button = document.createElement('button');
@@ -298,6 +301,16 @@
         const scope = desktop && visible(list) && list.querySelector('.pw-list-scope');
         const scopeLabel = list?.querySelector('.pw-list-scope-label');
         const trigger = account.querySelector('#top-system-dropdown-id');
+        const mobileTitle = document.querySelector('.pw-mobile-folder-label');
+        if (mobileTitle) {
+            const titleTarget = mobileIdentity && trigger || document.querySelector('.pw-mobile-identity');
+            if (titleTarget && mobileTitle.parentNode !== titleTarget) titleTarget.prepend(mobileTitle);
+        }
+        const globalScope = scopeLabel?.dataset.pwGlobalScope === 'true';
+        account.classList.toggle('pw-global-account-context',!!mobileIdentity && globalScope);
+        let prompt = trigger?.querySelector('.pw-mobile-account-prompt');
+        if (!prompt && trigger) { prompt=document.createElement('span');prompt.className='pw-mobile-account-prompt';trigger.append(prompt); }
+        if (prompt) prompt.textContent=t('Changer de boîte','Choose account');
         if (scope && scopeLabel && trigger) {
             if (!scopeHome) { scopeHome = document.createComment('List identity'); scopeLabel.before(scopeHome); }
             if (scopeLabel.parentNode !== trigger) trigger.prepend(scopeLabel);
@@ -311,6 +324,8 @@
             ? reader.querySelector('.top-toolbar') : visible(list) && list.querySelector(':scope > .btn-toolbar'));
         const parent = target || accountHome;
         if (account.parentNode !== parent) parent.append(account);
+        if (mobileIdentity && trigger) trigger.setAttribute('aria-label',t('Choisir un compte : ','Choose an account: ')
+            + (scopeLabel?.title || account.querySelector('.pw-account-label')?.title || ''));
         const docked = !!target;
         if (right.classList.contains('pw-compact-header') !== docked) right.classList.toggle('pw-compact-header', docked);
         if (account.classList.contains('pw-docked-account') !== docked) account.classList.toggle('pw-docked-account', docked);
@@ -321,6 +336,7 @@
     };
     const scheduleHeader = () => { if (!headerFrame) headerFrame = requestAnimationFrame(dockAccount); };
     addEventListener('resize', scheduleHeader);
+    addEventListener('pw-mail-scope', scheduleHeader);
     new MutationObserver(scheduleHeader).observe(document.documentElement, {attributes: true, attributeFilter: ['class']});
     addEventListener('rl-view-model', event => {
         if (['MailMessageList', 'MailMessageView', 'SystemDropDown'].includes(event.detail.viewModelTemplateID)) {

@@ -33,9 +33,9 @@
   }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle::before {
     content:''; display:block; width:8px; height:8px; border-radius:50%;
-    background:var(--pw-grey-300);
+    box-sizing:border-box;border:1px solid var(--pw-grey-600);background:transparent;
   }
-  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:var(--pw-primary-500); }
+  #rl-app #V-MailMessageList .messageListItem .pw-read-toggle[data-unread="1"]::before { background:var(--pw-primary-500);border-color:var(--pw-primary-500); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:hover { background:var(--pw-selected); }
   #rl-app #V-MailMessageList .messageListItem .pw-read-toggle:focus-visible { outline:1px solid var(--pw-focus); outline-offset:1px; }
   #rl-app #V-MailMessageList .messageListItem.unseen time::before { display:none; }

@@ -6,6 +6,7 @@ p.setDefaultTimeout(8000);
 await p.setViewportSize({width:1440,height:950});
 await p.emulateMedia({colorScheme:'light'});
 await p.goto(base+'?mode=list&side=1&shell=1');
+await p.waitForSelector('#V-PopupsCompose .pw-compose-main');
 await p.evaluate(async()=>{
  document.getElementById('V-PopupsCompose')?.remove();
  const html=await (await fetch('/app/snappymail/v/2.38.2/app/templates/Views/User/PopupsCompose.html')).text();

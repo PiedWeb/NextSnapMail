@@ -5,6 +5,7 @@ const p=await browser.getPage('pied-web-composer-actions');
 p.setDefaultTimeout(8000);
 await p.setViewportSize({width:1440,height:950});
 await p.emulateMedia({colorScheme:'light'});
+await p.mouse.move(1400,900);
 await p.goto(base+'?mode=list&shell=1');
 await p.waitForSelector('#V-PopupsCompose header a.btn.button-delete');
 // The composer view model is announced after the dialog markup exists.

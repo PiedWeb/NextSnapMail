@@ -50,12 +50,12 @@ html.pw-theme #rl-app #V-PopupsCompose button.pw-schedule:is(:hover, :focus-visi
 /* Destructive: discoverable, unobtrusive, red only on approach. */
 #rl-app #V-PopupsCompose > header > a.btn.button-delete {
   border-color: transparent !important;
-  background-color: transparent;
-  color: var(--pw-grey-600);
+  background-color: transparent !important;
+  color: var(--pw-grey-600) !important;
 }
 #rl-app #V-PopupsCompose > header > a.btn.button-delete:is(:hover, :focus-visible, :active) {
-  background-color: var(--pw-danger-tint);
-  color: var(--pw-danger);
+  background-color: var(--pw-danger-tint) !important;
+  color: var(--pw-danger-ink) !important;
 }
 #rl-app #V-PopupsCompose > header > a.btn:is(.button-save, .button-delete):focus-visible,
 #rl-app #V-PopupsCompose > header > a.btn:has(> .icon-paper-plane):focus-visible {
@@ -364,3 +364,18 @@ html:not(.pw-theme) #rl-app #V-PopupsCompose .pw-recipient-shortcuts,
     min-height: 44px;
   }
 }
+
+html.pw-theme #rl-app #V-PopupsCompose .b-header :is(input:not([type=checkbox]),.emailaddresses) {border-color:var(--pw-field-border);}
+html.pw-theme #rl-app #V-PopupsCompose .pw-recipient-error {display:block;color:var(--pw-danger-ink);font:var(--pw-weight-regular) var(--pw-text-xs)/1.5 var(--pw-font);padding-block:var(--pw-space-1);}
+html.pw-theme #rl-app #V-PopupsCompose .pw-recipient-error[hidden] {display:none;}
+html.pw-theme #rl-app #V-MailMessageList .inputSearch {border-color:var(--pw-field-border);}
+html.pw-theme #rl-app #V-PopupsCompose .b-header :is(input:not([type=checkbox]):focus,.emailaddresses:focus-within,.emailaddresses.emailaddresses-focused) {border-color:var(--pw-focus);}
+html.pw-theme #rl-app #V-MailMessageList .inputSearch:focus {border-color:var(--pw-focus);}
+/* Native recipient fields scale with preferred text size, including the input
+ * generated inside each address list. Received and composed content is untouched. */
+html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-sm);}
+html.pw-theme #rl-app #V-PopupsCompose .b-header td > input[type=text] {height:max(36px,2.25rem);}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses {min-height:max(36px,2.25rem);max-height:max(72px,4.5rem);}
+html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type=text] {height:2rem;}
+html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {width:auto;min-width:6em;max-width:100%;height:auto;min-height:max(36px,2.5em);line-height:1.4;}
+@media(max-width:799px) {html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-md);}}

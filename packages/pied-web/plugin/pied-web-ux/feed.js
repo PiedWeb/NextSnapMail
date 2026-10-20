@@ -371,8 +371,13 @@
             const reload = globalReloadPending;
             globalReloadPending = false;
             if (failure || !Array.isArray(result?.items) || !Array.isArray(result?.accounts)) {
+                paintGlobal();
+                globalSection.dataset.state='error';
                 globalStatus.textContent = t('Le flux global est indisponible. Réessayez.', 'The global feed is unavailable. Try again.');
                 globalRefresh.disabled = false;
+                globalRefresh.setAttribute('aria-busy','false');
+                const recovery=globalSection.querySelector('.pw-global-recovery');
+                if(recovery){recovery.hidden=false;recovery.textContent=t('Réessayer','Try again');}
                 if (reload) loadGlobal();
                 return;
             }
@@ -393,7 +398,8 @@
         const title = document.createElement('h1'); title.textContent = t('Tous mes comptes', 'All my accounts');
         globalRefresh = document.createElement('button'); globalRefresh.type = 'button'; globalRefresh.className = 'pw-global-refresh';
         globalRefresh.textContent = t('Actualiser', 'Refresh');
-        globalRefresh.addEventListener('click', loadGlobal);
+        globalRefresh.setAttribute('aria-label',globalRefresh.textContent);
+        globalRefresh.addEventListener('click', () => loadGlobal(true));
         header.append(title, globalRefresh);
         globalStatus = document.createElement('p'); globalStatus.className = 'pw-global-status';
         globalStatus.setAttribute('role', 'status'); globalStatus.setAttribute('aria-live', 'polite');
@@ -408,6 +414,12 @@
                 : String(value(value(folderView?.currentFolder)?.localName) || currentFolder()),
             refresh:() => loadGlobal(true),render:renderGlobal,open:openGlobalItem,
             beforeOpen:state => setSession(returnKey,JSON.stringify({...state,accountHash:accountHash(),mode}))});
+        const nativeRefresh=vm.viewModelDom.querySelector('[data-i18n="[title]MESSAGE_LIST/BUTTON_RELOAD"],[data-pw-icon="refresh"]');
+        if(workspace && nativeRefresh){
+            nativeRefresh.classList.add('pw-account-refresh');
+            globalRefresh.classList.add('btn');globalRefresh.dataset.pwIcon='refresh';
+            nativeRefresh.after(globalRefresh);globalSection.classList.add('pw-workspace-ready');
+        }
         const list = vm.messageList;
         [list, list?.page, list?.threadUid].filter(observable => observable?.subscribe)
             .forEach(observable => observable.subscribe(() => { updateNavigation(); renderGlobal(); }));
@@ -417,6 +429,8 @@
         updateNavigation();
         if (!globalSection) return;
         globalSection.hidden = !globalFeed();
+        listView.viewModelDom.classList.toggle('pw-workspace-visible',!globalSection.hidden);
+        globalRefresh.hidden=globalSection.hidden;
         if (!globalSection.hidden && !workspace?.isSearch() && (force || (!globalLoaded && !globalLoading))) loadGlobal(force);
     }
 

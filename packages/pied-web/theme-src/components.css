@@ -38,7 +38,7 @@ html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose),#V-Login)
   max-width:100%;
   min-height:var(--pw-control-height);
   font:var(--pw-weight-regular) var(--pw-text-sm)/var(--pw-leading-snug) var(--pw-font,system-ui);
-  border:1px solid var(--pw-line);
+  border:1px solid var(--pw-field-border);
   border-radius:var(--pw-radius-md);
   background-color:var(--pw-paper);
   color:var(--nc-color-main-text);
@@ -175,3 +175,10 @@ html.pw-theme #rl-app #rl-popups > dialog:not(#V-PopupsCompose) > footer :is(but
 html.pw-theme #rl-app #rl-popups > dialog:not(#V-PopupsCompose) > footer :is(button[form],.buttonSave):not(.btn-danger):hover { background:var(--pw-primary-600); }
 html.pw-theme #rl-app [data-pw-native-icon="edit"] { --pw-native-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m16%203%205%205-12%2012-6%201%201-6Z%20M13%206l5%205%22%2F%3E%3C%2Fsvg%3E"); }
 html.pw-theme #rl-app [data-pw-native-icon="add"] { --pw-native-action-icon:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%221.8%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M12%205v14M5%2012h14%22%2F%3E%3C%2Fsvg%3E"); }
+
+/* Error explanations remain visible; success keeps its quiet native marker. */
+html.pw-theme #rl-app .settings-save-trigger.error {display:block;width:auto;height:auto;max-width:100%;white-space:normal;}
+html.pw-theme #rl-app .settings-save-trigger.error .pw-native-status-text {position:static;display:block;width:auto;height:auto;overflow:visible;clip-path:none;white-space:normal;font:var(--pw-weight-regular) var(--pw-text-xs)/1.5 var(--pw-font);color:var(--pw-danger-ink);}
+@media(max-width:799px) {
+ html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) .control-group > :not(label) :is(.e-component,.select,select) {width:100%;box-sizing:border-box;}
+}

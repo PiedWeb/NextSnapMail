@@ -122,7 +122,7 @@
         root.querySelectorAll('.settings-save-trigger').forEach(node => {
             if (node.matches('input,select,textarea')) return;
             set(node, 'role', 'status'); set(node, 'aria-live', 'polite');
-            const state = node.classList.contains('error') ? t('Échec de l’enregistrement', 'Save failed')
+            const state = node.classList.contains('error') ? t('Échec de l’enregistrement. Vérifiez la connexion, puis modifiez à nouveau ce réglage pour réessayer.', 'Save failed. Check your connection, then change this setting again to retry.')
                 : node.classList.contains('success') ? t('Enregistré', 'Saved')
                 : node.classList.contains('saving') ? t('Enregistrement en cours', 'Saving') : '';
             let text = node.querySelector('.pw-native-status-text');
@@ -138,16 +138,52 @@
         });
         root.querySelectorAll('.alert-error').forEach(node => { if (!node.hasAttribute('role')) set(node, 'role', 'alert'); });
     };
+    const composerFields = root => {
+        root.querySelectorAll('.b-header tr').forEach(row => {
+            const caption = row.cells?.[0]?.querySelector('label') || row.cells?.[0];
+            if (!caption?.textContent.trim()) return;
+            const fields = row.cells?.[1]?.querySelectorAll('input:not([type=hidden]),textarea,select') || [];
+            const invalid = !!row.querySelector('.error-to');
+            let error = row.querySelector('.pw-recipient-error');
+            if (invalid && !error) {
+                error=document.createElement('span');error.className='pw-recipient-error';
+                error.setAttribute('role','alert');row.cells[1].append(error);
+            }
+            if (error) {
+                error.hidden=!invalid;
+                const text=t('Ajoutez au moins un destinataire valide.', 'Add at least one valid recipient.');
+                if(error.textContent!==text)error.textContent=text;
+            }
+            fields.forEach(field => {
+                if (caption.tagName==='LABEL') caption.htmlFor=id(field);
+                else set(field,'aria-labelledby',id(caption));
+                set(field,'aria-invalid',invalid);
+                if(error){
+                    const descriptions=new Set((field.getAttribute('aria-describedby')||'').split(/\s+/).filter(Boolean));
+                    descriptions.add(id(error));set(field,'aria-describedby',[...descriptions].join(' '));
+                }
+            });
+        });
+        root.querySelectorAll('.squire-wysiwyg,.squire-plain').forEach(field => {
+            if(!field.getAttribute('aria-label'))set(field,'aria-label',t('Corps du message','Message body'));
+            if(field.isContentEditable){set(field,'role','textbox');set(field,'aria-multiline','true');}
+        });
+    };
+    addEventListener('squire-toolbar',({detail})=>{
+        const root=detail?.squire?.container?.closest('#V-PopupsCompose');
+        if(root)queueMicrotask(()=>composerFields(root));
+    });
     addEventListener('rl-view-model', ({detail: vm}) => {
         const root = vm.viewModelDom, name = vm.viewModelTemplateID || '';
-        if (!root || root.dataset.pwNativeComponents || !/^(?:Settings|Popups|Login)/.test(name) || ['PopupsCompose','SettingsPane','SettingsMenu'].includes(name)) return;
+        if (!root || root.dataset.pwNativeComponents || !/^(?:Settings|Popups|Login)/.test(name) || ['SettingsPane','SettingsMenu'].includes(name)) return;
         root.dataset.pwNativeComponents = '1';
-        const update = () => { fieldNames(root); keyboardActions(root); sortableActions(root, vm); feedback(root); };
+        const update = name==='PopupsCompose' ? () => composerFields(root)
+            : () => { fieldNames(root); keyboardActions(root); sortableActions(root, vm); feedback(root); };
         update();
         // Components and foreach rows can render after the post-binding event.
         // One observer per native view, no whole-workspace rescanning.
         const observer = new MutationObserver(update);
-        observer.observe(root, {childList:true, subtree:true, characterData:true, attributes:true,
+        observer.observe(name==='PopupsCompose' ? root.querySelector('.b-header') || root : root, {childList:true, subtree:true, characterData:true, attributes:true,
             attributeFilter:['class','data-i18n']});
         window.ko?.utils?.domNodeDisposal?.addDisposeCallback?.(root, () => observer.disconnect());
     });

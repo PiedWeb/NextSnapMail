@@ -30,13 +30,15 @@
         if (!title) return;
         const selected = document.querySelector('#V-MailFolderList a.selectable.selected');
         const data = selected && ko.dataFor(selected);
-        title.textContent = ko.unwrap(data?.localName) || selected?.title || selected?.textContent.trim() || (fr() ? 'Messages' : 'Messages');
+        title.textContent = document.querySelector('.pw-list-scope-context')?.textContent
+            || ko.unwrap(data?.localName) || selected?.title || selected?.textContent.trim() || 'Messages';
         title.title = title.textContent;
         document.querySelector('.inputSearch')?.setAttribute('aria-label',(fr() ? 'Rechercher dans ' : 'Search in ')+title.textContent);
         const mobileTitle = document.querySelector('.pw-mobile-folder-label');
         const mobileName=(title.textContent==='Boîte de réception' && fr()) ? 'Réception' : title.textContent;
-        if (mobileTitle && mobileTitle.textContent !== mobileName) {mobileTitle.textContent=mobileName;mobileTitle.setAttribute('aria-label',title.textContent+' · '+(fr() ? 'Afficher les dossiers' : 'Show folders'));}
+        if (mobileTitle && mobileTitle.textContent !== mobileName) {mobileTitle.textContent=mobileName;mobileTitle.title=title.textContent;}
     };
+    addEventListener('pw-mail-scope',syncTitle);
     addEventListener('rl-view-model', ({detail: vm}) => {
         const dom = vm.viewModelDom;
         if (!dom || dom.dataset.pwStudio) return;
@@ -55,12 +57,21 @@
         const keyboardButton=node=>{
             if(!node || node.tagName==='BUTTON' || node.dataset.pwKeyboard || node.dataset.pwComposeMode || node.matches('[data-bind*="pwReply:"]')) return;
             node.dataset.pwKeyboard='1';node.setAttribute('role','button');node.tabIndex=0;
-            node.addEventListener('keydown',e=>{if(e.key===' ' || (e.key==='Enter' && !node.hasAttribute('href'))){e.preventDefault();node.click();}});
+            node.addEventListener('keydown',e=>{if(!e.repeat && !e.altKey && !e.ctrlKey && !e.metaKey
+                && (e.key===' ' || (e.key==='Enter' && !node.hasAttribute('href')))){
+                e.preventDefault();if(!node.matches('.disabled,[aria-disabled="true"]'))node.click();
+            }});
         };
         dom.querySelectorAll('[data-pw-icon].btn').forEach(keyboardButton);
         dom.querySelectorAll('.toggleLeft').forEach(n => n.dataset.pwIcon='menu');
         dom.querySelectorAll('.buttonUp').forEach(n => n.dataset.pwIcon='previous');
         dom.querySelectorAll('.buttonDown').forEach(n => n.dataset.pwIcon='next');
+        dom.querySelectorAll('.toggleLeft,.buttonUp,.buttonDown').forEach(node => {
+            if (!node.getAttribute('aria-label')) node.setAttribute('aria-label',node.title || (node.matches('.buttonUp')
+                ? (fr() ? 'Message précédent' : 'Previous message') : node.matches('.buttonDown')
+                    ? (fr() ? 'Message suivant' : 'Next message') : (fr() ? 'Afficher les dossiers' : 'Show folders')));
+            keyboardButton(node);
+        });
         if (vm.viewModelTemplateID === 'MailMessageView') {
             readerVM = vm;
             const nativeHeader=dom.querySelector('.messageItemHeader');
@@ -323,9 +334,7 @@
             document.getElementById('rl-right').prepend(header);
             const account = document.getElementById('top-system-dropdown-id');
             if (account) {
-                const label = document.createElement('button'); label.type='button'; label.className = 'pw-mobile-folder-label';
-                label.title=fr() ? 'Afficher les dossiers' : 'Show folders';
-                label.addEventListener('click',()=>folders.click());
+                const label = document.createElement('span'); label.className = 'pw-mobile-folder-label';
                 identity.prepend(label); syncTitle();
             }
             const toolbar = dom.querySelector(':scope > .btn-toolbar');
@@ -380,7 +389,8 @@
             if (moreMenu) {
                 const refresh = document.createElement('li'); refresh.className = 'pw-mobile-refresh';
                 refresh.innerHTML = `<a href="#" role="menuitem">${fr() ? 'Actualiser' : 'Refresh'}</a>`;
-                refresh.firstChild.addEventListener('click',e=>{e.preventDefault(); vm.reload();});
+                refresh.firstChild.addEventListener('click',e=>{e.preventDefault();
+                    if(dom.classList.contains('pw-global-active'))dom.querySelector('.pw-global-refresh')?.click();else vm.reload();});
                 const selection=document.createElement('li');selection.className='pw-mobile-select';
                 selection.innerHTML=`<a href="#" role="menuitem">${fr() ? 'Sélectionner des messages' : 'Select messages'}</a>`;
                 selection.firstChild.addEventListener('click',e=>{e.preventDefault();dom.classList.add('pw-search-open');searchToggle.setAttribute('aria-expanded','true');dom.querySelector('.checkboxCheckAll')?.focus();});
@@ -439,6 +449,7 @@
                 if (!control) return;
                 const marker=document.createComment('Native folder action');control.before(marker);
                 control.dataset.pwIcon=selector==='.icon-folder-add' ? 'add-folder' : 'settings';
+                keyboardButton(control);
                 const adaptFolderAction=()=>document.documentElement.classList.contains('pw-theme') ? sectionActions.append(control) : marker.after(control);
                 new MutationObserver(adaptFolderAction).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
                 adaptFolderAction();

@@ -370,3 +370,20 @@ plugin provides per-account out-of-office replies through Sieve, including exist
 Sieve availability/settings and existing calendar options are configuration concerns; never overwrite
 them while deploying this theme/plugin. The linked-account unread change is preserved separately
 as upstream PR #41 and the version-specific patch.
+
+## Refactoring UI follow-through (1.10.33)
+
+The mobile identity is part of the original account trigger, never a nested button.
+A separate folder button remains at least 44 px. Derive scope text from the Feed
+workspace and notify presentation listeners only when scope changes. Global refresh
+uses the existing global request handler in the native toolbar; the hidden account
+reload must never substitute for it. Mobile bulk selection is exposed from More or
+long touch, with native account/folder/UIDVALIDITY boundaries unchanged.
+
+Post-binding composer inputs must be labelled after EmailAddressesComponent replaces
+its original input. Observe only the composer header for late recipient replacement;
+use the Squire toolbar event for late body editors. Save errors expose guidance while
+successful autosave remains quiet. Field boundaries use `--pw-field-border`; separators
+keep `--pw-line`. Text tokens use rem; phone chrome may wrap with larger text.
+The native Source/Markdown nodes move into More below 720 px, preserving their commands,
+editor selection and current-mode indication. No received message HTML is restyled.

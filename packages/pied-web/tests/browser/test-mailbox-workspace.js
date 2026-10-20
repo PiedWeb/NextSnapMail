@@ -1,6 +1,7 @@
 const page = await browser.getPage('nextsnapmail-mailbox-workspace');
 page.setDefaultTimeout(10000);
 await page.setViewportSize({width:1440,height:900});
+await page.mouse.move(1400,850);
 await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1&shell=1&listOnly=1&accounts=2');
 await page.waitForFunction(() => window.PiedWebUx?.mailbox && document.querySelectorAll('.pw-global-row').length === 5);
 await page.waitForFunction(() => document.querySelector('.pw-global-rows')?.getAttribute('aria-busy') === 'false');

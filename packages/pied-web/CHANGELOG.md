@@ -1,5 +1,21 @@
 # Releases
 
+## 1.10.33 — 2026-10-20
+
+- Apply the Refactoring UI review: truthful single mobile scope/account identity,
+  separate 44 px folder control, one global refresh, progressive phone selection,
+  two-line global subjects, complete row labels and explicit unread conversation state.
+- Restore quiet composer discard against current core CSS; associate real generated
+  recipient fields with their native captions and visible validation guidance.
+- Strengthen field boundaries separately from dividers, align nested mobile selects,
+  explain save/load failures and provide Feed/search recovery actions.
+- Respect browser text preferences with rem tokens and wrapping mobile chrome;
+  name/enable native navigation controls for keyboard use, strengthen the read indicator,
+  move advanced editor modes into More on narrow screens and use natural status plurals.
+- Add regression checks using native recipient replacement, fictional transport,
+  light/dark and 320–1440 px layouts; preserve native commands and account-safe actions.
+
+
 ## 1.10.32, 2026-10-20
 
 Remove the duplicated folder/account row below the phone header. Hide it only

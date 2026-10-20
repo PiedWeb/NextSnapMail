@@ -79,8 +79,10 @@
             const moreLabel=document.createElement('span');more.append(svg('ellipsis'),moreLabel);
             const updateMore=()=>{
                 more.setAttribute('aria-expanded',String(!extra.hidden));
-                moreLabel.textContent=extra.hidden?(fr()?'Plus':'More'):(fr()?'Moins':'Less');
+                const mode=container.classList.contains('squire-mode-markdown')?'Markdown':container.classList.contains('squire-mode-source')?'Source':'';
+                moreLabel.textContent=(extra.hidden?(fr()?'Plus':'More'):(fr()?'Moins':'Less'))+(compact&&mode?' · '+mode:'');
                 more.title=extra.hidden?(fr()?'Plus d’options de mise en forme':'More formatting options'):(fr()?'Réduire les options':'Hide formatting options');
+                if(compact&&mode)more.title+=' · '+mode;
                 more.setAttribute('aria-label',more.title);
             };
             more.addEventListener('click',()=>{extra.hidden=!extra.hidden;updateMore();});
@@ -95,8 +97,9 @@
                 const narrow=container.clientWidth<720;
                 if(compact===narrow)return;
                 compact=narrow;toolbar.classList.toggle('pw-compact-tools',narrow);
-                if(narrow){extra.prepend(lists);extra.append(nativeGroup('changes'));images.prepend(button('imageUpload'));}
-                else{insert.append(button('imageUpload'));main.insertBefore(lists,insert);main.append(nativeGroup('changes'));}
+                if(narrow){extra.prepend(nativeGroup('views'),lists);extra.append(nativeGroup('changes'));images.prepend(button('imageUpload'));}
+                else{insert.append(button('imageUpload'));main.insertBefore(nativeGroup('views'),emphasis);main.insertBefore(lists,insert);main.append(nativeGroup('changes'));}
+                updateMore();
             };
             const adapt=()=>{
                 if(active()&&!enhanced){
@@ -131,7 +134,8 @@
             });
             const resize=new ResizeObserver(responsive);resize.observe(container);
             const theme=new MutationObserver(adapt);theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
-            ko.utils.domNodeDisposal.addDisposeCallback(container,()=>{resize.disconnect();theme.disconnect();});
+            const modeObserver=new MutationObserver(updateMore);modeObserver.observe(container,{attributes:true,attributeFilter:['class']});
+            ko.utils.domNodeDisposal.addDisposeCallback(container,()=>{resize.disconnect();theme.disconnect();modeObserver.disconnect();});
             adapt();
         });
     });

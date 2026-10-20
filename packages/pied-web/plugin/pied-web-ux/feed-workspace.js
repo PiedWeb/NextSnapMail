@@ -19,7 +19,7 @@
         let items = [], accounts = [], loading = false, stale = false, selected = new Set(), focused = '', anchor = '',
             searchState = null, generation = 0, snapshot = null, busy = false, keyboardEntered = false;
         const nodes = new Map(), headings = new Map(), desktopActions = matchMedia('(min-width:800px)');
-        let sharedRowActions = null, actionRow = null;
+        let sharedRowActions = null, actionRow = null, selectionRequested = false, scopeSignature = '';
         const scopeBar = document.createElement('div'); scopeBar.className = 'pw-list-scope';
         const scopeLabel = document.createElement('span'); scopeLabel.className = 'pw-list-scope-label';
         const scopeAccount = document.createElement('span'); scopeAccount.className = 'pw-list-scope-account';
@@ -56,7 +56,7 @@
         const controls = document.createElement('div'); controls.className = 'pw-global-selection';
         const allLabel = document.createElement('label'), all = document.createElement('input'); all.type = 'checkbox';
         all.setAttribute('aria-label',t('Sélectionner les messages de cette page','Select messages on this page'));
-        allLabel.append(all,document.createTextNode(t('Cette page','This page')));
+        allLabel.append(all,document.createTextNode(t('Sélectionner la page','Select this page')));
         const count = document.createElement('span'); count.setAttribute('role','status');
         const allResults = document.createElement('button'); allResults.type = 'button';
         const clear = document.createElement('button'); clear.type = 'button'; clear.textContent = t('Terminer','Done');
@@ -70,6 +70,24 @@
         remind.addEventListener('click',() => api.reminders?.choose(remind,date => execute('remind',{remindAt:date.toISOString()})));
         actions.append(remind); actionButtons.push(remind);
         controls.append(allLabel,count,allResults,actions,clear); section.querySelector('header')?.after(controls);
+        const selectionEntry = document.createElement('li'); selectionEntry.className='pw-workspace-select';
+        const selectionLink = document.createElement('a'); selectionLink.href='#'; selectionLink.setAttribute('role','menuitem');
+        selectionLink.textContent=t('Sélectionner des messages','Select messages');selectionEntry.append(selectionLink);
+        dom.querySelector('[aria-labelledby="more-list-dropdown-id"]')?.append(selectionEntry);
+        selectionLink.addEventListener('click',event=>{
+            event.preventDefault();selectionRequested=true;selectChanged();all.focus();
+            const trigger=dom.querySelector('#more-list-dropdown-id');if(trigger?.parentNode.classList.contains('show'))trigger.click();
+        });
+        const recovery=document.createElement('button');recovery.type='button';recovery.className='pw-global-recovery';
+        recovery.hidden=true;status.after(recovery);
+        recovery.addEventListener('click',()=>{
+            if(searchState){
+                const input=dom.querySelector('.inputSearch,input[type=search]');
+                if(input){input.value='';input.dispatchEvent(new Event('input',{bubbles:true}));}
+                if(typeof vm.inputSearch==='function')vm.inputSearch('');void search('');
+            }
+            else refreshButton.click();
+        });
         const pager = document.createElement('nav'); pager.className = 'pw-global-pager'; pager.setAttribute('aria-label',t('Pages des résultats','Result pages'));
         const previous = document.createElement('button'), next = document.createElement('button'), pageLabel = document.createElement('span');
         previous.type = next.type = 'button'; previous.textContent = t('Précédent','Previous'); next.textContent = t('Suivant','Next');
@@ -83,8 +101,11 @@
             const blocked = busy || loading || stale;
             all.disabled = blocked || !visible.length;
             all.setAttribute('aria-checked',all.indeterminate ? 'mixed' : String(all.checked));
-            count.textContent = n ? t(`${n} message(s) sélectionné(s)`,`${n} message(s) selected`) : '';
-            clear.hidden = !n; clear.disabled = busy; actions.hidden = !n;
+            count.textContent = n ? t(`${n} message${n>1?'s':''} sélectionné${n>1?'s':''}`,`${n} message${n>1?'s':''} selected`) : '';
+            controls.classList.toggle('pw-selection-active',!!n || selectionRequested);
+            controls.hidden=!visible.length;
+            selectionEntry.hidden=section.hidden || !visible.length;
+            clear.hidden = !n && !selectionRequested; clear.disabled = busy; actions.hidden = !n;
             actionButtons.forEach(button => button.disabled = blocked || !n);
             remind.hidden = snapshot ? !!snapshot.groups?.some(group => !/^inbox$/i.test(group.folder))
                 : visible.filter(item => selected.has(key(item))).some(item => !/^inbox$/i.test(item.folder));
@@ -97,7 +118,7 @@
                 node.classList.toggle('focused',id === focused); node.tabIndex = id === focused ? 0 : -1;
             }
         };
-        const resetSelection = () => { snapshot = null; selected.clear(); anchor = ''; selectChanged(); };
+        const resetSelection = () => { snapshot = null; selected.clear(); anchor = ''; selectionRequested=false;selectChanged(); };
         const setFlagged = (item,value) => {
             const previous = Array.isArray(item.flags) ? item.flags.slice() : [];
             const flags = previous.filter(flag => String(flag).toLowerCase() !== '\\flagged');
@@ -202,7 +223,12 @@
                 node.classList.toggle('pw-global-draft',item._pwKind === 'draft');
                 const texts = {'.pw-global-primary':options.primary(item),'.pw-global-subject':item.subject || t('(Sans objet)','(No subject)'),
                     '.pw-global-account':options.accountText(item) + (searchState ? ' · ' + item.folder : ''),'.pw-global-time':options.dateText(item)};
-                Object.entries(texts).forEach(([selector,text]) => { const el = node.querySelector(selector); if (el.textContent !== text) el.textContent = text; });
+                Object.entries(texts).forEach(([selector,text]) => { const el = node.querySelector(selector); if (el.textContent !== text) el.textContent = text; el.title=text; });
+                const unread=options.unseen(item) ? t('Non lu','Unread') : rank===1 ? t('Messages non lus dans la conversation','Unread messages in this conversation') : t('Lu','Read');
+                node.setAttribute('aria-label',[...Object.values(texts),unread].join(' · '));
+                let threadState=node.querySelector('.pw-global-thread-state');
+                if(!threadState){threadState=document.createElement('span');threadState.className='pw-global-thread-state';node.querySelector('.pw-global-content').append(threadState);}
+                threadState.textContent=t('Non lu dans la conversation','Unread in conversation');threadState.hidden=options.unseen(item)||rank!==1;
                 if (desktopActions.matches) { if (actionRow === node) attachRowActions(node); }
                 else if (!node.querySelector('.pw-row-actions') && api.mailbox) node.append(createRowActions(node,/^inbox$/i.test(item.folder)));
                 position(node);
@@ -213,10 +239,13 @@
             rows.classList.toggle('pw-results-stale',stale); rows.setAttribute('aria-disabled',String(stale));
             if ('inert' in rows) rows.inert = stale;
             const failed = accounts.filter(account => account.error).length;
+            section.dataset.state=loading?'loading':failed?'partial':!items.length?'empty':'ready';
             status.textContent = loading ? (stale ? t('Actualisation des résultats…','Refreshing results…') : t('Chargement…','Loading…')) : failed
-                ? t(`${failed} compte(s) indisponible(s). Résultats partiels.`,`${failed} account(s) unavailable. Partial results.`)
-                : searchState ? t(`${searchState.total} résultat(s). Corbeille et Indésirables exclus.`,`${searchState.total} result(s). Trash and Junk excluded.`)
-                : !items.length ? t('Aucun message à afficher.','No messages to show.') : '';
+                ? t(`${failed} compte${failed>1?'s':''} indisponible${failed>1?'s':''}. Résultats partiels.`,`${failed} account${failed>1?'s are':' is'} unavailable. Partial results.`)
+                : searchState ? t(`${searchState.total} résultat${searchState.total>1?'s':''}. Corbeille et Indésirables exclus.`,`${searchState.total} result${searchState.total===1?'':'s'}. Trash and Junk excluded.`)
+                : !items.length ? t('Votre flux est à jour. Aucun message à afficher.','Your feed is up to date. No messages to show.') : '';
+            recovery.hidden=loading || (!failed && !!items.length);
+            recovery.textContent=searchState?t('Effacer la recherche','Clear search'):t('Actualiser le flux','Refresh feed');
             refreshButton.disabled = loading; refreshButton.setAttribute('aria-busy',String(loading));
             pager.hidden = !searchState || searchState.total <= searchState.limit;
             previous.disabled = loading || !searchState?.offset;
@@ -239,6 +268,10 @@
             }
             const trigger = scopeLabel.closest('#top-system-dropdown-id');
             trigger?.setAttribute('aria-label',t('Choisir un compte : ','Choose an account: ') + scopeLabel.textContent);
+            scopeLabel.dataset.pwGlobalScope=String(searchState?searchScopeValue==='global':global);
+            const signature=scopeLabel.title+'|'+scopeLabel.dataset.pwGlobalScope;
+            if(signature!==scopeSignature){scopeSignature=signature;dispatchEvent(new Event('pw-mail-scope'));}
+            selectionEntry.hidden=section.hidden || !items.length;
         };
         const search = async (query,offset = 0,reuse = false) => {
             query = String(query).trim();
@@ -260,6 +293,7 @@
                 loading = false; stale = !!items.length; searchState.token = ''; paint();
                 status.textContent = api.mailbox.reason(error) + (stale
                     ? t(' Les résultats précédents restent affichés sans être interactifs.',' Previous results remain visible but inactive.') : '');
+                section.dataset.state='error';recovery.hidden=false;recovery.textContent=t('Effacer la recherche','Clear search');
             }
         };
         previous.addEventListener('click',() => search(searchState.query,Math.max(0,searchState.offset-searchState.limit),true));
@@ -328,8 +362,9 @@
                 if (current !== generation) return;
                 snapshot = prepared;
                 selected = new Set(items.filter(item => searchState || /^inbox$/i.test(item.folder)).map(key));
-                status.textContent = t(`${snapshot.count} messages, toutes pages incluses, dans ${snapshot.groups?.length || 0} dossier(s).`,
-                    `${snapshot.count} messages, all pages included, in ${snapshot.groups?.length || 0} folder(s).`)
+                const folders=snapshot.groups?.length || 0;
+                status.textContent = t(`${snapshot.count} message${snapshot.count>1?'s':''}, toutes pages incluses, dans ${folders} dossier${folders>1?'s':''}.`,
+                    `${snapshot.count} message${snapshot.count===1?'':'s'}, all pages included, in ${folders} folder${folders===1?'':'s'}.`)
                     + (snapshot.partial ? t(' Certains comptes sont indisponibles.',' Some accounts are unavailable.') : '');
             } catch (error) { if (current === generation) status.textContent = api.mailbox.reason(error); }
             finally { busy = false; selectChanged(); }
@@ -367,7 +402,7 @@
             else if (['Enter','ArrowRight'].includes(event.key) && focused) open(items.find(item => key(item) === focused));
             else if (event.key === ' ' && focused) toggle(focused);
             else if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'a') { selected = new Set(ids); snapshot = null; selectChanged(); }
-            else if (event.key === 'Escape') { if (selected.size || snapshot) resetSelection(); else if (searchState) search(''); else return; }
+            else if (event.key === 'Escape') { if (selected.size || snapshot || selectionRequested) resetSelection(); else if (searchState) search(''); else return; }
             else if (event.key === 'Delete') { if (!event.repeat && (selected.size || focused)) { if (!selected.size) selected.add(focused); void execute('trash').catch(() => {}); } }
             else if (!event.ctrlKey && !event.metaKey && ['q','u'].includes(event.key.toLowerCase())) { if (!selected.size && focused) selected.add(focused); void execute(event.key.toLowerCase()==='q'?'read':'unread').catch(() => {}); }
             else return;
