@@ -1,6 +1,6 @@
 # Pied Web Calendar workspace
 
-Independent Nextcloud app `piedwebcalendar`, version 1.0.1. Removes the surrounding
+Independent Nextcloud app `piedwebcalendar`, version 1.0.2. Removes the surrounding
 Nextcloud frame and places its native app grid immediately before Calendar's event
 filter. With navigation collapsed, open the native drawer to access both controls.
 The desktop and mobile calendar keep the full viewport without another toolbar.
@@ -12,7 +12,7 @@ apps retain their normal shell. The original Vue app-menu instance is mounted in
 focus trap includes it. A placeholder restores it on exit; no handlers or app lists are cloned. If expected markup is missing, the
 standard Nextcloud header stays available.
 
-Compatibility target: Nextcloud 34.0.4 and Calendar 6.5.4. Recheck selectors, keyboard
+Compatibility verified: Nextcloud 35.0.2 and Calendar 6.6.2; the manifest accepts Nextcloud 34–35. Recheck selectors, keyboard
 navigation and mobile after upstream updates; this is not a promise of compatibility
 with future versions.
 
@@ -38,6 +38,10 @@ Private event screenshots are excluded from versioned artifacts.
 ## Verification
 
 Fourteen live browser checks passed on desktop and 390/320 px, including native app-menu
-Enter/Escape and restored focus. Run `dev-browser --connect < integrations/calendar/tests/browser-validation.js`
-from the repository root. Read-only deployed hash audit: `python3 integrations/calendar/tools/audit.py`.
+Enter/Escape and restored focus. Run `dev-browser-agent < packages/pied-web/integrations/calendar/tests/browser-validation.js`
+from the repository root. Read-only deployed hash audit: `python3 packages/pied-web/integrations/calendar/tools/audit.py`.
 See [deployment and rollback](../../docs/deployments/calendar-1.0.1.md).
+
+## 1.0.2 — Nextcloud 35
+
+The existing listener and layout are retained. The compatibility ceiling is 35 and the runtime marker is 1.0.2. All fourteen desktop/mobile browser checks passed on 20 October 2026; see [deployment](../../docs/deployments/nextcloud-35-2026-10-20.md).

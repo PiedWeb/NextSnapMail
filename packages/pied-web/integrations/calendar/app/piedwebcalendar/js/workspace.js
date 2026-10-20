@@ -83,7 +83,7 @@
         restoreMenu();
         root.classList.remove(...classes);
     }
-    window.PiedWebCalendarWorkspace = { version: '1.0.1', sync };
+    window.PiedWebCalendarWorkspace = { version: '1.0.2', sync };
     preference.addEventListener('change', schedule);
     window.addEventListener('pageshow', start);
     window.addEventListener('pagehide', stop);

@@ -1,6 +1,6 @@
 # Pied Web mail scheduler
 
-Independent Nextcloud app `piedwebmailscheduler`, version 1.1.0. It sends outgoing messages and
+Independent Nextcloud app `piedwebmailscheduler`, version 1.1.1. It sends outgoing messages and
 wakes mail reminders at their scheduled times, whether or not a browser is open.
 
 ## What it does, and what it refuses to do
@@ -91,3 +91,7 @@ NEXTSNAPMAIL_SOURCE=/path/to/NextSnapMail php tests/reminders.php
 The checks cover folder resolution, claim order, header rewriting, recipients, filing, retry,
 abandonment and reminder wake-up/rollback, using native MailSo parsing and sequence sets. IMAP
 and SMTP transport are simulated: the checks open no mailbox and send no message.
+
+## 1.1.1 — Nextcloud 35
+
+Accept Nextcloud 34–35 without changing transport or queue behavior. The Nextcloud 35.0.2 API contracts, sender/reminder fixtures and a production dry run with NextSnapMail 0.1.16 passed on 20 October 2026. The two cron entries were restored exactly; no real delivery was used as a test. See [deployment](../../docs/deployments/nextcloud-35-2026-10-20.md).

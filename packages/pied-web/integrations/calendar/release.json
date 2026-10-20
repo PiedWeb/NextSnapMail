@@ -1,15 +1,15 @@
 {
-  "version": "1.0.1",
+  "version": "1.0.2",
   "app": "piedwebcalendar",
   "tested": {
-    "nextcloud": "34.0.4",
-    "calendar": "6.5.4"
+    "nextcloud": "35.0.2",
+    "calendar": "6.6.2"
   },
   "files": {
     "LICENSE": "76a97c878c9c7a8321bb395c2b44d3fe2f8d81314d219b20138ed0e2dddd5182",
-    "appinfo/info.xml": "dbf1356e1deebd79647a0ba73016c65ae1fa554448ff7858c12831c4cb41ab2f",
+    "appinfo/info.xml": "c6845fdfec416b6c3fda701edae78c68054dc8f5c1e5c7bd795475a383d778b6",
     "css/workspace.css": "2c8d705f506683a2bb52c5a53b088277f80dfc0b9d3c9355b0e00fe25f39fa8b",
-    "js/workspace.js": "58000d75107ac3e3f54ffab62be871afbe961d050f1f79959d9bca12597e4791",
+    "js/workspace.js": "ed62763628bb8975d9ec749d9756fa2925e6678f5efe182974d1c2168242050b",
     "lib/AppInfo/Application.php": "87e7340484a6864433be15da1fcd832788a2bc2e289364b02530fe9316f671a5",
     "lib/Listeners/WorkspaceListener.php": "8d239e4c9de597875f8122f1cf21ca7b9d3745cf4144e8d39537d36716a54f66"
   }

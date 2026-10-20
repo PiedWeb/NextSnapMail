@@ -1,5 +1,10 @@
 # Releases
 
+## Companion compatibility — 2026-10-20
+
+- Calendar workspace 1.0.2 and mail scheduler 1.1.1 accept Nextcloud 34–35; existing layout and transport logic are retained.
+- Deploy reviewed core 0.1.16 on Nextcloud 35.0.2 with Mail plugin 1.10.30 unchanged. Record API, fixture, authenticated runtime and rollback checks in `docs/deployments/nextcloud-35-2026-10-20.md`.
+
 Tags `piedweb-mail-v1.10.15` and `piedweb-mail-v1.10.16` predate a renumbering:
 they point to the compact badges (1.10.17) and one-pixel focus (1.10.18) commits.
 Published tags stay in place. 1.10.0, 1.10.1, 1.10.8, 1.10.21 and 1.10.23 have no tag.

@@ -1,4 +1,4 @@
-// Run with: dev-browser --connect < integrations/calendar/tests/browser-validation.js
+// Run with: dev-browser-agent < packages/pied-web/integrations/calendar/tests/browser-validation.js
 // Uses an owned tab; does not create/edit events or change account preferences.
 const p = await browser.getPage('calendar-shell-check');
 await p.bringToFront();
@@ -40,10 +40,10 @@ async function menu(name) {
 }
 await p.setViewportSize({ width: 1440, height: 900 });
 await p.goto('https://nc.robin-d.fr/apps/calendar/dayGridMonth/now', { waitUntil: 'domcontentloaded' });
-await p.waitForFunction(() => window.PiedWebCalendarWorkspace?.version === '1.0.1' && document.querySelector('.fc-col-header'), {}, { timeout: 15000 });
+await p.waitForFunction(() => window.PiedWebCalendarWorkspace?.version === '1.0.2' && document.querySelector('.fc-col-header'), {}, { timeout: 15000 });
 await p.waitForFunction(() => document.querySelector('.fc-col-header').getBoundingClientRect().width > 1000, {}, { timeout: 5000 });
 const desktop = await geometry();
-check('Installed web version', desktop.version === '1.0.1', desktop.version);
+check('Installed web version', desktop.version === '1.0.2', desktop.version);
 check('Desktop full viewport, no surrounding frame', desktop.content.x === 0 && desktop.content.y === 0 && desktop.content.width === 1440 && desktop.content.height === 900 && desktop.header.height === 0, desktop.content);
 check('Grid immediately before filter, centered and clickable', desktop.buttonHit && desktop.launcher.right <= desktop.filter.left && Math.abs((desktop.launcher.y + 22) - (desktop.filter.y + desktop.filter.height / 2)) < 1, { launcher: desktop.launcher, filter: desktop.filter });
 await menu('Desktop');
