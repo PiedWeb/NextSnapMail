@@ -3032,8 +3032,16 @@ html.rl-mobile #rl-app #V-AdminPane>.b-toolbar {
   }
 }
 
-/* The folder-only unread filter is not part of this theme's navigation. */
-#rl-app .b-folders .b-content > .e-checkbox {
+/* NextSnapMail 0.1.16 replaced the old checkbox with a bound label.
+ * Keep the established full folder navigation for both native templates. */
+#rl-app .b-folders .b-content > .e-checkbox,
+html.pw-theme #rl-app .b-folders .b-content > .folder-list-filter {
+  display: none;
+}
+
+/* Current/all/subtree scope remains in the native advanced-search popup.
+ * The new simple-search radios overflow Pied Web's single-row toolbar. */
+html.pw-theme #rl-app #V-MailMessageList .simple-search-scope {
   display: none;
 }
 
@@ -5846,7 +5854,7 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
 }
 #rl-app #V-MailFolderList .pw-folder-rail { display:none; }
 @media(min-width:800px) {
-  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList.pw-folder-rail-ready .b-content > :is(.b-folders-system,hr,.search-input-wrp,.e-checkbox,.b-folders-user,.move-action-content-wrapper) {
+  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList.pw-folder-rail-ready .b-content > :is(.b-folders-system,hr,.search-input-wrp,.e-checkbox,.folder-list-filter,.b-folders-user,.move-action-content-wrapper) {
     display:none!important;
   }
   html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList .pw-folder-rail {

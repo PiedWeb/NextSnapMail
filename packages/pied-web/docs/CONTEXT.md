@@ -316,6 +316,13 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 ## Native contracts that previously caused regressions
 
+- Core 0.1.16 adds `.simple-search-scope` inside the native search wrapper and
+  replaces the folder `.e-checkbox` with `.folder-list-filter`. Studio moves
+  that wrapper out of `.messageList`, so scope presentation must target
+  `#V-MailMessageList`. Keep the single-row toolbar and the full folder list;
+  current/all/subtree remain in the native advanced-search popup. Import the
+  current native fragments in upgrade tests, since the historical synthetic
+  fixture alone missed these additions. See `tests/browser/test-upstream-navigation.js`.
 - Squire installs a capture paste listener on the editable root. Our file handler must
   capture on its parent first, otherwise the image can be inserted twice.
 - Native Knockout exposes `ko.computed(fn, {pure:true})`, not `ko.pureComputed` here.

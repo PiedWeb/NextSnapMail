@@ -1,5 +1,20 @@
 # Releases
 
+## 1.10.31, 2026-10-20
+
+Restore the single-row search toolbar and full folder navigation with core
+0.1.16. Its new simple-search scope radios overflow the relocated search box;
+the native current/all/subtree choices remain in Advanced search. The folder
+unread filter changed from `.e-checkbox` to `.folder-list-filter`, so both
+native templates now retain the established hidden-filter presentation,
+including the compact rail. Native bindings and theme-exit behavior remain intact.
+
+Browser regression coverage imports these fragments from the current core
+templates instead of relying on the older hand-written fixture. Sixteen new
+checks cover four widths, both themes, the rail and advanced-search contracts;
+the existing toolbar and rail suites pass another 31 checks. See the
+[deployment and browser limitation](docs/deployments/1.10.31-native-navigation.md).
+
 ## Companion compatibility — 2026-10-20
 
 - Calendar workspace 1.0.2 and mail scheduler 1.1.1 accept Nextcloud 34–35; existing layout and transport logic are retained.

@@ -4,7 +4,7 @@
 }
 #rl-app #V-MailFolderList .pw-folder-rail { display:none; }
 @media(min-width:800px) {
-  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList.pw-folder-rail-ready .b-content > :is(.b-folders-system,hr,.search-input-wrp,.e-checkbox,.b-folders-user,.move-action-content-wrapper) {
+  html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList.pw-folder-rail-ready .b-content > :is(.b-folders-system,hr,.search-input-wrp,.e-checkbox,.folder-list-filter,.b-folders-user,.move-action-content-wrapper) {
     display:none!important;
   }
   html.pw-theme.rl-left-panel-disabled #rl-app #V-MailFolderList .pw-folder-rail {
