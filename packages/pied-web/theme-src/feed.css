@@ -221,6 +221,9 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
 #rl-app #V-Settings-General .pw-feed-settings-status:empty { display:none; }
 @media(max-width:799px) {
   #rl-app .pw-list-scope { align-items:flex-start;flex-direction:column;padding:8px 16px; }
+  /* The native account menu and folder title already live in the phone header.
+   * Keep this row as a fallback until that menu has mounted. */
+  html.pw-theme #rl-app #rl-right:has(> .pw-mobile-header #V-SystemDropDown) .pw-list-scope { display:none; }
   #rl-app #V-MailMessageList .pw-global-feed > header,
   #rl-app #V-MailMessageList .pw-global-feed h2,
   #rl-app #V-MailMessageList .pw-global-status { padding-inline:var(--pw-space-4); }

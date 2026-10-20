@@ -351,7 +351,11 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
   actual trigger, including mobile fallback rows when native day headings are hidden.
 - The desktop list identity uses a primary folder and secondary account line, with
   a transparent native toolbar container and neutral hover/open state. Keep the
-  full account/folder accessible label and mobile single-line scope.
+  full account/folder accessible label and the native account menu in the phone header.
+- Since 1.10.32, the phone header owns the folder/account identity. Hide the
+  repeated `.pw-list-scope` below it only under 800 px and after the native
+  account menu has mounted in the header. Keep the scope row as a fallback
+  and restore its desktop placement at 800 px.
 - Restore relocated account menus and Nextcloud shell styling when leaving the theme.
 
 ## History and scope limits

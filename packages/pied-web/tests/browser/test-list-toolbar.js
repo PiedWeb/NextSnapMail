@@ -16,6 +16,7 @@ const fresh = async suffix => {
                 trigger.parentElement.querySelector('menu').classList.toggle('show',open);
             });
         }
+        window.toolbarAccountNode = document.getElementById('V-SystemDropDown');
     });
 };
 await page.setViewportSize({width:1440,height:900});
@@ -79,8 +80,18 @@ const morePosition = () => page.evaluate(() => {
         && Math.min(Math.abs(b.top-a.bottom),Math.abs(b.bottom-a.top)) <= 5
         && (Math.abs(b.left-a.left) <= 1 || Math.abs(b.right-(innerWidth-12)) <= 1);
 });
-for (const viewport of [{width:1440,height:900},{width:1000,height:620},{width:390,height:844},{width:390,height:440}]) {
+for (const viewport of [{width:1440,height:900},{width:1000,height:620},{width:800,height:620},{width:799,height:844},{width:390,height:844},{width:390,height:440},{width:320,height:700}]) {
     await page.setViewportSize(viewport);
+    await page.waitForFunction(mobile => !!document.querySelector(mobile
+        ? '.pw-mobile-identity #V-SystemDropDown' : '.pw-list-scope #V-SystemDropDown'),viewport.width < 800);
+    check(`The folder/account identity occupies one row at ${viewport.width} × ${viewport.height}`,await page.evaluate(() => {
+        const scope = document.querySelector('.pw-list-scope'), account = document.getElementById('V-SystemDropDown');
+        const trigger = account.querySelector('#top-system-dropdown-id');
+        return account === window.toolbarAccountNode && trigger.getBoundingClientRect().width > 0
+            && (innerWidth < 800 ? scope.getClientRects().length === 0
+                && account.closest('.pw-mobile-identity') && document.querySelector('.pw-mobile-folder-label').getBoundingClientRect().height > 0
+                : scope.getBoundingClientRect().height > 0 && scope.contains(trigger));
+    }));
     await page.locator('#more-list-dropdown-id').click();
     await page.waitForFunction(() => document.querySelector('.pw-list-more-menu').style.getPropertyValue('--pw-list-menu-top'));
     check(`More menu stays beside its trigger and inside ${viewport.width} × ${viewport.height}`,await morePosition());
@@ -91,6 +102,30 @@ check('Mobile restores its existing account header and leaves the scope in the p
     && !document.querySelector('#top-system-dropdown-id .pw-list-scope-label')
     && getComputedStyle(document.querySelector('.pw-account-label')).display !== 'none'
     && !!document.querySelector('#V-PopupsAdvancedSearch #pw-search-scope')));
+await page.locator('#top-system-dropdown-id').focus(); await page.keyboard.press('Space');
+check('The retained native account menu remains keyboard accessible on a 320px phone',await page.evaluate(() => {
+    const trigger = document.querySelector('#top-system-dropdown-id');
+    return trigger.getAttribute('aria-expanded') === 'true'
+        && trigger.parentElement.querySelector('menu').getBoundingClientRect().width > 0;
+}));
+await page.locator('#top-system-dropdown-id').click();
+await page.locator('.pw-search-toggle').click();
+check('Mobile search expands below the sole identity header',await page.evaluate(() => {
+    const header = document.querySelector('.pw-mobile-header').getBoundingClientRect();
+    const input = document.querySelector('.inputSearch').getBoundingClientRect();
+    return input.width > 0 && input.top >= header.bottom && !document.querySelector('.pw-list-scope').getClientRects().length;
+}));
+await page.locator('.pw-search-toggle').click();
+await page.evaluate(() => { document.documentElement.dataset.themes = 'dark'; });
+check('Dark mobile also shows the account once without hiding its selector',await page.evaluate(() =>
+    !document.querySelector('.pw-list-scope').getClientRects().length
+    && document.querySelector('.pw-mobile-identity #top-system-dropdown-id').getBoundingClientRect().width > 0));
+check('An unavailable mobile account menu leaves the fallback identity visible',await page.evaluate(() => {
+    const account = document.getElementById('V-SystemDropDown'), home = document.createComment('Fixture account home');
+    account.before(home); account.remove();
+    const available = document.querySelector('.pw-list-scope').getBoundingClientRect().height > 0;
+    home.replaceWith(account); return available;
+}));
 await page.setViewportSize({width:1440,height:900});
 await page.waitForFunction(() => document.querySelector('.pw-list-scope #top-system-dropdown-id .pw-list-scope-label'));
 await page.evaluate(() => { document.documentElement.dataset.themes = 'dark'; });

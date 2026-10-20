@@ -19,6 +19,11 @@ it remains the native mail search field, with its bindings and keyboard scope. T
 compact desktop sidebar reserves space above Compose. Settings reserve the launcher
 slot alongside their back controls.
 
+Since 1.10.32, the separate desktop scope row is hidden below 800 px once the
+native account menu is mounted in that phone header. This removes the repeated
+folder/account line without moving or replacing the menu. An unavailable menu
+leaves the scope row visible as a fallback. The desktop scope row returns at 800 px.
+
 Since 1.7.32, the desktop sidebar keeps the state the reader chose. Collapsing or
 expanding it with the native toggle stores `pw-left-panel` in the browser's
 `localStorage`, and the next page load restores that choice while the folder pane is

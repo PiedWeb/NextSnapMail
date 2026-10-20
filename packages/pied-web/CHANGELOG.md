@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.32, 2026-10-20
+
+Remove the duplicated folder/account row below the phone header. Hide it only
+below 800 px while the existing native account menu is mounted in that header;
+retain the fallback identity and desktop scope row. Account switching, folder
+navigation and search keep their native controls. See the
+[deployment and checks](docs/deployments/1.10.32-mobile-identity.md).
+
 ## 1.10.31, 2026-10-20
 
 Restore the single-row search toolbar and full folder navigation with core
