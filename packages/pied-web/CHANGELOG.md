@@ -1,5 +1,16 @@
 # Releases
 
+## 1.10.34 — 2026-10-22
+
+- Fix mobile message reading: the theme's flex list no longer overrides the native
+  message-selected pane switch. Opening a message gives the reader the entire
+  content area; Back restores the list. Desktop single-pane mode follows the same
+  native contract, while desktop previews retain both panes.
+- Keep the phone reader within the available height with one scrolling message
+  surface and 16 px side gutters. Preserve received content and native commands.
+- Add a regression using both mounted native views and the engine's actual
+  selection statement, with opening, scrolling and Back in light/dark at phone widths.
+
 ## 1.10.33 — 2026-10-20
 
 - Apply the Refactoring UI review: truthful single mobile scope/account identity,

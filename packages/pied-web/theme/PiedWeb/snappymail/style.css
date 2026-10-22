@@ -3370,6 +3370,11 @@ html.rl-fullscreen #rl-app #V-MailMessageView.pw-enhanced .message-fixed-button-
   flex-direction: column;
   min-height: 0;
 }
+/* Native mail screens stay mounted while message-selected chooses the pane.
+ * The flex rule above outranks the engine's list-hiding selector. */
+html:not(.sm-msgView-side):not(.sm-msgView-bottom) #rl-app #rl-right.message-selected #V-MailMessageList {
+  display: none;
+}
 #rl-app #V-MailMessageList > .btn-toolbar {
   display: flex;
   align-items: center;
@@ -5003,6 +5008,27 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
   #rl-app #V-MailMessageView .pw-reading-actions > .btn[data-pw-icon] {
     height:44px;
     min-height:44px;
+  }
+}
+@media (max-width: 799px) {
+  /* A phone has one content pane, including during a desktop-layout transition. */
+  html.pw-theme #rl-app #rl-right.message-selected #V-MailMessageList,
+  html.pw-theme #rl-app #rl-right:not(.message-selected) #V-MailMessageView {
+    display:none;
+  }
+  html.pw-theme #rl-app #V-MailMessageView.pw-enhanced {
+    flex:1 1 0;
+    width:100%;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+  html.pw-theme #rl-app #V-MailMessageView .bodyText {
+    max-width:100%;
+    padding-inline:var(--pw-space-4);
+  }
+  html.pw-theme #rl-app #V-MailMessageView .messageItemHeader {
+    padding-inline:var(--pw-space-4);
   }
 }
 @media (min-width: 800px) {

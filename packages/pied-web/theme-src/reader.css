@@ -78,6 +78,27 @@
     min-height:44px;
   }
 }
+@media (max-width: 799px) {
+  /* A phone has one content pane, including during a desktop-layout transition. */
+  html.pw-theme #rl-app #rl-right.message-selected #V-MailMessageList,
+  html.pw-theme #rl-app #rl-right:not(.message-selected) #V-MailMessageView {
+    display:none;
+  }
+  html.pw-theme #rl-app #V-MailMessageView.pw-enhanced {
+    flex:1 1 0;
+    width:100%;
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+  html.pw-theme #rl-app #V-MailMessageView .bodyText {
+    max-width:100%;
+    padding-inline:var(--pw-space-4);
+  }
+  html.pw-theme #rl-app #V-MailMessageView .messageItemHeader {
+    padding-inline:var(--pw-space-4);
+  }
+}
 @media (min-width: 800px) {
   #rl-app #V-MailMessageView :is(
     #messageItem > .messageItemHeader,

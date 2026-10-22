@@ -316,6 +316,11 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 ## Native contracts that previously caused regressions
 
+- Since 1.10.34, the theme's flex rules must preserve the native message-selected
+  pane switch. The engine keeps both MailMessageList and MailMessageView mounted;
+  hidden attributes in a fixture cannot stand in for that switch. Phones always
+  show one pane and give it the available height; desktop preview layouts retain
+  their two panes. Cover opening and Back with both views unhidden.
 - Core 0.1.16 adds `.simple-search-scope` inside the native search wrapper and
   replaces the folder `.e-checkbox` with `.folder-list-filter`. Studio moves
   that wrapper out of `.messageList`, so scope presentation must target
