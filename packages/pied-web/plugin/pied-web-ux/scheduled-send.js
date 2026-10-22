@@ -73,7 +73,8 @@
         const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = 'pw-schedule-confirm';
         confirm.textContent = t('Programmer', 'Schedule');
         actions.append(cancel, confirm);
-        const note = document.createElement('p'); note.className = 'pw-schedule-note'; note.setAttribute('role', 'status');
+        const note = document.createElement('p'); note.className = 'pw-schedule-note'; note.id='pw-schedule-note'; note.setAttribute('role', 'status');
+        input.setAttribute('aria-describedby',note.id);
         panel.append(heading, options, custom, actions, note);
         wrap.append(button, panel); send.after(wrap);
 
@@ -93,13 +94,21 @@
             return list;
         };
         const say = text => { note.textContent = text || ''; note.hidden = !text; };
+        const invalid = text => {say(text);input.setAttribute('aria-invalid','true');input.focus();};
+        input.addEventListener('input',()=>{input.removeAttribute('aria-invalid');say('');});
         const choose = async date => {
-            if (!(date instanceof Date) || !Number.isFinite(date.getTime())) return say(t('Date incomplète.', 'Incomplete date.'));
-            if (date.getTime() < Date.now() + 30000) return say(t('Choisissez un moment à venir.', 'Choose a time in the future.'));
+            if (!(date instanceof Date) || !Number.isFinite(date.getTime())) return invalid(t('Date incomplète.', 'Incomplete date.'));
+            if (date.getTime() < Date.now() + 30000) return invalid(t('Choisissez un moment à venir.', 'Choose a time in the future.'));
+            input.removeAttribute('aria-invalid');input.disabled=true;button.disabled=true;cancel.disabled=true;panel.setAttribute('aria-busy','true');
             confirm.disabled = true; options.querySelectorAll('button').forEach(node => node.disabled = true);
             say(t('Programmation…', 'Scheduling…'));
-            const done = await api.scheduleSend?.(date.toISOString());
-            confirm.disabled = false; options.querySelectorAll('button').forEach(node => node.disabled = false);
+            let done=false;
+            try {done = await api.scheduleSend?.(date.toISOString());}
+            catch (_) { /* Keep the draft and expose recovery in the panel. */ }
+            finally {
+                input.disabled=false;button.disabled=false;cancel.disabled=false;panel.setAttribute('aria-busy','false');
+                confirm.disabled = false; options.querySelectorAll('button').forEach(node => node.disabled = false);
+            }
             // A refusal is already explained on the composer itself, next to what caused it.
             done ? close(false) : say(t('Message non programmé. Il reste ouvert.', 'Not scheduled. The message stays open.'));
         };
@@ -126,7 +135,7 @@
             removeEventListener('pointerdown', outside, true);
             focus && button.focus();
         };
-        const outside = event => { if (!wrap.contains(event.target)) close(false); };
+        const outside = event => { if (!wrap.contains(event.target) && panel.getAttribute('aria-busy')!=='true') close(false); };
         button.addEventListener('click', () => panel.hidden ? open() : close(true));
         cancel.addEventListener('click', () => close(true));
         confirm.addEventListener('click', () => choose(input.value ? new Date(input.value) : null));

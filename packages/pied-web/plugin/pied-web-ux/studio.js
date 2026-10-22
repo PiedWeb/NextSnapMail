@@ -189,18 +189,19 @@
             const copyLabel=fr() ? 'Copier en MD' : 'Copy as Markdown';
             copy.title=copyLabel;copy.setAttribute('aria-label',copyLabel);
             const copyStatus=document.createElement('span');copyStatus.className='pw-copy-md-status';copyStatus.setAttribute('role','status');copyStatus.setAttribute('aria-live','polite');
-            copyGroup.append(copy,copyStatus);
+            copyGroup.append(copy); dom.append(copyStatus);
             toolbar.querySelector('.buttonUp')?.closest('.btn-group')?.before(copyGroup);
             const updateCopy=()=>{copy.disabled=!vm.messageVisible?.();};
             vm.messageVisible?.subscribe(updateCopy);updateCopy();
             let copyTimer;
             const copyFeedback=(state,label)=>{
                 copyStatus.textContent=label;copy.title=label;
+                copyStatus.dataset.state=state;
                 delete copy.dataset.state;
                 void copy.offsetWidth; // Replay the brief confirmation on consecutive copies.
                 copy.dataset.state=state;
                 clearTimeout(copyTimer);
-                copyTimer=setTimeout(()=>{copyStatus.textContent='';copy.title=copyLabel;delete copy.dataset.state;},2400);
+                copyTimer=setTimeout(()=>{copyStatus.textContent='';copy.title=copyLabel;delete copy.dataset.state;delete copyStatus.dataset.state;},2400);
             };
             copy.addEventListener('click',async()=>{
                 if (copy.dataset.state==='copying') return;
@@ -247,6 +248,40 @@
                 };
                 new MutationObserver(restoreMenu).observe(document.documentElement,{attributes:true,attributeFilter:['class']});
                 restoreMenu();
+                // Move the same secondary buttons into the existing phone menu.
+                const phone = matchMedia('(max-width:799px)');
+                const overflow = menu.querySelector('menu');
+                const placements = new Map();
+                const placeSecondary = () => {
+                    if (!overflow) return;
+                    const compact = phone.matches && document.documentElement.classList.contains('pw-theme')
+                        && !document.documentElement.classList.contains('rl-fullscreen');
+                    [copy, reply?.querySelector('.pw-remind-message') || overflow.querySelector('.pw-remind-message')].filter(Boolean).forEach(button => {
+                        let item = placements.get(button);
+                        if (!item) {
+                            const marker = document.createComment('Secondary reader command'); button.before(marker);
+                            const row = document.createElement('li'); row.className = 'pw-reader-secondary'; row.setAttribute('role','presentation');
+                            item = {marker,row}; placements.set(button,item);
+                        }
+                        if (compact) {
+                            if (item.row.parentNode !== overflow) overflow.append(item.row);
+                            if (button.parentNode !== item.row) item.row.append(button);
+                        } else {
+                            if (button.previousSibling !== item.marker) item.marker.after(button);
+                            item.row.remove();
+                        }
+                    });
+                    dom.classList.toggle('pw-mobile-reader-ready',compact);
+                };
+                phone.addEventListener('change',placeSecondary);
+                const secondaryObserver = new MutationObserver(placeSecondary);
+                if (reply) secondaryObserver.observe(reply,{childList:true});
+                const themeObserver = new MutationObserver(placeSecondary);
+                themeObserver.observe(document.documentElement,{attributes:true,attributeFilter:['class']});
+                placeSecondary();
+                ko.utils.domNodeDisposal.addDisposeCallback(dom,() => {
+                    secondaryObserver.disconnect(); themeObserver.disconnect(); phone.removeEventListener('change',placeSecondary);
+                });
                 // `with: message` rebuilds part of this menu. Its former ancestor's
                 // i18nUpdate no longer reaches it after it moves to the toolbar.
                 const translateMenu=()=>menu.querySelectorAll('[data-i18n]').forEach(node=>{
@@ -347,6 +382,19 @@
             };
             vm.messageList.subscribe(revealSearch); vm.inputSearch?.subscribe(revealSearch); revealSearch();
             vm.focusSearch?.subscribe(focus=>{if(focus){dom.classList.add('pw-search-open');revealSearch();}});
+            const empty = dom.querySelector('.listEmptyMessage');
+            if (empty && typeof vm.cancelSearch === 'function') {
+                const recovery = document.createElement('button'); recovery.type='button'; recovery.className='pw-empty-clear';
+                recovery.textContent=fr() ? 'Effacer la recherche' : 'Clear search'; recovery.hidden=true;
+                empty.after(recovery);
+                const updateRecovery=()=>{
+                    const state=vm.messageList();
+                    recovery.hidden=!document.documentElement.classList.contains('pw-theme') || !state?.search
+                        || state.length>0 || dom.classList.contains('pw-global-active');
+                };
+                recovery.addEventListener('click',()=>{vm.cancelSearch();vm.inputSearch?.('');dom.classList.remove('pw-search-open');revealSearch();updateRecovery();});
+                vm.messageList.subscribe(updateRecovery); updateRecovery();
+            }
             const advanced=dom.querySelector('.buttonMoreSearch'), search=dom.querySelector('.search-input-wrp');
             const inputHome=document.createComment('Native mail search field');search.before(inputHome);
             // Native Enter shortcuts are scoped to the list. The mobile header is its sibling.

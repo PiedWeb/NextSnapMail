@@ -61,9 +61,12 @@ await p.evaluate(()=>readerVM.messageVisible(false));
 check('Copy is unavailable when the native reader has no visible message',await p.evaluate(()=>document.querySelector('.pw-copy-md').disabled));
 await p.evaluate(()=>readerVM.messageVisible(true));
 await p.setViewportSize({width:320,height:700});
-check('The extra control stays within the narrow mobile toolbar',await p.evaluate(()=>{
+await p.waitForFunction(()=>document.querySelector('.pw-copy-md').closest('menu'));
+await p.evaluate(()=>document.querySelector('.pw-copy-md').closest('menu').classList.add('show'));
+check('The same copy control stays available as a named phone menu action',await p.evaluate(()=>{
     const button=document.querySelector('.pw-copy-md').getBoundingClientRect();
-    return button.width>=27 && button.right<=innerWidth && document.documentElement.scrollWidth<=innerWidth;
+    return button.width>=150 && button.right<=innerWidth && document.documentElement.scrollWidth<=innerWidth
+        &&getComputedStyle(document.querySelector('.pw-copy-md'),'::after').content.includes('Copier en MD');
 }));
 check('No fixture runtime errors',await p.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:checks.length,checks}));

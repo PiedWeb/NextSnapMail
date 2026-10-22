@@ -8,7 +8,7 @@
         dom.dataset.pwMetadataVersion = '1.7.14';
         let frame;
         const desktop = matchMedia('(min-width: 1200px)');
-        const originals = new WeakMap(), attributes = ['title','role','tabindex','aria-label','aria-pressed'];
+        const originals = new WeakMap(), attributes = ['title','role','tabindex','aria-label','aria-pressed','aria-current','aria-disabled'];
         const remember = control => {
             if (!originals.has(control)) originals.set(control,attributes.map(name => control.getAttribute(name)));
         };
@@ -41,7 +41,7 @@
             frame = 0;
             if (!active()) {
                 removeReadButtons();
-                dom.querySelectorAll('.messageListItem .threads-len,.messageListItem .flagParent').forEach(control => {
+                dom.querySelectorAll('.messageListItem .threads-len,.messageListItem .flagParent,.messageListItem .subjectParent,.e-paginator a').forEach(control => {
                     const values = originals.get(control);
                     if (!values) return;
                     attributes.forEach((name,i) => values[i] === null ? control.removeAttribute(name) : control.setAttribute(name,values[i]));
@@ -51,6 +51,24 @@
             }
             const fr = (document.documentElement.lang || 'fr').startsWith('fr');
             updateReadButtons(fr);
+            dom.querySelectorAll('.messageListItem .subjectParent').forEach(node => {
+                remember(node);
+                const text=node.textContent.trim();
+                if(node.title!==text)node.title=text;
+            });
+            dom.querySelectorAll('.e-paginator a').forEach(node => {
+                const text=node.textContent.trim();
+                const page=Number(ko.unwrap(ko.dataFor(node)?.value)) || (/^\d+$/.test(text) ? Number(text) : 0);
+                if (!page) return;
+                remember(node);
+                node.setAttribute('aria-label',node.title || 'Page '+page);
+                const current=node.classList.contains('current');
+                if(current)node.setAttribute('aria-current','page');else node.removeAttribute('aria-current');
+                if(!node.hasAttribute('href')){
+                    node.setAttribute('role','button');node.tabIndex=current ? -1 : 0;
+                    node.setAttribute('aria-disabled',String(current));
+                }
+            });
             dom.querySelectorAll('.messageListItem .threads-len').forEach(control => {
                 // KO owns textContent. Read its native total/unread format without replacing children.
                 const match = control.textContent.trim().match(/^(\d+)(?:\/(\d+))?$/);
@@ -98,10 +116,10 @@
         dom.addEventListener('click',readClick,true);
         const keyboard = event => {
             if (!active() || !['Enter',' '].includes(event.key) || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-            const control = event.target.closest('.messageListItem .pw-read-toggle,.messageListItem .flagParent,.messageListItem .threads-len');
+            const control = event.target.closest('.messageListItem .pw-read-toggle,.messageListItem .flagParent,.messageListItem .threads-len,.e-paginator a[role=button]');
             if (!control || event.target !== control) return;
             event.preventDefault(); event.stopImmediatePropagation();
-            if (!event.repeat) control.click();
+            if (!event.repeat && control.getAttribute('aria-disabled')!=='true') control.click();
         };
         dom.addEventListener('keydown',keyboard,true); schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom,() => {

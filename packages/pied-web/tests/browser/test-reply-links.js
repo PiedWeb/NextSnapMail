@@ -71,8 +71,9 @@ await p.goto(base);await p.waitForSelector('.pw-message-actions');await p.evalua
 for(const dark of [false,true]){
  await p.setViewportSize({width:390,height:844});
  await p.evaluate(dark=>document.documentElement.dataset.themes=dark?'dark':'light',dark);
- check((dark?'Dark':'Light')+' mobile retains named links and native compact geometry',await p.evaluate(()=>
-  [...document.querySelectorAll('.pw-message-actions a')].every(node=>node.getBoundingClientRect().height>=32&&!!node.getAttribute('aria-label'))
+ check((dark?'Dark':'Light')+' mobile retains named links and one visible preferred reply',await p.evaluate(()=>
+  [...document.querySelectorAll('.pw-message-actions a')].every(node=>!!node.getAttribute('aria-label')&&!!node.href)
+  &&[...document.querySelectorAll('.pw-message-actions a')].filter(node=>node.getBoundingClientRect().height>=44).length===1
   &&document.documentElement.scrollWidth<=innerWidth));
 }
 check('No fixture errors',await p.evaluate(()=>fixtureErrors.length===0));

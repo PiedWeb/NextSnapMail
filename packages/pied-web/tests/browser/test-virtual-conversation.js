@@ -212,10 +212,11 @@ check('The visible conversation stack fits a narrow screen',await p.evaluate(()=
         const box=card.getBoundingClientRect();return box.width>0&&box.height>0&&box.left>=0&&box.right<=innerWidth;
     })&&document.documentElement.scrollWidth<=innerWidth;
 }));
-check('On mobile, the header Back action closes the reader without hiding other toolbar commands',await p.evaluate(()=>{
+await p.waitForFunction(()=>document.querySelector('.pw-copy-md')?.closest('menu'));
+check('On mobile, Back remains visible and secondary commands stay available in More',await p.evaluate(()=>{
     const back=document.querySelector('#rl-right > .pw-mobile-header > button[data-pw-icon="previous"]');
-    const copy=document.querySelector('#V-MailMessageView .pw-copy-md-group');
-    return back && getComputedStyle(back).display!=='none' && copy && getComputedStyle(copy).display!=='none';
+    const copy=document.querySelector('#V-MailMessageView .pw-copy-md');
+    return back && getComputedStyle(back).display!=='none' && copy?.closest('.pw-reader-menu menu');
 }));
 await p.evaluate(()=>{document.documentElement.classList.remove('pw-theme');});
 await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);

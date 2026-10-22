@@ -42,6 +42,7 @@ await p.evaluate(()=>{
  document.querySelector('#V-MailMessageList .buttonCompose').click();
 });
 await p.setViewportSize({width:390,height:844});
+await p.evaluate(()=>document.getElementById('rl-right').classList.remove('message-selected'));
 await p.locator('.pw-mobile-header a[data-pw-icon="compose"]').press('Space');
 await p.setViewportSize({width:1280,height:820});
 check('Native and mobile New message controls invoke compose exactly once',await p.evaluate(()=>actionCalls.filter(c=>c==='compose').length===3));
@@ -76,9 +77,9 @@ check('Enabling the exact Forward command consumes the intent once',await p.eval
 await p.goto(base);await p.waitForSelector('.pw-reading-actions');await ready();
 for(const dark of [false,true]){
  await p.setViewportSize({width:390,height:844});await p.evaluate(dark=>document.documentElement.dataset.themes=dark?'dark':'light',dark);
- check((dark?'Dark':'Light')+' mobile preserves footer and New message geometry',await p.evaluate(()=>
+ check((dark?'Dark':'Light')+' mobile preserves footer targets and focuses the reader header',await p.evaluate(()=>
   [...document.querySelectorAll('.pw-reading-actions a')].filter(node=>getComputedStyle(node).display!=='none').every(node=>node.getBoundingClientRect().height>=44)
-  &&document.querySelector('.pw-mobile-header a[data-pw-icon="compose"]').getBoundingClientRect().height>=32
+  &&getComputedStyle(document.querySelector('.pw-mobile-header a[data-pw-icon="compose"]')).display==='none'
   &&document.documentElement.scrollWidth<=innerWidth));
 }
 check('No fixture errors',await p.evaluate(()=>fixtureErrors.length===0));

@@ -11,7 +11,7 @@ check('Desktop keeps only the page-wide selection checkbox',await p.evaluate(()=
 check('Desktop messages have a subtle divider',await p.evaluate(()=>{const width=parseFloat(getComputedStyle(document.querySelector('.messageListItem')).borderBottomWidth);return width>0&&width<=1;}));
 await p.evaluate(()=>{demoRows[0].classList.add('checked');demoRows[1].classList.add('selected');});
 check('Checked, current and neutral rows have distinct surfaces',await p.evaluate(()=>new Set([0,1,2].map(i=>getComputedStyle(demoRows[i]).backgroundColor)).size===3));
-await p.screenshot({path:'shell-173-desktop.png'});
+if(globalThis.PW_CAPTURE_SCREENSHOTS)await p.screenshot({path:'shell-173-desktop.png'});
 await p.setViewportSize({width:390,height:844});
 await p.waitForFunction(()=>!document.querySelector('.pw-mobile-header').contains(document.querySelector('.search-input-wrp')));
 check('Mobile keeps one header with launcher, identity, search and compose',await p.evaluate(()=>{const header=document.querySelector('.pw-mobile-header'),search=document.querySelector('.search-input-wrp');return getComputedStyle(header).display==='flex'&&!header.contains(search)&&getComputedStyle(header.querySelector('.pw-search-toggle')).display==='flex'&&document.documentElement.scrollWidth===innerWidth;}));
@@ -22,13 +22,13 @@ check('Mobile keeps selection gesture-only',await p.evaluate(()=>
  [...document.querySelectorAll('.messageCheckbox,.checkboxCheckAll,.pw-mobile-select')]
   .every(el=>getComputedStyle(el).display==='none'||!el.getClientRects().length)));
 check('Mobile launcher is visible and does not overlap the identity',await p.evaluate(()=>{const b=document.querySelector('.app-menu__waffle'),r=b.getBoundingClientRect(),id=document.querySelector('.pw-mobile-identity').getBoundingClientRect();return b.contains(document.elementFromPoint(r.x+r.width/2,r.y+r.height/2))&&id.x>=r.right;}));
-await p.screenshot({path:'shell-173-mobile.png'});
+if(globalThis.PW_CAPTURE_SCREENSHOTS)await p.screenshot({path:'shell-173-mobile.png'});
 await p.setViewportSize({width:320,height:700});
-check('Narrow mobile header stays within 320px',await p.evaluate(()=>{const b=document.querySelector('.pw-mobile-header button[data-pw-icon="compose"]').getBoundingClientRect();return b.right<=innerWidth&&document.documentElement.scrollWidth===innerWidth;}));
-await p.screenshot({path:'shell-173-mobile-320.png'});
+check('Narrow mobile header stays within 320px',await p.evaluate(()=>{const b=document.querySelector('.pw-mobile-header a[data-pw-icon="compose"]').getBoundingClientRect();return b.width>=44&&b.right<=innerWidth&&document.documentElement.scrollWidth===innerWidth;}));
+if(globalThis.PW_CAPTURE_SCREENSHOTS)await p.screenshot({path:'shell-173-mobile-320.png'});
 await p.emulateMedia({colorScheme:'dark'});await p.evaluate(()=>document.documentElement.dataset.themes='dark');
 check('Dark checked rows keep a distinct surface',await p.evaluate(()=>getComputedStyle(demoRows[0]).backgroundColor!==getComputedStyle(demoRows[2]).backgroundColor));
-await p.screenshot({path:'shell-173-dark.png'});
+if(globalThis.PW_CAPTURE_SCREENSHOTS)await p.screenshot({path:'shell-173-dark.png'});
 await p.evaluate(()=>document.querySelector('#app-theme-style').dataset.name='NextcloudV25+');
 await p.waitForFunction(()=>!document.body.classList.contains('pw-mail-shell'));
 check('Leaving Pied Web restores the Nextcloud header',await p.evaluate(()=>getComputedStyle(document.querySelector('#header .header-end')).display!=='none'&&document.querySelector('#header').getBoundingClientRect().height>47.9));

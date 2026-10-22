@@ -57,3 +57,14 @@ complete accessible labels and an explicit unread conversation state. Expose pho
 selection on demand. Use a strong dedicated field boundary without darkening every
 divider. Errors explain recovery near the affected field; the Feed offers refresh or
 clear search. Text scale tokens use rem and chrome wraps at larger default font sizes.
+
+## Focused phone reading
+
+Keep one relevant top reply, Trash, More and previous/next. Secondary commands stay
+in the native menu, including the original copy/reminder buttons; More uses named,
+full-width rows. During reading, hide list search/compose and the redundant subject
+close, keeping Back and source identity. Metadata uses 14 px with wrapping; reply
+actions can wrap independently. Global phone rows share one line for time and
+tools without a raised container. Attachment names get two lines and conversation
+headers reflow. Settings sections stop at 52rem. Phone forms use 44 px targets;
+date fields use 16 px and described validation. Chrome respects reduced motion.

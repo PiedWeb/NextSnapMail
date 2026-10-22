@@ -6,8 +6,7 @@ p.setDefaultTimeout(8000);
 await p.emulateMedia({colorScheme:'light'});
 await p.setViewportSize({width:1440,height:950});
 
-// The control is mounted on the native composer header, taken from the template the engine
-// itself renders, so a change to that header cannot leave this check passing.
+// Mount the control on the current native composer header and popup geometry.
 const compose=async()=>{
  await p.addScriptTag({url:'/.local-work/pied-web-ux/scheduled-send.js'});
  await p.evaluate(async()=>{
@@ -16,13 +15,14 @@ const compose=async()=>{
   const html=await (await fetch('/app/snappymail/v/2.38.2/app/templates/Views/User/PopupsCompose.html')).text();
   const template=document.createElement('template');template.innerHTML=html;
   const header=template.content.querySelector('header');
-  const dialog=document.createElement('dialog');dialog.id='V-PopupsCompose';
-  dialog.append(header);document.querySelector('#rl-app').append(dialog);
-  // The native composer is a modal dialog; opening it any other way leaves its controls
-  // out of the top layer and out of reach of a real click. The engine sizes that dialog
-  // around a body this fixture does not build, so it is pinned to the top of the viewport.
+  const dialog=document.createElement('dialog');dialog.id='V-PopupsCompose';dialog.className='animate';
+  let popups=document.getElementById('rl-popups');
+  if(!popups){popups=document.createElement('div');popups.id='rl-popups';document.querySelector('#rl-app').append(popups);}
+  dialog.append(header);popups.append(dialog);
+  // Retain native full-height geometry and its real popup host. A header-only
+  // auto-height dialog gives fixed descendants a false containing block.
   dialog.showModal();
-  dialog.style.top='0';dialog.style.bottom='auto';dialog.style.height='auto';
+  dialog.style.top='0';dialog.style.bottom='auto';
   window.pwScheduled=[];
   window.PiedWebUx.canSchedule=()=>window.pwCanSchedule!==false;
   window.PiedWebUx.scheduleSend=iso=>{window.pwScheduled.push(iso);return Promise.resolve(true);};
@@ -150,6 +150,11 @@ check('A time in the past is refused in the panel, and nothing is handed over',a
  return window.pwScheduled.length===1&&!note.hidden&&note.textContent.includes('à venir')
   &&note.getAttribute('role')==='status'&&!document.querySelector('.pw-schedule-panel').hidden;
 }));
+check('A refused date focuses an invalid field linked to its visible explanation',await p.evaluate(()=>{
+ const input=document.querySelector('.pw-schedule-custom input');
+ return input.getAttribute('aria-invalid')==='true'&&document.activeElement===input
+  &&document.getElementById(input.getAttribute('aria-describedby')).textContent.includes('à venir');
+}));
 await p.evaluate(()=>document.querySelector('.pw-schedule-cancel').click());
 check('Cancelling closes the panel without scheduling anything',await p.evaluate(()=>
  document.querySelector('.pw-schedule-panel').hidden&&window.pwScheduled.length===1));
@@ -171,4 +176,15 @@ check('At 390 px the panel stays on screen and keeps its targets',await p.evalua
  return box.left>=0&&box.right<=innerWidth+1&&box.width>=240
   &&[...document.querySelectorAll('.pw-schedule-panel button')].every(node=>node.getBoundingClientRect().height>=44);
 }));
+check('Phone date controls avoid automatic zoom and retain a strong boundary',await p.evaluate(()=>getComputedStyle(document.querySelector('.pw-schedule-custom input')).fontSize==='16px'));
+await p.setViewportSize({width:320,height:240});
+check('A short phone screen scrolls the scheduling panel within its viewport',await p.evaluate(()=>{
+ const panel=document.querySelector('.pw-schedule-panel'),box=panel.getBoundingClientRect();
+ return box.top>=0&&box.bottom<=innerHeight&&panel.scrollHeight>panel.clientHeight;
+}));
+await p.evaluate(()=>{PiedWebUx.scheduleSend=()=>new Promise((_resolve,reject)=>{window.rejectSchedule=reject;});document.querySelector('.pw-schedule-option').click();});
+check('Pending scheduling is announced without allowing date edits',await p.evaluate(()=>document.querySelector('.pw-schedule-panel').getAttribute('aria-busy')==='true'&&document.querySelector('.pw-schedule-custom input').disabled));
+await p.evaluate(()=>rejectSchedule(Error('fictional refusal')));
+await p.waitForFunction(()=>document.querySelector('.pw-schedule-panel').getAttribute('aria-busy')==='false');
+check('A scheduling failure restores the controls and explains that the draft stays open',await p.evaluate(()=>!document.querySelector('.pw-schedule-custom input').disabled&&document.querySelector('.pw-schedule-note').textContent.includes('reste ouvert')));
 console.log(JSON.stringify({passed:checks.length,checks}));

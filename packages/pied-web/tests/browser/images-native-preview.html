@@ -448,7 +448,8 @@ rl.pluginRemoteRequest=(cb,action,params)=>{
  }
  mockRequests.push({...params});setTimeout(()=>cb(0,{Result:mockError?{error:mockError}:params.operation==='prepare'?{token:'test-snapshot',count:mockCount,cursor:0,done:false,permanent:messages.folder==='Trash'}:{count:mockCount,cursor:Math.min(mockCount,params.cursor+200),done:params.cursor+200>=mockCount}}),30);
 };
-window.listVM={viewModelTemplateID:'MailMessageList',viewModelDom:document.getElementById('V-MailMessageList'),composeInEdit:ko.observable(false),composeClick(){actionCalls.push('compose');},reload(){actionCalls.push('reload');},messageList};
+const fixtureEmpty=document.createElement('div');fixtureEmpty.className='listEmptyMessage';fixtureEmpty.style.display='none';document.querySelector('.messageList > .b-content').append(fixtureEmpty);
+window.listVM={viewModelTemplateID:'MailMessageList',viewModelDom:document.getElementById('V-MailMessageList'),composeInEdit:ko.observable(false),composeClick(){actionCalls.push('compose');},reload(){actionCalls.push('reload');},cancelSearch(){actionCalls.push('cancelSearch');const current=messageList();current.search='';messageList.valueHasMutated();},messageList};
 rl.app.messageList=messageList;
 // Native folder objects own URL encoding, including nested/custom folders.
 rl.app.folderList=ko.observableArray([{fullName:'INBOX',fullNameHash:'INBOX',subFolders:ko.observableArray([{fullName:'Projets/Équipe',fullNameHash:'Projets-fixture',subFolders:ko.observableArray([])}])},{fullName:'Sent',fullNameHash:'Sent',subFolders:ko.observableArray([])}]);

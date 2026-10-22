@@ -150,6 +150,23 @@ check('Phone controls stay touchable and the picker does not overflow',await p.e
  const action=document.querySelector('.pw-selection-remind').getBoundingClientRect(),panel=document.querySelector('.pw-reminder-panel').getBoundingClientRect();
  return action.width>=44&&action.height>=44&&panel.left>=11&&panel.right<=innerWidth-11&&document.documentElement.scrollWidth<=innerWidth;
 }));
+await p.evaluate(()=>{document.querySelector('.pw-reminder-custom input').value='';});
+await p.locator('.pw-reminder-confirm').click();
+check('An invalid reminder date focuses its field and describes the visible error',await p.evaluate(()=>{
+ const input=document.querySelector('.pw-reminder-custom input');
+ return input.getAttribute('aria-invalid')==='true'&&document.activeElement===input
+  &&document.getElementById(input.getAttribute('aria-describedby')).textContent.includes('incomplète');
+}));
+check('Phone reminder dates avoid automatic zoom',await p.evaluate(()=>getComputedStyle(document.querySelector('.pw-reminder-custom input')).fontSize==='16px'));
 await p.locator('.pw-reminder-cancel').click();
 check('No runtime errors',await p.evaluate(()=>fixtureErrors.length===0));
+await p.evaluate(()=>{
+ document.getElementById('V-MailMessageView').hidden=false;document.getElementById('V-MailMessageList').hidden=true;
+ document.getElementById('rl-right').classList.add('message-selected');
+ readerVM.message({...readerVM.message(),folder:'INBOX'});
+});
+await p.waitForFunction(()=>document.querySelector('.pw-remind-message:not([hidden])')?.closest('menu'));
+await p.evaluate(()=>{document.querySelector('.pw-reader-menu menu').classList.add('show');document.querySelector('.pw-remind-message').click();document.querySelector('.pw-reader-menu menu').classList.remove('show');});
+await p.waitForSelector('.pw-reminder-panel');await p.locator('.pw-reminder-cancel').click();
+check('Cancelling a phone menu reminder returns focus to the visible More trigger',await p.evaluate(()=>document.activeElement===document.querySelector('#more-view-dropdown-id')));
 console.log(JSON.stringify({passed:results.length,results},null,2));

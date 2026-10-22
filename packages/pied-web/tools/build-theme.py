@@ -1,5 +1,6 @@
 from pathlib import Path
 from urllib.parse import quote
+import re
 
 root = Path(__file__).resolve().parent.parent
 theme = root / 'theme-src'
@@ -21,5 +22,14 @@ base = (theme / 'nextcloud-v25.css').read_text()
 (root / 'theme/PiedWeb/snappymail/style.css').write_text((theme / 'font-face.css').read_text() + base + '\n' + (theme / 'tokens.css').read_text() + '\n' + (theme / 'overrides.css').read_text() + '\n' + (theme / 'studio.css').read_text() + '\n' + (theme / 'list-metadata.css').read_text() + '\n' + (theme / 'conversation-thread.css').read_text() + '\n' + (theme / 'app-shell.css').read_text() + '\n' + '\n'.join(icons) + '\n' + (theme / 'comfort-desktop.css').read_text() + '\n' + (theme / 'selection-mode.css').read_text() + '\n' + (theme / 'mail-polish.css').read_text() + '\n' + (theme / 'reader.css').read_text() + '\n' + (theme / 'composer.css').read_text() + '\n' + (theme / 'empty-state.css').read_text() + '\n' + (theme / 'native-controls.css').read_text() + '\n' + (theme / 'unread-order.css').read_text() + '\n' + (theme / 'feed.css').read_text() + '\n' + (theme / 'folder-rail.css').read_text())
 output = root / 'theme/PiedWeb/snappymail/style.css'
 output.write_text(output.read_text() + '\n' + '\n'.join((theme / name).read_text() for name in [
-    'mailbox-actions.css', 'interface-comfort.css', 'compact.css', 'components.css']))
+    'mailbox-actions.css', 'interface-comfort.css', 'compact.css', 'components.css', 'refinements.css']))
+# Keep implementation notes in the source, without shipping them on every load.
+# Match quoted strings first, so comment-like content and URLs stay intact.
+tokens = re.compile(r'''"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'|/\*.*?\*/''', re.S)
+def runtime_token(match):
+    token = match.group()
+    if token.startswith('/*') and not re.search(r'copyright|licen[cs]e|@preserve|SPDX|^/\*!', token, re.I):
+        return ' '  # Preserve separation between any adjoining CSS tokens.
+    return token
+output.write_text(re.sub(r'(?m)[\t ]+$', '', tokens.sub(runtime_token, output.read_text())))
 print('Built Pied Web theme with seven monochrome SVG folder icons and virtual Feed views.')

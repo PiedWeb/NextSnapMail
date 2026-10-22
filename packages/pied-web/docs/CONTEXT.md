@@ -316,6 +316,16 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 ## Native contracts that previously caused regressions
 
+- Since 1.10.35, phone reader copy/reminder buttons move into the native More menu,
+  with restoration markers and unchanged handlers. The copy live region stays
+  outside hidden groups. Reminder cancellation returns to More if the original
+  trigger is hidden. Handle late reminder controls and restore the same nodes on
+  desktop/theme exit. Preserve native sender titles, which include addresses;
+  add only the missing subject titles. Empty native search uses cancelSearch().
+- Scheduling fixtures must mount the full-height open `.animate` dialog in
+  `#rl-popups`, like the engine. Closing transforms, fallback drop-shadows and
+  header-only geometry give fixed descendants a false containing block. Phone
+  scheduling panels must also fit the composer containing block in short viewports.
 - Since 1.10.34, the theme's flex rules must preserve the native message-selected
   pane switch. The engine keeps both MailMessageList and MailMessageView mounted;
   hidden attributes in a fixture cannot stand in for that switch. Phones always

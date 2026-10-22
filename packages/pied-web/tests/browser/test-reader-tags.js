@@ -24,7 +24,8 @@ check('Label entries match the other menus rather than the message title',await 
  const scale=getComputedStyle(document.documentElement).getPropertyValue('--pw-text-sm').trim();
  const subject=document.querySelector('.messageItemHeader .subjectParent');
  const menuSize=parseFloat(style.fontSize);
- return style.fontSize===scale && Number(style.fontWeight)===400
+ const expected=parseFloat(scale)*(scale.endsWith('rem')?parseFloat(getComputedStyle(document.documentElement).fontSize):1);
+ return Math.abs(menuSize-expected)<.1 && Number(style.fontWeight)===400
   && (!subject || menuSize < parseFloat(getComputedStyle(subject).fontSize));
 }));
 await page.locator('.pw-reader-tags .dropdown-menu a').first().click();

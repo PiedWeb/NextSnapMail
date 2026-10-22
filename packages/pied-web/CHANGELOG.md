@@ -1,5 +1,21 @@
 # Releases
 
+## 1.10.35 — 2026-10-22
+
+- Apply the second Refactoring UI review: one focused phone reader toolbar,
+  secondary copy/reminder commands in the native More menu, contextual header,
+  readable/wrapping metadata and reply actions, and visible copy feedback.
+- Compact global phone rows by sharing timestamp/tool space; keep full native
+  subject titles, accessible touch pagination and native empty-search recovery.
+- Bound menus and settings sections, reflow received attachment names and long
+  conversation headers, and keep shared form targets comfortable on phones.
+- Make scheduling/reminder dates readable on phones, associate validation with
+  the focused invalid field, expose pending state and recover from refused scheduling.
+- Respect reduced motion in chrome and distinguish disabled pagination from waiting.
+  Preserve native commands, account boundaries and received/editor HTML.
+- Ship CSS implementation comments only in source, retaining licence notices and
+  quoted strings; the expanded interface still transfers less theme CSS than 1.10.34.
+
 ## 1.10.34 — 2026-10-22
 
 - Fix mobile message reading: the theme's flex list no longer overrides the native

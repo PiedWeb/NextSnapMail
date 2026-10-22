@@ -136,7 +136,9 @@
         const cancel = document.createElement('button'); cancel.type = 'button'; cancel.className = 'pw-reminder-cancel'; cancel.textContent = t('Annuler','Cancel');
         const confirm = document.createElement('button'); confirm.type = 'button'; confirm.className = 'pw-reminder-confirm'; confirm.textContent = t('Rappeler','Remind me');
         actions.append(cancel,confirm);
-        const note = document.createElement('p'); note.className = 'pw-reminder-note'; note.setAttribute('role','status');
+        const note = document.createElement('p'); note.className = 'pw-reminder-note'; note.id='pw-reminder-note'; note.setAttribute('role','status');
+        input.setAttribute('aria-describedby',note.id);
+        input.addEventListener('input',()=>{input.removeAttribute('aria-invalid');note.textContent='';});
         panel.append(heading,options,custom,actions,note);
         (document.getElementById('rl-app') || document.body).append(panel);
         anchor.setAttribute('aria-expanded','true');
@@ -153,14 +155,18 @@
             panel.remove(); anchor.setAttribute('aria-expanded','false');
             removeEventListener('pointerdown',outside,true); removeEventListener('resize',place);
             if (openPanel?.panel === panel) openPanel = null;
-            focus && anchor.focus();
+            if (focus) (anchor.getClientRects().length ? anchor : anchor.closest('.pw-reader-menu')?.querySelector('.dropdown-toggle') || anchor).focus();
         };
         const outside = event => { if (!panel.contains(event.target) && !anchor.contains(event.target)) close(false); };
-        const busy = value => panel.querySelectorAll('button,input').forEach(node => node.disabled = value);
+        const busy = value => {panel.setAttribute('aria-busy',String(value));panel.querySelectorAll('button,input').forEach(node => node.disabled = value);};
         async function choose(date) {
             note.textContent = '';
-            if (!(date instanceof Date) || !Number.isFinite(date.getTime())) { note.textContent = t('Date incomplète.','Incomplete date.'); return; }
-            if (date.getTime() < Date.now() + 30000) { note.textContent = t('Choisissez un moment à venir.','Choose a time in the future.'); return; }
+            if (!(date instanceof Date) || !Number.isFinite(date.getTime()) || date.getTime() < Date.now() + 30000) {
+                note.textContent = !(date instanceof Date) || !Number.isFinite(date.getTime())
+                    ? t('Date incomplète.','Incomplete date.') : t('Choisissez un moment à venir.','Choose a time in the future.');
+                input.setAttribute('aria-invalid','true');input.focus();return;
+            }
+            input.removeAttribute('aria-invalid');
             busy(true); note.textContent = t('Enregistrement…','Saving…');
             try {
                 const result = submit ? await submit(date)
