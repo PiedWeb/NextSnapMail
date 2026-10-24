@@ -23,7 +23,9 @@ deployment record.
 3. In the already connected NextSnapMail page, use the native API:
 
    When the browser connector supports DOM interaction only, open a separate Mail
-   tab with `?pw-runtime-maintenance=1`. The temporary plugin exposes two operator
+   tab with `?index&pw-runtime-maintenance=1`. The leading `index` is the native
+   SnappyMail route; an arbitrary first query parameter is rejected by its
+   Sec-Fetch routing check. The temporary plugin exposes two operator
    buttons there: check the version, then activate the installed files if stale,
    and check again in a new request. It uses the same native JSON hook and its
    administrator/POST/account/CSRF checks; the URL flag grants no permission.
