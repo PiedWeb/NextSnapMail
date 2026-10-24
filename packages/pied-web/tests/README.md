@@ -44,12 +44,14 @@ dev-browser-agent --timeout 35 < tests/browser/image-markdown-regression.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-copy-md.js
 dev-browser-agent --timeout 30 < tests/browser/test-quote-readability.js
 dev-browser-agent --timeout 40 < tests/browser/test-reader-addresses.js
+dev-browser-agent --timeout 45 < tests/browser/test-reply-links.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-tags.js
 dev-browser-agent --timeout 60 < tests/browser/test-virtual-conversation.js
 dev-browser-agent --timeout 45 < tests/browser/test-inline-reply.js
 dev-browser-agent --timeout 30 < tests/browser/test-reply-priority.js
 dev-browser-agent --timeout 30 < tests/browser/test-reader-signature-cleanup.js
 dev-browser-agent --timeout 60 < tests/browser/test-nextcloud-images.js
+dev-browser-agent --timeout 45 < tests/browser/test-mobile-reader.js
 dev-browser-agent --timeout 60 < tests/browser/test-unread-drafts.js
 dev-browser-agent --timeout 40 < tests/browser/test-list-metadata.js
 dev-browser-agent --timeout 45 < tests/browser/test-list-toolbar.js
@@ -57,6 +59,7 @@ dev-browser-agent --timeout 25 < tests/browser/test-list-metadata-fallback.js
 dev-browser-agent --timeout 45 < tests/browser/test-desktop-scan.js
 dev-browser-agent --timeout 45 < tests/browser/test-mail-polish.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-actions.js
+dev-browser-agent --timeout 45 < tests/browser/test-compose-links.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-recipients.js
 dev-browser-agent --timeout 45 < tests/browser/test-composer-tabs.js
 dev-browser-agent --timeout 45 < tests/browser/test-elevation.js
@@ -75,7 +78,10 @@ dev-browser-agent --timeout 45 < tests/browser/test-left-panel-state.js
 dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
 dev-browser-agent --timeout 90 < tests/browser/test-reminders.js
 dev-browser-agent --timeout 45 < tests/browser/test-app-shell.js
+dev-browser-agent --timeout 45 < tests/browser/test-upstream-navigation.js
 dev-browser-agent --timeout 60 < tests/browser/test-interface-comfort.js
+dev-browser-agent --timeout 60 < tests/browser/test-refactoring-ui.js
+dev-browser-agent --timeout 60 < tests/browser/test-refinements.js
 dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
 dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
@@ -195,7 +201,8 @@ controls at 320/390 px. Collection and transport are fictional. These event-sequ
 checks complement Chrome touch emulation; they are not a physical Android Firefox test.
 Real Knockout foreach blocks also dispose list/group headings during refresh; these
 checks prove that the relocated native menu keeps its bindings and still dispatches
-read/unread after list, group and grouping-mode changes.
+read/unread after list, group and grouping-mode changes. They also verify date headings
+are removed and restored when switching between native grouping and the flat list.
 
 `test-reader-addresses.js` uses the reader fixture's native-shaped recipient rows,
 expanded details table and a copy of the mailto interception that the native reader of

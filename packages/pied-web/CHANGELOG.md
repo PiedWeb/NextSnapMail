@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.39 — unreleased
+
+- Remove a redundant release-click guard assignment; the shared cancellation
+  path already preserves the long-press selection guard.
+- Cover date-heading removal/restoration across grouping changes and the mobile
+  composer mode selector's 44 px target. Document all 48 browser suites.
+- Source and fixture checks only; production remains on 1.10.38.
+
 ## 1.10.38 — 2026-10-24
 
 - Suppress the long-hold release click even if the new selection bar moves a

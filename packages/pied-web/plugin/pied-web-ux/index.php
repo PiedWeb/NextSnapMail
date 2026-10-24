@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.10.38',
+        VERSION = '1.10.39',
         RELEASE = '2026-10-24',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',

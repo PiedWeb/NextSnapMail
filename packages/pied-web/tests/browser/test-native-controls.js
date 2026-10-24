@@ -59,4 +59,9 @@ check('The editing-mode menu drops the platform control for the theme chevron',
  select.appearance==='none'&&select.image!=='none');
 check('It is still a native select with its options intact',
  select.tag==='SELECT'&&select.options>0&&!select.disabled);
+await composer.setViewportSize({width:390,height:844});
+check('The mobile editing-mode menu keeps a 44 px touch target',await composer.evaluate(()=>{
+ const rect=document.querySelector('#V-PopupsCompose .squire-toolbar select.btn').getBoundingClientRect();
+ return rect.height>=44;
+}));
 console.log(JSON.stringify({passed:checks.length,checks}));

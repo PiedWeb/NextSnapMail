@@ -165,7 +165,6 @@
             if (!g || g.id!==event.pointerId) return;
             if (g.longPress) {
                 event.preventDefault();
-                suppressClick={row:g.row,until:performance.now()+500};
                 cancel();return;
             }
             const commit=!!g.hint && Math.abs(g.dx)>=g.threshold && valid(g);

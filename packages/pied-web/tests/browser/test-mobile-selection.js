@@ -83,6 +83,14 @@ for (const property of ['messageList','groupedList','listGrouped']) {
     check('Read/unread still dispatches after ' + property,await page.evaluate(before=>fixtureSeenActions.length===before+1
         && fixtureSeenActions.at(-1).uids.join()==='2',before));
 }
+await page.evaluate(()=>listVM.listGrouped(true));
+await page.waitForFunction(()=>document.querySelectorAll('#V-MailMessageList .pw-day-label').length===0);
+check('Switching to native grouped rows removes stale date headings',await page.evaluate(()=>
+    document.querySelector('#V-MailMessageList .pw-mobile-list-tools')?.isConnected));
+await page.evaluate(()=>listVM.listGrouped(false));
+await page.waitForFunction(()=>document.querySelectorAll('#V-MailMessageList .pw-day-label').length>0);
+check('Returning to the flat list recreates date headings around the same controls',await page.evaluate(()=>
+    document.querySelector('#V-MailMessageList .pw-mobile-list-tools')?.isConnected));
 const fits = () => page.evaluate(() => {
     const bar=document.querySelector('.pw-selection-bar'),count=bar.querySelector('.pw-selection-count'),finish=bar.querySelector('.pw-selection-finish');
     return [...bar.querySelectorAll('button,.checkboxCheckAll,.pw-selection-count')].filter(el=>el.getClientRects().length)

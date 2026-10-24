@@ -22,7 +22,10 @@ python3 tools/package-release.py
 ```
 
 `tools/test.sh` exécute les tests du correctif cœur puis les vérifications et
-tests du paquet Pied Web. `package-release.py` ne lit ni configuration privée,
+tests serveur du paquet Pied Web. La CI exécute cette commande et l'empaquetage ;
+les [48 suites navigateur](packages/pied-web/tests/README.md) se lancent séparément
+avec `dev-browser-agent` sur des données fictives.
+`package-release.py` ne lit ni configuration privée,
 ni compte, ni message : il assemble exclusivement les fichiers versionnés.
 
 Depuis NextSnapMail 0.1.12, l’identifiant opaque du compte actif est porté par
@@ -37,8 +40,10 @@ accepté est enregistré dans [`UPSTREAM.lock.json`](UPSTREAM.lock.json).
 
 Le workflow `Upstream watch` vérifie quotidiennement la branche amont. Lorsqu’un
 nouveau commit existe, il crée une branche de synchronisation, tente le merge du
-subtree, lance toute la CI puis ouvre une pull request. Il ne publie et ne
-déploie jamais automatiquement.
+subtree, lance `tools/test.sh` puis ouvre une pull request. Un conflit fait échouer
+ce workflow et ouvre un ticket de maintenance ; il ne remet pas à lui seul en
+cause la CI du produit. L'intégration amont exige une PR revue. Aucun déploiement
+n'est automatique.
 
 ## Dépôts historiques
 
