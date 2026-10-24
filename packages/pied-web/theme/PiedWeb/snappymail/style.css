@@ -4665,6 +4665,7 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
 #rl-app #V-MailMessageList .pw-selection-count {flex:1;min-width:0;}
 #rl-app #V-MailMessageList .pw-selection-bar > .checkboxCheckAll {display:inline-flex!important;position:relative;align-items:center;justify-content:center;flex:0 0 36px;min-width:36px;min-height:36px;cursor:pointer;}
 #rl-app #V-MailMessageList .pw-selection-bar .pw-filtered-selection {display:inline-flex;align-items:center;padding:0;background:transparent;text-align:start;}
+#rl-app #V-MailMessageList .pw-selection-bar .pw-filtered-selection[hidden] {display:none!important;}
 #rl-app #V-MailMessageList .pw-selection-bar .pw-select-results {min-height:36px;padding:0 var(--pw-space-2);text-decoration:none;}
 #rl-app #V-MailMessageList .pw-selection-finish {
     height:36px;min-height:36px;padding:0 var(--pw-space-3);border:0!important;border-radius:6px;
@@ -4674,7 +4675,9 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
 #rl-app #V-MailMessageList .pw-selection-finish:focus-visible {outline:1px solid var(--pw-focus);outline-offset:2px;}
 @media(max-width:799px) {
     html.pw-theme #rl-app #V-MailMessageList[data-pw-selection-version="1.7.15"]:not(.pw-global-active) .checkboxCheckAll {min-width:44px;min-height:44px;}
-    #rl-app #V-MailMessageList .pw-selection-bar {min-height:52px;padding-inline:var(--pw-space-4);}
+    #rl-app #V-MailMessageList .pw-selection-bar {min-height:52px;padding-inline:var(--pw-space-4);flex-wrap:wrap;gap:var(--pw-space-2);}
+    #rl-app #V-MailMessageList .pw-selection-bar .pw-filtered-selection {order:1;flex-basis:100%;}
+    #rl-app #V-MailMessageList .pw-selection-bar .pw-select-results {min-height:44px;white-space:normal;text-align:start;}
     #rl-app #V-MailMessageList .pw-selection-bar > .checkboxCheckAll {flex-basis:44px;min-width:44px;min-height:44px;}
     #rl-app #V-MailMessageList .pw-selection-finish {height:44px;min-height:44px;}
 }
@@ -5349,7 +5352,10 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header td > input[type=text] {height:m
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses {min-height:max(36px,2.25rem);max-height:max(72px,4.5rem);}
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type=text] {height:2rem;}
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {width:auto;min-width:6em;max-width:100%;height:auto;min-height:max(36px,2.5em);line-height:1.4;}
-@media(max-width:799px) {html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-md);}}
+@media(max-width:799px) {
+  html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-md);}
+  html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {min-height:max(44px,2.5em);}
+}
 
 
 #rl-app {

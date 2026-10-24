@@ -1,5 +1,34 @@
 # Releases
 
+## 1.10.38 — 2026-10-24
+
+- Suppress the long-hold release click even if the new selection bar moves a
+  neighbouring row under the finger. A fresh pointerdown remains an intentional
+  tap and can immediately extend the selection.
+- Verify the complete gesture with Chrome touch input, native menu dispatch,
+  list refresh and server-persisted read/unread state. Includes the intermediate
+  1.10.36/1.10.37 corrections; only this final snapshot is published.
+
+## 1.10.37 — 2026-10-24
+
+- Preserve the bound mobile Conversations/More controls before native Knockout
+  list/group disposal. Reloading, regrouping and changing folders no longer leave
+  a visible menu whose read/unread, sorting and selection actions have been removed.
+- Add real Knockout foreach-disposal regressions alongside the touch-selection
+  checks. This completes the production verification of the intermediate 1.10.36.
+
+## 1.10.36 — 2026-10-24
+
+- Commit a stationary touch selection when the browser raises its long-press
+  context menu before the 550 ms timer. Preserve it across pointer cancellation
+  and suppress the compatibility click without selecting during scrolling.
+- Respect the hidden all-pages control and wrap it onto a second phone row when
+  available, keeping the selection count, reminder and Done within 320 px.
+- Exercise the current native read/unread menu dispatch with fictional transport,
+  early/late context menus, cancellation, scrolling and narrow selection geometry.
+- Restore 44 px phone targets on the native editor mode/font selects, uncovered
+  by the extended composer regression checks.
+
 ## 1.10.35 — 2026-10-22
 
 - Apply the second Refactoring UI review: one focused phone reader toolbar,

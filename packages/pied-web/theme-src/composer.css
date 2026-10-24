@@ -378,4 +378,7 @@ html.pw-theme #rl-app #V-PopupsCompose .b-header td > input[type=text] {height:m
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses {min-height:max(36px,2.25rem);max-height:max(72px,4.5rem);}
 html.pw-theme #rl-app #V-PopupsCompose .b-header .emailaddresses > li.emailaddresses-input > input[type=text] {height:2rem;}
 html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {width:auto;min-width:6em;max-width:100%;height:auto;min-height:max(36px,2.5em);line-height:1.4;}
-@media(max-width:799px) {html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-md);}}
+@media(max-width:799px) {
+  html.pw-theme #rl-app #V-PopupsCompose .b-header input[type=text] {font-size:var(--pw-text-md);}
+  html.pw-theme #rl-app #V-PopupsCompose .pw-composer-toolbar .squire-toolbar select.btn {min-height:max(44px,2.5em);}
+}

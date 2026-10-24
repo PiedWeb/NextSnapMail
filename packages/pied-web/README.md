@@ -79,7 +79,7 @@ The [shared design system](docs/DESIGN_SYSTEM.md) also covers native settings an
 
 ## Install and maintain
 
-Release **1.10.33** targets Nextcloud **35.0.2**, NextSnapMail **0.1.16** and embedded SnappyMail **2.38.2**. It applies the Refactoring UI review to scope, mobile hierarchy, keyboard access, fields, errors and text preferences. The [deployment record](docs/deployments/1.10.33-refactoring-ui.md) distinguishes passing fixture/server checks from the unavailable authenticated browser check. Other versions are unverified.
+Release **1.10.38** targets Nextcloud **35.0.2**, NextSnapMail **0.1.16** and embedded SnappyMail **2.38.2**. It preserves mobile menu commands across list refreshes, fixes interrupted long-press selection and keeps selection controls within phone screens. The [deployment record](docs/deployments/1.10.38-mobile-selection.md) records fixture, server and authenticated browser checks and their limits. Other versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).

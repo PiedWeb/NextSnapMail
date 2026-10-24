@@ -316,6 +316,18 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 ## Native contracts that previously caused regressions
 
+- Since 1.10.38, the long-touch release guard covers any message row: showing the
+  selection bar can move a neighbour under the finger before the compatibility
+  click. A new pointerdown clears that guard, preserving intentional rapid taps.
+- Since 1.10.37, mobile list tools leave date headings on the native list/group
+  observables' beforeChange notification. The headings belong to Knockout foreach:
+  retaining the DOM node after disposal does not retain its command handlers.
+  Remount after rendering, and cover actual Knockout cleanup in browser fixtures.
+- Since 1.10.36, a stationary touch's native contextmenu commits checked selection
+  even before the hold timer. A following pointercancel must preserve that state
+  and suppress the compatibility click; movement cancels selection eligibility.
+  The native read/unread menu remains the command owner. Selection controls must
+  honor hidden attributes, and all-pages selection wraps below the phone controls.
 - Since 1.10.35, phone reader copy/reminder buttons move into the native More menu,
   with restoration markers and unchanged handlers. The copy live region stays
   outside hidden groups. Reminder cancellation returns to More if the original

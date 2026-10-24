@@ -311,9 +311,18 @@
             vm.messageList.subscribe(syncTitle);
             let groupingFrame, regroupTools=()=>{};
             const mobileTools=document.createElement('span');mobileTools.className='pw-mobile-list-tools';
+            // Headings live inside native Knockout foreach blocks. Park the
+            // bound controls before those blocks dispose their old children;
+            // moving them back after rendering is too late to retain handlers.
+            const parkMobileTools=()=>{
+                if (mobileTools.parentNode && mobileTools.parentNode!==dom) dom.append(mobileTools);
+            };
+            const toolSubscriptions=[vm.messageList,vm.groupedList,vm.listGrouped].filter(Boolean)
+                .map(source=>source.subscribe(parkMobileTools,null,'beforeChange'));
+            ko.utils.domNodeDisposal.addDisposeCallback(dom,()=>toolSubscriptions.forEach(subscription=>subscription.dispose()));
             const groupRows=()=>{
                 groupingFrame=0;
-                if (mobileTools.parentNode?.classList.contains('pw-day-label')) dom.append(mobileTools);
+                parkMobileTools();
                 dom.querySelectorAll('.pw-day-label').forEach(el=>el.remove());
                 if (!document.documentElement.classList.contains('pw-theme') || vm.listGrouped?.() || vm.messageList.threadUid?.()) {regroupTools();return;}
                 const groups=vm.groupedList?.() || [];

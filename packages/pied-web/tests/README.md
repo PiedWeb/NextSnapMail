@@ -66,6 +66,7 @@ dev-browser-agent --timeout 50 < tests/browser/test-native-controls.js
 dev-browser-agent --timeout 60 < tests/browser/test-native-components.js
 dev-browser-agent --timeout 50 < tests/browser/test-font-delivery.js
 dev-browser-agent --timeout 45 < tests/browser/test-selection-mode.js
+dev-browser-agent --timeout 40 < tests/browser/test-mobile-selection.js
 dev-browser-agent --timeout 35 < tests/browser/test-conversation-toggle.js
 dev-browser-agent --timeout 40 < tests/browser/test-unread-order.js
 dev-browser-agent --timeout 90 < tests/browser/test-feed.js
@@ -79,7 +80,7 @@ dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
 dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
 
-The curated suite currently contains 41 scripts. `test-mailbox-workspace.js`
+The regression set contains 48 scripts (46 `test-*.js` suites and the two image toolbar/Markdown regressions). `test-mailbox-workspace.js`
 exercises scoped server search, thread-safe quick actions, multi-page selection
 and Undo with fictional data. `test-conversation-performance.js` is a synthetic
 200-message comparison; `benchmark-live-feed.js` is a separate authenticated,
@@ -186,6 +187,15 @@ that is neither stored nor undone.
 It verifies that Ctrl/Cmd+click carries that active row into the checked group and adds the
 clicked row, then covers further toggles, grouped commands, Done/Escape, touch hold, scroll
 cancellation, native-control independence and the checkbox fallback. No mailbox is opened.
+
+`test-mobile-selection.js` imports the current engine's read/unread methods and menu
+fragments. It covers a contextmenu before the hold timer, pointer cancellation before
+release, late contextmenu without double toggling, scroll cancellation, and selection
+controls at 320/390 px. Collection and transport are fictional. These event-sequence
+checks complement Chrome touch emulation; they are not a physical Android Firefox test.
+Real Knockout foreach blocks also dispose list/group headings during refresh; these
+checks prove that the relocated native menu keeps its bindings and still dispatches
+read/unread after list, group and grouping-mode changes.
 
 `test-reader-addresses.js` uses the reader fixture's native-shaped recipient rows,
 expanded details table and a copy of the mailto interception that the native reader of

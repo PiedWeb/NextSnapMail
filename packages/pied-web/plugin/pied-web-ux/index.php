@@ -4,8 +4,8 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.10.35',
-        RELEASE = '2026-10-20',
+        VERSION = '1.10.38',
+        RELEASE = '2026-10-24',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
         DESCRIPTION = 'Accessible message actions for the Pied Web theme, using native mail commands.';

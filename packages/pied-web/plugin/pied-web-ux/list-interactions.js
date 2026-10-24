@@ -103,6 +103,9 @@
         const cancel=()=>{
             if (!gesture) return;
             const {row,id,hint,timer}=gesture;
+            // A browser may end a long hold with pointercancel rather than
+            // pointerup. Its compatibility click must not undo the selection.
+            if (gesture.longPress) suppressClick={row,selection:true,until:performance.now()+700};
             gesture=null;
             clearTimeout(timer);
             row.classList.remove('pw-swiping','pw-swipe-ready');
@@ -113,8 +116,16 @@
         const valid=g=>available() && g.snapshot===list() && g.row.isConnected
             && ko.dataFor(g.row)===g.message && list().includes(g.message)
             && g.message.folder===list().folder;
+        const selectHeld=g=>{
+            if (gesture!==g || !valid(g) || g.hint || g.longPress || !g.timer) return;
+            clearTimeout(g.timer);
+            g.longPress=true;
+            toggleMessage(g.message);
+        };
         dom.addEventListener('pointerdown',event=>{
             if (gesture) {cancel();return;}
+            // A new intentional tap must not inherit the previous release guard.
+            suppressClick=null;
             if (event.pointerType!=='touch' || !event.isPrimary || !available() || selectedCount()
                 || !(event.target instanceof Element) || nativeControl(event.target)) return;
             const entry=listedRow(event.target);
@@ -123,11 +134,7 @@
             gesture={row,message,snapshot:list(),id:event.pointerId,x:event.clientX,y:event.clientY,dx:0,
                 threshold:Math.min(120,Math.max(72,row.clientWidth*.28))};
             const g=gesture;
-            g.timer=setTimeout(()=>{
-                if (gesture!==g || !valid(g) || g.hint) return;
-                g.longPress=true;
-                toggleMessage(g.message);
-            },550);
+            g.timer=setTimeout(()=>selectHeld(g),550);
         });
         dom.addEventListener('pointermove',event=>{
             const g=gesture;
@@ -179,12 +186,19 @@
             if (gesture?.row===event.target) cancel();
         });
         dom.addEventListener('contextmenu',event=>{
-            if ((gesture && gesture.row.contains(event.target))
-                || (suppressClick && performance.now()<suppressClick.until && suppressClick.row.contains(event.target))) event.preventDefault();
+            if (gesture && gesture.row.contains(event.target)) {
+                // Native long-press timing can precede our timer. Commit while
+                // the stationary touch is still known, before pointercancel.
+                selectHeld(gesture);
+                event.preventDefault();
+            } else if (suppressClick && performance.now()<suppressClick.until && suppressClick.row.contains(event.target)) event.preventDefault();
         },true);
         dom.addEventListener('click',event=>{
             if (suppressClick && performance.now()<suppressClick.until
-                && suppressClick.row.contains(event.target)) {
+                && (suppressClick.row.contains(event.target)
+                    || (suppressClick.selection && event.target instanceof Element && event.target.closest('.messageListItem')))) {
+                // Showing the selection bar shifts rows under the finger. The
+                // compatibility click can therefore land on a different row.
                 event.preventDefault();event.stopImmediatePropagation();suppressClick=null;
                 return;
             }
