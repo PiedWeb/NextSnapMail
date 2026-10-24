@@ -17,11 +17,11 @@ await list.evaluate(()=>{
     document.querySelector('.messageList .b-content').prepend(back);
 });
 await list.waitForSelector('.threads-len[data-pw-total]');
-check('The conversation count sits above the dedicated attachment column, with centered digits',await list.evaluate(()=>{
+check('Conversation count, date and attachment remain distinct with centered count digits',await list.evaluate(()=>{
     const row=document.querySelector('.messageListItem'),count=row.querySelector('.threads-len');
     const attachment=row.querySelector('.attachmentParent'),time=row.querySelector('time');
-    const a=count.getBoundingClientRect(),b=attachment.getBoundingClientRect(),style=getComputedStyle(count);
-    return a.top<b.top && Math.abs(a.right-b.right)<2 && getComputedStyle(time).display==='none'
+    const a=count.getBoundingClientRect(),b=attachment.getBoundingClientRect(),date=time.getBoundingClientRect(),style=getComputedStyle(count);
+    return a.right<=date.left && date.right<=b.left && getComputedStyle(time).display!=='none'
         && style.alignItems==='center'
         && style.justifyContent==='center' && count.dataset.pwTotal==='14';
 }));
@@ -43,11 +43,11 @@ check('The conversation toggle centers its icon and the back-to-list control sta
         && back.getBoundingClientRect().width<document.querySelector('.messageList').getBoundingClientRect().width-20
         && style.borderTopWidth==='0px';
 }));
-check('Both native column grips have room to resize in either direction',await list.evaluate(()=>{
+check('Column resizing keeps the working list bounded and can still make it narrower',await list.evaluate(()=>{
     const left=document.querySelector('#rl-left'),messages=document.querySelector('.messageList');
     const oldLeft=left.getAttribute('style'),oldMessages=messages.getAttribute('style');
     left.style.width='310px';messages.style.width='610px';
-    const wide=Math.abs(left.getBoundingClientRect().width-310)<2&&Math.abs(messages.getBoundingClientRect().width-610)<2;
+    const wide=Math.abs(left.getBoundingClientRect().width-310)<2&&messages.getBoundingClientRect().width<=480;
     left.style.width='215px';messages.style.width='380px';
     const narrow=Math.abs(left.getBoundingClientRect().width-215)<2&&Math.abs(messages.getBoundingClientRect().width-380)<2;
     if(oldLeft===null)left.removeAttribute('style');else left.setAttribute('style',oldLeft);

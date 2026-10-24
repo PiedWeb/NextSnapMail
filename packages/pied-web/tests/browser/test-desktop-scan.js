@@ -17,8 +17,8 @@ check('The attachment keeps its dedicated column at the trailing edge at rest',a
  return getComputedStyle(content).display==='grid'&&attachment.left>=subject.right&&attachment.right>actions.left&&attachment.width>=24
   &&getComputedStyle(content).maskImage==='none'&&getComputedStyle(row.querySelector(':scope > .pw-row-actions')).opacity==='0';
 }));
-check('Desktop row dates are hidden while day headings remain visible',await p.evaluate(()=>
- [...document.querySelectorAll('.messageListItem time')].every(el=>getComputedStyle(el).display==='none')
+check('Desktop row dates and day headings remain available for chronological scanning',await p.evaluate(()=>
+ [...document.querySelectorAll('.messageListItem time')].every(el=>getComputedStyle(el).display!=='none')
  &&[...document.querySelectorAll('.pw-day-label')].length>1
  &&[...document.querySelectorAll('.pw-day-label')].every(el=>getComputedStyle(el).display!=='none')
 ));

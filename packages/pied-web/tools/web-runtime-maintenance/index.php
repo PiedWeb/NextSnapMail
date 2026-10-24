@@ -1,7 +1,10 @@
 <?php
-class PiedWebRuntimeMaintenanceV32Plugin extends \RainLoop\Plugins\AbstractPlugin {
+class PiedWebRuntimeMaintenanceV33Plugin extends \RainLoop\Plugins\AbstractPlugin {
     const NAME = 'Temporary Pied Web runtime check', VERSION = '1.2.0', REQUIRED = '2.38.2';
-    public function Init(): void { $this->addJsonHook('PiedWebRuntimeCheck', 'Check'); }
+    public function Init(): void {
+        $this->addJsonHook('PiedWebRuntimeCheck', 'Check');
+        $this->addJs('runtime-ui.js');
+    }
     public function Check(): array {
         $actions = \RainLoop\Api::Actions();
         $user = \OC::$server->get(\OCP\IUserSession::class)->getUser();

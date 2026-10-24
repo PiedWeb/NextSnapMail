@@ -59,8 +59,19 @@ available to assistive technology and in its tooltip. This follows the hierarchy
 and tertiary-action principles in Schoger/Wathan, *Refactoring UI* (pp. 38–40,
 46, 56, 60). **Search scope / Portée de la recherche** lives in the native Advanced
 search popup, with folder, account and (for multiple accounts) All my accounts
-choices. Submitting commits the choice before the native query reaches the
-search hook; cancelling leaves the current query and scope unchanged.
+choices. Since 1.10.39, **one selector** also includes the current folder and
+its descendants, replacing the overlapping native scope in this theme. Its
+submit handler maps the one choice before the native form builds the query,
+retaining native `in:subtree` only for the native subtree path. Workspace searches
+clear that competing criterion. Cancel leaves the committed scope and query unchanged. A native
+`in:all`/`in:subtree` query is reflected when the popup opens. Theme exit restores
+the original bound control. Folder/subtree queries keep the native fast path
+outside the global view; account/global and global-view subtree searches retain the account-safe workspace and exact
+folder identities. The list header states the selected search scope.
+
+Subtrees use the IMAP hierarchy delimiter, include the explicit current folder
+and selectable descendants, and exclude similarly named sibling folders. They
+do not silently remove special folders under that explicitly selected scope.
 
 The native search field can ask the server for matching headers across every authorized account
 and eligible folder. Trash, Junk, Drafts, Reminders and scheduled-mail folders are excluded unless
@@ -71,6 +82,28 @@ stays grouped with its deselectable checkbox; all-results selection states the e
 included account/folder. While a query is pending, previous results remain visible but muted and
 inert. If the query fails, they stay explicitly stale and non-interactive until a retry or exit.
 The server rejects expired, changed or oversized snapshots.
+
+Repeated Enter while the identical query/scope/page is pending shares that request.
+A different query, scope or page starts a new generation; stale responses cannot
+replace its result. First navigation to All my accounts starts one global request,
+while confirmed mailbox mutations still queue an authoritative refresh. Account
+settings are loaded once per endpoint request, never cached between requests.
+
+## List scanning
+
+The normal desktop list uses approximately 60 px rows with unchanged 14 px type,
+a visible per-message date and shorter day headings. At 1200 px and above its
+default width is 30vw, bounded between 360 and 480 px; native resize remains bounded
+at 480 px so the reader keeps the remaining space. Folder navigation stays 248 px
+with 36 px rows; the collapsed rail stays 72 px. Medium desktops use 320–420 px.
+Phone rows remove excess vertical padding while allowing long subjects two lines.
+Global phone rows retain their complete account identity and 44 px row commands.
+The explicit compact preference remains available on fine-pointer desktops.
+
+Date grouping maps message models to row nodes in one pass and leaves existing
+heading DOM in place when groups and native rows have not changed. Before native
+Knockout disposal, mobile commands still leave date headings; a changed row/group
+or removed heading rebuilds presentation and restores the same bound controls.
 
 Flag/Unflag, Delete and Remind share one reserved row-action rail and operate on those exact
 identities. Delete requires each

@@ -27,6 +27,9 @@ for (const theme of ['light', 'dark']) {
             document.getElementById('V-MailMessageList').hidden = false;
             document.getElementById('V-MailMessageView').hidden = false;
         });
+        await page.waitForFunction(() =>
+            getComputedStyle(document.getElementById('V-MailMessageView')).display === 'none'
+            && document.getElementById('V-MailMessageList').getBoundingClientRect().height >= innerHeight - 100);
         const label = theme + ' ' + width;
         check(label + ': list alone fills the phone before opening a message', await page.evaluate(() => {
             const list = document.getElementById('V-MailMessageList'), reader = document.getElementById('V-MailMessageView');

@@ -22,6 +22,14 @@ deployment record.
    and records the configuration fingerprint. No browser reload is needed for the hook.
 3. In the already connected NextSnapMail page, use the native API:
 
+   When the browser connector supports DOM interaction only, open a separate Mail
+   tab with `?pw-runtime-maintenance=1`. The temporary plugin exposes two operator
+   buttons there: check the version, then activate the installed files if stale,
+   and check again in a new request. It uses the same native JSON hook and its
+   administrator/POST/account/CSRF checks; the URL flag grants no permission.
+   Other Mail tabs get no maintenance UI. The suffix for this operator UI is v33.
+   Cleanup removes both PHP and JavaScript. Never package it as a permanent plugin.
+
    ```js
    rl.pluginRemoteRequest((error, data) => console.log(error, data?.Result),
        'PiedWebRuntimeCheck', {}, 15000);

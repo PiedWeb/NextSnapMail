@@ -309,7 +309,7 @@
             dom.querySelector(':scope > .btn-toolbar')?.prepend(title);
             syncTitle();
             vm.messageList.subscribe(syncTitle);
-            let groupingFrame, regroupTools=()=>{};
+            let groupingFrame, groupingState, regroupTools=()=>{};
             const mobileTools=document.createElement('span');mobileTools.className='pw-mobile-list-tools';
             // Headings live inside native Knockout foreach blocks. Park the
             // bound controls before those blocks dispose their old children;
@@ -322,18 +322,23 @@
             ko.utils.domNodeDisposal.addDisposeCallback(dom,()=>toolSubscriptions.forEach(subscription=>subscription.dispose()));
             const groupRows=()=>{
                 groupingFrame=0;
+                const rows=Array.from(dom.querySelectorAll('.messageListItem'));
+                const groups=document.documentElement.classList.contains('pw-theme') && !vm.listGrouped?.() && !vm.messageList.threadUid?.()
+                    ? (vm.groupedList?.() || []).map(group=>[group.label,group.messages[0]]) : [];
+                if (groupingState && rows.length===groupingState.rows.length && rows.every((row,i)=>row===groupingState.rows[i])
+                    && groups.length===groupingState.groups.length && groups.every(([label,first],i)=>label===groupingState.groups[i][0] && first===groupingState.groups[i][1])
+                    && groupingState.headings.every(heading=>heading.isConnected)) {regroupTools();return;}
                 parkMobileTools();
                 dom.querySelectorAll('.pw-day-label').forEach(el=>el.remove());
-                if (!document.documentElement.classList.contains('pw-theme') || vm.listGrouped?.() || vm.messageList.threadUid?.()) {regroupTools();return;}
-                const groups=vm.groupedList?.() || [];
-                const rows=Array.from(dom.querySelectorAll('.messageListItem'));
-                groups.forEach(group=>{
-                    const first=group.messages[0];
-                    const row=rows.find(el=>ko.dataFor(el)===first);
+                const rowsByMessage=new Map(rows.map(row=>[ko.dataFor(row),row]));
+                const headings=[];
+                groups.forEach(([text,first])=>{
+                    const row=rowsByMessage.get(first);
                     if (!row) return;
-                    const label=document.createElement('div'); label.className='pw-day-label'; label.textContent=group.label;
-                    row.before(label);
+                    const label=document.createElement('div'); label.className='pw-day-label'; label.textContent=text;
+                    row.before(label);headings.push(label);
                 });
+                groupingState={rows,groups,headings};
                 regroupTools();
             };
             const scheduleGrouping=()=>{if(!groupingFrame)groupingFrame=requestAnimationFrame(groupRows);};

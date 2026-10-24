@@ -1,12 +1,24 @@
 # Releases
 
-## 1.10.39 — unreleased
+## 1.10.39 — 2026-10-24
 
+- Unify advanced search into one folder, subtree, account or all-accounts scope.
+  Retain native folder/subtree fast paths and restore native controls on theme
+  exit. The result header states its scope; explicit subtrees retain exact folder
+  identities, IMAP hierarchy boundaries and frozen selection/pagination.
+- Make the working list easier to scan: bound its desktop width at 480 px, use
+  approximately 60 px desktop rows, show each message's date and reduce excess
+  phone padding. Preserve readable type, two-line phone subjects, touch commands,
+  native selection, dark mode and the reader's existing measure.
+- Remove the second global scan on first navigation, share identical pending
+  searches and load account settings once per server search. Group date headings
+  with a linear identity map and retain unchanged heading DOM through presentation
+  updates, preserving the bound mobile commands before Knockout disposal.
 - Remove a redundant release-click guard assignment; the shared cancellation
   path already preserves the long-press selection guard.
 - Cover date-heading removal/restoration across grouping changes and the mobile
-  composer mode selector's 44 px target. Document all 48 browser suites.
-- Source and fixture checks only; production remains on 1.10.38.
+  composer mode selector's 44 px target. Add scope and density/performance cases
+  to the 50 browser suites. See FEEDS.md for search and list contracts.
 
 ## 1.10.38 — 2026-10-24
 

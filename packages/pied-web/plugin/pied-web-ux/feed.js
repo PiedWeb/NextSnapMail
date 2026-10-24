@@ -140,13 +140,16 @@
     };
     const selectView = next => {
         workspace?.reset();
+        const refreshGlobal = next === 'global' && globalLoaded && !globalLoading;
         setMode(next);
         if (!isInbox(currentFolder())) {
             const href = nativeInbox?.href;
             if (href) location.href = href;
             return;
         }
-        if (next === 'global') renderGlobal(true);
+        // setMode already starts the first request. A second forced render would
+        // queue another whole-account scan behind that same navigation.
+        if (next === 'global') { if (refreshGlobal) renderGlobal(true); }
         else reloadList();
     };
 

@@ -28,8 +28,9 @@
         scopeLabel.append(scopeAccount,scopeSeparator,scopeContext);
         const searchScope = document.createElement('select'); searchScope.setAttribute('aria-label',t('Portée de la recherche','Search scope'));
         searchScope.id = 'pw-search-scope';
-        let searchScopeValue = 'folder';
-        [['folder',t('Ce dossier','This folder')],['account',t('Tous les dossiers du compte','All folders in this account')],['global',t('Tous mes comptes','All my accounts')]]
+        let searchScopeValue = 'folder', pendingSearch = '';
+        [['folder',t('Ce dossier','This folder')],['subtree',t('Ce dossier et ses sous-dossiers','This folder and subfolders')],
+            ['account',t('Tous les dossiers du compte','All folders in this account')],['global',t('Tous mes comptes','All my accounts')]]
             .forEach(([value,label]) => { const option = document.createElement('option'); option.value = value; option.textContent = label; searchScope.append(option); });
         scopeBar.append(scopeLabel); dom.querySelector(':scope > .btn-toolbar')?.after(scopeBar);
         // Keep one scope control in the native popup. Choosing a scope is staged
@@ -37,19 +38,38 @@
         const scopeField = document.createElement('div'); scopeField.className = 'control-group pw-search-scope-field';
         const scopeFieldLabel = document.createElement('label'); scopeFieldLabel.htmlFor = searchScope.id;
         scopeFieldLabel.textContent = searchScope.getAttribute('aria-label'); scopeField.append(scopeFieldLabel,searchScope);
-        let popupObserver, searchForm;
-        const commitScope = () => { if (active()) searchScopeValue = searchScope.value; };
-        const mountSearchScope = popup => {
+        let popupObserver, searchForm, searchPopup;
+        const commitScope = () => {
+            if (!active()) return;
+            searchScopeValue = searchScope.value;
+            // Keep native folder/subtree searches fast outside the global view.
+            // Workspace searches carry scope separately and must have no in: term.
+            const nativeScope = options.mode() !== 'global' && ['folder','subtree'].includes(searchScopeValue);
+            searchPopup?.selectedTreeValue?.(nativeScope && searchScopeValue === 'subtree' ? 'subtree' : '');
+            if (nativeScope) {
+                searchState = null; pendingSearch = ''; loading = stale = false; ++generation;
+                resetSelection(); options.render();
+            }
+        };
+        const mountSearchScope = (popup, viewModel) => {
             const form = popup?.querySelector('#advancedsearchform');
-            if (!form || form === searchForm) return;
+            if (!form) return;
+            if (form === searchForm) { if (viewModel) searchPopup = viewModel; return; }
             searchForm?.removeEventListener('submit',commitScope,true); popupObserver?.disconnect();
-            searchForm = form; form.querySelector(':scope > div')?.prepend(scopeField);
+            searchForm = form; searchPopup = viewModel;
+            const nativeScope = [...form.querySelectorAll('[data-bind]')]
+                .find(node => node.dataset.bind.includes('selectedTreeValue'))?.closest('.control-group');
+            nativeScope?.classList.add('pw-native-search-scope');
+            form.querySelector(':scope > div')?.prepend(scopeField);
             form.addEventListener('submit',commitScope,true);
-            popupObserver = new MutationObserver(() => { searchScope.value = searchScopeValue; });
+            popupObserver = new MutationObserver(() => {
+                const nativeScope = popup.open ? unwrap(searchPopup?.selectedTreeValue) : '';
+                searchScope.value = nativeScope === 'all' ? 'account' : nativeScope === 'subtree' ? 'subtree' : searchScopeValue;
+            });
             popupObserver.observe(popup,{attributes:true,attributeFilter:['open','hidden','style']});
         };
         const onSearchPopup = ({detail:popup}) => {
-            if (popup.viewModelTemplateID === 'PopupsAdvancedSearch') mountSearchScope(popup.viewModelDom);
+            if (popup.viewModelTemplateID === 'PopupsAdvancedSearch') mountSearchScope(popup.viewModelDom,popup);
         };
         addEventListener('rl-view-model',onSearchPopup);
         mountSearchScope(document.getElementById('V-PopupsAdvancedSearch'));
@@ -240,9 +260,11 @@
             if ('inert' in rows) rows.inert = stale;
             const failed = accounts.filter(account => account.error).length;
             section.dataset.state=loading?'loading':failed?'partial':!items.length?'empty':'ready';
+            const exclusions = ['account','global'].includes(searchScopeValue)
+                ? t(' Corbeille et Indésirables exclus.',' Trash and Junk excluded.') : '';
             status.textContent = loading ? (stale ? t('Actualisation des résultats…','Refreshing results…') : t('Chargement…','Loading…')) : failed
                 ? t(`${failed} compte${failed>1?'s':''} indisponible${failed>1?'s':''}. Résultats partiels.`,`${failed} account${failed>1?'s are':' is'} unavailable. Partial results.`)
-                : searchState ? t(`${searchState.total} résultat${searchState.total>1?'s':''}. Corbeille et Indésirables exclus.`,`${searchState.total} result${searchState.total===1?'':'s'}. Trash and Junk excluded.`)
+                : searchState ? t(`${searchState.total} résultat${searchState.total>1?'s':''}.`,`${searchState.total} result${searchState.total===1?'':'s'}.`) + exclusions
                 : !items.length ? t('Votre flux est à jour. Aucun message à afficher.','Your feed is up to date. No messages to show.') : '';
             recovery.hidden=loading || (!failed && !!items.length);
             recovery.textContent=searchState?t('Effacer la recherche','Clear search'):t('Actualiser le flux','Refresh feed');
@@ -256,8 +278,9 @@
         };
         const updateScope = () => {
             const global = options.mode() === 'global';
-            scopeAccount.textContent = searchState || global ? '' : options.accountLabel();
-            scopeContext.textContent = searchState ? t('Résultats de recherche','Search results') : global ? t('Tous mes comptes','All my accounts')
+            const committedScope = [...searchScope.options].find(option => option.value === searchScopeValue);
+            scopeAccount.textContent = (searchState ? searchScopeValue === 'global' : global) ? '' : options.accountLabel();
+            scopeContext.textContent = searchState ? t('Recherche : ','Search: ') + (committedScope?.textContent || '') : global ? t('Tous mes comptes','All my accounts')
                 : options.mode() === 'feed' ? t('Flux','Feed') : options.folderLabel();
             scopeSeparator.textContent = scopeAccount.textContent && scopeContext.textContent ? ' · ' : '';
             scopeAccount.hidden = !scopeAccount.textContent;
@@ -275,12 +298,15 @@
         };
         const search = async (query,offset = 0,reuse = false) => {
             query = String(query).trim();
-            if (!query) { searchState = null; loading = stale = false; ++generation; resetSelection(); options.render(true); return; }
+            if (!query) { searchState = null; pendingSearch = ''; loading = stale = false; ++generation; resetSelection(); options.render(true); return; }
+            const params = {operation:'search',search:query,scope:searchScopeValue === 'subtree' ? 'subtree' : searchScopeValue === 'folder' ? 'folder' : 'all',folder:options.folder(),offset,limit:50};
+            if (searchScopeValue !== 'global') params.accountHashes = JSON.stringify([options.accountHash()]);
+            if (reuse && searchState?.token) params.searchToken = searchState.token;
+            const requestKey = JSON.stringify(params);
+            if (loading && pendingSearch === requestKey) return;
+            pendingSearch = requestKey;
             const current = ++generation, previousState = searchState;
             searchState = {query,offset,limit:50,total:previousState?.total || 0,token:reuse ? previousState?.token : ''};
-            const params = {operation:'search',search:query,scope:searchScopeValue === 'folder' ? 'folder' : 'all',folder:options.folder(),offset,limit:50};
-            if (searchScopeValue !== 'global') params.accountHashes = JSON.stringify([options.accountHash()]);
-            if (reuse && searchState.token) params.searchToken = searchState.token;
             loading = true; stale = !!items.length; resetSelection(); options.render(); paint();
             try {
                 const result = await api.mailbox.request(params);
@@ -300,7 +326,7 @@
         next.addEventListener('click',() => search(searchState.query,searchState.offset+searchState.limit,true));
         const mailUi = window.rl.mailUi = window.rl.mailUi || {}, priorSearch = mailUi.onSearch;
         const onSearch = query => {
-            if (active() && section.isConnected && (options.mode() === 'global' || searchState || searchScopeValue !== 'folder')) {
+            if (active() && section.isConnected && (options.mode() === 'global' || searchState || !['folder','subtree'].includes(searchScopeValue))) {
                 void search(query); return true;
             }
             return priorSearch?.(query) || false;
@@ -308,7 +334,7 @@
         mailUi.onSearch = onSearch;
         dom.addEventListener('keydown',event => {
             if (event.key !== 'Enter' || !event.target.matches?.('.inputSearch,input[type="search"]') || event.isComposing) return;
-            if (options.mode() !== 'global' && searchScopeValue === 'folder' && !searchState) return;
+            if (options.mode() !== 'global' && ['folder','subtree'].includes(searchScopeValue) && !searchState) return;
             event.preventDefault(); event.stopImmediatePropagation(); search(event.target.value);
         },true);
         dom.querySelector('.inputSearch,input[type="search"]')?.addEventListener('search',event => { if (!event.target.value && searchState) search(''); });
@@ -425,7 +451,7 @@
             if (mailUi.onSearch === onSearch) mailUi.onSearch = priorSearch;
         });
         const active = () => document.documentElement.classList.contains('pw-theme');
-        return {isSearch:() => !!searchState,reset:() => { searchState = null; loading = stale = false; ++generation; resetSelection(); },updateScope,
+        return {isSearch:() => !!searchState,reset:() => { searchState = null; pendingSearch = ''; loading = stale = false; ++generation; resetSelection(); },updateScope,
             refresh:refreshResults,search,restore:async state => {
                 searchScopeValue = searchScope.value = state.scope || 'global';
                 if (state.search) await search(state.search,Number(state.offset || 0));

@@ -79,6 +79,8 @@ dev-browser-agent --timeout 60 < tests/browser/test-scheduled-send.js
 dev-browser-agent --timeout 90 < tests/browser/test-reminders.js
 dev-browser-agent --timeout 45 < tests/browser/test-app-shell.js
 dev-browser-agent --timeout 45 < tests/browser/test-upstream-navigation.js
+dev-browser-agent --timeout 60 < tests/browser/test-search-scope.js
+dev-browser-agent --timeout 60 < tests/browser/test-list-density-performance.js
 dev-browser-agent --timeout 60 < tests/browser/test-interface-comfort.js
 dev-browser-agent --timeout 60 < tests/browser/test-refactoring-ui.js
 dev-browser-agent --timeout 60 < tests/browser/test-refinements.js
@@ -86,7 +88,13 @@ dev-browser-agent --timeout 60 < tests/browser/test-mailbox-workspace.js
 dev-browser-agent --timeout 120 < tests/browser/test-conversation-performance.js
 ```
 
-The regression set contains 48 scripts (46 `test-*.js` suites and the two image toolbar/Markdown regressions). `test-mailbox-workspace.js`
+The regression set contains 50 scripts (48 `test-*.js` suites and the two image toolbar/Markdown regressions). `test-search-scope.js` imports the current
+native popup and covers the single scope, submit/cancel, native fast path, exact
+account/subtree requests, pending-request sharing and theme restoration.
+`test-list-density-performance.js` covers readable dates/type, long phone subjects,
+native selection and bounds at 320–1536 px in both themes, one global request per
+initial navigation and bounded grouping work with 500 fictional rows.
+`test-mailbox-workspace.js`
 exercises scoped server search, thread-safe quick actions, multi-page selection
 and Undo with fictional data. `test-conversation-performance.js` is a synthetic
 200-message comparison; `benchmark-live-feed.js` is a separate authenticated,

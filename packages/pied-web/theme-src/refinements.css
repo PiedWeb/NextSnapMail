@@ -79,7 +79,7 @@ html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom) input[aria-in
   /* A timestamp and its row tools share one metadata line. */
   html.pw-theme #rl-app #V-MailMessageList .pw-global-row {
     grid-template-areas:'primary account' 'subject subject' 'time actions';grid-template-columns:minmax(0,1fr) auto;
-    row-gap:var(--pw-space-1);padding-block:var(--pw-space-3);
+    row-gap:var(--pw-space-0-5);padding-block:var(--pw-space-1);
   }
   html.pw-theme #rl-app #V-MailMessageList .pw-global-time {justify-self:start;align-self:center;font-size:var(--pw-text-sm);}
   html.pw-theme #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions {padding:0;box-shadow:none;background:transparent;gap:0;}
@@ -88,7 +88,7 @@ html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom) input[aria-in
   html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) label:has(input[type=checkbox],input[type=radio]) {display:inline-flex;align-items:center;gap:var(--pw-space-2);min-height:44px;}
   html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) :is(td:first-child,td:last-child) {padding-inline:0;}
   html.pw-theme #rl-app #V-MailMessageView #messageItem .attachmentList {display:grid;grid-template-columns:minmax(0,1fr);gap:var(--pw-space-2);padding:0;}
-  html.pw-theme #rl-app #V-MailMessageView #messageItem .attachmentList .attachmentItem {width:100%;min-width:0;max-width:100%;box-sizing:border-box;}
+  html.pw-theme #rl-app #V-MailMessageView #messageItem .attachmentList .attachmentItem {width:100%;min-width:0;max-width:100%;margin-inline:0;box-sizing:border-box;}
   html.pw-theme #rl-app #V-MailMessageView #messageItem .attachmentName {white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
   html.pw-theme #rl-app #V-MailMessageView #messageItem .attachmentIcon a {display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;}
   html.pw-theme #rl-app #V-MailMessageView .pw-conversation-card-toggle {grid-template-columns:minmax(0,1fr);gap:var(--pw-space-1);}

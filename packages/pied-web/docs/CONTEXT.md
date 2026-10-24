@@ -6,6 +6,17 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.39, search has one authoritative folder/subtree/account/global field.
+  Hide the original native group only with Pied Web and map its selectedTreeValue
+  on submit before native criteria serialization. Cancellation preserves the prior
+  scope. Keep folder/subtree searches native outside the global view; workspace subtrees use the real IMAP
+  delimiter and exact account/folder/UIDVALIDITY identities. Pending identical
+  searches share one request; changed queries and confirmed mutations remain fresh.
+- The 1.10.39 Roundcube comparison supersedes the early comfort geometry below:
+  normal desktop rows are about 60 px with dates visible, the list is bounded at
+  480 px, folder rows are 36 px, and phones remove excess padding while retaining
+  readable type, two-line long subjects and touch actions. Keep the 248 px folder
+  navigation and 72 px collapsed rail. See FEEDS.md and DESIGN.md.
 - Pied Web branding, neutral surfaces and teal selection/primary actions; local licensed fonts/icons.
 - Since 1.7.3 mail fills the Nextcloud window. Preserve the native app grid at top left;
   hide surrounding Nextcloud chrome only with Pied Web, restore it on exit. Mobile search

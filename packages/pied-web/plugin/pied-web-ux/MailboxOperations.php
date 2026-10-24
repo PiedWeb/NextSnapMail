@@ -8,7 +8,7 @@ final class PiedWebMailboxOperations
     private const MAX_FOLDERS = 200, SEARCH_SECONDS = 20;
     private $actions;
     private $main;
-    private array $accounts = [], $clients = [];
+    private array $accounts = [], $clients = [], $accountSettings = [];
     private PiedWebFilteredSelection $store;
 
     public function __construct($actions, $main)
@@ -54,9 +54,10 @@ final class PiedWebMailboxOperations
     private function settings(string $hash)
     {
         if (!isset($this->accounts[$hash])) throw new \RuntimeException('scope');
+        if (isset($this->accountSettings[$hash])) return $this->accountSettings[$hash];
         $settings = $this->actions->SettingsProvider(true)->Load($this->accounts[$hash]['account']);
         if (!$settings) throw new \RuntimeException('settings');
-        return $settings;
+        return $this->accountSettings[$hash] = $settings;
     }
 
     private static function folder(string $folder): string
@@ -108,11 +109,11 @@ final class PiedWebMailboxOperations
     private function scope(): array
     {
         $scope = (string) $this->param('scope', 'all');
-        if (!\in_array($scope, ['all', 'inbox', 'folder'], true)) throw new \RuntimeException('scope');
+        if (!\in_array($scope, ['all', 'inbox', 'folder', 'subtree'], true)) throw new \RuntimeException('scope');
         $search = \trim((string) $this->param('search'));
         if (\strlen($search) > 8192 || ($scope === 'all' && $search === '')) throw new \RuntimeException('scope');
         return ['scope' => $scope, 'queryHash' => \hash('sha256', $search),
-            'folder' => $scope === 'folder' ? self::folder((string) $this->param('folder')) : '',
+            'folder' => \in_array($scope, ['folder', 'subtree'], true) ? self::folder((string) $this->param('folder')) : '',
             'accountHashes' => $this->hashes(), 'excludeSpecial' => $scope === 'all' ? ['trash', 'spam'] : [],
             'unit' => 'messages', 'sort' => 'arrival-desc'];
     }
@@ -121,9 +122,14 @@ final class PiedWebMailboxOperations
     {
         if ($scope['scope'] === 'inbox') return ['INBOX'];
         if ($scope['scope'] === 'folder') return [$scope['folder']];
-        $excluded = \array_filter([(string) $settings->GetConf('TrashFolder', ''), (string) $settings->GetConf('SpamFolder', '')]);
+        $delimiter = $scope['scope'] === 'subtree' ? $imap->FolderHierarchyDelimiter($scope['folder']) : null;
+        if ($scope['scope'] === 'subtree' && !$delimiter) return [$scope['folder']];
+        $excluded = $scope['scope'] === 'all'
+            ? \array_filter([(string) $settings->GetConf('TrashFolder', ''), (string) $settings->GetConf('SpamFolder', '')]) : [];
         $folders = [];
         foreach ($imap->FolderList('', '*') as $folder) {
+            if ($scope['scope'] === 'subtree' && $folder->FullName !== $scope['folder']
+                && !\str_starts_with($folder->FullName, $scope['folder'] . $delimiter)) continue;
             if ($folder->Selectable() && !\in_array($folder->FullName, $excluded, true)) $folders[] = $folder->FullName;
         }
         \sort($folders, SORT_STRING);

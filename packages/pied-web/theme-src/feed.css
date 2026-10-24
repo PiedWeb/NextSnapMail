@@ -11,6 +11,7 @@
 #rl-app .pw-list-scope { display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:40px;padding:4px 16px;border-bottom:1px solid var(--pw-line); }
 #rl-app .pw-list-scope-label { min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:var(--pw-weight-strong) var(--pw-text-sm)/1.4 var(--pw-font); }
 html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
+html.pw-theme #rl-app #V-PopupsAdvancedSearch #advancedsearchform .pw-native-search-scope { display:none; }
 #rl-app .pw-search-scope-field > label { flex:0 0 140px; }
 #rl-app .pw-search-scope-field select { width:100%;min-width:0;min-height:36px; }
 @media(min-width:800px) {
@@ -133,9 +134,9 @@ html:not(.pw-theme) #rl-app .pw-search-scope-field { display:none; }
   display:grid;
   grid-template-columns:minmax(0,1fr) auto 106px;
   grid-template-areas:'primary account actions' 'subject time actions';
-  gap:var(--pw-space-1) var(--pw-space-3);
+  gap:var(--pw-space-0-5) var(--pw-space-3);
   width:100%;
-  min-height:62px;
+  min-height:56px;
   box-sizing:border-box;
   margin:0;
   padding:var(--pw-space-2) var(--pw-space-6);

@@ -483,7 +483,7 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app .messageListItem > div + div { padd
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign.icon-right-mini::before { transform:rotate(-90deg); }
 #rl-app .b-folders .b-folders-user a > .e-collapsed-sign:focus-visible { outline:1px solid var(--pw-focus); outline-offset:0; border-radius:4px; }
 @media(min-width:800px){}
-@media(max-width:799px){#rl-app #V-MailMessageList .messageListItem { min-height:64px; padding:var(--pw-space-3) var(--pw-space-4); }}
+@media(max-width:799px){#rl-app #V-MailMessageList .messageListItem { min-height:60px; padding:var(--pw-space-1) var(--pw-space-4); }}
 /* Iteration 15: consistent optical weight and shorter action distances. */
 
 #rl-app .messageListItem .subjectParent { font-size:var(--pw-text-sm); }

@@ -145,7 +145,7 @@ namespace {
         }
     }
     class BoxActions {
-        public array $params = [], $accounts = [], $mails = [], $settings = [], $offline = [];
+        public array $params = [], $accounts = [], $mails = [], $settings = [], $offline = [], $settingsLoads = [];
         public function __construct(public BoxAccount $main, public BoxAccount $active) {}
         public function getMainAccountFromToken() { return $this->main; }
         public function getAccountFromToken() { return $this->active; }
@@ -153,7 +153,10 @@ namespace {
         public function GetActionParam($key, $default = '') { return $this->params[$key] ?? $default; }
         public function HasActionParam($key) { return array_key_exists($key, $this->params); }
         public function SettingsProvider($local) { return $this; }
-        public function Load($account) { return $this->settings[$account->Hash()] ??= new BoxSettings; }
+        public function Load($account) {
+            $hash = $account->Hash(); $this->settingsLoads[$hash] = ($this->settingsLoads[$hash] ?? 0) + 1;
+            return $this->settings[$hash] ??= new BoxSettings;
+        }
         public function PiedWebFeedMailClient($account) {
             if (in_array($account->Hash(), $this->offline, true)) throw new \RuntimeException('offline');
             return $this->mails[$account->Hash()] ??= new BoxMail(new BoxImap);
@@ -386,6 +389,31 @@ namespace {
                 'runs' => 5, 'indexMedianMs' => round($indexMs[2], 2), 'pageMedianMs' => round($pageMs[2], 2),
                 'peakMemoryMiB' => round(memory_get_peak_usage(true) / 1048576, 2)], JSON_UNESCAPED_SLASHES) . "\n";
         }
+        $treeActions = new BoxActions($main, $main);
+        $treeActions->accounts = $actions->accounts;
+        $treeMail = $treeActions->PiedWebFeedMailClient($main)->imap;
+        foreach (['Projects', 'Projects/One', 'Projects/One/Child', 'Projects-other', 'Trash/Child'] as $folder) {
+            $treeMail->data[$folder] = [1 => $row(100)]; $treeMail->validity[$folder] = 500;
+        }
+        $treeActions->params = ['operation'=>'search','scope'=>'subtree','folder'=>'Projects','accountHashes'=>'["main"]','search'=>'subject:needle'];
+        $treeSearch = PiedWebFeed::handle($treeActions);
+        check($treeSearch['total'] === 3 && !$treeSearch['partial']
+            && array_unique(array_column($treeSearch['items'], '_pwAccountHash')) === ['main'],
+            'One subtree scope includes the current folder and descendants in only the selected account');
+        $treeFolders = array_column($treeSearch['items'], 'folder'); sort($treeFolders);
+        check($treeFolders === ['Projects','Projects/One','Projects/One/Child'],
+            'Subtree matching respects the IMAP delimiter and excludes similar sibling prefixes');
+        check($treeActions->settingsLoads === ['main'=>1],
+            'A search loads each account settings once, including hydration of every result row');
+        $treeActions->params['folder'] = 'Trash';
+        $treeMail->data['Trash'] = [1 => $row(100)];
+        $trashTree = PiedWebFeed::handle($treeActions);
+        $trashFolders = array_column($trashTree['items'], 'folder'); sort($trashFolders);
+        check($trashTree['total'] === 2 && $trashFolders === ['Trash','Trash/Child']
+            && $trashTree['scope']['excludeSpecial'] === [],
+            'An explicitly selected subtree does not silently omit its special-folder descendants');
+        check($mutations($treeMail) === 0, 'Subtree discovery never changes message flags or folders');
+
         $saved = json_decode($saved, true); $saved['expires'] = time() - 1; file_put_contents($path, json_encode($saved));
         check($call(['operation' => 'action', 'action' => 'read', 'token' => $foreign['token'], 'cursor' => 0, 'confirmed' => '1'])['error'] === 'expired', 'Expired actions are rejected');
         $_SERVER['REQUEST_METHOD'] = 'GET';

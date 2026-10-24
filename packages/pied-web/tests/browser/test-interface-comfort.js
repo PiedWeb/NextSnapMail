@@ -36,7 +36,7 @@ const lightHierarchy=await hierarchy();
 check('Light senders stay readable and quieter than subjects on plain, selected and checked rows',lightHierarchy.rows.every(row=>row.sender>=4.5&&row.subject>row.sender));
 check('Light focus is one pixel with strong contrast',lightHierarchy.width==='1px'&&lightHierarchy.focus>=3);
 const comfortable=await heights();
-check('Comfort mode remains the default',comfortable.every(height=>height>=60));
+check('Default working rows retain room for readable text and longer subjects',comfortable.every(height=>height>=56));
 await p.locator('#compact').check();
 check('Compact native/global rows are 50–54 px including long subjects and thread counts',(await heights()).every(height=>height>=50&&height<=54));
 check('Keyboard focus has an immediate shape cue',await p.evaluate(()=>getComputedStyle(document.querySelector('.focused')).outlineWidth==='1px'));

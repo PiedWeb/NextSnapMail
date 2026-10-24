@@ -57,18 +57,18 @@ for (const dark of [false,true]) {
         && document.querySelector('.pw-folder-rail-button')));
     await page.evaluate(() => document.documentElement.classList.remove('rl-left-panel-disabled'));
     await page.locator('#V-PopupsAdvancedSearch').evaluate(popup => { popup.classList.add('animate'); popup.showModal(); });
-    check('Advanced search retains the native current/all/subtree scope and the account scope',await page.evaluate(() => {
+    check('Advanced search presents one scope while retaining the native binding for theme exit',await page.evaluate(() => {
         const popup = document.querySelector('#V-PopupsAdvancedSearch');
         const native = [...popup.querySelectorAll('[data-bind]')].find(node => node.dataset.bind.includes('selectedTreeValue'));
-        // The fixture does not render native KO components; their owning group
-        // must remain visible and retain the live selectedTreeValue binding.
-        return !!native && native.parentElement.getBoundingClientRect().width > 0
-            && popup.querySelector('#pw-search-scope').getBoundingClientRect().width > 0;
+        return !!native && !native.parentElement.getClientRects().length
+            && popup.querySelector('#pw-search-scope').getBoundingClientRect().width > 0
+            && popup.querySelector('#pw-search-scope option[value="subtree"]');
     }));
     await page.locator('#V-PopupsAdvancedSearch').evaluate(popup => popup.close());
     await page.evaluate(() => document.documentElement.classList.remove('pw-theme'));
     check('Leaving Pied Web restores the new native controls',await page.evaluate(() =>
         getComputedStyle(document.querySelector('.simple-search-scope')).display !== 'none'
-        && getComputedStyle(document.querySelector('.folder-list-filter')).display !== 'none'));
+        && getComputedStyle(document.querySelector('.folder-list-filter')).display !== 'none'
+        && getComputedStyle(document.querySelector('.pw-native-search-scope')).display !== 'none'));
 }
 console.log(JSON.stringify({passed:checks.length,checks},null,2));
