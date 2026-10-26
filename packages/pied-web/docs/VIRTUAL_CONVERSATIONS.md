@@ -40,6 +40,27 @@ Missing Message-ID headers produce an explicit empty explanation, never a specul
 subject search. Malformed chains whose replies omit the common root from References can
 remain incomplete; this is not an archive/migration or an all-mail indexing service.
 
+Since 1.10.40, discovery first reads the source's headers through a UID-scoped
+native BODY.PEEK fetch and tests a Message-ID search against that verified UID. Some IMAP
+servers answer this valid search with OK and no hits even while FETCH returns
+the header. If the probe fails or is rejected, discovery reads unfiltered native
+header pages on the same connection and builds an exact-ID graph from Message-ID,
+References and In-Reply-To. It follows that graph independently of page order;
+subject and participant similarity never join messages. No bodies are loaded
+and no flags are changed. There is no new message store or persistent index.
+
+The fallback retains the Inbox source/thread plus configured Sent scope, or the
+explicit account's selectable folders and existing exclusions. Account fallback
+visits Sent first. An unset Sent setting resolves through the server's native
+SPECIAL-USE Sent role, like the native UI; explicit disabled-Sent settings stay
+disabled. Drafts/Junk settings use the current native names, and their special-use
+roles (plus Trash) also enforce account exclusions. The source/probe plus fallback consume at most 160 search/fetch
+operations, with at most 50 headers per fetch and a 12-second budget checked between commands; at most 200
+connected messages are returned. Exhausted folders produce complete results;
+inaccessible folders and page/time/row ceilings produce the existing partial
+exchange status. A complete Inbox fallback retains STATUS/etag refreshes; a
+partial one cannot be cached as an unchanged complete exchange.
+
 Verification: `tests/conversation.php` covers authenticated read-only discovery, exclusions,
 exact matching, failures and budgets. `tests/browser/test-virtual-conversation.js` uses
 fictional native models to cover single action ownership, previews, focus, scroll, native

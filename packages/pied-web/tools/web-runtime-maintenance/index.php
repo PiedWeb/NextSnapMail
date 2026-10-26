@@ -1,5 +1,5 @@
 <?php
-class PiedWebRuntimeMaintenanceV33Plugin extends \RainLoop\Plugins\AbstractPlugin {
+class PiedWebRuntimeMaintenanceV34Plugin extends \RainLoop\Plugins\AbstractPlugin {
     const NAME = 'Temporary Pied Web runtime check', VERSION = '1.2.0', REQUIRED = '2.38.2';
     public function Init(): void {
         $this->addJsonHook('PiedWebRuntimeCheck', 'Check');

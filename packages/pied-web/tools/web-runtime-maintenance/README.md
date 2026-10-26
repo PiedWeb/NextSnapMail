@@ -29,7 +29,7 @@ deployment record.
    buttons there: check the version, then activate the installed files if stale,
    and check again in a new request. It uses the same native JSON hook and its
    administrator/POST/account/CSRF checks; the URL flag grants no permission.
-   Other Mail tabs get no maintenance UI. The suffix for this operator UI is v33.
+   Other Mail tabs get no maintenance UI. The suffix for this operator UI is v34.
    Cleanup removes both PHP and JavaScript. Never package it as a permanent plugin.
 
    ```js

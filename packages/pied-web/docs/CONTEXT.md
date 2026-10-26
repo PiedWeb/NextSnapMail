@@ -6,6 +6,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.40, conversation discovery verifies a source UID's Message-ID
+  search before trusting IMAP HEADER results. A successful empty result for
+  that existing ID switches to bounded native header pages, with exact-ID
+  chain matching, no body reads, unchanged folder/account scope and visible
+  partial results at the page/time/row ceilings. See VIRTUAL_CONVERSATIONS.md.
 - Since 1.10.39, search has one authoritative folder/subtree/account/global field.
   Hide the original native group only with Pied Web and map its selectedTreeValue
   on submit before native criteria serialization. Cancellation preserves the prior

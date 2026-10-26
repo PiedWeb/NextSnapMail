@@ -72,18 +72,32 @@ final class PiedWebConversation
         $sent = (string) $settings->GetConf('SentFolder', '');
         if ($sent === '__UNUSE__') {
             $sent = '';
+        } elseif ($sent === '') {
+            // The native UI also recognizes SPECIAL-USE folders before their
+            // names have been saved in account-local settings.
+            foreach ($mail->Folders('', '*', false) ?? [] as $candidate) {
+                if ($candidate->Selectable() && $candidate->Role() === 'sent') {
+                    $sent = (string) $candidate->FullName;
+                    break;
+                }
+            }
         }
         $hideDeleted = !empty($settings->GetConf('HideDeleted', 1));
 
-        if ($actions->GetActionParam('scope', '') === 'account') {
-            return self::accountScan($actions, $mail, $settings, $folder, $anchors, $hideDeleted);
-        }
-
         // Cheap freshness probe: one STATUS per folder. The reader sends back the
         // previous value, so an unchanged mailbox costs no SEARCH and no FETCH.
-        $current = self::etag($mail, $folder, $sent);
-        if ($etag !== '' && $etag === $current) {
+        $full = $actions->GetActionParam('scope', '') === 'account';
+        $current = $full ? '' : self::etag($mail, $folder, $sent);
+        if (!$full && $etag !== '' && $etag === $current) {
             return ['etag' => $current, 'unchanged' => true, 'messages' => []];
+        }
+
+        $started = \microtime(true);
+        $source = $anchors ? self::source($mail, $folder, $uid, $hideDeleted) : null;
+        $fallback = $source && self::needsHeaderScan($mail, $source, $hideDeleted);
+        if ($full) {
+            return self::accountScan($actions, $mail, $settings, $folder, $anchors, $hideDeleted,
+                $fallback, $source, $started, $sent);
         }
 
         $rows = [];
@@ -94,6 +108,16 @@ final class PiedWebConversation
                     $rows[self::key($message)] = $message;
                 }
             }
+        }
+
+        if ($fallback) {
+            $rows[self::key($source)] = $source;
+            foreach ($rows as $message) {
+                foreach (self::ids($message->sMessageId) as $id) $anchors[self::normalize($id)] = $id;
+            }
+            $result = self::scanHeaders($mail, $sent !== '' && $sent !== $folder ? [$sent] : [],
+                $anchors, $hideDeleted, $rows, $started);
+            return ['etag' => $result['partial'] ? '' : $current, 'unchanged' => false] + $result;
         }
 
         if ($sent !== '' && $sent !== $folder) {
@@ -163,25 +187,35 @@ final class PiedWebConversation
      * Limits and inaccessible folders are reported, never silently called complete.
      */
     private static function accountScan($actions, $mail, $settings, string $origin,
-        array $anchors, bool $hideDeleted): array
+        array $anchors, bool $hideDeleted, bool $fallback, $source, float $started, string $sent): array
     {
         $excluded = ['Scheduled', 'Reminders'];
-        foreach (['DraftFolder', 'SpamFolder', 'TrashFolder'] as $setting) {
+        foreach (['DraftsFolder', 'JunkFolder', 'TrashFolder'] as $setting) {
             $excluded[] = (string) $settings->GetConf($setting, '');
         }
         $folders = [$origin => true];
         $partial = false;
         foreach ($mail->Folders('', '*', false) ?? [] as $folder) {
             $name = (string) $folder->FullName;
-            if ($name === '' || !$folder->Selectable() || \in_array($name, $excluded, true)) continue;
+            if ($name === '' || !$folder->Selectable() || \in_array($name, $excluded, true)
+                || \in_array($folder->Role(), ['drafts', 'junk', 'trash'], true)) continue;
             if (\count($folders) >= self::MAX_FOLDERS && !isset($folders[$name])) { $partial = true; continue; }
             $folders[$name] = true;
+        }
+        if ($fallback) {
+            // Search Sent first so a large source folder cannot exhaust the
+            // account budget before the owner's replies have been examined.
+            if (isset($folders[$sent])) $folders = [$sent => true] + $folders;
+            $result = self::scanHeaders($mail, \array_keys($folders), $anchors, $hideDeleted,
+                [self::key($source) => $source], $started);
+            $result['partial'] = $result['partial'] || $partial;
+            return ['etag' => '', 'unchanged' => false, 'scope' => 'account',
+                'searchedFolders' => \count($folders), 'missingMessageId' => false] + $result;
         }
         $rows = [];
         $failed = [];
         $queries = [];
-        $remaining = self::MAX_FULL_SEARCHES;
-        $started = \microtime(true);
+        $remaining = self::MAX_FULL_SEARCHES - 2;
         $root = self::root($actions);
         $query = static function(string $folder, string $header, string $id) use (
             $mail, $hideDeleted, &$rows, &$failed, &$queries, &$remaining, &$partial, $started
@@ -232,6 +266,97 @@ final class PiedWebConversation
         return ['etag' => '', 'unchanged' => false, 'messages' => \array_values($rows),
             'scope' => 'account', 'partial' => $partial, 'searchedFolders' => \count($folders),
             'failedFolders' => \count($failed), 'missingMessageId' => $root === ''];
+    }
+
+    /** Fetch only display/linking headers for exact UIDs through native BODY.PEEK. */
+    private static function headers($imap, string $folder, array $uids): array
+    {
+        $rows = [];
+        foreach ($imap->Fetch(['FLAGS', 'INTERNALDATE',
+            'BODY.PEEK[HEADER.FIELDS (MESSAGE-ID REFERENCES IN-REPLY-TO SUBJECT DATE FROM TO)]'],
+            \implode(',', $uids), true) as $response) {
+            $message = \MailSo\Mail\Message::fromFetchResponse($folder, $response);
+            if (\in_array($message->Uid, $uids, true)) $rows[self::key($message)] = $message;
+        }
+        return $rows;
+    }
+
+    private static function source($mail, string $folder, int $uid, bool $hideDeleted)
+    {
+        $imap = $mail->ImapClient();
+        $imap->FolderExamine($folder);
+        foreach (self::headers($imap, $folder, [$uid]) as $message) {
+            if (!$hideDeleted || !\in_array('\\deleted', $message->aFlagsLowerCase, true)) return $message;
+        }
+        return null;
+    }
+
+    /** Some servers return a successful empty HEADER search for an existing ID. */
+    private static function needsHeaderScan($mail, $source, bool $hideDeleted): bool
+    {
+        $ids = self::ids($source->sMessageId);
+        if (!$ids) return false;
+        $imap = $mail->ImapClient();
+        $criteria = 'UID ' . $source->Uid . ' HEADER Message-ID '
+            . \MailSo\Imap\SearchCriterias::escapeSearchString($imap, $ids[0])
+            . ($hideDeleted ? ' UNDELETED' : '');
+        try {
+            return !\in_array($source->Uid, $imap->MessageSearch($criteria, true), true);
+        } catch (\Throwable $error) {
+            return true;
+        }
+    }
+
+    /**
+     * Bounded fallback for broken HEADER search. Snapshot existing UIDs once per
+     * folder, then fetch header-only pages. Exact IDs join chains independently
+     * of arrival order, without subject/participant guesses or message bodies.
+     */
+    private static function scanHeaders($mail, array $folders, array $anchors, bool $hideDeleted,
+        array $candidates, float $started): array
+    {
+        $partial = false;
+        $failed = 0;
+        $remaining = self::MAX_FULL_SEARCHES - 2;
+        $imap = $mail->ImapClient();
+        foreach ($folders as $folder) {
+            if ($remaining <= 0 || \microtime(true) - $started > 12) { $partial = true; break; }
+            --$remaining;
+            try {
+                $imap->FolderExamine($folder);
+                $criteria = \MailSo\Imap\SearchCriterias::fromString($imap, $folder, '', $hideDeleted);
+                $uids = $imap->MessageSearch((string) $criteria, true);
+                \rsort($uids, SORT_NUMERIC);
+                foreach (\array_chunk($uids, self::PAGE) as $page) {
+                    if ($remaining <= 0 || \microtime(true) - $started > 12) { $partial = true; break 2; }
+                    --$remaining;
+                    $candidates += self::headers($imap, $folder, $page);
+                }
+            } catch (\Throwable $error) {
+                ++$failed; $partial = true;
+            }
+        }
+        $byId = [];
+        $messageIds = [];
+        foreach ($candidates as $key => $message) {
+            $ids = self::ids($message->sMessageId . ' ' . $message->References . ' ' . $message->InReplyTo);
+            $messageIds[$key] = \array_unique(\array_map([self::class, 'normalize'], $ids));
+            foreach ($messageIds[$key] as $id) $byId[$id][$key] = true;
+        }
+        $queue = \array_values($anchors);
+        $seen = $rows = [];
+        for ($index = 0; $index < \count($queue); ++$index) {
+            $id = self::normalize($queue[$index]);
+            if (isset($seen[$id])) continue;
+            $seen[$id] = true;
+            foreach ($byId[$id] ?? [] as $key => $_) {
+                if (isset($rows[$key])) continue;
+                if (\count($rows) >= self::MAX_ROWS) { $partial = true; break 2; }
+                $rows[$key] = $candidates[$key];
+                foreach ($messageIds[$key] as $next) if (!isset($seen[$next])) $queue[] = $next;
+            }
+        }
+        return ['messages' => \array_values($rows), 'partial' => $partial, 'failedFolders' => $failed];
     }
 
     /**

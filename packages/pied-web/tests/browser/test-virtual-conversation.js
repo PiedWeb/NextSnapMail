@@ -379,4 +379,21 @@ await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hi
 check('Leaving explicit exchange restores the same individual filed message',await p.evaluate(()=>
     readerVM.message().folder==='Projects'&&readerVM.message().uid===80
     &&!document.querySelector('.pw-conversation-full').hidden));
+await p.evaluate(()=>{
+    window.partialLookups=0;window.conversations=true;
+    const other=rl.pluginRemoteRequest;
+    rl.pluginRemoteRequest=(callback,action,params)=>{
+        if(action!=='PiedWebConversation')return other(callback,action,params);
+        ++partialLookups;setTimeout(()=>callback(0,{Result:{etag:'',messages:[],partial:true}}),20);
+    };
+    readerVM.message(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);
+});
+await p.waitForFunction(()=>!document.querySelector('.pw-conversation-before').hidden
+    &&document.querySelector('.pw-conversation-before [role="status"]').textContent.includes('Échange partiel'));
+check('An incomplete Inbox lookup remains visible even when only the original message was found',await p.evaluate(()=>
+    document.querySelectorAll('.pw-conversation-card').length===0
+    &&!document.querySelector('.pw-conversation-retry').hidden));
+await p.locator('.pw-conversation-retry').click();
+await p.waitForFunction(()=>partialLookups===2);
+check('A partial Inbox lookup offers an explicit retry',true);
 console.log(JSON.stringify({passed:checks.length}));

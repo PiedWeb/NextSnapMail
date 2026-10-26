@@ -1,5 +1,22 @@
 # Releases
 
+## 1.10.40 — 2026-10-26
+
+- Recover received/sent exchanges when IMAP returns a successful empty HEADER
+  search for an existing Message-ID. Verify the source UID, detect the failed
+  lookup and fall back to bounded native header pages on the same connection.
+- Keep exact Message-ID/References/In-Reply-To matching, folder exclusions and
+  account boundaries. Join reply chains independently of page order; never
+  group messages by subject or sender. Prioritize Sent in account lookups and
+  report inaccessible folders, page/time budgets and the 200-message ceiling.
+- Preserve the cheap unchanged-mailbox refresh after complete Inbox scans.
+- Keep the partial-exchange status and retry visible in Inbox even when the
+  bounded scan has only found the original message.
+- Read the engine's current DraftsFolder/JunkFolder settings and special-use
+  folder roles when excluding drafts, junk and trash from full exchanges.
+- Recognize the native SPECIAL-USE Sent role when account-local settings have
+  not saved its name yet; preserve the explicit disabled-Sent setting.
+
 ## 1.10.39 — 2026-10-24
 
 - Unify advanced search into one folder, subtree, account or all-accounts scope.

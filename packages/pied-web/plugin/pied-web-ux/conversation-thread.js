@@ -347,7 +347,7 @@
             if (previewAccount !== account()) { previews.clear(); cards.clear(); previewAccount = account(); }
             const index = entries.findIndex(entry => entry.key === currentKey());
             const visible = active() && !!context && index >= 0
-                && (entries.length > 1 || context.full || loading && !silentRefresh || error);
+                && (entries.length > 1 || context.full || context.partial || loading && !silentRefresh || error);
             before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
             host.classList.toggle('pw-conversation-active', visible);
             currentLabel.hidden = !visible;
@@ -366,7 +366,7 @@
                         : context?.missingMessageId ? t('Aucun identifiant de conversation dans ce message.', 'This message has no conversation identifier.')
                             : context?.full && entries.length === 1 ? t('Aucun autre message trouvé dans cette portée.', 'No other message found in this scope.') : '');
             text(retry,error ? t('Réessayer', 'Try again') : t('Actualiser l’échange', 'Refresh exchange'));
-            retry.hidden = !error && !context?.full;
+            retry.hidden = !error && !context?.full && !context?.partial;
             syncCards(beforeCards,visible ? entries.slice(0,index) : []);
             syncCards(afterCards,visible ? entries.slice(index + 1) : []);
             const kept = new Set(entries.map(entry => entry.key));
