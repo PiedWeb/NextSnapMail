@@ -291,13 +291,22 @@ namespace {
     $check($result['partial'] && !$actions->imap->calls,
         'An expired fallback deadline stops before any additional IMAP command');
 
-    $actions->folderNames = ['INBOX','Sent','ServerDrafts','ServerJunk','ServerTrash'];
+    $actions->folderNames = ['INBOX','Sent','ServerDrafts','ServerJunk','ServerTrash',
+        'ServerDrafts/child','ServerJunk/child','ServerTrash/child','INBOX/Scheduled','INBOX/Reminders'];
     $actions->folderRoles = ['ServerDrafts'=>'drafts','ServerJunk'=>'junk','ServerTrash'=>'trash'];
     $actions->responses['Sent|'] = [[message('Sent',21,$reply,$root)]];
     $actions->imap->calls = []; $result = $plugin->Conversation();
     $check(!$result['partial'] && $result['searchedFolders'] === 2
-        && !array_intersect(['ServerDrafts','ServerJunk','ServerTrash'],array_column($actions->imap->calls,'folder')),
-        'Native special-use roles exclude drafts, junk and trash even when local settings use other folder names');
+        && !array_intersect(array_slice($actions->folderNames,2),array_column($actions->imap->calls,'folder')),
+        'Native special-use roles exclude protected descendants and nested queues even when local settings use other names');
+    $protectedId = '<opened-protected@example.test>';
+    $actions->params = ['scope'=>'account','folder'=>'ServerTrash/child','uid'=>77,'messageId'=>$protectedId,'references'=>$root];
+    $actions->responses['ServerTrash/child|'] = [[message('ServerTrash/child',77,$protectedId,$root,$root)]];
+    $result = $plugin->Conversation();
+    $check(!$result['partial'] && $result['searchedFolders'] === 3
+        && in_array('ServerTrash/child/77',array_map(fn($m)=>$m->sFolder.'/'.$m->Uid,$result['messages']),true),
+        'An explicitly opened protected descendant remains the sole excluded-folder exception');
+    $actions->params = ['scope'=>'account','folder'=>'INBOX','uid'=>11,'messageId'=>$root];
     unset($actions->params['scope']); $actions->sent = '';
     $actions->folderRoles['Sent'] = 'sent';
     $result = $plugin->Conversation();

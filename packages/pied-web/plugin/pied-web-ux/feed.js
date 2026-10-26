@@ -603,6 +603,11 @@
         showDrafts: () => settings.showDrafts,
         showRead: () => settings.showRead,
         accountCount: () => accountCount,
+        isSearchMessage: message => {
+            const state = returnState(), parts = String(state?.key || '').split('\x1f');
+            return !!state?.search && !state.resume && parts[0] === accountHash()
+                && parts[1] === message?.folder && Number(parts[3]) === Number(message?.uid);
+        },
         setMode,
         refreshGlobal: () => renderGlobal(true)
     };

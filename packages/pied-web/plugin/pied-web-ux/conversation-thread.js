@@ -46,7 +46,7 @@
         after.append(afterCards); item.after(after);
 
         let generation = 0, timer, disposed = false, context = null, entries = [];
-        let loading = false, error = false, silentRefresh = false, explicitOrigin = '';
+        let loading = false, error = false, silentRefresh = false, explicitOrigin = '', singleOrigin = '';
         let previewAccount = '', previewActive = 0;
         const previews = new Map();
         const previewQueue = [];
@@ -103,6 +103,29 @@
         const sentFolder = () => String(rl.settings.get('SentFolder') || '');
         const current = () => vm.message?.();
         const currentKey = () => itemKey(current());
+        const currentIdentity = () => account() + '\u0000' + currentKey();
+        const searchContext = message => String(rl.app.messageList?.()?.search || ko.unwrap(listVM?.listSearch) || '').trim()
+            || (window.PiedWebUx?.feed?.isSearchMessage?.(message) ? 'workspace' : '');
+        const queueFolder = name => /(?:^|[^a-z0-9])(?:Scheduled|Reminders)$/i.test(name);
+        const automaticFolder = name => {
+            if (!name || queueFolder(name)) return false;
+            const excluded = ['DraftsFolder','JunkFolder','TrashFolder'].map(key => rl.settings.get(key)).filter(Boolean);
+            if (excluded.includes(name)) return false;
+            const pending = [...(rl.app.folderList?.() || [])].map(folder => ({folder,blocked:false}));
+            while (pending.length) {
+                const {folder,blocked} = pending.pop();
+                const denied = blocked || excluded.includes(folder.fullName) || queueFolder(folder.fullName)
+                    || ['drafts','junk','trash'].includes(ko.unwrap(folder.role));
+                if (folder.fullName === name) return !denied;
+                for (const child of ko.unwrap(folder.subFolders) || []) pending.push({folder:child,blocked:denied});
+            }
+            return true;
+        };
+        const sameListScope = ctx => !ctx?.listFolder || !rl.app.messageList?.()?.folder
+            || ctx.listFolder === rl.app.messageList().folder;
+        const inContext = () => context && context.account === account() && sameListScope(context)
+            && context.search === searchContext(context.originModel)
+            && entries.some(entry => entry.key === currentKey());
         const addFlag = (message, flag) => {
             const flags = message?.flags;
             if (!flag || typeof flags !== 'function' || flags().includes(flag)) return;
@@ -121,12 +144,9 @@
         };
         const active = () => {
             const key = currentKey();
-            const listFolder = rl.app.messageList?.()?.folder;
-            const folder = context && (!listFolder || isInbox(listFolder))
-                && entries.some(entry => entry.key === key) ? context.folder : current()?.folder;
-            return document.documentElement.classList.contains('pw-theme')
-                && (isInbox(folder)
-                    || explicitOrigin === key || !!context?.full && entries.some(entry => entry.key === key));
+            if (!key || singleOrigin === currentIdentity() || !document.documentElement.classList.contains('pw-theme')) return false;
+            if (inContext()) return context.explicit || automaticFolder(context.folder);
+            return explicitOrigin === currentIdentity() || automaticFolder(current()?.folder);
         };
         const valid = (version, ctx) => !disposed && version === generation && context === ctx
             && account() === ctx.account && active() && !!currentKey()
@@ -348,7 +368,7 @@
         function render() {
             if (previewAccount !== account()) { previews.clear(); cards.clear(); previewAccount = account(); }
             const index = entries.findIndex(entry => entry.key === currentKey());
-            const visible = active() && !!context && index >= 0
+            const visible = active() && !!context && context.account === account() && index >= 0
                 && (entries.length > 1 || context.full || context.partial || loading && !silentRefresh || error);
             before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
             host.classList.toggle('pw-conversation-active', visible);
@@ -471,7 +491,7 @@
                 host.classList.remove('pw-conversation-pending');
                 render(); return;
             }
-            if (context && account() === context.account && entries.some(entry => entry.key === currentKey())) {
+            if (inContext()) {
                 if (context.needsRefresh) { context.needsRefresh = false; void scan(context); }
                 else { render(); settle(); }
                 return;
@@ -479,18 +499,22 @@
             if (vm.messageLoadingThrottle?.()) return;
             const source = current(), origin = plain(source);
             const threads = source.threads?.() || [];
-            const full = explicitOrigin === itemKey(source);
+            const list = rl.app.messageList?.();
+            const search = searchContext(source);
+            const explicit = explicitOrigin === currentIdentity();
+            const full = explicit || !isInbox(source.folder) || !!search;
             anchored = ''; viewportAnchor = null;
             host.classList.add('pw-conversation-pending');
-            context = {account:account(), folder:source.folder, sent:sentFolder(), origin,
+            context = {account:account(), folder:source.folder, listFolder:list?.folder, search, sent:sentFolder(), origin,
                 originModel:source,originKey:itemKey(source),threadUid:threads.length > 1
-                    ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:!full,full};
+                    ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:!full,full,explicit};
             entries = [{raw:origin,model:source,key:context.originKey}];
             void scan(context);
         }
         const schedule = () => {
-            if (observedKey !== currentKey()) {
-                observedKey = currentKey(); manualDuringLoad = false; viewportAnchor = null;
+            if (observedKey !== currentIdentity()) {
+                observedKey = currentIdentity(); manualDuringLoad = false; viewportAnchor = null;
+                if (singleOrigin !== currentIdentity()) singleOrigin = '';
             }
             if (active() && currentKey() && (!context || !entries.some(entry => entry.key === currentKey())))
                 host.classList.add('pw-conversation-pending');
@@ -500,12 +524,12 @@
         };
         latestButton.addEventListener('click', () => { const latest = entries.at(-1); if (latest) showMessage(latest,true); });
         fullButton.addEventListener('click', () => {
-            explicitOrigin = currentKey(); context = null; entries = []; anchored = ''; manualDuringLoad = false;
+            singleOrigin = ''; explicitOrigin = currentIdentity(); context = null; entries = []; anchored = ''; manualDuringLoad = false;
             update();
         });
-        singleButton.addEventListener('click', () => { reset(); render(); });
+        singleButton.addEventListener('click', () => { reset(); singleOrigin = currentIdentity(); render(); });
         retry.addEventListener('click', () => { if (context) void scan(context); });
-        const subscriptions = [vm.message,vm.messageLoadingThrottle].filter(value => value?.subscribe)
+        const subscriptions = [vm.message,vm.messageLoadingThrottle,rl.app.folderList].filter(value => value?.subscribe)
             .map(value => value.subscribe(schedule));
         const theme = new MutationObserver(schedule);
         theme.observe(document.documentElement,{attributes:true,attributeFilter:['class']});

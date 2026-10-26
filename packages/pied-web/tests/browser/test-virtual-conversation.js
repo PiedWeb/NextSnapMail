@@ -10,6 +10,7 @@ await p.evaluate(()=>{
     const get=rl.settings.get;
     window.threadAccount='fixture-A';window.conversations=false;
     rl.settings.get=k=>k==='SentFolder'?'Sent':k==='accountHash'?threadAccount
+        :k==='DraftsFolder'?'Drafts':k==='JunkFolder'?'Junk':k==='TrashFolder'?'Trash'
         :k==='useThreads'?conversations:k==='threadAlgorithm'?'REFERENCES':get(k);
     const email=(name,address)=>({'@Object':'Object/Email',name,email:address});
     const raw=(folder,uid,id,parent,refs,subject,date,plain,from)=>({'@Object':'Object/Message',folder,uid,
@@ -64,9 +65,15 @@ await p.evaluate(()=>{
     };
     ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageList'),{css:()=>({})},listVM);
     ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageView'),{css:()=>({})},readerVM);
+    window.nativeReaderInterval=setInterval;
+    window.setInterval=(handler,delay,...args)=>{
+        if(delay===60000)window.readerPoll=handler;
+        return nativeReaderInterval(handler,delay,...args);
+    };
 });
 await p.addScriptTag({url:fixtureBase+'/.local-work/pied-web-ux/conversation-thread.js'});
 await p.waitForFunction(()=>readerVM.pwConversationThread===true);
+await p.evaluate(()=>{window.setInterval=nativeReaderInterval;delete window.nativeReaderInterval;});
 await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===32
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3);
 await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
@@ -277,10 +284,12 @@ await p.evaluate(()=>{
     listVM.messageList().folder='Sent';
     readerVM.message(NativeDraftCollection.reviveFromJson([sentMatches[0]])[0]);
 });
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-check('Opening Sent directly leaves the Inbox conversation even when its reply was already active',await p.evaluate(before=>
+await p.waitForFunction(before=>document.querySelectorAll('.pw-conversation-card').length===1
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length>before,beforeDirectSent);
+check('Opening Sent directly discovers its exchange and keeps the selected sent message active',await p.evaluate(before=>
     readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===51
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,beforeDirectSent));
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before+1
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account',beforeDirectSent));
 await p.evaluate(()=>{listVM.messageList().folder='INBOX';});
 await p.evaluate(()=>{
     holdThreadSearch=true;releaseThreadSearch=null;
@@ -330,19 +339,22 @@ await p.evaluate(()=>{
     readerVM.message(NativeDraftCollection.reviveFromJson([filedRaw])[0]);
     document.querySelector('#messageItem > .bodyText').textContent=filedRaw.plain;
 });
-await p.waitForFunction(()=>!document.querySelector('.pw-conversation-full').hidden);
-check('A filed message offers an explicit full-exchange action, without an automatic lookup',await p.evaluate(before=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before
-    &&document.querySelector('.pw-conversation-before').hidden,requestsBeforeTrash));
-await p.locator('.pw-conversation-full').click();
 await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2
     &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
-check('Explicit full exchange keeps the filed message as the only native action target',await p.evaluate(()=>
+check('A filed message automatically opens its exchange without a full-exchange click',await p.evaluate(before=>
+    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before+1
+    &&document.querySelector('.pw-conversation-full').hidden,requestsBeforeTrash));
+check('Automatic full exchange keeps the filed message as the only native action target',await p.evaluate(()=>
     threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'
     &&readerVM.message().folder==='Projects'&&readerVM.message().uid===80
     &&document.querySelector('#messageItem > .bodyText').textContent==='Message actif classé'
     &&!document.querySelector('.pw-conversation-current').hidden
     &&document.querySelector('.pw-conversation-scope').textContent.includes('hors brouillons')));
+const beforeAccountPoll=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{readerPoll();readerPoll();});
+await p.waitForTimeout(50);
+check('Automatic account exchanges are not periodically rescanned',await p.evaluate(before=>
+    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,beforeAccountPoll));
 await p.locator('.pw-conversation-preview-toggle').last().click();
 await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===1);
 check('A useful previous-message continuation expands without duplicating its one-line excerpt or changing reader state',await p.evaluate(()=>
@@ -401,6 +413,99 @@ await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hi
 check('Leaving explicit exchange restores the same individual filed message',await p.evaluate(()=>
     readerVM.message().folder==='Projects'&&readerVM.message().uid===80
     &&!document.querySelector('.pw-conversation-full').hidden));
+const singleRequests=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);});
+await p.waitForTimeout(100);
+check('Single-message choice survives native loading updates without restarting discovery',await p.evaluate(before=>
+    document.querySelector('.pw-conversation-before').hidden
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,singleRequests));
+await p.locator('.pw-conversation-full').click();
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
+check('The full-exchange action can reopen an opted-out automatic exchange',await p.evaluate(()=>
+    readerVM.message().folder==='Projects'&&readerVM.message().uid===80));
+
+await p.evaluate(()=>{
+    rl.app.folderList([
+        {fullName:'INBOX'}, {fullName:'Sent'}, {fullName:'Archive'},
+        {fullName:'Projects',subFolders:[{fullName:'Projects/Team'}]},
+        {fullName:'Quarantaine',role:'junk',subFolders:[{fullName:'Quarantaine/Child'}]},
+        {fullName:'Corbeille locale',role:'trash'}, {fullName:'Brouillons locaux',role:'drafts'},
+        {fullName:'INBOX.Scheduled',subFolders:[{fullName:'INBOX.Scheduled/Child'}]},
+        {fullName:'INBOX.Reminders',subFolders:[{fullName:'INBOX.Reminders/Child'}]}
+    ]);
+    window.openFixtureMessage=(raw,search='')=>{
+        listVM.messageList().folder=raw.folder;listVM.messageList().search=search;
+        readerVM.message(NativeDraftCollection.reviveFromJson([raw])[0]);
+        document.querySelector('#messageItem > .bodyText').textContent=raw.plain;
+    };
+});
+const protectedRequests=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+for(const [index,folder] of ['Drafts','Junk','Trash','Quarantaine','Quarantaine/Child',
+    'Corbeille locale','Brouillons locaux','INBOX.Scheduled/Child','INBOX.Reminders/Child',
+    'INBOX.Scheduled','INBOX.Reminders'].entries()){
+    await p.evaluate(({index,folder})=>openFixtureMessage({...filedRaw,folder,uid:90+index,
+        messageId:'<excluded-'+index+'@example.test>',references:'',inReplyTo:''}),{index,folder});
+    await p.waitForTimeout(30);
+}
+check('Configured protected folders, native roles, descendants and nested queues never auto-discover exchanges',await p.evaluate(before=>
+    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before
+    &&document.querySelector('.pw-conversation-before').hidden,protectedRequests));
+await p.locator('.pw-conversation-full').click();
+await p.waitForFunction(()=>!document.querySelector('.pw-conversation-before').hidden
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+check('A protected message still allows an explicitly requested full exchange',await p.evaluate(()=>
+    readerVM.message()?.folder==='INBOX.Reminders'
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
+await p.locator('.pw-conversation-before > button').filter({hasText:'Revenir au message seul'}).click();
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
+
+await p.evaluate(()=>{
+    window.readerCases=['Sent','Archive','Projects','Projects/Team'].map((folder,index)=>({...filedRaw,
+        folder,uid:110+index,messageId:'<selected-'+index+'@example.test>',
+        dateTimestamp:1789000520+index,plain:'Selected fictional '+folder}));
+    threadRows=()=>[sourceRaw,...sentMatches,filedRaw,...readerCases];
+});
+for(let index=0;index<4;index++){
+    await p.evaluate(index=>openFixtureMessage(readerCases[index],index===0?'subject:fixture':''),index);
+    await p.waitForFunction(index=>readerVM.message()?.uid===110+index
+        &&document.querySelectorAll('.pw-conversation-card').length===6
+        &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'),index);
+    check(['Sent search','Archive','Filed folder','Nested filed folder'][index]+' opens its exchange while keeping the selected older message active',await p.evaluate(index=>
+        document.querySelector('#messageItem > .bodyText').textContent===readerCases[index].plain
+        &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'
+        &&document.querySelector('.pw-conversation-full').hidden,index));
+}
+await p.evaluate(()=>openFixtureMessage(sourceRaw,'subject:fixture'));
+await p.waitForFunction(()=>readerVM.message()?.uid===50&&document.querySelectorAll('.pw-conversation-card').length===6
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+check('An Inbox search preserves its selected match instead of promoting a newer reply',await p.evaluate(()=>
+    readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
+const beforeWorkspaceSearch=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{
+    sessionStorage.setItem('pw-mail-feed-return',JSON.stringify({search:'subject:fixture',accountHash:threadAccount,
+        key:[threadAccount,'INBOX',77,sourceRaw.uid].join('\x1f'),mode:'global'}));
+    openFixtureMessage(sourceRaw);
+});
+await p.waitForFunction(before=>threadRequests.filter(request=>request.action==='PiedWebConversation').length>before
+    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'),beforeWorkspaceSearch);
+check('A workspace search also keeps the exact selected Inbox message active after native navigation clears its query',await p.evaluate(()=>
+    readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
+await p.locator('.pw-conversation-before > button').filter({hasText:'Revenir au message seul'}).click();
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
+const beforeNextAccount=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{
+    threadAccount='fixture-D';sessionStorage.removeItem('pw-mail-feed-return');
+    sourceRaw={...sourceRaw,messageId:'<next-account@example.test>',plain:'Another account, same UID'};
+    openFixtureMessage(sourceRaw);
+});
+await p.waitForFunction(before=>threadRequests.filter(request=>request.action==='PiedWebConversation').length>before,beforeNextAccount);
+check('A per-message opt-out and old history cannot cross accounts with the same folder and UID',await p.evaluate(()=>
+    threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).account==='fixture-D'
+    &&document.querySelectorAll('.pw-conversation-card').length===0));
+await p.evaluate(()=>{readerVM.message(null);});
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
 await p.evaluate(()=>{
     window.partialLookups=0;window.conversations=true;
     const other=rl.pluginRemoteRequest;

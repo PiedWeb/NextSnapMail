@@ -6,8 +6,22 @@ Since 1.10.41, opening an Inbox message automatically discovers its conversation
 and displays the newest received or sent message, with earlier messages folded
 around the native reader. This works when the native list's useThreads setting
 is false: list grouping and conversation reading are separate choices. No
-full-exchange click or preference migration is required. Direct readers in
-other folders retain individual messages and the explicit full-exchange action.
+full-exchange click or preference migration is required.
+
+Since 1.10.42, Sent, Archive and filed messages also open their account exchange
+automatically, keeping the selected message active. Native search results and
+workspace search provenance preserve the exact selected result, including Inbox
+results. Native list grouping remains unchanged. Account-scoped lookups run on
+open or explicit refresh; they are not polled. The Single message action opts
+out only for that account/folder/UID and remains stable through native loading.
+Full exchange can reopen it explicitly.
+
+Drafts, junk, trash, their descendants and Scheduled/Reminders queue folders
+retain individual reading by default. The client uses native settings and folder
+roles, including inherited protected roles; server discovery excludes the same
+hierarchies using the real IMAP delimiter. An explicitly opened protected origin
+remains available to a manual full-exchange request. Account switches discard
+old history and cannot carry a per-message opt-out into another account.
 
 There is exactly one native actionable message. Its header says **Active message**;
 reply, move, delete, attachments and remote-image permissions remain owned by the

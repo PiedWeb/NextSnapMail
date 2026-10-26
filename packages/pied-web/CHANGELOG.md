@@ -1,5 +1,17 @@
 # Releases
 
+## 1.10.42 — 2026-10-26
+
+- Automatically discover exchanges when opening Sent, Archive or a filed message,
+  keeping the selected message active instead of jumping to the newest reply.
+  Native and workspace search results retain their exact selected match too.
+- Keep list grouping native and independent. Wider reader lookups run on open
+  or explicit refresh, without periodic account scans. Single-message mode is
+  scoped to the current account/folder/UID and survives native loading updates.
+- Preserve individual reading in drafts, junk, trash and queue folders, including
+  renamed special-use folders and protected descendants. Apply the same exclusion
+  hierarchy to server discovery while preserving the explicit opened-origin exception.
+
 ## 1.10.41 — 2026-10-26
 
 - Open Inbox conversations automatically, including historical Sent replies,

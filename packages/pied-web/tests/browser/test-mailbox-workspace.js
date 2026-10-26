@@ -17,6 +17,18 @@ check('All my accounts lives in the account menu while the folder rail keeps onl
     document.querySelector('.pw-global-nav')?.parentElement === document.querySelector('#V-SystemDropDown menu')
     && !document.querySelector('.b-folders-system .pw-global-nav')
     && document.querySelector('.pw-list-scope-label').textContent === 'Tous mes comptes'));
+check('Reader search context matches the exact account, folder and UID and ignores resumed or stale results',await page.evaluate(()=>{
+    const old=sessionStorage.getItem('pw-mail-feed-return'),account=rl.settings.get('accountHash'),message={folder:'INBOX',uid:17};
+    const state={search:'subject:fixture',accountHash:'original-list-account',key:[account,'INBOX',77,17].join('\x1f')};
+    const set=value=>sessionStorage.setItem('pw-mail-feed-return',JSON.stringify(value));
+    set(state);const correct=PiedWebUx.feed.isSearchMessage(message);
+    const otherUid=PiedWebUx.feed.isSearchMessage({...message,uid:18});
+    const otherFolder=PiedWebUx.feed.isSearchMessage({...message,folder:'Sent'});
+    set({...state,key:['another-account','INBOX',77,17].join('\x1f')});const otherAccount=PiedWebUx.feed.isSearchMessage(message);
+    set({...state,resume:true});const resumed=PiedWebUx.feed.isSearchMessage(message);
+    if(old===null)sessionStorage.removeItem('pw-mail-feed-return');else sessionStorage.setItem('pw-mail-feed-return',old);
+    return correct&&!otherUid&&!otherFolder&&!otherAccount&&!resumed;
+}));
 
 await page.locator('.pw-global-row').first().focus();
 await page.keyboard.press('ArrowDown');

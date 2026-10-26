@@ -195,10 +195,21 @@ final class PiedWebConversation
         }
         $folders = [$origin => true];
         $partial = false;
+        $listed = [];
         foreach ($mail->Folders('', '*', false) ?? [] as $folder) {
+            $listed[] = $folder;
+            if (\in_array($folder->Role(), ['drafts', 'junk', 'trash'], true)
+                || \preg_match('/(?:^|[^a-z0-9])(?:Scheduled|Reminders)$/i', $folder->FullName)) {
+                $excluded[] = (string) $folder->FullName;
+            }
+        }
+        foreach ($listed as $folder) {
             $name = (string) $folder->FullName;
-            if ($name === '' || !$folder->Selectable() || \in_array($name, $excluded, true)
-                || \in_array($folder->Role(), ['drafts', 'junk', 'trash'], true)) continue;
+            if ($name === '' || !$folder->Selectable()) continue;
+            foreach ($excluded as $blocked) {
+                if ($blocked !== '' && ($name === $blocked || $folder->Delimiter()
+                    && \str_starts_with($name, $blocked . $folder->Delimiter()))) continue 2;
+            }
             if (\count($folders) >= self::MAX_FOLDERS && !isset($folders[$name])) { $partial = true; continue; }
             $folders[$name] = true;
         }

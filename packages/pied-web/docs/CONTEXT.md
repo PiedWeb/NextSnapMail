@@ -6,10 +6,17 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.42, Sent, Archive, filed folders and search results automatically
+  discover the account exchange while keeping the selected message active.
+  Ordinary Inbox reading still follows the newest reply. Wider lookups run once
+  on open or explicit refresh, not periodically. Single-message opt-out belongs
+  to one account/folder/UID; native/workspace search provenance remains exact.
+  Drafts, junk, trash, their descendants and queues stay individual by default;
+  server discovery enforces the same hierarchy except the explicitly opened origin.
 - Since 1.10.41, opening an Inbox message automatically discovers matching Sent
   replies and opens the newest message in the native reader. This is independent
-  of useThreads, which controls list grouping only. Preserve individual folder
-  lists and direct readers outside Inbox; explicit full exchange remains available.
+  of useThreads, which controls list grouping only. Folder lists stay individual
+  outside Inbox; reader discovery follows the 1.10.42 policy above.
 - Since 1.10.40, conversation discovery verifies a source UID's Message-ID
   search before trusting IMAP HEADER results. A successful empty result for
   that existing ID switches to bounded native header pages, with exact-ID
@@ -76,9 +83,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   bootstrap setting is `useThreads` (lowercase `u`); the saved server setting is
   `UseThreads`. The button must read the bootstrap spelling to show the real mode.
 - Since 1.8.4, that preference belongs to `INBOX` only. Hide its control elsewhere,
-  strip native thread parameters from list and reader requests outside `INBOX`, and
-  never start the Pied Web conversation reader from Trash, Sent, Drafts, Archive or
-  a custom folder. An Inbox conversation may still contain its matching Sent replies.
+  strip native thread parameters from list and reader requests outside `INBOX`.
+  The separate conversation reader follows the current policy above without
+  enabling native grouping on Sent, Archive or filed folder lists.
 - Since 1.9.0, the working workflow lives in a dedicated Feed per account and the Inbox entry
   is restored as an unmodified native folder. Only Feed `MessageList` requests carry the
   `PiedWebFeed=1` marker; never enrich an unmarked Inbox response. One account gets only its
