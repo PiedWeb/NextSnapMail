@@ -1,5 +1,15 @@
 # Releases
 
+## 1.10.41 — 2026-10-26
+
+- Open Inbox conversations automatically, including historical Sent replies,
+  even when native list grouping is disabled. Show the newest message in the
+  native reader with earlier messages folded, without requiring View full
+  exchange or changing the user's list preference.
+- Keep Sent, drafts, trash and filed messages individual when opened directly;
+  their explicit full-exchange action remains available. Test the Inbox row's
+  native selection callback with grouping disabled.
+
 ## 1.10.40 — 2026-10-26
 
 - Recover received/sent exchanges when IMAP returns a successful empty HEADER

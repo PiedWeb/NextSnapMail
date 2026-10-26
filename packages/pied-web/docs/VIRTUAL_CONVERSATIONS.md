@@ -2,6 +2,13 @@
 
 ## Current interaction contract
 
+Since 1.10.41, opening an Inbox message automatically discovers its conversation
+and displays the newest received or sent message, with earlier messages folded
+around the native reader. This works when the native list's useThreads setting
+is false: list grouping and conversation reading are separate choices. No
+full-exchange click or preference migration is required. Direct readers in
+other folders retain individual messages and the explicit full-exchange action.
+
 There is exactly one native actionable message. Its header says **Active message**;
 reply, move, delete, attachments and remote-image permissions remain owned by the
 native reader. Clicking a folded card opens that message through the native selector.
@@ -84,7 +91,7 @@ be selected. It did not appear when a normal Inbox row was opened. Version
 1.7.20 attaches to `MailMessageView`, including when that view's DOM is built
 before the plugin script runs.
 
-With Pied Web and Conversations mode active, opening a received message gathers
+With Pied Web, opening an Inbox message gathers
 all messages in its native folder thread and searches the account's configured
 Sent folder for replies. The folder thread uses SnappyMail's native read-only
 `MessageList` query. Sent discovery searches `References` and `In-Reply-To`
@@ -92,7 +99,7 @@ headers, checks exact Message-ID tokens, follows reply chains, deduplicates
 folder/UID pairs, and sorts the combined set by date. Each search is limited to
 200 results, and following a Sent chain stops after 20 IDs.
 
-Since 1.8.4, Conversations is an Inbox-only preference. Its control is shown in
+Since 1.8.4, native list grouping is an Inbox-only preference. Its control is shown in
 `INBOX`; every list and reader request for Trash, Sent, Drafts, Archive and custom
 folders is forced back to individual messages, even when the saved Inbox
 preference is enabled. This prevents automatic cross-folder discovery outside the Inbox.

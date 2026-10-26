@@ -121,9 +121,11 @@
         };
         const active = () => {
             const key = currentKey();
-            const folder = context && entries.some(entry => entry.key === key) ? context.folder : current()?.folder;
+            const listFolder = rl.app.messageList?.()?.folder;
+            const folder = context && (!listFolder || isInbox(listFolder))
+                && entries.some(entry => entry.key === key) ? context.folder : current()?.folder;
             return document.documentElement.classList.contains('pw-theme')
-                && ((!!rl.settings.get('useThreads') && isInbox(folder))
+                && (isInbox(folder)
                     || explicitOrigin === key || !!context?.full && entries.some(entry => entry.key === key));
         };
         const valid = (version, ctx) => !disposed && version === generation && context === ctx

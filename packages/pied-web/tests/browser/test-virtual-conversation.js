@@ -8,7 +8,7 @@ await p.waitForFunction(()=>window.draftsReady);
 await p.evaluate(()=>{
     document.documentElement.classList.add('pw-theme');
     const get=rl.settings.get;
-    window.threadAccount='fixture-A';window.conversations=true;
+    window.threadAccount='fixture-A';window.conversations=false;
     rl.settings.get=k=>k==='SentFolder'?'Sent':k==='accountHash'?threadAccount
         :k==='useThreads'?conversations:k==='threadAlgorithm'?'REFERENCES':get(k);
     const email=(name,address)=>({'@Object':'Object/Email',name,email:address});
@@ -225,9 +225,21 @@ check('Leaving the theme restores the single native reader',await p.evaluate(()=
     &&!document.querySelector('.b-message').classList.contains('pw-conversation-active')));
 await p.evaluate(()=>{document.documentElement.classList.add('pw-theme');});
 await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===5);
-await p.evaluate(()=>{conversations=false;readerVM.message(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);});
+await p.evaluate(()=>{readerVM.message(null);});
 await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-check('Individual-message mode does not show the conversation stack',true);
+await p.evaluate(()=>{
+    conversations=false;
+    listVM.selector.oCallbacks.ItemSelect(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);
+});
+await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33
+    &&document.querySelectorAll('.pw-conversation-card').length===5);
+check('Opening an Inbox row automatically displays its latest sent reply even with list grouping disabled',await p.evaluate(()=>
+    rl.settings.get('useThreads')===false
+    &&document.querySelector('#messageItem > .bodyText').textContent==='Nouvelle réponse envoyée'
+    &&document.querySelector('.pw-conversation-full').hidden
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='inbox'));
+await p.evaluate(()=>{readerVM.message(null);});
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
 await p.evaluate(()=>{conversations=true;failThreadSearch=true;readerVM.message(NativeDraftCollection.reviveFromJson([receivedRaw])[0]);});
 await p.waitForFunction(()=>!document.querySelector('.pw-conversation-retry').hidden);
 check('A failed search offers a retry without changing mailbox data',await p.evaluate(()=>
@@ -260,6 +272,16 @@ check('A single received message and its older Sent reply also form a native two
     document.querySelector('#messageItem > .bodyText').textContent==='Réponse envoyée seule'
     &&document.querySelector('.pw-conversation-before h2').textContent==='Un seul message reçu'
     &&threadRequests.at(-1).account==='fixture-C'));
+const beforeDirectSent=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await p.evaluate(()=>{
+    listVM.messageList().folder='Sent';
+    readerVM.message(NativeDraftCollection.reviveFromJson([sentMatches[0]])[0]);
+});
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
+check('Opening Sent directly leaves the Inbox conversation even when its reply was already active',await p.evaluate(before=>
+    readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===51
+    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,beforeDirectSent));
+await p.evaluate(()=>{listVM.messageList().folder='INBOX';});
 await p.evaluate(()=>{
     holdThreadSearch=true;releaseThreadSearch=null;
     readerVM.message(NativeDraftCollection.reviveFromJson([{

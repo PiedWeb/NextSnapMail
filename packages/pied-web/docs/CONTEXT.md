@@ -6,6 +6,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.41, opening an Inbox message automatically discovers matching Sent
+  replies and opens the newest message in the native reader. This is independent
+  of useThreads, which controls list grouping only. Preserve individual folder
+  lists and direct readers outside Inbox; explicit full exchange remains available.
 - Since 1.10.40, conversation discovery verifies a source UID's Message-ID
   search before trusting IMAP HEADER results. A successful empty result for
   that existing ID switches to bounded native header pages, with exact-ID
