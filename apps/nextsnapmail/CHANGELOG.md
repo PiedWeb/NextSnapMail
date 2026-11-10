@@ -1,11 +1,131 @@
-## 0.1.16 – 2026-10-10
+## 0.1.17 – 2026-11-10
+
+### Fixed
+
+- Add content-based cache busting to the main stylesheet URL used by the
+  embedded Nextcloud user and administration views. Normal browser reloads now
+  request the current toolbar icon styles instead of returning to a previously
+  cached stylesheet after a hard reload.
+
+## 0.1.16 – 2026-11-09
+
+### Fixed
+
+- Regenerate the precompressed Brotli and gzip variants of the main webmail
+  stylesheets. Web servers that prefer precompressed assets now deliver the
+  current toolbar icon rules instead of the older stylesheet bundled with
+  0.1.15, so the semantic SVG toolbar icons are visible without requiring a
+  hard browser reload.
+
+## 0.1.15 – 2026-11-07
+
+### Added
+
+- Add Polish, Russian, Simplified Chinese and Traditional Chinese translations
+  for the new search scopes, unread-folder filter and out-of-office interface.
+- Add consistent, scalable and semantically colored SVG icons to the main
+  message toolbar so its actions remain recognizable in light and dark themes.
+- Offer a protected complete administration view when Safari or iPadOS cannot
+  display the embedded administration interface.
+
+### Changed
+
+- Correct the declared compatibility range to Nextcloud 32–35 and PHP 8.1 or
+  newer. Older Nextcloud releases were inherited from the former integration
+  metadata but are not part of NextSnapMail's maintained compatibility range.
+- Use the complete email address as the initial display name for newly
+  connected Gmail and Google Workspace additional accounts, so multiple Google
+  accounts can be distinguished in the account menu.
+- Establish the integrated administrator session in the top-level Nextcloud
+  settings response for Safari and iPadOS compatibility.
+- Replace the main message toolbar's platform-dependent emoji with the new SVG
+  icon set.
+- Add content-based cache busting for the main webmail stylesheet so regular
+  reloads immediately use updated interface styles without requiring a hard
+  browser refresh.
+- Present the product consistently as NextSnapMail, expose the NextSnapMail app
+  version separately from the embedded SnappyMail 2.38.2 base, and retain the
+  upstream attribution without renaming compatibility-sensitive internals.
+
+## 0.1.14 – 2026-10-17
+
+### Added
+
+- Begin the native Nextcloud administration integration: the complete existing
+  domain and webmail configuration is available directly from the NextSnapMail
+  administration section without a second administrator login.
+- Add a dedicated Nextcloud-admin-only endpoint for every embedded
+  administration request.
+- Add a page-based administration navigation for domains and Google OAuth,
+  webmail settings, extensions, Nextcloud integration, and data migration.
+
+### Changed
+
+- Hide the redundant embedded SnappyMail administration sidebar and logout
+  controls in favor of the NextSnapMail navigation.
+- Move Google OAuth settings next to the mail-domain configuration and place
+  import and reset operations on their own administration page.
+- Present all former webmail administration subsections in the main
+  NextSnapMail navigation and use SnappyMail's actual `settings/*` routes so
+  existing domains and domain creation remain available.
+- Restyle embedded administration forms, tables, dialogs, controls and domain
+  actions to match the Nextcloud interface more closely.
+- Treat the bundled Nextcloud integration as an internal system module: load it
+  independently of optional plugin support and hide it from the extension list.
+- Move the configurable contact-suggestion and calendar options of that system
+  module into the regular Nextcloud integration settings.
+- Replace legacy extension action glyphs with Material Design icons and hide
+  activation controls for extensions that are not installed.
+- Reorder the integrated administration navigation and consistently use
+  Nextcloud-style Material icons and NextSnapMail branding throughout it.
+- Show mail-domain management before the Google OAuth configuration and remove
+  the obsolete iframe-mode choice from the visible Nextcloud administration.
+- Keep `rainloop.user` and `nextsnapmail.user` independently selectable and
+  editable during normal filter changes. Merge the legacy filters and remove
+  `rainloop.user` only after the user explicitly starts a successful migration.
+
+### Fixed
+
+- Use the driver-specific `Pdo\Mysql` SSL constants on current PHP versions
+  while retaining compatibility fallbacks for older PHP releases, preventing
+  PHP 8.5 deprecation warnings from the database and password-plugin PDO
+  connections (issue #56).
+- Preserve visible message content wrapped in leaked MJML `mj-raw` elements
+  while continuing to sanitize the contained HTML normally (issue #55).
+- Prevent additional mail accounts from replacing the shared CardDAV URL and
+  credentials. CardDAV settings are read-only while an additional account is
+  active and server-side requests attempting to change them are rejected.
+- Preserve Sieve model class names in the minified JavaScript bundle so server
+  scripts and filters are recognized outside debug mode (issue #54).
+- Show a clear IMAP, SMTP and optional Sieve result after testing a domain
+  configuration.
+- Close every administration dialog reliably when a Nextcloud theme suppresses
+  SnappyMail's original closing transition.
+- Close the domain-test credentials dialog directly after testing or
+  cancelling instead of depending on a browser animation event.
+- Make the confirmation action in the domain connection-test credentials
+  dialog close reliably while retaining form submission with the Enter key.
+- Save newly created filters reliably when the Done button is used.
+
+### Security
+
+- Require an active Nextcloud administrator session for the integrated admin
+  page and all of its follow-up API requests while retaining SnappyMail's own
+  request token validation.
+- Protect the legacy administration URL and its service requests with the same
+  Nextcloud administrator check, making the separate SnappyMail administrator
+  password unnecessary for this Nextcloud-only app.
+- Reject attempts to disable, delete or replace the mandatory Nextcloud system
+  module through package-management endpoints.
+
+## Pied Web 0.1.16 – 2026-10-10
 
 Merge upstream through `99dcb2828c02`, including account-wide search scopes,
 Sieve out-of-office settings, namespaced cookies and validated page-size limits.
 Preserve Pied Web's tab-local account context, shared unread counters and quiet
 notification default. Rebuild both runtime bundles from the merged sources.
 
-## 0.1.15 – 2026-09-21
+## Pied Web 0.1.15 – 2026-09-21
 
 ### Changed
 
@@ -13,7 +133,7 @@ notification default. Rebuild both runtime bundles from the merged sources.
   remain supported; the production rollout separately migrates current profiles
   to the quiet setting.
 
-## 0.1.12 – 2026-09-19
+## Pied Web 0.1.12 – 2026-09-19
 
 ### Added
 

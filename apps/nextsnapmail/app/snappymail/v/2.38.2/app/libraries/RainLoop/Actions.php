@@ -559,12 +559,14 @@ class Actions
 
 		$aResult = array(
 			'Auth' => false,
-			'title' => $oConfig->Get('webmail', 'title', 'SnappyMail Webmail'),
-			'loadingDescription' => $oConfig->Get('webmail', 'loading_description', 'SnappyMail'),
+			'title' => $oConfig->Get('webmail', 'title', 'NextSnapMail Webmail'),
+			'loadingDescription' => $oConfig->Get('webmail', 'loading_description', 'NextSnapMail'),
 			'Plugins' => array(),
 			'System' => array(
 				'version' => APP_VERSION,
 				'assetVersion' => (string) (\filemtime(APP_VERSION_ROOT_PATH . 'static/js/app.js') ?: APP_VERSION),
+				'nextsnapmailVersion' => defined('NEXTSNAPMAIL_VERSION') ? NEXTSNAPMAIL_VERSION : '',
+				'snappymailBaseVersion' => defined('SNAPPYMAIL_BASE_VERSION') ? SNAPPYMAIL_BASE_VERSION : APP_VERSION,
 				'token' => Utils::GetCsrfToken(),
 				'languages' => \SnappyMail\L10n::getLanguages(false),
 				'webPath' => \RainLoop\Utils::WebPath(),
@@ -641,6 +643,7 @@ class Actions
 						'Url' => '',
 						'User' => ''
 					];
+					$aData['ReadOnly'] = $oAccount instanceof Model\AdditionalAccount;
 					$aData['Password'] = empty($aData['Password']) ? '' : static::APP_DUMMY;
 					$aData['Interval'] = \max(20, \min(320, (int) $oConfig->Get('contacts', 'sync_interval', 20)));
 					unset($aData['PasswordHMAC']);

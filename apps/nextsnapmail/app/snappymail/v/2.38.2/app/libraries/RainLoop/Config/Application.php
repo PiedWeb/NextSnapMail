@@ -176,8 +176,8 @@ class Application extends \RainLoop\Config\AbstractConfig
 
 			'webmail' => array(
 
-				'title'                       => array('SnappyMail Webmail', 'Text displayed as page title'),
-				'loading_description'         => array('SnappyMail', 'Text displayed on startup'),
+				'title'                       => array('NextSnapMail Webmail', 'Text displayed as page title'),
+				'loading_description'         => array('NextSnapMail', 'Text displayed on startup'),
 				'favicon_url'                 => array(''),
 				'app_path'                    => array(''),
 
@@ -226,7 +226,7 @@ Warning: only enable when server does not do this, else double compression error
 			),
 
 			'security' => array(
-				'custom_server_signature' => array('SnappyMail'),
+				'custom_server_signature' => array('NextSnapMail'),
 				'x_xss_protection_header' => array('1; mode=block'),
 
 				'gnupg'                   => array(true),

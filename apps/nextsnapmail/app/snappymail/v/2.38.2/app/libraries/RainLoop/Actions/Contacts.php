@@ -39,6 +39,12 @@ trait Contacts
 	public function DoSaveContactsSyncData() : array
 	{
 		$oAccount = $this->getAccountFromToken();
+		if ($oAccount instanceof \RainLoop\Model\AdditionalAccount) {
+			return $this->FalseResponse(
+				\RainLoop\Notifications::ClientViewError,
+				'CardDAV synchronization settings can only be changed from the main account.'
+			);
+		}
 
 		$oAddressBookProvider = $this->AddressBookProvider($oAccount);
 		if (!$oAddressBookProvider || !$oAddressBookProvider->IsActive()) {
@@ -132,7 +138,7 @@ trait Contacts
 				$vCard = \Sabre\VObject\Reader::readJson($this->GetActionParam('jCard'));
 				if ($vCard && $vCard instanceof \Sabre\VObject\Component\VCard) {
 					$vCard->REV = \gmdate('Ymd\\THis\\Z');
-					$vCard->PRODID = 'SnappyMail-'.APP_VERSION;
+					$vCard->PRODID = 'NextSnapMail-'.(defined('NEXTSNAPMAIL_VERSION') ? NEXTSNAPMAIL_VERSION : APP_VERSION);
 					$sUid = \trim($this->GetActionParam('uid'));
 					$oContact = $sUid ? $oAddressBookProvider->GetContactByID($sUid) : null;
 					if (!$oContact) {

@@ -2,7 +2,7 @@
   "version": "1.10.43",
   "tested": {
     "nextcloud": "35.0.2",
-    "nextsnapmail": "0.1.16",
+    "nextsnapmail": "0.1.17",
     "snappymail": "2.38.2"
   },
   "files": {
@@ -80,16 +80,16 @@
       "Default SoundNotification to false while preserving explicit user settings"
     ],
     "files": {
-      "app/libraries/RainLoop/Actions.php": "d7a73e60b8988770bc614e320dbbea70d4fb9242f84b741fc2e8eb49d6e1995a",
-      "app/libraries/RainLoop/Actions/Accounts.php": "114b08e8a21398cafd32b4a6a66e16f025fd4d780f9fcb7ca049408f9a44e300",
+      "app/libraries/RainLoop/Actions.php": "b7aadad698a7f8dce0e9c9e2f08dc0ef89d146502e14b17bb6f95522c8c2daf2",
+      "app/libraries/RainLoop/Actions/Accounts.php": "57b3ddb0eb34afd6a9d0bacfc146c5d6313f36965a2c1d54fe153dab18b29cd9",
       "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
       "app/libraries/RainLoop/Actions/User.php": "bf7bc9e8953212f5d86be8a1d498f785cda54b163a250f005dea16d8e7c93aae",
       "app/libraries/RainLoop/ServiceActions.php": "d224923aac286432ccf9f9965cdcca3198194fafa0cb7f2406d2538a18b74741",
-      "static/js/app.js": "662946be14c1772d2f20efde158c5d3d56077fc6516dc778c7a329a77b88e9b4",
+      "static/js/app.js": "88c46b32396d04b22b3b0cde11441aafd9137b659cc331455dd55a218fc364c8",
       "static/js/boot.js": "290da0fa53a9745da67bb0abaf8ad36cf948ce0ec382d5cfcd0678846d4dbd90",
-      "static/js/min/app.min.js": "551c1153f328b3f4e1aff67f57ef39099a4b048eeaa4964600474c6909820bbf",
-      "static/js/min/app.min.js.gz": "10c96103191d34736f0e1b03e04ce5c120bb2430dc4010fdfc74aeaedee0470e",
-      "static/js/min/app.min.js.br": "97ab97a24b1052a9810670f5973d8fb801d9942eb43d1aebf10c88ab26748953",
+      "static/js/min/app.min.js": "93aa2bfc1dcce1929ff8a2798e8c7864291b68370ab7ee7e50e6bf0a31891e14",
+      "static/js/min/app.min.js.gz": "46c7f261486a23218f138fa404521368a98a4f57d12ae5c47cbbd44b2ddfa545",
+      "static/js/min/app.min.js.br": "c2071bb5aaceba9f5093cff1704a4a4b7c0562e80414b548eafe884f4d4fbf5d",
       "static/js/min/boot.min.js": "ff25870af42f2390a54ba86eb668366caff1a3fa20ef5a3f0f3eb4e428225a27"
     }
   }

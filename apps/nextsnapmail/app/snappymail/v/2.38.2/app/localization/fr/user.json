@@ -458,7 +458,9 @@
 		"SUBNAME_FORWARD_TO": "Faire suivre à \"%EMAIL%\"",
 		"SUBNAME_REJECT": "Rejeter",
 		"SUBNAME_VACATION_MESSAGE": "Message d'absence",
-		"SUBNAME_DISCARD": "Exclure"
+		"SUBNAME_DISCARD": "Exclure",
+		"BUTTON_MIGRATE_LEGACY": "Migrer les filtres RainLoop maintenant",
+		"LEGACY_SCRIPT_FOUND": "Un ancien script de filtres RainLoop a été détecté. Ses filtres seront fusionnés dans nextsnapmail.user, puis rainloop.user sera supprimé."
 	},
 	"SETTINGS_SECURITY": {
 		"LEGEND_SECURITY": "Sécurité",
@@ -523,7 +525,8 @@
 		"LABEL_CONTACTS_SYNC_SERVER": "Serveur",
 		"LABEL_CONTACTS_SYNC_AB_URL": "URL du carnet d'adresses",
 		"LABEL_CONTACTS_SYNC_USER": "Utilisateur",
-		"SYNC_READ": "Lecture seulement"
+		"SYNC_READ": "Lecture seulement",
+		"NOTICE_CONTACTS_SYNC_SHARED": "La synchronisation CardDAV est partagée entre tous les comptes mail. Passez au compte principal pour modifier ces paramètres."
 	},
 	"SETTINGS_THEMES": {
 		"LEGEND_THEMES": "Thèmes",
