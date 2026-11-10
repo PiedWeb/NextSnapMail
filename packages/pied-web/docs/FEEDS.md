@@ -96,8 +96,11 @@ a visible per-message date and shorter day headings. At 1200 px and above its
 default width is 30vw, bounded between 360 and 480 px; native resize remains bounded
 at 480 px so the reader keeps the remaining space. Folder navigation stays 248 px
 with 36 px rows; the collapsed rail stays 72 px. Medium desktops use 320–420 px.
-Phone rows remove excess vertical padding while allowing long subjects two lines.
-Global phone rows retain their complete account identity and 44 px row commands.
+Phone and touch-pane rows give the sender and two-line subject the full width.
+Dates, conversation counts, attachments and the 44 px commands share a separate
+footer; long timestamps use their own line when space is limited. The native
+content wrapper remains in place for swipe feedback. Global phone rows put the
+source account below the full-width subject.
 The explicit compact preference remains available on fine-pointer desktops.
 
 Date grouping maps message models to row nodes in one pass and leaves existing

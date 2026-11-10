@@ -76,14 +76,6 @@ html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom) input[aria-in
   }
   html.pw-theme #rl-app #V-MailMessageView .pw-reading-actions {padding-inline:var(--pw-space-4);}
   html.pw-theme #rl-app #V-MailMessageView .pw-reading-actions > .btn[data-pw-icon] {max-width:100%;height:auto;min-height:44px;white-space:normal;text-align:start;padding-block:var(--pw-space-2);}
-  /* A timestamp and its row tools share one metadata line. */
-  html.pw-theme #rl-app #V-MailMessageList .pw-global-row {
-    grid-template-areas:'primary account' 'subject subject' 'time actions';grid-template-columns:minmax(0,1fr) auto;
-    row-gap:var(--pw-space-0-5);padding-block:var(--pw-space-1);
-  }
-  html.pw-theme #rl-app #V-MailMessageList .pw-global-time {justify-self:start;align-self:center;font-size:var(--pw-text-sm);}
-  html.pw-theme #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions {padding:0;box-shadow:none;background:transparent;gap:0;}
-  html.pw-theme #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions > button {width:44px;min-width:44px;height:44px;min-height:44px;}
   html.pw-theme #rl-app .e-paginator a {display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;min-width:44px;min-height:44px;}
   html.pw-theme #rl-app :is(#V-SettingsPane,dialog:not(#V-PopupsCompose)) label:has(input[type=checkbox],input[type=radio]) {display:inline-flex;align-items:center;gap:var(--pw-space-2);min-height:44px;}
   html.pw-theme #rl-app #V-SettingsPane :is(.accounts-list,.identities-list) :is(td:first-child,td:last-child) {padding-inline:0;}
@@ -98,6 +90,18 @@ html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom) input[aria-in
   html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom) input {font-size:var(--pw-text-md);}
   html.pw-theme #rl-app :is(.pw-schedule-custom,.pw-reminder-custom,.pw-schedule-detail,.pw-reminder-detail) {font-size:var(--pw-text-sm);}
   html.pw-theme #rl-app :is(.pw-schedule-option,.pw-reminder-option) {flex-wrap:wrap;gap:var(--pw-space-1) var(--pw-space-3);}
+}
+@media(max-width:799px),(pointer:coarse) {
+  /* Keep identity above the footer, including narrow tablet list panes. */
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-row {
+    grid-template-areas:'primary primary' 'subject subject' 'account account' 'time actions';grid-template-columns:minmax(0,1fr) auto;
+    row-gap:var(--pw-space-0-5);padding-block:var(--pw-space-1);
+  }
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-subject {white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.45;}
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-account {box-sizing:border-box;justify-self:start;max-width:100%;}
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-time {justify-self:start;align-self:center;min-width:0;white-space:normal;overflow-wrap:anywhere;font-size:var(--pw-text-sm);}
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions {padding:0;box-shadow:none;background:transparent;gap:0;}
+  html.pw-theme #rl-app #V-MailMessageList .pw-global-row > .pw-row-actions > button {width:44px;min-width:44px;height:44px;min-height:44px;}
 }
 @media(prefers-reduced-motion:reduce) {
   html.pw-theme #rl-app :is(.pw-global-rows,.pw-row-actions,.pw-mobile-header,.top-toolbar,.button-confirm-delete,#V-SettingsPane,dialog) {scroll-behavior:auto;transition:none!important;animation:none!important;}

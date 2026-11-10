@@ -1,7 +1,8 @@
 // Scan real row content without shrinking type; retain native actions and scope.
 const page=await browser.getPage('nextsnapmail-list-density-performance');
 page.setDefaultTimeout(7000);
-await page.addInitScript(()=>{localStorage.clear();sessionStorage.clear();});
+await page.goto('http://127.0.0.1:8876/.local-work/images-native-preview.html?mode=list&side=1');
+await page.evaluate(()=>{localStorage.clear();sessionStorage.clear();});
 const checks=[],measurements=[];
 const check=(name,ok)=>{if(!ok)throw Error(name);checks.push(name);console.log('PASS '+name);};
 for(const dark of [false,true])for(const width of [1536,1000,390,320]) {
@@ -24,8 +25,8 @@ for(const dark of [false,true])for(const width of [1536,1000,390,320]) {
   !result.overflow&&!result.rowClipped&&result.timeVisible&&result.fonts.every(size=>size>=14));
  if(width>=1200)check('The default desktop working list shows ten rows with space left for reading',
   result.visible>=10&&result.list<=480&&result.heights.every(height=>height>=56&&height<=64));
- if(width===390)check('A phone shows ten rows while allowing long subjects two lines',
-  result.visible>=10&&Math.max(...result.heights)>Math.min(...result.heights));
+ if(width===390)check('A phone gives text and touch actions separate rows while keeping six messages visible',
+  result.visible>=6&&result.heights.every(height=>height>=90));
  await page.locator('.messageListItem .subjectParent').first().click({modifiers:['Control']});
  check('Denser geometry keeps native selection and exact message identity',await page.evaluate(()=>
   demoMessages[0].checked()&&demoMessages.slice(1).every(message=>!message.checked())));

@@ -56,3 +56,52 @@
   #rl-app .pw-row-action { min-height:44px;min-width:44px; }
   #rl-app .messageListItem > .pw-row-actions { position:static;transform:none;opacity:1;pointer-events:auto;grid-column:1/-1;justify-content:flex-end;background:transparent;box-shadow:none; }
 }
+
+/* On phones and touch panes, reading owns the width. Keep bound nodes in place and
+ * share the bottom metadata row with the actions, rather than making the
+ * action rail a flex sibling that squeezes the entire message into a sliver.
+ * The content wrapper remains a real box for native swipe feedback. */
+@media(max-width:799px),(pointer:coarse) {
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem {
+    display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:0;
+    container:pw-mail-row / inline-size;
+    --pw-row-actions-space:44px;
+  }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem.pw-has-row-actions { --pw-row-actions-space:88px; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem:has(> .pw-row-actions > :nth-child(3):not([hidden])) { --pw-row-actions-space:132px; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > .messageCheckbox { grid-area:1/1;align-self:center; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
+    grid-area:1/2;min-width:0;width:auto;
+    grid-template-columns:minmax(0,1fr) auto auto var(--pw-row-actions-space);
+    grid-template-rows:minmax(20px,auto) auto minmax(44px,auto);
+    gap:var(--pw-space-1);
+  }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .senderParent { grid-area:1/1/2/-1;padding-inline-end:0; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .subjectParent { grid-area:2/1/3/-1; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time {
+    grid-area:3/1;min-width:0;max-width:100%;justify-self:start;text-align:start;
+    white-space:normal;overflow-wrap:anywhere;
+  }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len { grid-area:3/2;margin:0;justify-self:end; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent { grid-area:3/3;justify-self:end; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent:not(:has(> i[class*="icon-"])) { display:none; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent { grid-area:3/4;justify-self:end; }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > .pw-row-actions {
+    grid-area:1/2;position:static;transform:none;align-self:end;justify-self:end;
+    opacity:1;pointer-events:auto;padding:0;gap:0;height:44px;background:transparent;box-shadow:none;
+  }
+  html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > .pw-row-actions > :is(.flagParent,.pw-row-action) { width:44px;min-width:44px;height:44px;min-height:44px; }
+  /* Let the date use its own line when text grows or the row is very narrow.
+   * The rem threshold follows text size, rather than breaking words to make
+   * a larger date fit beside three fixed touch targets. */
+  @container pw-mail-row (max-width:20rem) {
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem > div + div {
+      grid-template-columns:auto auto minmax(var(--pw-row-actions-space),1fr);
+      grid-template-rows:minmax(20px,auto) auto auto minmax(44px,auto);
+    }
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem time { grid-area:3/1/4/-1; }
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .threads-len { grid-area:4/1;justify-self:start; }
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .attachmentParent { grid-area:4/2; }
+    html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messageListItem .flagParent { grid-area:4/3; }
+  }
+}

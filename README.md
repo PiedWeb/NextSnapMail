@@ -23,7 +23,7 @@ python3 tools/package-release.py
 
 `tools/test.sh` exécute les tests du correctif cœur puis les vérifications et
 tests serveur du paquet Pied Web. La CI exécute cette commande et l'empaquetage ;
-les [48 suites navigateur](packages/pied-web/tests/README.md) se lancent séparément
+les [49 suites navigateur](packages/pied-web/tests/README.md) se lancent séparément
 avec `dev-browser-agent` sur des données fictives.
 `package-release.py` ne lit ni configuration privée,
 ni compte, ni message : il assemble exclusivement les fichiers versionnés.

@@ -6,6 +6,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.43, phone senders and subjects own the full row width. Native
+  quick actions share the metadata footer, reserving only that footer's end
+  column. Do not put a static coarse-pointer action rail beside the whole
+  content wrapper: it compresses senders to a few characters. Retain the
+  wrapper for native swipe transforms and the same bound command nodes.
+  Global phone account labels sit below the subject, leaving the sender full width.
 - Since 1.10.42, Sent, Archive, filed folders and search results automatically
   discover the account exchange while keeping the selected message active.
   Ordinary Inbox reading still follows the newest reply. Wider lookups run once

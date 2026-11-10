@@ -1,5 +1,19 @@
 # Releases
 
+## 1.10.43 — 2026-11-10
+
+- Give phone and touch-pane senders and subjects the full row width. Put dates,
+  conversation counts, attachments and the existing 44 px actions below the text. Coarse
+  pointer action groups no longer squeeze the whole message into a narrow column.
+- Give global phone senders their own line, keeping the source account visible
+  below the subject. Long dates wrap within the metadata footer, including at
+  200% text size, with a separate date line in narrow rows. Preserve native bound
+  controls and the swipe content wrapper.
+- Cover actual coarse-pointer media queries, touch hit targets and native flag,
+  reminder cancellation and refused Trash dispatch on fictional mail. Check
+  320–799 px, 800/1280 px touch panes, light/dark and fallback native stars;
+  retain desktop regression checks.
+
 ## 1.10.42 — 2026-10-26
 
 - Automatically discover exchanges when opening Sent, Archive or a filed message,
