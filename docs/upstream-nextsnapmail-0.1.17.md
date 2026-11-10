@@ -37,3 +37,11 @@ backup, compare the installed payload, install the reviewed fork, invalidate
 web PHP and validate the authenticated runtime. Do not install the unmodified
 App Store archive over the customized fork. The production maintenance on
 10 November intentionally keeps NextSnapMail 0.1.16 and Pied Web 1.10.42.
+
+## Follow-up
+
+Robin requested the merge and production installation. PR #8 was merged as
+`f07b6351f` and release `50c7cc505` was deployed as NextSnapMail 0.1.17 / Pied Web
+1.10.44. The [deployment record](../packages/pied-web/docs/deployments/1.10.44-nextsnapmail-0.1.17.md)
+records the completed backend/fixture checks, recovery point and remaining
+authenticated-browser limitation.

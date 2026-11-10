@@ -79,10 +79,10 @@ The [shared design system](docs/DESIGN_SYSTEM.md) also covers native settings an
 
 ## Install and maintain
 
-The source on `main` prepares **1.10.44**, integrating NextSnapMail **0.1.17** and preserving the 1.10.43 changes: full-width phone senders and subjects,
+Release **1.10.44** integrates NextSnapMail **0.1.17** and preserves the 1.10.43 changes: full-width phone senders and subjects,
 with dates and touch actions in a separate footer. It has not been deployed or tagged.
 
-Deployed release **1.10.42** targets Nextcloud **35.0.2**, NextSnapMail **0.1.16** and embedded SnappyMail **2.38.2**. The [release history](CHANGELOG.md) records its conversation behavior; the latest phone changes are checked on fictional browser fixtures. Other platform versions are unverified.
+Deployed files **1.10.44** target Nextcloud **35.0.2**, NextSnapMail **0.1.17** and embedded SnappyMail **2.38.2**. Native IMAP, served assets and isolated browser checks pass; authenticated production visual validation remains pending because the Chrome automation connection times out. See the [deployment and rollback record](docs/deployments/1.10.44-nextsnapmail-0.1.17.md). Other platform versions are unverified.
 
 1. Follow [installation and removal](docs/INSTALL.md).
 2. Read [what survives upgrades](docs/UPDATES.md).
