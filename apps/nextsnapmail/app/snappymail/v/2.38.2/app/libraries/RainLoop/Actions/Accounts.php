@@ -219,6 +219,7 @@ trait Accounts
 			'mainEmail' => $oMainAccount->Email(),
 			'mainAccountHash' => $oMainAccount->Hash(),
 			'contactsAllowed' => $this->AddressBookProvider($oAccount)->IsActive(),
+			'contactsSyncReadOnly' => $oAccount instanceof AdditionalAccount,
 			'HideUnsubscribed' => false,
 			'useThreads' => (bool) $oConfig->Get('defaults', 'mail_use_threads', false),
 			'threadAlgorithm' => '',

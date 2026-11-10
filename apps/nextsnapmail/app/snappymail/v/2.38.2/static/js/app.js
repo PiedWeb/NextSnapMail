@@ -1634,7 +1634,9 @@
 			"'": '&#x27;'
 		},
 
-		keepTagContent = 'form,button,data', // font
+		// Some senders leak MJML's mj-raw authoring wrapper into delivered HTML.
+		// Unwrap it so its visible children still pass through the normal sanitizer.
+		keepTagContent = 'form,button,data,mj-raw', // font
 
 		allowedTags = [
 			// Structural Elements:
@@ -9459,6 +9461,7 @@ body > * {
 
 	addObservablesTo(ContactUserStore, {
 		allowSync: false, // Admin setting
+		syncReadOnly: false,
 		syncMode: 0,
 		syncUrl: '',
 		syncUser: '',
@@ -9501,6 +9504,7 @@ body > * {
 		let config = SettingsGet('ContactsSync');
 		ContactUserStore.allowSync(!!config);
 		if (config) {
+			ContactUserStore.syncReadOnly(!!config.ReadOnly);
 			ContactUserStore.syncMode(config.Mode);
 			ContactUserStore.syncUrl(config.Url);
 			ContactUserStore.syncUser(config.User);
@@ -15741,7 +15745,7 @@ body > * {
 		}
 
 		testSystemNotification() {
-			NotificationUserStore.display('SnappyMail', 'Test notification');
+			NotificationUserStore.display('NextSnapMail', 'Test notification');
 		}
 
 		selectLanguage() {
@@ -15753,7 +15757,7 @@ body > * {
 			navigator.registerProtocolHandler(
 				'mailto',
 				`${location.protocol}//${location.host}${location.pathname}?mailto&to=%s`,
-				(SettingsGet('title') || 'SnappyMail')
+				(SettingsGet('title') || 'NextSnapMail')
 			);
 			alert(i18n('GLOBAL/DONE'));
 			this.mailto(0);
@@ -15765,6 +15769,7 @@ body > * {
 			this.contactsAutosave = ko.observable(!!SettingsGet('ContactsAutosave'));
 
 			this.allowContactsSync = ContactUserStore.allowSync;
+			this.contactsSyncReadOnly = ContactUserStore.syncReadOnly;
 			this.syncMode = ContactUserStore.syncMode;
 			this.syncUrl = ContactUserStore.syncUrl;
 			this.syncUser = ContactUserStore.syncUser;
@@ -15793,14 +15798,16 @@ body > * {
 				Remote.saveSettings(null, { ContactsAutosave: value })
 			);
 
-			this.saveTrigger.subscribe(() =>
-				Remote.request('SaveContactsSyncData', null, {
-					Mode: ContactUserStore.syncMode(),
-					Url: ContactUserStore.syncUrl(),
-					User: ContactUserStore.syncUser(),
-					Password: ContactUserStore.syncPass()
-				})
-			);
+			this.saveTrigger.subscribe(() => {
+				if (!ContactUserStore.syncReadOnly()) {
+					Remote.request('SaveContactsSyncData', null, {
+						Mode: ContactUserStore.syncMode(),
+						Url: ContactUserStore.syncUrl(),
+						User: ContactUserStore.syncUser(),
+						Password: ContactUserStore.syncPass()
+					});
+				}
+			});
 		}
 	}
 
@@ -15908,7 +15915,9 @@ body > * {
 				serverErrorDesc: ''
 			});
 
-			rl.loadScript(SettingsGet('StaticLibsJs').replace('/libs.', '/sieve.')).then(() => {
+			const sieveScriptUrl = SettingsGet('StaticLibsJs').replace('/libs.', '/sieve.'),
+				sieveScriptVersion = 'nextsnapmail-0.1.15-independent-scripts';
+			rl.loadScript(sieveScriptUrl + (sieveScriptUrl.includes('?') ? '&' : '?') + 'v=' + sieveScriptVersion).then(() => {
 				const Sieve = window.Sieve;
 				Sieve.folderList = FolderUserStore.folderList;
 				Sieve.serverError.subscribe(value => this.serverError(value));
@@ -15919,6 +15928,37 @@ body > * {
 			}).catch(e => console.error(e));
 
 			this.hasActive = koComputable(() => this.scripts().filter(script=>script.active()).length);
+			this.managedScripts = koComputable(() => this.scripts().filter(script =>
+				script && 'function' === typeof script.name && (script.name() || '').trim()
+					&& 'function' === typeof script.allowFilters && script.allowFilters()
+			));
+			this.advancedScripts = koComputable(() => this.scripts().filter(script =>
+				script && 'function' === typeof script.name && (script.name() || '').trim()
+					&& 'function' === typeof script.allowFilters && !script.allowFilters()
+			));
+			this.legacyScript = koComputable(() =>
+				this.managedScripts().find(script => 'rainloop.user' === script.name()) || null
+			);
+			const migrationFallback = () => {
+				const language = (LanguageStore.language() || doc.documentElement.lang || '').toLowerCase();
+				return language.startsWith('de')
+					? {
+						description: 'Ein altes RainLoop-Filterskript wurde erkannt. Die Filter werden mit nextsnapmail.user zusammengeführt und rainloop.user wird anschließend entfernt.',
+						button: 'RainLoop-Filter jetzt übernehmen'
+					}
+					: {
+						description: 'A legacy RainLoop filter script was detected. Its filters will be merged into nextsnapmail.user and rainloop.user will then be removed.',
+						button: 'Migrate RainLoop filters now'
+					};
+			};
+			this.legacyMigrationDescription = koComputable(() => {
+				LanguageStore.language();
+				return i18n('SETTINGS_FILTERS/LEGACY_SCRIPT_FOUND', null, migrationFallback().description);
+			});
+			this.legacyMigrationButton = koComputable(() => {
+				LanguageStore.language();
+				return i18n('SETTINGS_FILTERS/BUTTON_MIGRATE_LEGACY', null, migrationFallback().button);
+			});
 
 			this.scriptForDeletion = ko.observable(null).askDeleteHelper();
 		}
@@ -15941,6 +15981,16 @@ body > * {
 
 		deleteScript(script) {
 			window.Sieve.deleteScript(script);
+		}
+
+		migrateLegacyScript() {
+			const script = this.legacyScript();
+			script && window.Sieve.migrateLegacyScript(script);
+		}
+
+		scriptDisplayName(script) {
+			LanguageStore.language();
+			return i18n('SETTINGS_FILTERS/SIMPLE', null, 'Simple') + ' (' + script.name() + ')';
 		}
 
 		disableScripts() {

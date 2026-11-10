@@ -1,11 +1,11 @@
 {
   "schema": 1,
-  "updated": "2026-10-10T06:28:09Z",
+  "updated": "2026-11-10T18:30:00Z",
   "components": {
     "nextsnapmail": {
       "repository": "https://github.com/oe79/NextSnapMail.git",
       "branch": "master",
-      "commit": "99dcb2828c02e829e7543069873179b0877a94c7",
+      "commit": "f1625b9f6240fcaf992592c58dcfc06cb4ccf373",
       "path": "apps/nextsnapmail"
     },
     "pied-web-import": {

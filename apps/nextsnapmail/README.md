@@ -1,6 +1,6 @@
 # NextSnapMail
 
-NextSnapMail is a SnappyMail fork focused on integration with Nextcloud.
+NextSnapMail is a Nextcloud-focused webmail application based on SnappyMail.
 
 It provides a lightweight webmail interface inside Nextcloud, using the
 embedded SnappyMail application for IMAP/SMTP mail access.
@@ -8,6 +8,17 @@ embedded SnappyMail application for IMAP/SMTP mail access.
 This project is now maintained as a dedicated Nextcloud app. The repository root
 is the installable app directory that belongs in a Nextcloud `apps/` folder as
 `nextsnapmail`.
+
+## Requirements
+
+- Nextcloud 32 through 35
+- PHP 8.1 or newer, within the PHP versions supported by the installed
+  Nextcloud release
+
+Older Nextcloud releases are not declared compatible because they are not part
+of the maintained compatibility range. Compatibility reports for supported
+versions are welcome, especially where a particular setup has not yet been
+reproduced by the maintainer.
 
 ## Looking for a standalone webmail client?
 
@@ -21,21 +32,61 @@ Tachyon is an independent project and is not affiliated with NextSnapMail.
 
 ## About this project
 
-I maintain NextSnapMail primarily for my own private use, because I wanted to
-continue using SnappyMail inside Nextcloud after upstream development slowed
-down.
+I originally created NextSnapMail primarily for my own private use so I could
+continue developing the Nextcloud integration according to my own needs.
+NextSnapMail remains an independent, Nextcloud-focused project. Compatible bug
+fixes and security improvements from SnappyMail may be adopted where useful,
+but returning existing NextSnapMail installations to the upstream app would be
+difficult because the projects now differ in their integration, data migration
+and feature sets.
 
 Everyone is welcome to use it, but please do so at your own risk. I am happy to
 receive bug reports, hints, and practical feedback, and I will try to help where
 I can. However, there is no guarantee of support, fixes, compatibility, or
 continued maintenance.
 
-## Current development status
+## Current release highlights (0.1.17)
 
 Newest changes first:
 
 - Scoped the selected mail account to an opaque URL context, so different
   browser tabs can keep different linked mailboxes open without shared state.
+- Added content-based cache busting to the stylesheet URL used by the embedded
+  Nextcloud views, preventing a normal reload from restoring stale toolbar
+  icon styles after a hard reload.
+- Fixed missing main-toolbar icons on web servers that serve precompressed
+  Brotli or gzip assets by rebuilding those files from the current stylesheet.
+- Added consistent, scalable and semantically colored SVG icons to the main
+  message toolbar, replacing platform-dependent emoji while remaining clearly
+  visible in light and dark themes.
+- Improved the integrated administration session and added a protected
+  full-page fallback for Safari and iPadOS if the embedded administration view
+  remains empty.
+- Added Polish, Russian, Simplified Chinese and Traditional Chinese
+  translations for the search scopes, unread-folder filter and out-of-office
+  interface.
+- Newly connected Gmail and Google Workspace additional accounts now initially
+  use the complete email address as their display name.
+- Updated MySQL PDO SSL options for PHP 8.5 while retaining compatibility with
+  older PHP versions, preventing recurring deprecation entries in the
+  Nextcloud log.
+- Fixed empty message bodies when an HTML-only email contains visible content
+  inside a leaked MJML `mj-raw` wrapper. The wrapper is removed while its
+  contents still pass through the regular HTML sanitizer.
+- Integrated the complete NextSnapMail administration directly into the
+  Nextcloud administration settings. Domains, Google OAuth, webmail settings,
+  extensions, Nextcloud integration, import and reset functions can now be
+  managed without a separate webmail administrator login.
+- Reworked the administration pages with dedicated navigation, Nextcloud-style
+  forms and icons, clearer domain actions and visible IMAP, SMTP and Sieve test
+  results.
+- The bundled Nextcloud integration is now treated as an internal system
+  component and is no longer presented as an optional extension.
+- Fixed Sieve script detection in the optimized JavaScript bundle so existing
+  server-side scripts and filters are also displayed outside debug mode.
+- Protected the shared CardDAV configuration from being overwritten while an
+  additional mail account is active. The settings remain visible but can only
+  be changed from the main account.
 - Added a dedicated multilingual out-of-office settings page with start and
   end dates, reply intervals and automatic Sieve capability checks.
 - Out-of-office responses can be configured separately for the main address
@@ -44,8 +95,10 @@ Newest changes first:
 - Out-of-office settings stored by another NextSnapMail instance on the same
   Sieve server are detected and preserved. Their addresses are shown and can
   be removed explicitly when they are no longer needed.
-- New managed Sieve filters use `nextsnapmail.user`; existing `rainloop.user`
-  filters are preserved and can be migrated safely.
+- New managed Sieve filters use `nextsnapmail.user`. Existing `rainloop.user`
+  and `nextsnapmail.user` scripts remain independently selectable and editable.
+  A separate migration button can explicitly merge the legacy filters into
+  `nextsnapmail.user` and remove `rainloop.user` after a successful transfer.
 - Added account-wide and subfolder search scopes to both the regular and
   Advanced Search while keeping the current folder as the default.
 - Clarified the unread-folder control in the folder sidebar by presenting it as
@@ -89,8 +142,11 @@ NextSnapMail can be configured in two places:
   login and, when supported by the configured mail server, personal
   out-of-office responses
 
-The embedded NextSnapMail webmail admin panel can be opened from the
-NextSnapMail administration settings in Nextcloud.
+The complete webmail administration is integrated into the dedicated
+NextSnapMail section of the Nextcloud administration settings. A separate
+NextSnapMail administrator login is not required. This includes mail domains,
+Google OAuth, general webmail settings, extensions, Nextcloud integration and
+the import and reset tools.
 
 If you previously used the original SnappyMail Nextcloud app, you can use the
 NextSnapMail admin settings to import existing SnappyMail accounts and app data.

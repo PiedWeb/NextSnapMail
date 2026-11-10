@@ -5,6 +5,7 @@ repo_root=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 
 cd "$repo_root/apps/nextsnapmail"
 php tests/account-url-context.php
+php tests/admin-account-routing.php
 php tests/account-unread-counts.php
 php tests/account-unread-count-setting.php
 php tests/notification-sound-default.php

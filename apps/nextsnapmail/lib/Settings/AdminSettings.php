@@ -1,7 +1,6 @@
 <?php
 namespace OCA\NextSnapMail\Settings;
 
-use OCA\NextSnapMail\Util\SnappyMailHelper;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IConfig;
 use OCP\Settings\ISettings;
@@ -17,12 +16,14 @@ class AdminSettings implements ISettings
 
 	public function getForm()
 	{
-		\OCA\NextSnapMail\Util\SnappyMailHelper::loadApp();
+		// Establish the SnappyMail-compatible administrator cookie in the
+		// top-level Nextcloud response. Safari on iPadOS may otherwise delay or
+		// reject a cookie first created by the embedded administration frame.
+		\OCA\NextSnapMail\Util\SnappyMailHelper::ensureAdminSession();
 
 		$keys = [
 			'nextsnapmail-autologin',
 			'nextsnapmail-autologin-with-email',
-			'nextsnapmail-no-embed',
 			'nextsnapmail-autologin-oidc'
 		];
 		$parameters = [];
@@ -30,23 +31,29 @@ class AdminSettings implements ISettings
 			$v = $this->config->getAppValue('nextsnapmail', $k);
 			$parameters[$k] = $v;
 		}
-		$uid = \OC::$server->get(\OCP\IUserSession::class)->getUser()->getUID();
-		if (\OC_User::isAdminUser($uid)) {
-//			$parameters['nextsnapmail-admin-panel-link'] = SnappyMailHelper::getAppUrl().'?admin';
-			SnappyMailHelper::loadApp();
-			$parameters['nextsnapmail-admin-panel-link'] =
-				\OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('nextsnapmail.page.index')
-				. '?' . \RainLoop\Api::Config()->Get('security', 'admin_panel_key', 'admin');
-		}
+		$parameters['nextsnapmail-integrated-admin-url'] =
+			\OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('nextsnapmail.page.admin');
+		$parameters['nextsnapmail-legacy-admin-url'] =
+			\OC::$server->get(\OCP\IURLGenerator::class)->linkToRoute('nextsnapmail.page.index') . '?admin';
 
 		$oConfig = \RainLoop\Api::Config();
+		$brandingChanged = false;
+		if ('SnappyMail Webmail' === $oConfig->Get('webmail', 'title', '')) {
+			$oConfig->Set('webmail', 'title', 'NextSnapMail Webmail');
+			$brandingChanged = true;
+		}
+		if (\in_array($oConfig->Get('webmail', 'loading_description', ''), ['SnappyMail', 'NextSnapMail - based on SnappyMail'], true)) {
+			$oConfig->Set('webmail', 'loading_description', 'NextSnapMail');
+			$brandingChanged = true;
+		}
+		if ($brandingChanged) {
+			$oConfig->Save();
+		}
 		$passfile = APP_PRIVATE_DATA . 'admin_password.txt';
 		$sPassword = '';
 		if (\is_file($passfile)) {
 			$sPassword = \file_get_contents($passfile);
-			$parameters['nextsnapmail-admin-panel-link'] .= '#/security';
 		}
-		$parameters['nextsnapmail-admin-password'] = $sPassword;
 
 		$parameters['can-import-rainloop'] = $sPassword && \is_dir(
 			\rtrim(\trim($this->config->getSystemValue('datadirectory', '')), '\\/')
@@ -72,7 +79,19 @@ class AdminSettings implements ISettings
 		$parameters['gmail-oauth-callback-url'] = \OC::$server->get(\OCP\IURLGenerator::class)
 			->linkToRouteAbsolute('nextsnapmail.page.index') . '?NextSnapMailGmailOauth';
 
+		$oNextcloudPlugin = \RainLoop\Api::Actions()->Plugins()->CreatePluginByName('nextcloud');
+		$oNextcloudPluginConfig = $oNextcloudPlugin ? $oNextcloudPlugin->Config() : null;
+		$parameters['nextcloud-plugin-suggestions'] = $oNextcloudPluginConfig
+			? (bool) $oNextcloudPluginConfig->Get('plugin', 'suggestions', true) : true;
+		$parameters['nextcloud-plugin-ignore-system-addressbook'] = $oNextcloudPluginConfig
+			? (bool) $oNextcloudPluginConfig->Get('plugin', 'ignoreSystemAddressbook', true) : true;
+		$parameters['nextcloud-plugin-calendar'] = $oNextcloudPluginConfig
+			? (bool) $oNextcloudPluginConfig->Get('plugin', 'calendar', false) : false;
+
 		\OCP\Util::addScript('nextsnapmail', 'nextsnapmail');
+		\OCP\Util::addScript('nextsnapmail', 'admin-dashboard');
+		\OCP\Util::addStyle('nextsnapmail', 'style');
+		\OCP\Util::addStyle('nextsnapmail', 'admin-dashboard');
 		return new TemplateResponse('nextsnapmail', 'admin-local', $parameters);
 	}
 

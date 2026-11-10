@@ -2,8 +2,8 @@
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
 	<id>nextsnapmail</id>
 	<name>NextSnapMail</name>
-	<summary>A SnappyMail fork focused on integration with Nextcloud</summary>
-	<version>0.1.16</version>
+	<summary>A fast, Nextcloud-focused webmail client</summary>
+	<version>0.1.17</version>
 	<licence>AGPL-3.0-only</licence>
 	<author homepage="https://github.com/oe79">Erhard Scharf</author>
 	<author homepage="https://github.com/the-djmaze/snappymail">SnappyMail contributors</author>
@@ -12,14 +12,14 @@
 	<author>Tab Fitts</author>
 	<author>Nathan Kinkade</author>
 	<author>Pierre-Alain Bandinelli</author>
-	<description><![CDATA[**A SnappyMail fork focused on integration with Nextcloud.**
+	<description><![CDATA[**A fast, Nextcloud-focused webmail client.**
 
 NextSnapMail is an independent community fork of SnappyMail for the Nextcloud
 use case. It is not affiliated with, endorsed by, or sponsored by Nextcloud GmbH.
 
-NextSnapMail is under active development and provided as-is. Please test it
-carefully before using it in production. Installation and use are at your own
-risk.
+NextSnapMail is maintained as an independent, Nextcloud-focused project and is
+provided as-is. Please test new releases carefully before using them in
+production. Installation and use are at your own risk.
 
 **Lightweight & fast email client.**
 
@@ -31,15 +31,24 @@ risk.
   per-sender reply intervals for the full absence, daily, weekly or custom use
 - **Safe multi-instance Sieve handling** that detects and preserves vacation
   settings created by another NextSnapMail instance and allows explicit removal
-- **Automatic migration of existing managed Sieve filters** from
-  `rainloop.user` to `nextsnapmail.user` while retaining the old script as a backup
+- **Explicit migration of existing managed Sieve filters** from
+  `rainloop.user` to `nextsnapmail.user`; both scripts remain independently
+  editable until the user deliberately starts the migration
 - **Almost all IMAP features** including advanced searching
 - **Integration with Nextcloud Unified Search**
 - **Integration with other Nextcloud apps** (Contacts, Files and Calendar)
 - **Multiple mail accounts and identities**
+- **Consistent SVG toolbar icons** designed to remain recognizable in light and
+  dark Nextcloud themes
 - **Integrated Gmail / Google OAuth2 login**, including main account setup from
   the personal settings and additional Gmail accounts from the webmail account
   menu
+- **Administration integrated into Nextcloud**, including mail domains, Google
+  OAuth, webmail settings, extensions and data migration without a separate
+  webmail administrator login
+- **Domain connection tests** with visible IMAP, SMTP and optional Sieve results
+- **Protected shared CardDAV settings** that cannot be overwritten while an
+  additional mail account is active
 - **Admin-assisted import from existing SnappyMail installations**, including
   stored mailbox credentials, additional accounts and app data
 - **Admin reset option** to remove NextSnapMail account settings and recreate a
@@ -51,8 +60,9 @@ risk.
 - **Many security features** (Sodium encrypted passwords, Sec-Fetch, TOTP 2FA, DKIM, prevent tracking, etc.)
 - **Kolab integrations**
 
-After enabling the app, administrators can configure the integration in the
-dedicated "NextSnapMail" section of the Nextcloud administration settings.
+After enabling the app, administrators can manage the complete webmail
+configuration in the dedicated "NextSnapMail" section of the Nextcloud
+administration settings without a separate webmail administrator login.
 Users can add their initial mailbox credentials in the dedicated
 "NextSnapMail" section of their personal settings.
 
@@ -76,7 +86,7 @@ troubleshooting.
 	<repository>https://github.com/oe79/NextSnapMail</repository>
 	<bugs>https://github.com/oe79/NextSnapMail/issues</bugs>
 	<dependencies>
-		<php min-version="7.4" min-int-size="32" />
+		<php min-version="8.1" min-int-size="32" />
 		<lib>mbstring</lib>
 		<lib>zlib</lib>
 <!--
@@ -99,9 +109,9 @@ troubleshooting.
 		<lib>uuid</lib>
 		<lib>xxtea</lib>
 		<lib>zip</lib>
-		<nextcloud min-version="20" max-version="35" />
+		<nextcloud min-version="32" max-version="35" />
 -->
-		<nextcloud min-version="20" max-version="35" />
+		<nextcloud min-version="32" max-version="35" />
 	</dependencies>
 	<settings>
 		<admin-section>OCA\NextSnapMail\Settings\Section</admin-section>
