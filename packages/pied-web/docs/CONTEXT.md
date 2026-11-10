@@ -6,6 +6,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Since 1.10.44 / NextSnapMail 0.1.17, keep the upstream admin session checks on
+  legacy and integrated routes alongside URL-scoped account shell parameters.
+  Account switches still navigate by URL; CardDAV read-only state comes from
+  that account bootstrap. Preserve content-versioned stylesheet URLs.
+
 - Since 1.10.43, phone senders and subjects own the full row width. Native
   quick actions share the metadata footer, reserving only that footer's end
   column. Do not put a static coarse-pointer action rail beside the whole

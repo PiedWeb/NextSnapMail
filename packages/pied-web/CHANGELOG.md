@@ -1,5 +1,16 @@
 # Releases
 
+## 1.10.44 — 2026-11-10
+
+- Integrate the reviewed NextSnapMail 0.1.17 upstream source while preserving
+  URL-scoped accounts, shared unread counters and quiet notification defaults.
+- Keep the new administrator guards on every legacy and integrated admin route,
+  retain account shell parameters, and add 19 controller routing checks.
+- Use the upstream content-based stylesheet URLs, updated toolbar assets and
+  explicit Sieve migration. Translate the three added user strings into French.
+- Retain the full-width mobile message rows from 1.10.43. Rebuild the native JS
+  and compressed variants from the merged sources.
+
 ## 1.10.43 — 2026-11-10
 
 - Give phone and touch-pane senders and subjects the full row width. Put dates,

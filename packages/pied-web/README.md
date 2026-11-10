@@ -79,7 +79,7 @@ The [shared design system](docs/DESIGN_SYSTEM.md) also covers native settings an
 
 ## Install and maintain
 
-The source on `main` prepares **1.10.43**: full-width phone senders and subjects,
+The source on `main` prepares **1.10.44**, integrating NextSnapMail **0.1.17** and preserving the 1.10.43 changes: full-width phone senders and subjects,
 with dates and touch actions in a separate footer. It has not been deployed or tagged.
 
 Deployed release **1.10.42** targets Nextcloud **35.0.2**, NextSnapMail **0.1.16** and embedded SnappyMail **2.38.2**. The [release history](CHANGELOG.md) records its conversation behavior; the latest phone changes are checked on fictional browser fixtures. Other platform versions are unverified.
