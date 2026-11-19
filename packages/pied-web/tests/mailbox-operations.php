@@ -29,6 +29,8 @@ namespace {
     }
     class BoxImap extends \MailSo\Imap\ImapClient {
         public array $data = [], $validity = [], $calls = [], $capabilities = ['MOVE', 'UIDPLUS', 'MULTISEARCH'];
+        public array $folderAttributes = [];
+        public ?\MailSo\Imap\NamespaceResult $namespaces = null;
         public string $folder = '';
         public bool $failMove = false, $omitMapping = false, $failFlag = false;
         public bool $keywords = true;
@@ -59,10 +61,11 @@ namespace {
         }
         public function FolderList(string $parent, string $pattern, bool $subscribed = false, bool $status = false): \MailSo\Imap\FolderCollection {
             $list = new \MailSo\Imap\FolderCollection;
-            foreach (array_keys($this->data) as $name) $list->append(new \MailSo\Imap\Folder($name, '/'));
+            foreach (array_keys($this->data) as $name) $list->append(new \MailSo\Imap\Folder($name, '/', $this->folderAttributes[$name] ?? []));
             $list->append(new \MailSo\Imap\Folder('Not selectable', '/', ['\\Noselect']));
             return $list;
         }
+        public function GetNamespaces(): ?\MailSo\Imap\NamespaceResult { return $this->namespaces; }
         public function FolderHierarchyDelimiter(string $folder = ''): ?string { return '/'; }
         public function FolderStatusList(string $parent, string $pattern): \MailSo\Imap\FolderCollection {
             $list = new \MailSo\Imap\FolderCollection;
@@ -413,6 +416,68 @@ namespace {
             && $trashTree['scope']['excludeSpecial'] === [],
             'An explicitly selected subtree does not silently omit its special-folder descendants');
         check($mutations($treeMail) === 0, 'Subtree discovery never changes message flags or folders');
+
+        $fresh = new BoxActions($main, $main);
+        $fresh->accounts = $actions->accounts;
+        $workImap = $fresh->PiedWebFeedMailClient($work)->imap;
+        $workSettings = $fresh->Load($work);
+        unset($workSettings->data['TrashFolder']);
+        $workImap->data['INBOX'] = [42 => $row(42), 43 => $row(43)];
+        foreach (['Personal/Deleted Items', 'Shared/Deleted Items', 'Personal/Disabled'] as $folder) {
+            $workImap->data[$folder] = [1 => $row(100)];
+            $workImap->validity[$folder] = count($workImap->data) + 100;
+        }
+        $workImap->folderAttributes = [
+            'Personal/Deleted Items' => ['\\Trash'], 'Shared/Deleted Items' => ['\\Trash'],
+            'Personal/Disabled' => ['\\Trash', '\\Noselect'],
+        ];
+        $response = new \MailSo\Imap\Response;
+        $response->ResponseList = ['*', 'NAMESPACE', [['Personal/', '/'], ['', '/']], null, [['Shared/', '/']]];
+        $workImap->namespaces = new \MailSo\Imap\NamespaceResult($response);
+        $runFresh = static function (array $params) use ($fresh): array {
+            $fresh->params = $params;
+            return PiedWebFeed::handle($fresh);
+        };
+        $global = $runFresh(['operation' => 'search', 'scope' => 'all', 'search' => 'subject:needle', 'accountHashes' => ['work']]);
+        check($global['total'] === 2 && array_unique(array_column($global['items'], 'folder')) === ['INBOX'],
+            'Global search excludes advertised Trash before the linked account has saved a role');
+        $trashLinked = static function (int $uid) use ($runFresh, $workImap): array {
+            $prepared = $runFresh(['operation' => 'prepare', 'items' => [['accountHash' => 'work', 'folder' => 'INBOX',
+                'uidValidity' => $workImap->validity['INBOX'], 'uid' => $uid]]]);
+            return $runFresh(['operation' => 'action', 'action' => 'trash', 'token' => $prepared['token'], 'cursor' => 0, 'confirmed' => '1']);
+        };
+        $detected = $trashLinked(42);
+        check($detected['successful'] === 1 && $detected['undoToken'] !== '' && !isset($workImap->data['INBOX'][42])
+            && count($workImap->data['Personal/Deleted Items']) === 2 && count($workImap->data['Shared/Deleted Items']) === 1
+            && !array_key_exists('TrashFolder', $workSettings->data) && $workSettings->data['DraftsFolder'] === 'Drafts',
+            'A linked account can move to its unique selectable personal IMAP Trash and undo without saving a preference');
+        $runFresh(['operation' => 'undo', 'undoToken' => $detected['undoToken'], 'cursor' => 0]);
+        check(count($workImap->data['INBOX']) === 2 && count($workImap->data['Personal/Deleted Items']) === 1,
+            'Undo restores a message moved to an IMAP-discovered destination');
+        $workImap->folderAttributes['Trash'] = ['\\Trash'];
+        $denied = $trashLinked(43);
+        check($denied['failures'][0]['error'] === 'trash' && !$denied['undoToken'] && isset($workImap->data['INBOX'][43]),
+            'Two distinct advertised personal folders make the destination ambiguous');
+        unset($workImap->folderAttributes['Trash'], $workImap->folderAttributes['Personal/Deleted Items']);
+        $denied = $trashLinked(43);
+        check($denied['failures'][0]['error'] === 'trash' && isset($workImap->data['INBOX'][43]),
+            'An unmarked folder named Trash or a shared advertised Trash is insufficient');
+        $workImap->folderAttributes['Personal/Deleted Items'] = ['\\Trash'];
+        $workSettings->data['TrashFolder'] = '__UNUSE__';
+        $denied = $trashLinked(43);
+        check($denied['failures'][0]['error'] === 'trash' && isset($workImap->data['INBOX'][43]), 'Explicitly disabling Trash prevents autodetection');
+        $workSettings->data['TrashFolder'] = 'Trash';
+        $override = $trashLinked(43);
+        check($override['successful'] === 1 && count($workImap->data['Trash']) === 1
+            && count($workImap->data['Personal/Deleted Items']) === 1, 'An explicit Trash assignment wins over an advertised folder');
+        unset($workSettings->data['TrashFolder']);
+        $workImap->namespaces = null;
+        $workImap->capabilities[] = 'ACL';
+        $workImap->data['INBOX'][44] = $row(44);
+        $workImap->folderAttributes = ['Shared/Deleted Items' => ['\\Trash']];
+        $denied = $trashLinked(44);
+        check($denied['failures'][0]['error'] === 'trash' && isset($workImap->data['INBOX'][44]),
+            'A sharing-capable server must identify personal namespaces for automatic Trash moves');
 
         $saved = json_decode($saved, true); $saved['expires'] = time() - 1; file_put_contents($path, json_encode($saved));
         check($call(['operation' => 'action', 'action' => 'read', 'token' => $foreign['token'], 'cursor' => 0, 'confirmed' => '1'])['error'] === 'expired', 'Expired actions are rejected');

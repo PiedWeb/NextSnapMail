@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.46 — 2026-11-19
+
+- Move messages to the unique personal Trash advertised by IMAP when the source
+  account has no saved Trash. This covers linked accounts used directly from
+  All my accounts and filtered selections without changing account settings.
+- Require an explicit Trash choice for ambiguous destinations and permanent deletion.
+  Preserve explicitly disabled Trash and the existing UID mapping for Undo.
+
 ## 1.10.45 — 2026-11-19
 
 - Save detected system folders with the parameter names expected by NextSnapMail,

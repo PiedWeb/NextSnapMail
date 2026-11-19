@@ -109,10 +109,13 @@ Knockout disposal, mobile commands still leave date headings; a changed row/grou
 or removed heading rebuilds presentation and restores the same bound controls.
 
 Flag/Unflag, Delete and Remind share one reserved row-action rail and operate on those exact
-identities. Delete requires each
-account's configured Trash and exposes Undo only after the mail server confirms the destination
-UID mapping. Undo therefore restores the original folder and read state rather than replaying
-stale source UIDs. Flag and bulk read/unread paint their intended state immediately, and reminder
+identities. Delete uses the source account's configured Trash. With an empty setting,
+it uses a single selectable personal folder that IMAP advertises as Trash. The server
+can resolve it without opening the linked account or saving a preference. Ambiguous,
+unavailable or explicitly disabled destinations require a Trash setting. An inferred
+destination only permits a move. Undo becomes available after IMAP confirms the
+destination UID mapping and restores the original folder and read state. Flag and bulk
+read/unread paint their intended state immediately, and reminder
 rows leave the visible list only after a date is confirmed. Every optimistic state rolls back on
 refusal; uncertain or partial results are reported and are never retried blindly.
 For an account with no saved system roles, the native folder list detects the
@@ -120,6 +123,10 @@ server's roles and persists them through `SystemFoldersUpdate`. Its payload uses
 lowercase role names, while the settings cache uses keys such as `TrashFolder`.
 Mailbox notices show the reason for a refusal, including where to verify the Trash
 assignment. Failed moves return staged rows to the list.
+
+Filtered selections freeze the resolved Trash and confirm it again before each batch.
+Global search excludes advertised Trash folders when the source account has no saved
+Trash. An explicitly selected folder or subtree keeps its original scope.
 
 Each account can be excluded from All my accounts under General settings. One unavailable mailbox
 is reported without hiding rows fetched from the others. The endpoint returns message-list header

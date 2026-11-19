@@ -4,7 +4,7 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
 {
     const NAME = 'Pied Web UX',
         AUTHOR = 'Pied Web',
-        VERSION = '1.10.45',
+        VERSION = '1.10.46',
         RELEASE = '2026-11-19',
         REQUIRED = '2.38.2',
         LICENSE = 'AGPL v3',
@@ -194,15 +194,20 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
             if (!$folder || strlen($search) > 8192 || strlen($folder) > 1024) {
                 throw new \RuntimeException('scope');
             }
+            $operation = (string) $actions->GetActionParam('operation', '');
+            if ($operation !== 'prepare' && ($operation !== 'delete' || (string) $actions->GetActionParam('confirmed', '') !== '1')) {
+                throw new \RuntimeException('scope');
+            }
             $imap = $actions->ImapClient();
             $account->ImapConnectAndLogin($actions->Plugins(), $imap, $actions->Config());
             $settings = $actions->SettingsProvider(true)->Load($account);
-            $trash = (string) $settings->GetConf('TrashFolder', '');
+            $configured = (string) $settings->GetConf('TrashFolder', '');
+            require_once __DIR__ . '/TrashFolder.php';
+            $trash = PiedWebTrashFolder::resolve($imap, $configured);
+            if ($configured === '' && $folder === $trash) throw new \RuntimeException('trash');
             require_once __DIR__ . '/FilteredSelection.php';
             $store = new PiedWebFilteredSelection(APP_PRIVATE_DATA . 'pied-web-ux/selections', $account->Hash());
-            $operation = (string) $actions->GetActionParam('operation', '');
             if ($operation === 'prepare') {
-                if (!$trash || $trash === '__UNUSE__') throw new \RuntimeException('trash');
                 if (!$imap->hasCapability($folder === $trash ? 'UIDPLUS' : 'MOVE')) throw new \RuntimeException('capability');
                 $cache = false;
                 $parsedCriteria = \MailSo\Imap\SearchCriterias::fromString(
@@ -216,11 +221,9 @@ class PiedWebUxPlugin extends \RainLoop\Plugins\AbstractPlugin
                 $info = $imap->FolderExamine($folder, true);
                 $uids = $imap->MessageSearch($criteria, true);
                 $result = $store->prepare($folder, $search, (int) $info->UIDVALIDITY, $uids, $trash);
-            } elseif ($operation === 'delete' && (string) $actions->GetActionParam('confirmed', '') === '1') {
+            } else {
                 $result = $store->batch((string) $actions->GetActionParam('token', ''),
                     (int) $actions->GetActionParam('cursor', -1), $folder, $search, $trash, $imap);
-            } else {
-                throw new \RuntimeException('scope');
             }
         } catch (\Throwable $error) {
             $known = ['scope', 'trash', 'capability', 'expired', 'changed', 'uncertain', 'storage', 'limit'];

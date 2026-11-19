@@ -1,5 +1,5 @@
 {
-  "version": "1.10.45",
+  "version": "1.10.46",
   "tested": {
     "nextcloud": "35.0.2",
     "nextsnapmail": "0.1.17",
@@ -12,9 +12,10 @@
     "plugin/pied-web-ux/FilteredSelection.php": "8fb0a519980ce2dc1c56b8fa8039ab6f595395d3c0f8d870918208c646fa131f",
     "plugin/pied-web-ux/FolderOrder.php": "d174d89067e89a4b334f262a07c1cba877565a05df3463eaa3eaa38aec0506ab",
     "plugin/pied-web-ux/MailboxMailClient.php": "609457b0a1d8c9466c1f59c1332e38da872e3ff49d249a65953b5f6636925837",
-    "plugin/pied-web-ux/MailboxOperations.php": "76871cd21cef09b8735e1dac7094bc580b2dd60ea576e9d33ed1e66d1eb11538",
+    "plugin/pied-web-ux/MailboxOperations.php": "0edf671eed7c6d2c4cbfeabd8bd18e57326a15b7b170a55b15e99400d4ebe1dd",
     "plugin/pied-web-ux/Reminders.php": "8a0115505df36104be7f9b25143882e59470d803da36539d8479c261e9b4dec5",
     "plugin/pied-web-ux/ScheduledSend.php": "6ca2c59ccf71b6b8c9628ba00627bcebb96b9965cf1149856ffb612c1e11dad9",
+    "plugin/pied-web-ux/TrashFolder.php": "a3a916f4ca60ca4e365e8a0e81527115e6199413f3dfa663606dc9e0b4a98b2a",
     "plugin/pied-web-ux/UnreadDrafts.php": "618edb04b96eb01c7f0db2088765472122e3a67149559370d3525be0cfcbda18",
     "plugin/pied-web-ux/UnreadOrder.php": "b552ab98e814a918635b0f305dde4afb8aba4399650b3c563d89a387783ebe49",
     "plugin/pied-web-ux/address-actions.js": "8e232a0d2dfde8855453727ee933aa344a6c32f8a6ec73b3d78e9b612a99d1d5",
@@ -35,7 +36,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "16ea3585e6557c24a709238c72a4305950ebd896bc6b1d49be2da800aabc6194",
+    "plugin/pied-web-ux/index.php": "acc7d76777425239835adcd2b20c727a1e931fbe0c58ebf12d051e3449a80072",
     "plugin/pied-web-ux/inline-reply.js": "0c459e8efa15a3b68d9d9b08038fbaa03cce21b4fdae9d65cc96cf83880376f0",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",

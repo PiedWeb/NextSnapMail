@@ -19,8 +19,14 @@ namespace {
         public array $capabilities = ['MOVE', 'UIDPLUS', 'MULTISEARCH'], $uids = [], $calls = [];
         public int $validity = 123;
         public bool $fail = false;
+        public string $advertisedTrash = '';
         public function __construct() { $this->Settings = (new \ReflectionClass(\MailSo\Imap\Settings::class))->newInstanceWithoutConstructor(); }
         public function hasCapability(string $name): bool { return in_array($name, $this->capabilities); }
+        public function FolderList(string $parent, string $pattern, bool $subscribed = false, bool $status = false): \MailSo\Imap\FolderCollection {
+            $list = new \MailSo\Imap\FolderCollection;
+            if ($this->advertisedTrash !== '') $list->append(new \MailSo\Imap\Folder($this->advertisedTrash, '/', ['\\Trash']));
+            return $list;
+        }
         public function FolderSelect(string $folder, bool $force = false): \MailSo\Imap\FolderInformation {
             $this->calls[] = ['select', $folder, $force];
             $info = new \MailSo\Imap\FolderInformation($folder, true); $info->UIDVALIDITY = $this->validity; return $info;
@@ -129,6 +135,25 @@ namespace {
         $expired = json_decode(file_get_contents($file), true); $expired['expires'] = time() - 1; file_put_contents($file, json_encode($expired));
         check($call($delete)['error'] === 'expired', 'Expired selection is rejected');
         check($call(array_replace($delete, ['confirmed' => '0']))['error'] === 'scope', 'Mutation requires confirmation');
+
+        unset($actions->settings['TrashFolder']);
+        $actions->imap->advertisedTrash = 'Deleted Items';
+        $actions->imap->uids = [7, 9];
+        $automatic = $call(['operation' => 'prepare']);
+        check(($automatic['trash'] ?? null) === 'Deleted Items' && !$automatic['permanent'] && $automatic['count'] === 2,
+            'Filtered selection freezes a reversible move to the IMAP-advertised Trash');
+        $automaticDelete = array_replace($delete, ['token' => $automatic['token']]);
+        $before = $mutationCount();
+        $actions->imap->advertisedTrash = 'Other Bin';
+        check($call($automaticDelete)['error'] === 'scope' && $mutationCount() === $before,
+            'A changed advertised Trash cannot redirect an already confirmed selection');
+        $actions->imap->advertisedTrash = 'Deleted Items';
+        check($call(['operation' => 'prepare', 'folder' => 'Deleted Items'])['error'] === 'trash' && $mutationCount() === $before,
+            'An advertised Trash alone cannot enable permanent deletion');
+        $moved = $call($automaticDelete);
+        check($moved['done'] && end($actions->imap->calls) === ['move', 'INBOX', 'Deleted Items', [7, 9], true]
+            && !array_key_exists('TrashFolder', $actions->settings), 'Filtered deletion uses only the verified destination and does not save a preference');
+
         $actions->authenticated = false;
         try { $call(['operation' => 'prepare']); throw new \LogicException('Authentication bypass'); }
         catch (\RuntimeException $e) { check($e->getMessage() === 'login required', 'Login is required before any search'); }

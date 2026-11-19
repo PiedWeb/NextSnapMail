@@ -124,12 +124,15 @@ final class PiedWebMailboxOperations
         if ($scope['scope'] === 'folder') return [$scope['folder']];
         $delimiter = $scope['scope'] === 'subtree' ? $imap->FolderHierarchyDelimiter($scope['folder']) : null;
         if ($scope['scope'] === 'subtree' && !$delimiter) return [$scope['folder']];
+        $trash = (string) $settings->GetConf('TrashFolder', '');
+        $excludeAdvertisedTrash = $scope['scope'] === 'all' && $trash === '';
         $excluded = $scope['scope'] === 'all'
-            ? \array_filter([(string) $settings->GetConf('TrashFolder', ''), (string) $settings->GetConf('SpamFolder', '')]) : [];
+            ? \array_filter([$trash, (string) $settings->GetConf('SpamFolder', '')]) : [];
         $folders = [];
         foreach ($imap->FolderList('', '*') as $folder) {
             if ($scope['scope'] === 'subtree' && $folder->FullName !== $scope['folder']
                 && !\str_starts_with($folder->FullName, $scope['folder'] . $delimiter)) continue;
+            if ($excludeAdvertisedTrash && $folder->Role() === 'trash') continue;
             if ($folder->Selectable() && !\in_array($folder->FullName, $excluded, true)) $folders[] = $folder->FullName;
         }
         \sort($folders, SORT_STRING);
@@ -389,9 +392,10 @@ final class PiedWebMailboxOperations
                 $mail = $this->mail($hash);
                 $imap = $mail->ImapClient();
                 $flags = $this->fetchFlags($imap, $first['folder'], $uids, $first['uidValidity'])['flags'];
-                $trash = (string) $this->settings($hash)->GetConf('TrashFolder', '');
                 if ($action === 'trash') {
-                    if (!$trash || $trash === '__UNUSE__' || $trash === $first['folder']) throw new \RuntimeException('trash');
+                    require_once __DIR__ . '/TrashFolder.php';
+                    $trash = PiedWebTrashFolder::resolve($imap, (string) $this->settings($hash)->GetConf('TrashFolder', ''));
+                    if ($trash === $first['folder']) throw new \RuntimeException('trash');
                     if (!$imap->hasCapability('MOVE') || !$imap->hasCapability('UIDPLUS')) throw new \RuntimeException('capability');
                 }
                 if ($action === 'remind') {
