@@ -5928,7 +5928,7 @@ html.pw-folder-dragging, html.pw-folder-dragging * { cursor:grabbing!important; 
 #rl-app .pw-mailbox-notice button { min-height:44px;min-width:44px;padding:8px;border:0!important;background:transparent;color:var(--pw-primary-ink);font:inherit;cursor:pointer; }
 #rl-app .pw-mailbox-notice button:disabled { cursor:progress;opacity:.55; }
 #rl-app .pw-mailbox-notice button:focus-visible { outline:1px solid var(--pw-focus);outline-offset:2px; }
-#rl-app .pw-mailbox-notice[data-state="error"] > span { color:var(--pw-danger); }
+#rl-app .pw-mailbox-notice[data-state="error"] { background:var(--pw-danger-tint); }
 #rl-app .pw-row-pending { display:none!important; }
 @media(min-width:800px) and (pointer:fine) {
 

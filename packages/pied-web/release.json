@@ -1,5 +1,5 @@
 {
-  "version": "1.10.44",
+  "version": "1.10.45",
   "tested": {
     "nextcloud": "35.0.2",
     "nextsnapmail": "0.1.17",
@@ -35,7 +35,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "95ddf6b0aa464b2e1481692abf66cd5fc374d7b4136676d32b4648806dcbc31e",
+    "plugin/pied-web-ux/index.php": "16ea3585e6557c24a709238c72a4305950ebd896bc6b1d49be2da800aabc6194",
     "plugin/pied-web-ux/inline-reply.js": "0c459e8efa15a3b68d9d9b08038fbaa03cce21b4fdae9d65cc96cf83880376f0",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",
@@ -45,7 +45,7 @@
     "plugin/pied-web-ux/lucide-license.txt": "b495047bd93a9b06913511076f504daba17d5bbeb3e0650f3bb53a4220329c57",
     "plugin/pied-web-ux/lucide-settings.svg": "0ae27fd0f81999229e3127ac96c5b32edfea448e291d509e76212b917551d66b",
     "plugin/pied-web-ux/lucide-source.json": "4086a72f095493c1ce45228883fa7c2c247372cc1f336823f0b88ea054385fd2",
-    "plugin/pied-web-ux/mailbox-actions.js": "1a78d0742fb59e940da59f2d1d5016e6224fa3ecf96833aedd9d81e7586ed701",
+    "plugin/pied-web-ux/mailbox-actions.js": "93aa157b90d2a46e1d1f3ee5cf9c45cdb782221593057dc38eb118604efb944b",
     "plugin/pied-web-ux/markdown-dependencies.json": "b1c62316047e23d4b3e9505d49c1b5624c551344e9ccfce99863f461a0260a2e",
     "plugin/pied-web-ux/markdown-licenses.txt": "95d9c100bec971b24af20baf84129557c829580990ed25fd2c827ee761f6ebc9",
     "plugin/pied-web-ux/markdown-vendors.js": "4a82cbc4ee4981995cd46bda7c607fe35a003ff011488c75487a8d9749a5a2dc",
@@ -70,14 +70,15 @@
     "theme/PiedWeb/snappymail/pied-web-ui-latin-ext.woff2": "38f1483ab1f20c8fa86347c83dc20fff5e68bc198aaf2cd8679b2a4db233403b",
     "theme/PiedWeb/snappymail/pied-web-ui-latin.woff2": "21831cc7940800de3c8a0c0760cd001d110090fc6f0f7c02387ca1256649a56c",
     "theme/PiedWeb/snappymail/preview.png": "907dbecd98e0fe5de36285c02d43d6ecee4df76203d50b9f948d24dce753b1a0",
-    "theme/PiedWeb/snappymail/style.css": "95f137324bb0ce3d6c0b08b0cadee8ad624f2daa0ea6e9b24119e12dd326b458"
+    "theme/PiedWeb/snappymail/style.css": "9ac6e09440a9ceba150179feb514364c31152f85f77e23ea0c06e4c5e325bff9"
   },
   "core_patch": {
     "pull_request": "https://github.com/oe79/NextSnapMail/pull/41",
     "base_commit": "d3b0a34f4bec9f8cbb1e722f5467e50305c788c1",
     "patched_commit": "c13bf1bc45d9d638a50f6fb21c1f4dfd3af0e402",
     "local_changes": [
-      "Default SoundNotification to false while preserving explicit user settings"
+      "Default SoundNotification to false while preserving explicit user settings",
+      "Persist auto-detected system folders using the native request parameter names"
     ],
     "files": {
       "app/libraries/RainLoop/Actions.php": "b7aadad698a7f8dce0e9c9e2f08dc0ef89d146502e14b17bb6f95522c8c2daf2",
@@ -85,11 +86,11 @@
       "app/libraries/RainLoop/Actions/UserAuth.php": "7e19df63637f47bf20d0d72d179f507650ee74c8823a045d4118df7a56f05e78",
       "app/libraries/RainLoop/Actions/User.php": "bf7bc9e8953212f5d86be8a1d498f785cda54b163a250f005dea16d8e7c93aae",
       "app/libraries/RainLoop/ServiceActions.php": "d224923aac286432ccf9f9965cdcca3198194fafa0cb7f2406d2538a18b74741",
-      "static/js/app.js": "88c46b32396d04b22b3b0cde11441aafd9137b659cc331455dd55a218fc364c8",
+      "static/js/app.js": "389494a6af15efa7d110e987feeba2c7be7eb33ef7180d2644b3ce8e276ac259",
       "static/js/boot.js": "290da0fa53a9745da67bb0abaf8ad36cf948ce0ec382d5cfcd0678846d4dbd90",
-      "static/js/min/app.min.js": "93aa2bfc1dcce1929ff8a2798e8c7864291b68370ab7ee7e50e6bf0a31891e14",
-      "static/js/min/app.min.js.gz": "46c7f261486a23218f138fa404521368a98a4f57d12ae5c47cbbd44b2ddfa545",
-      "static/js/min/app.min.js.br": "c2071bb5aaceba9f5093cff1704a4a4b7c0562e80414b548eafe884f4d4fbf5d",
+      "static/js/min/app.min.js": "9e644b6579c09e3eb2b573d86e76fb003d658bcd842bd4c110a248a1a65d95a5",
+      "static/js/min/app.min.js.gz": "ed292c6eac56b12dc64128655c0b3457a25a7009edf58de7e716c936e82117d7",
+      "static/js/min/app.min.js.br": "05fc9ffb24e8852dda36525796880abc1269f98c900874da7cecaa4202c419dd",
       "static/js/min/boot.min.js": "ff25870af42f2390a54ba86eb668366caff1a3fa20ef5a3f0f3eb4e428225a27"
     }
   }

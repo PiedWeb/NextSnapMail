@@ -1,5 +1,12 @@
 # Releases
 
+## 1.10.45 — 2026-11-19
+
+- Save detected system folders with the parameter names expected by NextSnapMail,
+  including Trash for accounts that have never saved their folder settings.
+- Report why a mailbox refused a move, restore rows when the server confirms no
+  move and use the standard text color on the error notice in light and dark mode.
+
 ## 1.10.44 — 2026-11-10
 
 - Integrate the reviewed NextSnapMail 0.1.17 upstream source while preserving

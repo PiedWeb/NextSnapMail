@@ -3,6 +3,7 @@
     const snapshots = new Map(), undo = new Map(); let sequence = 0;
     window.mailboxFixtureCalls = [];
     window.mailboxFixtureFailure = '';
+    window.mailboxFixtureBatchFailure = '';
     window.mailboxFixtureDelay = 20;
     window.feedGlobalItems?.forEach(item => { item._pwUidValidity = 77; });
     const send = (callback,result) => setTimeout(() => callback(0,{Result:result}),mailboxFixtureDelay);
@@ -32,8 +33,9 @@
             if (!state || Number(params.cursor) !== state.cursor) send(callback,{error:'uncertain'});
             else {
                 state.cursor = Math.min(state.count,state.cursor+200); const done = state.cursor === state.count;
-                const result = {cursor:state.cursor,count:state.count,done,failures:[]};
-                if (done && params.action === 'trash') { result.undoToken = 'undo-' + (++sequence); undo.set(result.undoToken,state.count); }
+                const failures = mailboxFixtureBatchFailure ? [{error:mailboxFixtureBatchFailure,count:state.cursor}] : [];
+                const result = {cursor:state.cursor,count:state.count,done,failures};
+                if (done && params.action === 'trash' && !failures.length) { result.undoToken = 'undo-' + (++sequence); undo.set(result.undoToken,state.count); }
                 send(callback,result);
             }
         } else {

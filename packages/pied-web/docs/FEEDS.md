@@ -115,6 +115,11 @@ UID mapping. Undo therefore restores the original folder and read state rather t
 stale source UIDs. Flag and bulk read/unread paint their intended state immediately, and reminder
 rows leave the visible list only after a date is confirmed. Every optimistic state rolls back on
 refusal; uncertain or partial results are reported and are never retried blindly.
+For an account with no saved system roles, the native folder list detects the
+server's roles and persists them through `SystemFoldersUpdate`. Its payload uses
+lowercase role names, while the settings cache uses keys such as `TrashFolder`.
+Mailbox notices show the reason for a refusal, including where to verify the Trash
+assignment. Failed moves return staged rows to the list.
 
 Each account can be excluded from All my accounts under General settings. One unavailable mailbox
 is reported without hiding rows fetched from the others. The endpoint returns message-list header

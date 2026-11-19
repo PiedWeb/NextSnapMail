@@ -237,5 +237,43 @@ check('A refused Trash restores the row and exposes the confirmed error',await f
     && document.querySelector('.pw-mailbox-notice')?.textContent.includes('Le dossier a changé')));
 await page.evaluate(() => { mailboxFixtureFailure=''; mailboxFixtureDelay=20; });
 
+await page.evaluate(() => { mailboxFixtureBatchFailure='trash'; });
+await failedRow.hover();
+await failedRow.locator('.pw-row-action[aria-label="Supprimer"]').click();
+await page.waitForFunction(() => document.querySelector('.pw-mailbox-notice')?.textContent.includes('Dossiers systèmes'));
+check('A completed batch with zero moves restores the message and explains the Trash setting',await failedRow.evaluate(row => {
+    const notice=document.querySelector('.pw-mailbox-notice');
+    return !row.classList.contains('pw-row-pending') && !row.inert && notice.dataset.state==='error'
+        && notice.textContent.includes('Aucun message mis à la corbeille.') && notice.querySelector('button').hidden;
+}));
+await page.evaluate(() => { mailboxFixtureBatchFailure=''; });
+
+for (const colorScheme of ['light','dark']) {
+    await page.emulateMedia({colorScheme});
+    await page.waitForFunction(scheme => document.documentElement.dataset.themes===scheme,colorScheme);
+    check(`Mailbox error message meets 4.5:1 contrast in ${colorScheme} mode`,await page.evaluate(scheme => {
+        const notice=document.querySelector('.pw-mailbox-notice');
+        const root=document.documentElement.style;
+        root.setProperty('--color-error',scheme==='light' ? '#ffe4e4' : '#442222');
+        const canvas=document.createElement('canvas');
+        canvas.width=canvas.height=1;
+        const context=canvas.getContext('2d',{willReadFrequently:true});
+        const luminance=color => {
+            context.fillStyle=color;
+            context.fillRect(0,0,1,1);
+            const rgb=[...context.getImageData(0,0,1,1).data].slice(0,3).map(value => {
+                const channel=value/255;
+                return channel<=0.04045 ? channel/12.92 : ((channel+0.055)/1.055)**2.4;
+            });
+            return 0.2126*rgb[0]+0.7152*rgb[1]+0.0722*rgb[2];
+        };
+        const foreground=luminance(getComputedStyle(notice.querySelector('span')).color);
+        const background=luminance(getComputedStyle(notice).backgroundColor);
+        root.removeProperty('--color-error');
+        return (Math.max(foreground,background)+0.05)/(Math.min(foreground,background)+0.05)>=4.5;
+    },colorScheme));
+}
+await page.emulateMedia({colorScheme:'light'});
+
 check('Workspace run has no fixture runtime error',await page.evaluate(()=>fixtureErrors.length===0));
 console.log(JSON.stringify({passed:checks.length,checks},null,2));

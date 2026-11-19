@@ -3561,14 +3561,19 @@
 
 		saveSystemFolders(folders) {
 			folders = folders || {
-				sent: FolderUserStore.sentFolder(),
-				drafts: FolderUserStore.draftsFolder(),
-				junk: FolderUserStore.spamFolder(),
-				trash: FolderUserStore.trashFolder(),
-				archive: FolderUserStore.archiveFolder()
+				Sent: FolderUserStore.sentFolder(),
+				Drafts: FolderUserStore.draftsFolder(),
+				Junk: FolderUserStore.spamFolder(),
+				Trash: FolderUserStore.trashFolder(),
+				Archive: FolderUserStore.archiveFolder()
 			};
-			forEachObjectEntry(folders, (k,v)=>Settings.set(k+'Folder',v));
-			rl.app.Remote.request('SystemFoldersUpdate', null, folders);
+			const params = {};
+			for (const role of ['Sent', 'Drafts', 'Junk', 'Trash', 'Archive']) {
+				const folder = folders[role] || '';
+				Settings.set(role + 'Folder', folder);
+				params[role.toLowerCase()] = folder;
+			}
+			rl.app.Remote.request('SystemFoldersUpdate', null, params);
 		}
 	};
 

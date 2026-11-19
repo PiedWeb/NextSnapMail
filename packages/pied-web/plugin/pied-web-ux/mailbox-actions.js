@@ -20,8 +20,9 @@
         uncertain:t('Résultat non confirmé. Actualisez et vérifiez avant de recommencer.','Unconfirmed result. Refresh and check before trying again.'),
         sender:t('Le service de rappel est indisponible.','The reminder service is unavailable.'),
         scope:t('La portée de la sélection a changé. Sélectionnez à nouveau.','The selection scope changed. Select again.'),
-        trash:t('Configurez le dossier Corbeille dans les paramètres.','Configure the Trash folder in settings.')
-        ,busy:t('Une opération est déjà en cours. Patientez avant de recommencer.','An operation is already running. Wait before trying again.')
+        trash:t('Vérifiez le dossier Corbeille dans Paramètres → Dossiers → Dossiers systèmes.',
+            'Check the Trash folder in Settings → Folders → System folders.'),
+        busy:t('Une opération est déjà en cours. Patientez avant de recommencer.','An operation is already running. Wait before trying again.')
     })[error?.message] || t('Opération interrompue. Vérifiez la liste avant de recommencer.','Operation interrupted. Check the list before trying again.');
     const stageRows = rows => {
         const focus = document.activeElement, staged = [...new Set(rows)].filter(row => row instanceof Element
@@ -117,11 +118,20 @@
                 // remaining groups; an undo snapshot is usable only at done.
                 if (result.done && result.undoToken) tokens.push(result.undoToken);
             } while (!result.done);
-            const failed = (result.failures || []).reduce((sum,failure) => sum + Math.max(0,Number(failure.count) || 0),0);
-            const confirmed = Math.max(0,cursor-failed), partial = !!result.partial || !!result.failures?.length;
-            const description = action === 'trash' ? t(`${confirmed} message(s) mis à la corbeille.`,`${confirmed} message(s) moved to Trash.`)
-                : t(`${confirmed} message(s) mis à jour.`,`${confirmed} message(s) updated.`);
-            show(description + (partial ? t(' Certaines opérations ont échoué ; vérifiez les comptes concernés.',' Some operations failed; check the affected accounts.') : ''),tokens,partial);
+            const failures = result.failures || [];
+            const failed = failures.reduce((sum,failure) => sum + Math.max(0,Number(failure.count) || 0),0);
+            const confirmed = Math.max(0,cursor-failed), partial = !!result.partial || failures.length > 0;
+            let description;
+            if (action === 'trash') {
+                description = confirmed ? t(`${confirmed} message(s) mis à la corbeille.`,`${confirmed} message(s) moved to Trash.`)
+                    : t('Aucun message mis à la corbeille.','No messages moved to Trash.');
+            } else {
+                description = confirmed ? t(`${confirmed} message(s) mis à jour.`,`${confirmed} message(s) updated.`)
+                    : t('Aucun message mis à jour.','No messages updated.');
+            }
+            const details = [...new Set(failures.map(failure => reason({message:failure.error})))];
+            if (partial && !details.length) details.push(t('Vérifiez les comptes concernés.','Check the affected accounts.'));
+            show([description,...details].join(' '),tokens,partial);
             return {...result,confirmed,partial};
         } catch (error) { show(reason(error),[],true); error.mailboxNotified = true; throw error; }
         finally { running = false; if (undoButton) undoButton.disabled = busy; changed(); }
@@ -178,11 +188,12 @@
         const trash = glyph('trash-2',t('Supprimer','Delete'));
         trash.addEventListener('click',async event => {
             event.preventDefault(); event.stopPropagation(); if (!active() || trash.disabled) return;
-            trash.disabled = true; const pending = stageRows([trash.closest('.messageListItem,.pw-global-row')]); let confirmed = false;
-            try { await perform(scope(),'trash'); confirmed = true; }
+            trash.disabled = true; const pending = stageRows([trash.closest('.messageListItem,.pw-global-row')]);
+            let result;
+            try { result = await perform(scope(),'trash'); }
             catch (error) { reportError(error); }
-            finally { trash.disabled = false; if (!confirmed) pending.rollback(); }
-            if (confirmed) onDone?.();
+            finally { trash.disabled = false; if (!result?.confirmed || result.partial) pending.rollback(); }
+            if (result?.confirmed) onDone?.();
         });
         group.append(trash);
         if (options.reminder) {
@@ -256,6 +267,7 @@
                 const pending = stageRows(nativeRows(folder,ids));
                 return perform({folder,uids:JSON.stringify([...ids]),uidValidity:nativeValidity(),
                     accountHashes:JSON.stringify([account()])},'trash')
+                    .then(result => { if (!result.confirmed || result.partial) pending.rollback(); })
                     .catch(error => { pending.rollback(); reportError(error); });
             };
             nativeWrapped = true;
