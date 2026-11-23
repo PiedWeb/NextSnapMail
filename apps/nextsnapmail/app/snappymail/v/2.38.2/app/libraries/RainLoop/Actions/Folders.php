@@ -4,6 +4,10 @@ namespace RainLoop\Actions;
 
 use RainLoop\Exceptions\ClientException;
 use RainLoop\Notifications;
+use RainLoop\Model\Account;
+use RainLoop\Providers\Storage\Enumerations\StorageType;
+use MailSo\Imap\FolderCollection;
+use MailSo\Imap\NamespaceResult;
 use MailSo\Imap\Enumerations\FolderType;
 
 trait Folders
@@ -96,6 +100,14 @@ trait Folders
 				return !\preg_match('/^(IMAP|AUTH|LOGIN|SASL)/', $item);
 			}));
 
+			$aSystemFolders = $this->readSystemFolders($oAccount);
+			if (\in_array('', $aSystemFolders, true)) {
+				$aDetected = self::detectSystemFolders($oFolderCollection, $oNamespaces, $this->ImapClient()->hasCapability('ACL'));
+				if (\array_intersect_key(\array_filter($aSystemFolders, static fn($name) => '' === $name), $aDetected)) {
+					$aSystemFolders = $this->updateSystemFolders($oAccount, $aDetected, true) ?? $aSystemFolders;
+				}
+			}
+
 			$oFolderCollection = \array_merge(
 				$oFolderCollection->jsonSerialize(),
 				array(
@@ -103,7 +115,8 @@ trait Folders
 					'quotaLimit' => $aQuota ? $aQuota[1] * 1024 : null,
 					'namespace' => $oNamespaces ? $oNamespaces->GetPersonalPrefix() : '',
 					'namespaces' => $oNamespaces,
-					'capabilities' => $aCapabilities
+					'capabilities' => $aCapabilities,
+					'systemFolders' => $aSystemFolders
 				)
 			);
 		}
@@ -398,16 +411,66 @@ trait Folders
 	public function DoSystemFoldersUpdate() : array
 	{
 		$oAccount = $this->getAccountFromToken();
+		$aUpdates = [];
+		foreach (\array_keys(self::systemFolderSettings()) as $role) {
+			$aUpdates[$role] = (string) $this->GetActionParam($role, '');
+		}
+		return $this->DefaultResponse(null !== $this->updateSystemFolders($oAccount, $aUpdates, false));
+	}
 
-		$oSettingsLocal = $this->SettingsProvider(true)->Load($oAccount);
+	private static function systemFolderSettings() : array
+	{
+		return ['sent' => 'SentFolder', 'drafts' => 'DraftsFolder', 'junk' => 'JunkFolder',
+			'trash' => 'TrashFolder', 'archive' => 'ArchiveFolder'];
+	}
 
-		$oSettingsLocal->SetConf('SentFolder', $this->GetActionParam('sent', ''));
-		$oSettingsLocal->SetConf('DraftsFolder', $this->GetActionParam('drafts', ''));
-		$oSettingsLocal->SetConf('JunkFolder', $this->GetActionParam('junk', ''));
-		$oSettingsLocal->SetConf('TrashFolder', $this->GetActionParam('trash', ''));
-		$oSettingsLocal->SetConf('ArchiveFolder', $this->GetActionParam('archive', ''));
+	private static function detectSystemFolders(FolderCollection $folders, ?NamespaceResult $namespaces, bool $acl) : array
+	{
+		// Without NAMESPACE, ACL can expose folders owned by other users.
+		if (!$namespaces && $acl) return [];
+		$personal = $namespaces ? \array_column($namespaces->aPersonal, 'prefix') : [''];
+		$external = $namespaces ? \array_column(\array_merge($namespaces->aOtherUsers, $namespaces->aShared), 'prefix') : [];
+		$roles = self::systemFolderSettings();
+		$candidates = [];
+		foreach ($folders as $folder) {
+			$role = $folder->Role();
+			$name = $folder->FullName;
+			if (!isset($roles[$role]) || !$folder->Selectable() || $folder->IsInbox() || '' === $name || '__UNUSE__' === $name) continue;
+			$matches = static fn(string $prefix): bool => \str_starts_with($name, $prefix);
+			if (\array_filter($personal, $matches) && !\array_filter($external, $matches)) {
+				$candidates[$role][$name] = $name;
+			}
+		}
+		return \array_map(static fn($names) => \reset($names),
+			\array_filter($candidates, static fn($names) => 1 === \count($names)));
+	}
 
-		return $this->DefaultResponse($oSettingsLocal->save());
+	private function readSystemFolders(Account $account, ?\RainLoop\Settings $settings = null) : array
+	{
+		$settings = $settings ?? $this->SettingsProvider(true)->Load($account);
+		return \array_map(static fn($key) => (string) $settings->GetConf($key, ''), self::systemFolderSettings());
+	}
+
+	private function updateSystemFolders(Account $account, array $updates, bool $onlyMissing) : ?array
+	{
+		$directory = $this->LocalStorageProvider()->GenerateFilePath($account, StorageType::CONFIG, true);
+		$lock = $directory ? @\fopen($directory . '/system-folders.lock', 'c') : false;
+		if (!$lock) return null;
+		try {
+			if (!\flock($lock, LOCK_EX)) return null;
+			$settings = $this->SettingsProvider(true)->Load($account);
+			$folders = $this->readSystemFolders($account, $settings);
+			$changed = false;
+			foreach (self::systemFolderSettings() as $role => $key) {
+				if (!isset($updates[$role]) || $updates[$role] === $folders[$role]) continue;
+				if ($onlyMissing && ('' !== $folders[$role] || \in_array($updates[$role], $folders, true))) continue;
+				$settings->SetConf($key, $folders[$role] = $updates[$role]);
+				$changed = true;
+			}
+			return !$changed || $settings->save() ? $folders : null;
+		} finally {
+			\fclose($lock);
+		}
 	}
 
 	public function DoFolderACL() : array

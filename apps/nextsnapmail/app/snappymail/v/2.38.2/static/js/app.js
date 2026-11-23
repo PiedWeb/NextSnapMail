@@ -8172,11 +8172,16 @@ body > * {
 		 * @returns {FolderCollectionModel}
 		 */
 		static reviveFromJson(object) {
-			const expandedFolders = get(ClientSideKeyNameExpandedFolders);
+			const expandedFolders = get(ClientSideKeyNameExpandedFolders),
+				resolvedFolders = object?.systemFolders;
 
-			forEachObjectEntry(SystemFolders, (key, value) =>
-				value || (SystemFolders[key] = SettingsGet(key+'Folder'))
-			);
+			forEachObjectEntry(SystemFolders, (role) => {
+				const setting = role + 'Folder';
+				if (resolvedFolders && role !== 'Inbox') {
+					Settings.set(setting, resolvedFolders[role.toLowerCase()] || '');
+				}
+				SystemFolders[role] = SettingsGet(setting) || '';
+			});
 
 			const result = super.reviveFromJson(object, oFolder => {
 				let oCacheFolder = getFolderFromCacheList(oFolder.fullName);
@@ -8242,9 +8247,9 @@ body > * {
 					}
 				}
 	*/
-				if (role) {
+				if (role && (role === 'inbox' || !resolvedFolders)) {
 					role = role[0].toUpperCase() + role.slice(1);
-					SystemFolders[role] || (SystemFolders[role] = oFolder.fullName);
+					if (Object.hasOwn(SystemFolders, role) && !SystemFolders[role]) SystemFolders[role] = oFolder.fullName;
 				}
 
 				oCacheFolder.type(FolderType[getKeyByValue(SystemFolders, oFolder.fullName)] || 0);
@@ -8257,7 +8262,7 @@ body > * {
 			});
 
 			result.CountRec = result.length;
-			setFolderInboxName(SystemFolders.Inbox);
+			setFolderInboxName(SystemFolders.Inbox || 'INBOX');
 
 			let i = result.length;
 			if (i) {
@@ -8311,17 +8316,6 @@ body > * {
 
 		storeIt() {
 			FolderUserStore.displaySpecSetting(Settings.app('folderSpecLimit') < this.CountRec);
-
-			if (!(
-					SettingsGet('SentFolder') +
-					SettingsGet('DraftsFolder') +
-					SettingsGet('JunkFolder') +
-					SettingsGet('TrashFolder') +
-					SettingsGet('ArchiveFolder')
-				)
-			) {
-				FolderUserStore.saveSystemFolders(SystemFolders);
-			}
 
 			FolderUserStore.folderList(this);
 

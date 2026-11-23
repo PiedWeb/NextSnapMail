@@ -9,6 +9,7 @@ php tests/admin-account-routing.php
 php tests/account-unread-counts.php
 php tests/account-unread-count-setting.php
 php tests/notification-sound-default.php
+php tests/system-folders.php
 node --test tests/account-url-context.mjs
 node --test tests/upstream-vacation.mjs
 node --test tests/system-folders.mjs

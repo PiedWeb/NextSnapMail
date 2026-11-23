@@ -357,6 +357,10 @@ Follow MAINTENANCE.md for deployment **and rollback**; require authenticated web
 
 ## Native contracts that previously caused regressions
 
+- The native `Folders` response includes saved system folder roles. Only fill
+  empty settings from unique, selectable personal IMAP roles. Keep explicit
+  choices and `__UNUSE__` for each account.
+
 - Since 1.10.38, the long-touch release guard covers any message row: showing the
   selection bar can move a neighbour under the finger before the compatibility
   click. A new pointerdown clears that guard, preserving intentional rapid taps.

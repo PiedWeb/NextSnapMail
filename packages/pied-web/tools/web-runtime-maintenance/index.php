@@ -1,5 +1,5 @@
 <?php
-class PiedWebRuntimeMaintenanceV34Plugin extends \RainLoop\Plugins\AbstractPlugin {
+class PiedWebRuntimeMaintenanceV35Plugin extends \RainLoop\Plugins\AbstractPlugin {
     const NAME = 'Temporary Pied Web runtime check', VERSION = '1.2.0', REQUIRED = '2.38.2';
     public function Init(): void {
         $this->addJsonHook('PiedWebRuntimeCheck', 'Check');
@@ -27,6 +27,7 @@ class PiedWebRuntimeMaintenanceV34Plugin extends \RainLoop\Plugins\AbstractPlugi
             'core/PageController.php' => '/home/robindfr/nextcloud/apps/nextsnapmail/lib/Controller/PageController.php',
             'core/Actions.php' => APP_VERSION_ROOT_PATH . 'app/libraries/RainLoop/Actions.php',
             'core/Accounts.php' => APP_VERSION_ROOT_PATH . 'app/libraries/RainLoop/Actions/Accounts.php',
+            'core/Folders.php' => APP_VERSION_ROOT_PATH . 'app/libraries/RainLoop/Actions/Folders.php',
             'core/UserAuth.php' => APP_VERSION_ROOT_PATH . 'app/libraries/RainLoop/Actions/UserAuth.php',
             'core/ServiceActions.php' => APP_VERSION_ROOT_PATH . 'app/libraries/RainLoop/ServiceActions.php',
         ];

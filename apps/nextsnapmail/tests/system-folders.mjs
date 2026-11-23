@@ -42,3 +42,48 @@ test('manually disabling Trash updates the settings cache and sends the explicit
     sent: 'Sent', drafts: 'Drafts', junk: 'Junk', trash: '__UNUSE__', archive: 'Archive',
   } }]);
 });
+
+test('the native folder model uses confirmed roles and clears stale roles when loading another account', () => {
+  const from = source.indexOf('class FolderCollectionModel extends AbstractCollectionModel');
+  const to = source.indexOf('class FolderModel extends AbstractModel', from);
+  const settings = { SentFolder: 'old sent', DraftsFolder: '', TrashFolder: 'old trash' };
+  const system = { Inbox: '', Sent: '', Drafts: '', Junk: '', Trash: '', Archive: '' };
+  const folders = new Map(), types = new Map();
+  const collection = vm.runInNewContext(`(${source.slice(from, to)})`, {
+    AbstractCollectionModel: class {
+      static reviveFromJson(input, visit) { return input.rows.map(visit); }
+    },
+    FolderModel: {
+      reviveFromJson: row => ({ ...row, type: value => types.set(row.fullName, value), collapsed() {} }),
+    },
+    FolderType: { Inbox: 1, Drafts: 3, Trash: 5 },
+    ClientSideKeyNameExpandedFolders: '',
+    SystemFolders: system,
+    SettingsGet: key => settings[key],
+    Settings: { set: (key, value) => { settings[key] = value; } },
+    forEachObjectEntry: (record, visit) => Object.entries(record).forEach(([key, value]) => visit(key, value)),
+    getKeyByValue: (record, value) => Object.keys(record).find(key => record[key] === value),
+    getFolderFromCacheList: name => folders.get(name),
+    setFolder: folder => folders.set(folder.fullName, folder),
+    sortFolders() {}, setFolderInboxName() {}, get() {},
+  });
+
+  collection.reviveFromJson({
+    systemFolders: { sent: '', drafts: 'Brouillons', trash: '__UNUSE__' },
+    rows: [{ fullName: 'INBOX', role: 'inbox' }, { fullName: 'Brouillons', role: 'drafts' }, { fullName: 'Trash', role: 'trash' }],
+  });
+  assert.equal(settings.SentFolder, '');
+  assert.equal(settings.DraftsFolder, 'Brouillons');
+  assert.equal(settings.TrashFolder, '__UNUSE__');
+  assert.equal(types.get('Brouillons'), 3);
+  assert.equal(types.get('Trash'), 0);
+
+  collection.reviveFromJson({
+    systemFolders: { drafts: '', trash: 'Corbeille' },
+    rows: [{ fullName: 'Other drafts', role: 'drafts' }, { fullName: 'Corbeille', role: 'trash' }],
+  });
+  assert.equal(settings.DraftsFolder, '');
+  assert.equal(types.get('Other drafts'), 0);
+  assert.equal(settings.TrashFolder, 'Corbeille');
+  assert.equal(types.get('Corbeille'), 5);
+});

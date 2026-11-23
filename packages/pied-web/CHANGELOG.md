@@ -1,5 +1,11 @@
 # Releases
 
+## 1.10.46.2 — 2026-11-23
+
+- Save unassigned system folders per account when IMAP advertises a unique,
+  selectable personal destination. Draft saving, the Feed and the folder list
+  use the confirmed assignments. Keep explicit folder choices and disabled roles.
+
 ## 1.10.46.1 — 2026-11-23
 
 - Backport the progressive conversation reader to 1.10.46. The selected message
