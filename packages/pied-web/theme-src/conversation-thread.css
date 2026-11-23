@@ -31,7 +31,7 @@ html.pw-theme #rl-app #V-MailMessageView .messageView { scrollbar-gutter:stable;
 #rl-app #V-MailMessageView .pw-conversation-history > button {
  margin:0 var(--pw-space-2) var(--pw-space-3) 0; padding:var(--pw-space-1) var(--pw-space-2); min-height:36px;
  border:1px solid var(--pw-line); border-radius:6px; background:var(--pw-paper);
- color:var(--nc-color-primary-element); font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
+ color:var(--pw-primary-ink,var(--nc-color-primary-element)); font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
 }
 #rl-app #V-MailMessageView .pw-conversation-history :is(h2,button):focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-card-toggle:focus-visible,
@@ -71,7 +71,7 @@ html.pw-theme #rl-app #V-MailMessageView .messageView { scrollbar-gutter:stable;
  display:inline-flex; align-items:center; gap:var(--pw-space-2);
  margin:0 0 var(--pw-space-2); padding:var(--pw-space-1) 0;
  border:0!important; box-shadow:none!important; background:transparent;
- color:var(--nc-color-primary-element); min-height:36px;
+ color:var(--pw-primary-ink,var(--nc-color-primary-element)); min-height:36px;
  font:var(--pw-text-sm)/1.5 var(--pw-font); cursor:pointer;
 }
 #rl-app #V-MailMessageView .pw-conversation-count {
@@ -91,7 +91,8 @@ html.pw-theme #rl-app #V-MailMessageView .messageView { scrollbar-gutter:stable;
 #rl-app #V-MailMessageView .pw-conversation-preview[hidden] { display:none; }
 #rl-app #V-MailMessageView .pw-conversation-preview-toggle {
  display:block; margin:0 var(--pw-space-3) var(--pw-space-1); padding:var(--pw-space-1);
- border:0!important; box-shadow:none!important; background:transparent; color:var(--nc-color-primary-element); min-height:32px;
+ border:0!important; box-shadow:none!important; background:transparent;
+ color:var(--pw-primary-ink,var(--nc-color-primary-element)); min-height:32px;
  font:var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
 }
 #rl-app #V-MailMessageView .pw-conversation-preview-toggle[aria-busy="true"] {
