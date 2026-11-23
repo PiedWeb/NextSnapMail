@@ -1,15 +1,16 @@
-# Native reader, folded history and explicit full exchange
+# Native reader and conversation history
 
 ## Current interaction contract
 
-Opening an Inbox message shows the native body as soon as it is ready and looks
-up the conversation in the background. The newest received or sent reply opens
-automatically if the reader has yet to scroll or interact with the selected
-message. Otherwise that message and its viewport position are preserved, with
-the latest reply available through **Show latest message**. The behavior is
-independent of the native list's `useThreads` setting.
+Opening an Inbox message shows the native body as soon as it is ready. The
+conversation lookup updates a fixed-width count in **View conversation**. The
+selected message and its viewport stay in place. The control opens the history
+below the body and focuses its heading. **Show latest message** opens the newest
+reply through the native reader. History cards are created on demand, and an
+Inbox status poll runs while the history is open. List grouping has its own
+`useThreads` setting.
 
-Since 1.10.42, Sent, Archive and filed messages also open their account exchange
+Sent, Archive and filed messages also discover their account exchange
 automatically, keeping the selected message active. Native search results and
 workspace search provenance preserve the exact selected result, including Inbox
 results. Native list grouping remains unchanged. Account-scoped lookups run on
@@ -24,15 +25,15 @@ hierarchies using the real IMAP delimiter. An explicitly opened protected origin
 remains available to a manual full-exchange request. Account switches discard
 old history and cannot carry a per-message opt-out into another account.
 
-There is exactly one native actionable message. Its header says **Active message**;
-reply, move, delete, attachments and remote-image permissions remain owned by the
-native reader. Clicking a folded card opens that message through the native selector.
+The **Open message** marker locates the current native message in the chronological
+history. The native reader owns reply, move, delete, attachments and remote-image
+permissions. Selecting a history card opens the message and returns focus to the
+conversation control in the reader.
 An independent preview control expands a bounded plain-text continuation without changing
 the active message, flags or native commands. It appears only when the one-line excerpt is
 actually truncated; short messages no longer repeat the same text under a redundant action.
 The triggered card keeps its viewport position while the continuation opens. Other history stays folded.
-The immediate predecessor shows its sender, timestamp and excerpt when the conversation
-opens, rather than an anonymous 24px strip. Only that predecessor is prefetched; other
+The immediate predecessor can prefetch its excerpt when the history opens. Other
 missing excerpts load on hover, keyboard focus or explicit preview, at most two at once.
 The read-only native `Message` response is converted inside an inert HTML template and
 inserted only with `textContent`: preview HTML never executes or loads remote assets.
@@ -41,9 +42,9 @@ Cards are keyed by folder/UID within the current account. Refresh keeps their ac
 focus and explicit expansion state. A per-message viewport anchor preserves the active
 header or visible history/body element through preview and image layout changes. A manual
 scroll replaces the anchor, including same-turn scrolls before a native observable update.
-Only a newly selected message receives an initial position; background refresh never hides
-and rebuilds the active native body. Native observable updates are coalesced for one task,
-without the former extra 160ms delay after loading.
+The browser discards card nodes when the history closes. The selected message keeps its
+geometry across successful, empty, partial and failed lookups. Native observable
+updates are coalesced for one task.
 
 **View full exchange** is available explicitly from an individual message, including a
 filed message, without changing the Inbox thread preference or enabling threads in other
@@ -117,25 +118,10 @@ folder/UID pairs, and sorts the combined set by date. Each search is limited to
 Since 1.8.4, native list grouping is an Inbox-only preference. Its control is shown in
 `INBOX`; every list and reader request for Trash, Sent, Drafts, Archive and custom
 folders is forced back to individual messages, even when the saved Inbox
-preference is enabled. This prevents automatic cross-folder discovery outside the Inbox.
-The explicit account lookup above is a reader action, not an exception to list scoping.
+preference is enabled. Reader-side discovery has its own account scope described above.
 
-The newest message, received or sent, opens in SnappyMail's **native reader**.
-Earlier messages appear as folded cards above it; clicking one opens that
-message natively and places the remaining cards around it. A button returns
-to the newest message. Native body, attachment, image, reply, flag and other
-message actions therefore belong to whichever message is open. The current
-folder's message list is not copied or altered. Searches are retried after a
-failure, and a 60-second refresh can pick up a new reply while the reader stays
-open. Account changes discard stale searches.
-
-Version 1.7.21 holds the native expanded message out of view while a newly
-opened conversation is being assembled. The reader and folded cards appear
-together after native loading, avoiding a visible jump when Sent results arrive.
 The native Close control is beside the previous/next arrows on desktop; mobile
 uses its existing header Back control. Folded cards have one border.
-Version 1.7.22 uses the earliest message's subject as the conversation heading.
-The open message still shows its own subject at the size of its sender line.
 Since 1.7.23, folded cards show the beginning of their body as plain text,
 truncated to one visual line. The excerpt uses the already loaded plain part
 when available; otherwise, requested cards fetch the native `Message` response

@@ -4392,6 +4392,11 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 
 
 #rl-app #V-MailMessageView .b-message.pw-conversation-active { overflow-anchor:none; }
+html.pw-theme #rl-app #V-MailMessageView .messageView { scrollbar-gutter:stable; }
+
+#rl-app #V-MailMessageView .b-message:has(> .pw-conversation-history:not([hidden])) > #messageItem {
+ flex:0 0 auto;
+}
 @media(min-width:800px) {
  #rl-app #V-MailMessageView:has(.pw-conversation-active) > .top-toolbar > .btn-group:has(.buttonClose) {
   display:flex!important; order:1; margin-inline-start:var(--pw-space-1);
@@ -4404,37 +4409,32 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 #rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent > .close {
  display:none!important;
 }
-#rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent {
- font-size:var(--pw-text-sm); line-height:1.4; letter-spacing:0;
+#rl-app #V-MailMessageView .pw-conversation-history {
+ flex:0 0 auto; margin:var(--pw-space-5) var(--pw-space-6) var(--pw-space-4);
+ padding-block-start:var(--pw-space-3); border-block-start:1px solid var(--pw-line);
+ font-family:var(--pw-font);
 }
-#rl-app #V-MailMessageView .pw-conversation-before,
-#rl-app #V-MailMessageView .pw-conversation-after {
- flex:0 0 auto; margin:0 var(--pw-space-6) var(--pw-space-4); font-family:var(--pw-font);
+#rl-app #V-MailMessageView .pw-conversation-history[hidden],
+#rl-app #V-MailMessageView .pw-conversation-history > button[hidden] { display:none; }
+#rl-app #V-MailMessageView .pw-conversation-history h2 {
+ margin:0 0 var(--pw-space-3);
+ color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-lg)/1.35 var(--pw-font);
 }
-#rl-app #V-MailMessageView .pw-conversation-before { margin-bottom:var(--pw-space-1); }
-#rl-app #V-MailMessageView .pw-conversation-before[hidden],
-#rl-app #V-MailMessageView .pw-conversation-after[hidden],
-#rl-app #V-MailMessageView .pw-conversation-before > h2[hidden],
-#rl-app #V-MailMessageView .pw-conversation-before > button[hidden] { display:none; }
-#rl-app #V-MailMessageView .pw-conversation-before h2 {
- margin:0 0 var(--pw-space-2); padding:var(--pw-space-3) var(--pw-space-2); border-top:1px solid var(--pw-line);
- color:var(--nc-color-main-text); font:var(--pw-weight-strong) var(--pw-text-xl)/1.35 var(--pw-font);
-}
-#rl-app #V-MailMessageView .pw-conversation-before > button {
- margin:0 var(--pw-space-2) var(--pw-space-3); padding:var(--pw-space-1) var(--pw-space-2); min-height:36px;
+#rl-app #V-MailMessageView .pw-conversation-history > button {
+ margin:0 var(--pw-space-2) var(--pw-space-3) 0; padding:var(--pw-space-1) var(--pw-space-2); min-height:36px;
  border:1px solid var(--pw-line); border-radius:6px; background:var(--pw-paper);
  color:var(--nc-color-primary-element); font:var(--pw-weight-strong) var(--pw-text-xs)/1.5 var(--pw-font); cursor:pointer;
 }
-#rl-app #V-MailMessageView .pw-conversation-before > button:focus-visible,
+#rl-app #V-MailMessageView .pw-conversation-history :is(h2,button):focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-card-toggle:focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-preview-toggle:focus-visible,
 #rl-app #V-MailMessageView .pw-conversation-full:focus-visible {
  outline:1px solid var(--pw-focus); outline-offset:2px;
 }
-#rl-app #V-MailMessageView .pw-conversation-before > p {
- margin:0 var(--pw-space-2) var(--pw-space-3); color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font);
+#rl-app #V-MailMessageView .pw-conversation-history > p {
+ margin:0 0 var(--pw-space-3); color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font);
 }
-#rl-app #V-MailMessageView .pw-conversation-before > p:empty { display:none; }
+#rl-app #V-MailMessageView .pw-conversation-history > p:empty { display:none; }
 #rl-app #V-MailMessageView .pw-conversation-card {
  border:1px solid var(--pw-line); border-radius:8px; margin:0 0 var(--pw-space-3);
  background:var(--pw-paper); overflow:hidden;
@@ -4460,12 +4460,21 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
 }
 #rl-app #V-MailMessageView .pw-conversation-full {
- align-self:flex-start; margin:var(--pw-space-2) var(--pw-space-6); padding:var(--pw-space-1) var(--pw-space-2);
- border:0; background:transparent; color:var(--nc-color-primary-element); min-height:36px;
+ display:inline-flex; align-items:center; gap:var(--pw-space-2);
+ margin:0 0 var(--pw-space-2); padding:var(--pw-space-1) 0;
+ border:0!important; box-shadow:none!important; background:transparent;
+ color:var(--nc-color-primary-element); min-height:36px;
  font:var(--pw-text-sm)/1.5 var(--pw-font); cursor:pointer;
 }
+#rl-app #V-MailMessageView .pw-conversation-count {
+ display:grid; place-items:center; inline-size:4ch; min-block-size:1.5em;
+ border-radius:var(--pw-space-2); background:var(--pw-selected); color:var(--nc-color-main-text);
+ font-size:var(--pw-text-xs); font-variant-numeric:tabular-nums;
+}
+#rl-app #V-MailMessageView .pw-conversation-count:empty { visibility:hidden; }
 #rl-app #V-MailMessageView .pw-conversation-current {
- display:block; color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font); margin-bottom:var(--pw-space-2);
+ display:block; color:var(--pw-muted); font:var(--pw-text-xs)/1.5 var(--pw-font);
+ margin-block:var(--pw-space-3);
 }
 #rl-app #V-MailMessageView .pw-conversation-full[hidden],
 #rl-app #V-MailMessageView .pw-conversation-current[hidden],
@@ -4486,11 +4495,12 @@ html:is(.sm-msgView-side,.rl-mobile) #rl-app #rl-right #V-MailMessageList .messa
 }
 @media(pointer:coarse) {
  #rl-app #V-MailMessageView .pw-conversation-preview-toggle,
+ #rl-app #V-MailMessageView .pw-conversation-history > button,
  #rl-app #V-MailMessageView .pw-conversation-full { min-height:44px; }
 }
 @media(max-width:799px) {
- #rl-app #V-MailMessageView .pw-conversation-before,
- #rl-app #V-MailMessageView .pw-conversation-after { margin-inline:var(--pw-space-3); }
+ #rl-app #V-MailMessageView .pw-conversation-history { margin-inline:var(--pw-space-3); }
+ #rl-app #V-MailMessageView .pw-conversation-control { padding-inline:var(--pw-space-4); }
 }
 
 
@@ -4753,7 +4763,7 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
 }
 
 @media (min-width: 800px) {
-  #rl-app #V-MailMessageView .b-message:not(.pw-conversation-active) > .messageItemHeader .subjectParent {
+  #rl-app #V-MailMessageView .b-message > .messageItemHeader .subjectParent {
     font-size:var(--pw-text-lg); line-height:1.3; letter-spacing:var(--pw-tracking-tight);
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader .informationShort:has(.pw-from) {
@@ -4966,8 +4976,8 @@ html.pw-theme #rl-app #V-MailMessageList .checkboxCheckAll:focus-visible {outlin
     .pw-message-extras,
     #messageItem .attachmentsPlace,
     .pw-reading-actions,
-    .pw-conversation-before,
-    .pw-conversation-after
+    .pw-conversation-history,
+    .pw-conversation-control
   ) {
     width:100%;
     max-width: var(--pw-measure);

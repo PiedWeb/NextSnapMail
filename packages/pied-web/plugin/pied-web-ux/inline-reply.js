@@ -109,9 +109,8 @@
         const slot = document.createElement('section');
         slot.className = 'pw-inline-reply-slot';
         slot.setAttribute('aria-label', t('Zone de réponse', 'Reply area'));
-        const after = host.querySelector(':scope > .pw-conversation-after');
-        (after || host.lastElementChild)?.after(slot);
-        if (!slot.isConnected) host.append(slot);
+        const history = host.querySelector(':scope > .pw-conversation-history');
+        host.insertBefore(slot,history);
         return slot;
     }
 

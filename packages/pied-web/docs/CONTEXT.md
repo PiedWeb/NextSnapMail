@@ -6,10 +6,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
-- Show the native message while cross-folder discovery runs. When a reader
-  interacts with the selected message during discovery, keep that message and
-  its viewport position as the history arrives. The inbox can still promote
-  the newest reply when the reader has not interacted. See VIRTUAL_CONVERSATIONS.md.
+- Show the selected native message throughout cross-folder discovery. Update a
+  stable count in the conversation control and render the history below the
+  reader on demand. The latest-reply action is explicit. The user's own send
+  event can still open the new Sent copy. See VIRTUAL_CONVERSATIONS.md.
 
 - Since 1.10.44 / NextSnapMail 0.1.17, keep the upstream admin session checks on
   legacy and integrated routes alongside URL-scoped account shell parameters.
@@ -24,14 +24,12 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   Global phone account labels sit below the subject, leaving the sender full width.
 - Since 1.10.42, Sent, Archive, filed folders and search results automatically
   discover the account exchange while keeping the selected message active.
-  Ordinary Inbox reading still follows the newest reply. Wider lookups run once
-  on open or explicit refresh, not periodically. Single-message opt-out belongs
+  Wider lookups run on open or explicit refresh. Single-message opt-out belongs
   to one account/folder/UID; native/workspace search provenance remains exact.
   Drafts, junk, trash, their descendants and queues stay individual by default;
   server discovery enforces the same hierarchy except the explicitly opened origin.
 - Since 1.10.41, opening an Inbox message automatically discovers matching Sent
-  replies and opens the newest message in the native reader. This is independent
-  of useThreads, which controls list grouping only. Folder lists stay individual
+  replies. The `useThreads` setting controls list grouping. Folder lists stay individual
   outside Inbox; reader discovery follows the 1.10.42 policy above.
 - Since 1.10.40, conversation discovery verifies a source UID's Message-ID
   search before trusting IMAP HEADER results. A successful empty result for
@@ -130,18 +128,14 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   reader leaves it and then restore the next row's scroll anchor before reclassifying.
 - Native IMAP threads are folder-scoped. Since 1.7.20, Conversations mode
   assembles the opened message's native folder thread with matching Sent replies
-  from read-only header searches. The newest message, received or sent, opens
-  with SnappyMail's native reader and actions; other messages are folded cards
-  around it. Mounting retries after the reader DOM appears, since the plugin
+  from read-only header searches. Messages open with SnappyMail's native reader
+  and actions. Mounting retries after the reader DOM appears, since the plugin
   event can precede its template. The older list-only panel missed normal
   opened messages. Since 1.7.10 the send hook no longer creates copies.
   Existing copies from 1.7.8/1.7.9 are not deleted. See
   `VIRTUAL_CONVERSATIONS.md`.
 - The 1.7.21 reader keeps SnappyMail's bound Close action beside previous/next
   on desktop, with the mobile header Back action serving the same purpose.
-- Since 1.7.22, take the conversation heading from the earliest chronological
-  message and keep the native open-message subject at sender-line size. Hide
-  the conversation heading during initial lookup while showing the native subject.
 - Since 1.7.23, folded cards show a one-line plain-text body excerpt instead of
   the repeated subject. Fetch missing excerpts only for visible cards with the
   native read-only Message endpoint, at most two requests at once, and clear
@@ -157,15 +151,9 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   their lower divider. A single file relies on its already-downloadable tile;
   with multiple files, native selection and ZIP download controls are visible
   without the ambiguous settings cog. Mobile keeps SnappyMail's compact control.
-- Since 1.7.32, the reader places the opened message at the top of its scroller
-  when folded history is drawn above it, 24 px below the previous card, so a long
-  conversation no longer opens on its oldest card. It happens once per opened
-  message, where the expanded reader is revealed, so a manual scroll, a revealed
-  summary and the periodic refresh keep the position they find; the earliest
-  message of a thread keeps its heading and latest-message action in view
-  instead. A failed walk now drops the folder state it was answered with,
-  otherwise the unchanged shortcut answered the retry and the collapsed stack
-  never returned.
+- Since 1.7.32, a failed discovery clears the shared freshness token so retry
+  asks for new rows. The viewport anchor preserves the visible reading position
+  through preview and image layout changes.
 - Since 1.7.33, the desktop calendar action keeps 6 px between the metadata rule and
   its own hover surface, so the tinted background never touches a divider.
 - Since 1.7.34, every address in the reader header is a link on the address text only,

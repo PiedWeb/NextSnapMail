@@ -1,4 +1,4 @@
-/* One chronological reader stack for the current folder's thread and Sent replies. */
+/* Read the selected message before opening its conversation history. */
 (() => {
     'use strict';
     const t = (fr, en) => (document.documentElement.lang || 'fr').startsWith('fr') ? fr : en;
@@ -27,8 +27,10 @@
         vm.pwConversationThread = true;
         bootstrapObserver?.disconnect();
 
-        const before = document.createElement('section'); before.className = 'pw-conversation-before'; before.hidden = true;
-        const title = document.createElement('h2');
+        const history = document.createElement('section'); history.className = 'pw-conversation-history'; history.hidden = true;
+        history.id = dom.id + '-conversation';
+        const title = document.createElement('h2'); title.tabIndex = -1; title.id = history.id + '-title';
+        history.setAttribute('aria-labelledby',title.id);
         const latestButton = document.createElement('button'); latestButton.type = 'button'; latestButton.hidden = true;
         const beforeCards = document.createElement('div'); beforeCards.className = 'pw-conversation-cards';
         const status = document.createElement('p'); status.setAttribute('role', 'status');
@@ -36,24 +38,27 @@
         const scopeNote = document.createElement('p'); scopeNote.className = 'pw-conversation-scope';
         const singleButton = document.createElement('button'); singleButton.type = 'button'; singleButton.hidden = true;
         const fullButton = document.createElement('button'); fullButton.type = 'button'; fullButton.hidden = true;
+        const control = document.createElement('div'); control.className = 'pw-conversation-control';
         fullButton.className = 'pw-conversation-full';
+        fullButton.setAttribute('aria-controls',history.id);
+        const fullLabel = document.createElement('span');
+        const count = document.createElement('span'); count.className = 'pw-conversation-count';
+        count.setAttribute('aria-hidden','true'); fullButton.append(fullLabel,count);
         const currentLabel = document.createElement('span'); currentLabel.className = 'pw-conversation-current'; currentLabel.hidden = true;
-        currentLabel.textContent = t('Message actif', 'Active message');
-        before.append(title,latestButton,scopeNote,singleButton,status,retry,beforeCards); header.before(before);
-        header.prepend(currentLabel); header.after(fullButton);
-        const after = document.createElement('section'); after.className = 'pw-conversation-after'; after.hidden = true;
         const afterCards = document.createElement('div'); afterCards.className = 'pw-conversation-cards';
-        after.append(afterCards); item.after(after);
+        currentLabel.textContent = t('Message affiché', 'Open message');
+        history.append(title,scopeNote,singleButton,status,retry,latestButton,beforeCards,currentLabel,afterCards);
+        control.append(fullButton); header.after(control); host.append(history);
 
         let generation = 0, timer, disposed = false, context = null, entries = [];
-        let loading = false, error = false, silentRefresh = false, explicitOrigin = '', singleOrigin = '';
+        let historyOpen = false, loading = false, error = false, silentRefresh = false, explicitOrigin = '', singleOrigin = '';
         let previewAccount = '', previewActive = 0;
         const previews = new Map();
         const previewQueue = [];
         const cards = new Map();
         let previewControlFrame = 0;
         const schedulePreviewControls = () => {
-            if (previewControlFrame) return;
+            if (previewControlFrame || !cards.size) return;
             previewControlFrame = requestAnimationFrame(() => {
                 previewControlFrame = 0;
                 const measured = [...cards.values()].map(state => [state,state.canExpand?.()]);
@@ -151,12 +156,7 @@
         const valid = (version, ctx) => !disposed && version === generation && context === ctx
             && account() === ctx.account && active() && !!currentKey()
             && (currentKey() === ctx.originKey || entries.some(entry => entry.key === currentKey()));
-        // Folded history sits above the open message, so a long conversation would
-        // otherwise start the reader on its oldest card. Place the opened message
-        // at the top of its scroller once, leaving the previous card in sight; a
-        // manual scroll, a revealed summary and the silent refresh then keep the
-        // position they find.
-        let anchored = '', viewportAnchor = null, manualDuringLoad = false, observedKey = '';
+        let viewportAnchor = null, observedKey = '';
         const scroller = () => {
             for (let node = host; node && node !== document.body; node = node.parentElement)
                 if (node.scrollHeight - node.clientHeight > 1
@@ -211,39 +211,18 @@
                 scrollTop:box.scrollTop
             };
         };
-        const anchor = () => {
-            const key = currentKey();
-            if (before.hidden || !key || anchored === key) return;
-            const box = scroller();
-            if (!box) return;
-            anchored = key;
-            if (!manualDuringLoad && viewportAnchor?.key !== key) {
-                // Show the identifiable previous card, not its anonymous last
-                // 24px. Never let a very tall preview push the active header away.
-                const previous = beforeCards.lastElementChild;
-                const peek = previous ? Math.min(previous.getBoundingClientRect().height + 8, 132) : 0;
-                box.scrollTop = previous
-                    ? Math.max(0, box.scrollTop + header.getBoundingClientRect().top - box.getBoundingClientRect().top - peek)
-                    : 0;
-            }
-            rememberPosition();
-        };
-        const settle = () => {
-            if (!loading && !vm.messageLoadingThrottle?.()) anchor();
-        };
-
-        function showMessage(entry, followLatest = false, preserveManual = false) {
+        function showMessage(entry) {
             const callback = listVM?.selector?.oCallbacks?.ItemSelect;
             const CollectionModel = rl.app.messageList?.()?.constructor;
             const model = entry.model || CollectionModel?.reviveFromJson?.([entry.raw])?.[0];
             if (typeof callback !== 'function' || !model || itemKey(model) !== entry.key) {
                 error = true; render(); return;
             }
-            context.followLatest = followLatest;
-            const wasManual = manualDuringLoad;
-            manualDuringLoad = false; viewportAnchor = null;
+            historyOpen = false;
+            viewportAnchor = null;
             callback(model); // Native reader fetch, attachments and actions use this message's real folder/UID.
-            if (preserveManual) manualDuringLoad = wasManual;
+            render();
+            fullButton.focus({preventScroll:true});
         }
 
         function card(entry) {
@@ -338,7 +317,7 @@
             }
             button.append(sender,recipient,date,summary);
             button.addEventListener('click', () => {
-                if (context && active()) showMessage(state.entry,state.entry.key === entries.at(-1)?.key);
+                if (context && active()) showMessage(state.entry);
             });
             article.append(button,previewButton,preview);
             // Observe each card directly as well as its container. A late font,
@@ -349,6 +328,7 @@
         }
 
         function syncCards(container, wanted) {
+            if (!container.childElementCount && !wanted.length) return;
             const keep = new Set(wanted.map(entry => entry.key));
             [...container.children].forEach(node => {
                 if (!keep.has(node.dataset.key)) { geometry?.unobserve(node); node.remove(); }
@@ -362,32 +342,44 @@
 
         function render() {
             if (previewAccount !== account()) { previews.clear(); cards.clear(); previewAccount = account(); }
-            const index = entries.findIndex(entry => entry.key === currentKey());
-            const visible = active() && !!context && context.account === account() && index >= 0
-                && (entries.length > 1 || context.full || context.partial || loading && !silentRefresh || error);
-            before.hidden = !visible; after.hidden = !visible || index >= entries.length - 1;
-            host.classList.toggle('pw-conversation-active', visible);
-            currentLabel.hidden = !visible;
-            text(fullButton,t('Voir l’échange complet', 'View full exchange'));
-            fullButton.hidden = !document.documentElement.classList.contains('pw-theme') || !currentKey() || active();
-            text(title,entries[0]?.raw.subject || t('(Sans objet)', '(No subject)'));
-            title.hidden = loading && !silentRefresh;
+            const available = active();
+            const scoped = !!inContext();
+            const index = scoped ? entries.findIndex(entry => entry.key === currentKey()) : -1;
+            const visible = historyOpen && available && scoped;
+            history.hidden = !visible;
+            // The top of the native reader is shared by all states of discovery.
+            const label = visible ? t('Masquer l’échange', 'Hide conversation')
+                : available ? t('Voir l’échange', 'View conversation') : t('Voir l’échange complet', 'View full exchange');
+            text(fullLabel,label);
+            const pending = scoped && loading && !silentRefresh;
+            const incomplete = scoped && (error || context.partial);
+            const countText = pending ? '…' : incomplete ? '!' : scoped ? String(entries.length) : '';
+            text(count,available ? countText : '');
+            const detail = pending ? t('Recherche en cours', 'Finding messages')
+                : incomplete ? t('Échange incomplet', 'Incomplete conversation')
+                    : scoped ? entries.length + (entries.length === 1 ? ' message' : ' messages') : '';
+            fullButton.setAttribute('aria-label',available && detail ? label + ', ' + detail : label);
+            fullButton.setAttribute('aria-expanded',String(!!visible));
+            control.hidden = !document.documentElement.classList.contains('pw-theme') || !currentKey();
+            fullButton.hidden = control.hidden;
+            host.classList.toggle('pw-conversation-active', available);
+            currentLabel.hidden = !visible || entries.length < 2;
+            text(title,t('Messages de l’échange', 'Conversation messages'));
             text(latestButton,t('Afficher le dernier message', 'Show latest message'));
             latestButton.hidden = !visible || index === entries.length - 1;
             text(scopeNote,context?.full ? t('Dossiers de ce compte, hors brouillons, corbeille, indésirables, rappels et envois programmés (sauf le dossier ouvert).',
                 'Folders in this account, excluding drafts, trash, junk, reminders and scheduled mail (except the opened folder).') : '');
             text(singleButton,t('Revenir au message seul', 'Return to single message')); singleButton.hidden = !context?.full;
-            text(status,loading && !silentRefresh ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')
+            text(status,pending ? t('Recherche des messages de la conversation…', 'Finding conversation messages…')
                 : error ? t('Conversation incomplète.', 'Conversation incomplete.')
                     : context?.partial ? t('Échange partiel : certains dossiers ou résultats n’ont pas pu être parcourus.', 'Partial exchange: some folders or results could not be searched.')
                         : context?.missingMessageId ? t('Aucun identifiant de conversation dans ce message.', 'This message has no conversation identifier.')
-                            : context?.full && entries.length === 1 ? t('Aucun autre message trouvé dans cette portée.', 'No other message found in this scope.') : '');
-            text(retry,error ? t('Réessayer', 'Try again') : t('Actualiser l’échange', 'Refresh exchange'));
-            retry.hidden = !error && !context?.full && !context?.partial;
+                            : entries.length === 1 ? t('Aucun autre message trouvé.', 'No other message found.') : '');
+            text(retry,error ? t('Réessayer', 'Try again') : t('Actualiser l’échange', 'Refresh conversation'));
+            retry.hidden = pending;
             syncCards(beforeCards,visible ? entries.slice(0,index) : []);
             syncCards(afterCards,visible ? entries.slice(index + 1) : []);
-            const kept = new Set(entries.map(entry => entry.key));
-            for (const [key] of cards) if (!kept.has(key)) cards.delete(key);
+            for (const [key, state] of cards) if (!state.article.isConnected) cards.delete(key);
             restorePosition();
             // The immediate predecessor is the only automatic excerpt fetch.
             // All older bodies stay on demand, bounded to two concurrent reads.
@@ -449,7 +441,7 @@
                 queueMicrotask(() => { if (!loading) void scan(ctx,true); });
             };
             if (rows === null && !error) {
-                loading = silentRefresh = false; render(); settle(); repeat(); return;
+                loading = silentRefresh = false; render(); repeat(); return;
             }
             const combined = new Map();
             for (const row of [{raw:ctx.origin,model:ctx.originModel},...(rows || [])]) {
@@ -459,23 +451,20 @@
             const nextEntries = [...combined.values()].sort((a,b) =>
                 Number(a.raw.dateTimestamp || 0) - Number(b.raw.dateTimestamp || 0)
                 || a.key.localeCompare(b.key));
-            const changed = entries.map(entry => entry.key).join('\n') !== nextEntries.map(entry => entry.key).join('\n');
-            if (!silent && manualDuringLoad) ctx.followLatest = false;
             const latest = nextEntries.at(-1);
-            const openLatest = ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key;
-            if (!silent && !openLatest) rememberPosition();
+            const openLatest = ctx.openLatestAfterSend && !ctx.needsRefresh && latest
+                && selectedBefore === currentKey() && currentKey() !== latest.key;
+            if (!ctx.needsRefresh) ctx.openLatestAfterSend = false;
             entries = nextEntries;
             loading = silentRefresh = false; render();
             if (ctx.listFlag) reflectListFlag(ctx,ctx.listFlag);
-            if (openLatest) showMessage(latest,true,true);
-            else if (changed) requestAnimationFrame(settle);
-            else settle();
+            if (openLatest) showMessage(latest);
             repeat();
         }
 
         function reset() {
             ++generation; context = null; entries = []; loading = error = silentRefresh = false;
-            anchored = explicitOrigin = ''; viewportAnchor = null; cards.clear();
+            historyOpen = false; explicitOrigin = ''; viewportAnchor = null; cards.clear();
             render();
         }
         function update() {
@@ -487,39 +476,48 @@
             }
             if (inContext()) {
                 if (context.needsRefresh) { context.needsRefresh = false; void scan(context); }
-                else { render(); settle(); }
+                else render();
                 return;
             }
-            if (vm.messageLoadingThrottle?.()) return;
+            if (vm.messageLoadingThrottle?.()) { render(); return; }
             const source = current(), origin = plain(source);
             const threads = source.threads?.() || [];
             const list = rl.app.messageList?.();
             const search = searchContext(source);
             const explicit = explicitOrigin === currentIdentity();
             const full = explicit || !isInbox(source.folder) || !!search;
-            anchored = ''; viewportAnchor = null;
+            viewportAnchor = null;
             context = {account:account(), folder:source.folder, listFolder:list?.folder, search, sent:sentFolder(), origin,
                 originModel:source,originKey:itemKey(source),threadUid:threads.length > 1
-                    ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:!full,full,explicit};
+                    ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),full,explicit};
             entries = [{raw:origin,model:source,key:context.originKey}];
             void scan(context);
         }
         const schedule = () => {
             if (observedKey !== currentIdentity()) {
-                observedKey = currentIdentity(); manualDuringLoad = false; viewportAnchor = null;
+                observedKey = currentIdentity(); historyOpen = false; viewportAnchor = null;
                 if (singleOrigin !== currentIdentity()) singleOrigin = '';
             }
             // Coalesce native observables within this turn, without imposing a
             // second 160ms wait after the native reader has already loaded.
             clearTimeout(timer); timer = setTimeout(update,0);
         };
-        latestButton.addEventListener('click', () => { const latest = entries.at(-1); if (latest) showMessage(latest,true); });
+        latestButton.addEventListener('click', () => { const latest = entries.at(-1); if (latest) showMessage(latest); });
         fullButton.addEventListener('click', () => {
-            singleOrigin = ''; explicitOrigin = currentIdentity(); context = null; entries = []; anchored = ''; manualDuringLoad = false;
-            update();
+            historyOpen = !historyOpen;
+            if (historyOpen && !active()) {
+                singleOrigin = ''; explicitOrigin = currentIdentity(); context = null; entries = [];
+                update();
+            } else render();
+            if (!history.hidden) {
+                history.scrollIntoView({block:'start'});
+                title.focus({preventScroll:true});
+            }
         });
-        singleButton.addEventListener('click', () => { reset(); singleOrigin = currentIdentity(); render(); });
-        retry.addEventListener('click', () => { if (context) void scan(context); });
+        singleButton.addEventListener('click', () => {
+            reset(); singleOrigin = currentIdentity(); render(); fullButton.focus();
+        });
+        retry.addEventListener('click', () => { if (context && !loading) void scan(context, !error); });
         const subscriptions = [vm.message,vm.messageLoadingThrottle,rl.app.folderList].filter(value => value?.subscribe)
             .map(value => value.subscribe(schedule));
         const theme = new MutationObserver(schedule);
@@ -529,7 +527,7 @@
             const detail = event.detail || {}, key = itemKey(detail);
             if (!context || detail.account !== account() || !active() || !key
                 || !entries.some(entry => entry.key === key)) return;
-            context.followLatest = true;
+            context.openLatestAfterSend = true;
             context.listFlag = detail.flag;
             reflectListFlag(context,detail.flag);
             context.etag = '';
@@ -543,22 +541,12 @@
             if (event.target === box && (!viewportAnchor || viewportAnchor.key !== currentKey()
                 || Math.abs(viewportAnchor.scrollTop - box.scrollTop) > 0.5)) rememberPosition();
         };
-        const manual = event => {
-            if (event.type === 'pointerdown' && !header.contains(event.target) && !item.contains(event.target)) return;
-            if (event.type === 'keydown' && (!['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)
-                || event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
-            manualDuringLoad = true;
-        };
         dom.addEventListener('scroll',scroll,true);
-        dom.addEventListener('pointerdown',manual,true);
-        dom.addEventListener('wheel',manual,{passive:true});
-        dom.addEventListener('touchstart',manual,{passive:true});
-        dom.addEventListener('keydown',manual);
         geometry = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
             restorePosition();
             schedulePreviewControls();
         }) : null;
-        [beforeCards,afterCards,item,header].forEach(observeGeometry);
+        [history,item,header].forEach(observeGeometry);
         // ResizeObserver's default delivery differs for padding-only changes.
         // Attribute-driven late layout (lazy widgets, expanded previews, test
         // fixtures) gets the same anchor restoration path deterministically.
@@ -567,7 +555,7 @@
         host.addEventListener('load',restorePosition,true);
         // Cheap now: an unchanged mailbox answers from two IMAP STATUS commands.
         const poll = setInterval(() => {
-            if (context && !context.full && active() && !loading && !document.hidden) void scan(context,true);
+            if (historyOpen && context && !context.full && active() && !loading && !document.hidden) void scan(context,true);
         },60000);
         schedule();
         ko.utils.domNodeDisposal.addDisposeCallback(dom, () => {
@@ -575,12 +563,10 @@
             cancelAnimationFrame(previewControlFrame);
             previews.clear(); geometry?.disconnect(); geometryMutations.disconnect();
             dom.removeEventListener('scroll',scroll,true);
-            dom.removeEventListener('pointerdown',manual,true);
-            dom.removeEventListener('wheel',manual); dom.removeEventListener('touchstart',manual);
-            dom.removeEventListener('keydown',manual); host.removeEventListener('load',restorePosition,true);
+            host.removeEventListener('load',restorePosition,true);
             subscriptions.forEach(subscription => subscription.dispose());
             document.removeEventListener('visibilitychange',wake);
-            removeEventListener('pw-message-sent',messageSent); before.remove(); after.remove(); fullButton.remove(); currentLabel.remove();
+            removeEventListener('pw-message-sent',messageSent); history.remove(); control.remove();
         });
     }
 
