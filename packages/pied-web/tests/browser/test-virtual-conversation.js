@@ -4,6 +4,7 @@ let previewNetworkRequests=0;
 await p.route('https://tracker.example.test/**',route=>{++previewNetworkRequests;return route.abort();});
 await p.setViewportSize({width:1280,height:900});
 await p.goto(fixtureBase+'/.local-work/images-native-preview.html?drafts=1&mode=reader&side=1');
+await p.bringToFront();
 await p.waitForFunction(()=>window.draftsReady);
 await p.evaluate(()=>{
     document.documentElement.classList.add('pw-theme');
@@ -28,10 +29,12 @@ await p.evaluate(()=>{
     const collection=NativeDraftCollection.reviveFromJson([sourceRaw]);collection.folder='INBOX';
     collection[0].threads([11,12]);listVM.messageList(collection);
     readerVM.message(collection[0]);readerVM.messageLoadingThrottle=ko.observable(false);
+    document.querySelector('#messageItem > .bodyText').textContent=sourceRaw.plain;
     window.threadRequests=[];window.nativeOpens=[];window.failThreadSearch=false;window.holdThreadSearch=false;
     listVM.selector={oCallbacks:{ItemSelect(model){
         nativeOpens.push({folder:model.folder,uid:model.uid});readerVM.message(model);
-        const all=[sourceRaw,receivedRaw,...sentMatches];
+        const all=threadRows();
+        document.querySelector('.messageView').scrollTop=0;
         document.querySelector('#messageItem > .bodyText').textContent=all.find(item=>item.folder===model.folder&&item.uid===model.uid)?.plain||'';
     }}};
     window.threadRows=()=>[sourceRaw,receivedRaw,...sentMatches,...(window.thirdReceived?[thirdReceived]:[])];
@@ -48,6 +51,7 @@ await p.evaluate(()=>{
             etag:params.etag,scope:params.scope,account:threadAccount});
         const answer=()=>{
             if(failThreadSearch)return callback(0,{Result:{error:'conversation'}});
+            if(window.partialThreadSearch)return callback(0,{Result:{etag:'',messages:[],partial:true}});
             const all=threadRows(),anchors=new Set([params.messageId,params.inReplyTo,
                 ...String(params.references||'').split(/\s+/)].filter(Boolean));
             for(let size=-1;size!==anchors.size;){
@@ -74,136 +78,134 @@ await p.evaluate(()=>{
 await p.addScriptTag({url:fixtureBase+'/.local-work/pied-web-ux/conversation-thread.js'});
 await p.waitForFunction(()=>readerVM.pwConversationThread===true);
 await p.evaluate(()=>{window.setInterval=nativeReaderInterval;delete window.nativeReaderInterval;});
-await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===32
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3);
-const checks=[];const check=(label,ok)=>{if(!ok)throw new Error(label);checks.push(label);console.log('PASS '+label);};
-check('The newest Sent message opens in the native reader while three older messages stay one click away',await p.evaluate(()=>
-    readerVM.message().folder==='Sent'&&readerVM.message().uid===32
-    &&document.querySelector('#messageItem > .bodyText').textContent==='Dernière réponse envoyée'
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3
-    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
-check('The conversation heading uses the earliest message subject, and the open subject matches the sender line size',await p.evaluate(()=>{
-    const heading=document.querySelector('.pw-conversation-before h2');
-    const subject=document.querySelector('.b-message > .messageItemHeader .subjectParent > .subject');
-    const sender=document.querySelector('.pw-sender-name');
-    return heading.textContent==='Projet Alpha'&&!heading.hidden&&subject&&sender
-        &&getComputedStyle(subject).fontSize===getComputedStyle(sender).fontSize;
+
+const checks=[];
+const check=(label,ok)=>{if(!ok)throw new Error(label);checks.push(label);console.log('PASS '+label);};
+const control=p.locator('.pw-conversation-full');
+const history=p.locator('.pw-conversation-history');
+const latest=history.getByRole('button',{name:'Afficher le dernier message'});
+const openHistory=async expected=>{
+    await control.click();
+    await p.waitForFunction(count=>!document.querySelector('.pw-conversation-history').hidden
+        &&document.querySelectorAll('.pw-conversation-card').length===count,expected);
+};
+const waitForCount=async expected=>p.waitForFunction(count=>
+    document.querySelector('.pw-conversation-count')?.textContent===String(count),expected);
+await waitForCount(4);
+check('An Inbox lookup keeps the requested message readable regardless of native list grouping',await p.evaluate(()=>
+    readerVM.message()?.uid===11 && document.querySelector('#messageItem > .bodyText').textContent===sourceRaw.plain
+    &&rl.settings.get('useThreads')===false&&nativeOpens.length===0));
+check('The count resolves while the history stays closed and requests no message bodies',await p.evaluate(()=>
+    document.querySelector('.pw-conversation-history').hidden&&!document.querySelector('.pw-conversation-card')
+    &&threadRequests.length===1&&threadRequests[0].action==='PiedWebConversation'&&threadRequests[0].scope==='inbox'));
+await p.evaluate(()=>readerPoll());
+check('A closed conversation makes no periodic IMAP request',await p.evaluate(()=>threadRequests.length===1));
+await control.focus();
+await p.keyboard.press('Enter');
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===3);
+check('Keyboard activation focuses the named history below the native body',await p.evaluate(()=>{
+    const panel=document.querySelector('.pw-conversation-history'),button=document.querySelector('.pw-conversation-full');
+    return document.activeElement===panel.querySelector('h2')&&button.getAttribute('aria-controls')===panel.id
+        &&button.getAttribute('aria-expanded')==='true'
+        &&Boolean(document.getElementById('messageItem').compareDocumentPosition(panel)&Node.DOCUMENT_POSITION_FOLLOWING);
 }));
-check('A reader built before the plugin script is mounted from its native Knockout view model',await p.evaluate(()=>
-    readerVM.pwConversationThread===true&&!!document.querySelector('.pw-conversation-before')));
+check('Both received and Sent messages appear chronologically without opening another native message',await p.evaluate(()=>
+    [...document.querySelectorAll('.pw-conversation-card')].map(node=>Number(node.dataset.key.split('\u0000').at(-1))).join(',')==='31,12,32'
+    &&nativeOpens.length===0));
 check('A folded message has one border, and native Close sits beside the toolbar arrows',await p.evaluate(()=>{
     const card=document.querySelector('.pw-conversation-card'),button=card.querySelector('button');
     const close=document.querySelector('#V-MailMessageView .top-toolbar .buttonClose');
     const next=document.querySelector('#V-MailMessageView .top-toolbar .buttonDown');
     const subjectClose=document.querySelector('.b-message > .messageItemHeader .subjectParent > .close');
-    return getComputedStyle(card).borderTopWidth!=='0px'
-        &&getComputedStyle(button).borderTopWidth==='0px'
-        &&getComputedStyle(close).display!=='none'
-        &&close.getBoundingClientRect().left-next.getBoundingClientRect().right<=12
-        &&close.getBoundingClientRect().left>=next.getBoundingClientRect().right
-        &&getComputedStyle(subjectClose).display==='none';
+    const gap=close.getBoundingClientRect().left-next.getBoundingClientRect().right;
+    return getComputedStyle(card).borderTopWidth!=='0px'&&getComputedStyle(button).borderTopWidth==='0px'
+        &&getComputedStyle(close).display!=='none'&&gap>=0&&gap<=12&&getComputedStyle(subjectClose).display==='none';
 }));
-check('The stack includes both received messages and historical Sent replies without making copies',await p.evaluate(()=>
-    threadRequests.every(request=>['PiedWebConversation','Message'].includes(request.action))
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===1
-    &&threadRequests[0].action==='PiedWebConversation'&&threadRequests[0].folder==='INBOX'
-    &&nativeOpens.length===1));
-await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Première réponse envoyée'));
-check('Folded cards show one-line plain-text body previews, never the repeated subject or active HTML',await p.evaluate(()=>
-    !document.querySelector('.pw-conversation-card img, .pw-conversation-card script')
+check('HTML excerpts become inert single-line text and do not load tracking pixels',await p.evaluate(()=>
+    !document.querySelector('.pw-conversation-card img,.pw-conversation-card script')
     &&[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Première réponse envoyée')
-    &&[...document.querySelectorAll('.pw-conversation-card-summary')].every(node=>!node.textContent.includes('Projet Alpha'))
-    &&getComputedStyle(document.querySelector('.pw-conversation-card-summary')).whiteSpace==='nowrap'));
-check('Inert preview extraction does not fetch remote tracking images',previewNetworkRequests===0);
-await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
-    .filter(button=>button.textContent==='Afficher la suite').every(button=>button.hidden));
-check('Known short excerpts do not offer a redundant preview action',await p.evaluate(()=>
-    [...document.querySelectorAll('.pw-conversation-preview-toggle')]
-        .filter(button=>button.textContent==='Afficher la suite').every(button=>button.hidden)
-    &&[...document.querySelectorAll('.pw-conversation-preview-toggle')]
-        .some(button=>!button.hidden&&button.textContent==='Charger l’aperçu')));
-await p.evaluate(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
-    .find(button=>!button.hidden&&button.textContent==='Charger l’aperçu').click());
-await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-preview-toggle')]
-    .every(button=>button.hidden));
-check('Loading a short missing excerpt fills the summary and removes the spent action',await p.evaluate(()=>
-    [...document.querySelectorAll('.pw-conversation-card-summary')].some(summary=>summary.textContent==='Premier message')
-    &&document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===0));
-await p.locator('.pw-conversation-card-toggle').nth(2).click();
-await p.waitForFunction(()=>readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===12
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===2
-    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===1);
-check('An older received message opens with its native body and actions',await p.evaluate(()=>
+    &&getComputedStyle(document.querySelector('.pw-conversation-card-summary')).whiteSpace==='nowrap')&&previewNetworkRequests===0);
+await p.evaluate(()=>readerPoll());
+await p.waitForFunction(()=>threadRequests.filter(r=>r.action==='PiedWebConversation').length===2);
+check('The open Inbox history reuses the freshness token on the periodic lookup',await p.evaluate(()=>!!threadRequests.at(-1).etag));
+await p.locator('.pw-conversation-card-toggle').nth(1).click();
+await p.waitForFunction(()=>readerVM.message()?.uid===12&&document.querySelector('.pw-conversation-history').hidden);
+check('Opening a historical message puts its native body and actions first',await p.evaluate(()=>
     document.querySelector('#messageItem > .bodyText').textContent==='Réponse reçue'
-    &&document.querySelector('.pw-conversation-before h2').textContent==='Projet Alpha'
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===2
-    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===1));
-await p.locator('.pw-conversation-before > button').first().click();
+    &&document.querySelector('.messageView').scrollTop===0
+    &&document.activeElement===document.querySelector('.pw-conversation-full')));
+await openHistory(3);
+const missingPreview=history.getByRole('button',{name:'Charger l’aperçu'}).first();
+await missingPreview.click();
+await p.waitForFunction(()=>[...document.querySelectorAll('.pw-conversation-card-summary')].some(node=>node.textContent==='Premier message'));
+check('A missing excerpt is fetched on demand and remains a plain preview',await p.evaluate(()=>
+    threadRequests.some(request=>request.action==='Message'&&request.uid===11)
+    &&!document.querySelector('.pw-conversation-preview:not([hidden])')&&readerVM.message()?.uid===12));
+await latest.click();
 await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===32);
-check('The last message is one click away from an earlier message',await p.evaluate(()=>
-    nativeOpens.at(-1).folder==='Sent'&&nativeOpens.at(-1).uid===32));
+check('The latest reply is an explicit native open and closes the history',await p.evaluate(()=>
+    document.querySelector('#messageItem > .bodyText').textContent==='Dernière réponse envoyée'
+    &&document.querySelector('.pw-conversation-history').hidden&&nativeOpens.length===2));
 await p.evaluate(()=>{
-    thirdReceived={...receivedRaw,uid:13,hash:'INBOX-13',messageId:'<received-three@example.test>',
-        dateTimestamp:1789000400,plain:'Dernier message reçu'};
-    listVM.messageList()[0].threads([11,12,13]);
-    const model=NativeDraftCollection.reviveFromJson([thirdReceived])[0];model.threads([11,12,13]);
-    readerVM.message(model);
-    document.querySelector('#messageItem > .bodyText').textContent='Dernier message reçu';
+    const next={...sentMatches.at(-1),uid:33,hash:'Sent-33',messageId:'<sent-three@example.test>',
+        inReplyTo:receivedRaw.messageId,dateTimestamp:1789000400,plain:'Nouvelle réponse envoyée'};
+    sentMatches.push(next);
+    dispatchEvent(new CustomEvent('pw-message-sent',{detail:{account:threadAccount,folder:'INBOX',uid:11,flag:'\\answered'}}));
 });
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4
-    &&readerVM.message()?.uid===13);
-check('When the latest message is received it stays expanded, with older Sent and received messages folded',await p.evaluate(()=>
-    readerVM.message().folder==='INBOX'&&readerVM.message().uid===13
-    &&document.querySelector('.pw-conversation-before h2').textContent==='Projet Alpha'
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4
-    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===0));
-await p.setViewportSize({width:1280,height:420});
-await p.locator('.pw-conversation-card-toggle').first().click();
-await p.waitForFunction(()=>readerVM.message()?.uid===11
-    &&!document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length
-    &&document.querySelectorAll('.pw-conversation-after .pw-conversation-card').length===4);
-check('The oldest message keeps the conversation heading and the latest-message action in view',await p.evaluate(()=>
-    document.querySelector('.messageView').scrollTop===0
-    &&!document.querySelector('.pw-conversation-before > button').hidden));
-await p.locator('.pw-conversation-before > button').first().click();
-await p.waitForFunction(()=>readerVM.message()?.uid===13
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===4);
-check('A message opened under a long folded history starts in the viewport',await p.evaluate(()=>{
-    const box=document.querySelector('.messageView').getBoundingClientRect();
-    const head=document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect();
-    const last=[...document.querySelectorAll('.pw-conversation-before .pw-conversation-card')].at(-1);
-    return document.querySelector('.messageView').scrollTop>0
-        &&head.top-box.top>=80&&head.top-box.top<=140&&head.bottom<=box.bottom
-        &&last.querySelector('strong').getBoundingClientRect().top>=box.top
-        &&last.querySelector('time').getBoundingClientRect().bottom<=box.bottom;
-}));
+await p.waitForFunction(()=>readerVM.message()?.uid===33);
+check('An explicitly sent reply still opens the native Sent copy and reflects the reply flag',await p.evaluate(()=>
+    document.querySelector('#messageItem > .bodyText').textContent==='Nouvelle réponse envoyée'
+    &&listVM.messageList()[0].flags().includes('\\answered')
+    &&document.querySelector('.pw-conversation-history').hidden));
+await p.evaluate(()=>{document.documentElement.classList.remove('pw-theme');});
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-full').hidden);
+check('Switching away from Pied Web restores the native reader and hides the conversation controls',await p.evaluate(()=>
+    document.querySelector('.pw-conversation-history').hidden&&!document.querySelector('.b-message').classList.contains('pw-conversation-active')));
+await p.evaluate(()=>{document.documentElement.classList.add('pw-theme');});
+await waitForCount(5);
+
 await p.evaluate(()=>{
-    document.querySelector('.messageView').scrollTop=0;
+    window.openFixtureMessage=(raw,search='')=>{
+        listVM.messageList().folder=raw.folder;listVM.messageList().search=search;
+        readerVM.message(NativeDraftCollection.reviveFromJson([raw])[0]);
+        document.querySelector('.messageView').scrollTop=0;
+        document.querySelector('#messageItem > .bodyText').textContent=raw.plain;
+    };
+    window.filedRaw={...sourceRaw,folder:'Projects',uid:80,hash:'Projects-80',messageId:'<filed@example.test>',
+        references:sourceRaw.messageId,inReplyTo:sourceRaw.messageId,subject:'Message classé',
+        dateTimestamp:1789000150,plain:'Message actif classé'};
+    sentMatches[0].plain='Aperçu long. '+('Une phrase fictive pour ouvrir la suite du message. '.repeat(8));
+    threadRows=()=>[sourceRaw,receivedRaw,...sentMatches,filedRaw];
+    failThreadSearch=true;openFixtureMessage(filedRaw);
+});
+await waitForCount('!');
+await openHistory(0);
+check('A failed lookup leaves the selected message readable and explains how to retry',await p.evaluate(()=>
+    document.querySelector('.pw-conversation-history [role="status"]').textContent==='Conversation incomplète.'
+    &&!document.querySelector('.pw-conversation-retry').hidden
+    &&document.querySelector('#messageItem > .bodyText').textContent==='Message actif classé'));
+await p.evaluate(()=>{failThreadSearch=false;});
+await history.getByRole('button',{name:'Réessayer'}).click();
+await waitForCount(6);
+check('Retry restores the history and keeps the filed message selected',await p.evaluate(()=>
+    document.querySelectorAll('.pw-conversation-card').length===5 && readerVM.message().uid===80
+    &&threadRequests.at(-1).scope==='account'&&document.querySelector('.pw-conversation-scope').textContent.includes('hors brouillons')));
+const accountRequests=await p.evaluate(()=>threadRequests.length);
+await p.evaluate(()=>{readerPoll();readerPoll();});
+check('Account-wide history is refreshed only when requested',await p.evaluate(before=>threadRequests.length===before,accountRequests));
+await history.getByRole('button',{name:'Afficher la suite'}).first().click();
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-preview:not([hidden])'));
+await p.evaluate(()=>{
+    window.stableCards=[...document.querySelectorAll('.pw-conversation-card')];
+    window.stableFocus=document.activeElement;
     readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);
 });
-await p.waitForTimeout(400);
-check('A later settle leaves a manual scroll alone',await p.evaluate(()=>
-    document.querySelector('.messageView').scrollTop===0));
-await p.evaluate(()=>{
-    sentMatches.push({...sentMatches.at(-1),uid:33,hash:'Sent-33',messageId:'<sent-three@example.test>',
-        inReplyTo:'<received-three@example.test>',
-        references:'<root@example.test> <received-three@example.test>',
-        dateTimestamp:1789000500,plain:'Nouvelle réponse envoyée'});
-    dispatchEvent(new CustomEvent('pw-message-sent',{detail:{
-        account:threadAccount,folder:'INBOX',uid:13,flag:'\\answered'
-    }}));
-});
-await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===5
-    &&document.querySelector('.messageView').scrollTop>0);
-check('A successful reply refreshes the open stack immediately, marks its feed row and scrolls to the sent message',await p.evaluate(()=>{
-    const box=document.querySelector('.messageView').getBoundingClientRect();
-    const head=document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect();
-    return document.querySelector('#messageItem > .bodyText').textContent==='Nouvelle réponse envoyée'
-        &&listVM.messageList()[0].flags().includes('\\answered')
-        &&document.querySelector('.messageView').scrollTop>0
-        &&head.top-box.top>=80&&head.top-box.top<=140&&head.bottom<=box.bottom;
-}));
+await p.waitForTimeout(85);
+check('A native loading update preserves the expanded preview, card nodes and focus',await p.evaluate(()=>
+    stableCards.every((node,index)=>node===document.querySelectorAll('.pw-conversation-card')[index])
+    &&document.activeElement===stableFocus&&document.querySelector('.pw-conversation-preview:not([hidden])').textContent.length>180
+    &&readerVM.message()?.uid===80));
+
 await p.setViewportSize({width:390,height:850});
 await p.evaluate(()=>{
     document.getElementById('V-MailMessageView').hidden=false;
@@ -211,226 +213,49 @@ await p.evaluate(()=>{
     document.getElementById('V-MailMessageList').hidden=true;
     document.getElementById('rl-left').hidden=true;
 });
-check('The visible conversation stack fits a narrow screen',await p.evaluate(()=>{
+check('The open history fits a phone viewport',await p.evaluate(()=>{
     const cards=[...document.querySelectorAll('.pw-conversation-card')];
-    return cards.length===5&&cards.every(card=>{
+    return cards.length===5 && cards.every(card=>{
         const box=card.getBoundingClientRect();return box.width>0&&box.height>0&&box.left>=0&&box.right<=innerWidth;
     })&&document.documentElement.scrollWidth<=innerWidth;
 }));
 await p.waitForFunction(()=>document.querySelector('.pw-copy-md')?.closest('menu'));
-check('On mobile, Back remains visible and secondary commands stay available in More',await p.evaluate(()=>{
+check('The mobile Back and More controls remain available',await p.evaluate(()=>{
     const back=document.querySelector('#rl-right > .pw-mobile-header > button[data-pw-icon="previous"]');
-    const copy=document.querySelector('#V-MailMessageView .pw-copy-md');
-    return back && getComputedStyle(back).display!=='none' && copy?.closest('.pw-reader-menu menu');
+    return !!back && getComputedStyle(back).display!=='none' && !!document.querySelector('.pw-copy-md')?.closest('.pw-reader-menu menu');
 }));
-await p.evaluate(()=>{document.documentElement.classList.remove('pw-theme');});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-check('Leaving the theme restores the single native reader',await p.evaluate(()=>
-    document.querySelector('.pw-conversation-before').hidden&&document.querySelector('.pw-conversation-after').hidden
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-active')));
-await p.evaluate(()=>{document.documentElement.classList.add('pw-theme');});
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===5);
-await p.evaluate(()=>{readerVM.message(null);});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-await p.evaluate(()=>{
-    conversations=false;
-    listVM.selector.oCallbacks.ItemSelect(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);
-});
-await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33
-    &&document.querySelectorAll('.pw-conversation-card').length===5);
-check('Opening an Inbox row automatically displays its latest sent reply even with list grouping disabled',await p.evaluate(()=>
-    rl.settings.get('useThreads')===false
-    &&document.querySelector('#messageItem > .bodyText').textContent==='Nouvelle réponse envoyée'
-    &&document.querySelector('.pw-conversation-full').hidden
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='inbox'));
-await p.evaluate(()=>{readerVM.message(null);});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-await p.evaluate(()=>{conversations=true;failThreadSearch=true;readerVM.message(NativeDraftCollection.reviveFromJson([receivedRaw])[0]);});
-await p.waitForFunction(()=>!document.querySelector('.pw-conversation-retry').hidden);
-check('A failed search offers a retry without changing mailbox data',await p.evaluate(()=>
-    document.querySelector('.pw-conversation-retry')?.textContent==='Réessayer'));
-await p.evaluate(()=>{failThreadSearch=false;});
-await p.locator('.pw-conversation-retry').click();
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===5
-    &&readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33);
-check('Retry restores the stack',true);
-await p.evaluate(()=>{holdThreadSearch=true;readerVM.message(NativeDraftCollection.reviveFromJson([{...sourceRaw,uid:14,hash:'INBOX-14'}])[0]);});
-await p.waitForFunction(()=>!!window.releaseThreadSearch);
-await p.evaluate(()=>{threadAccount='fixture-B';holdThreadSearch=false;readerVM.message(NativeDraftCollection.reviveFromJson([{
-    ...sourceRaw,uid:91,hash:'INBOX-91',messageId:'<other@example.test>',subject:'Autre conversation',references:'',inReplyTo:''
-}])[0]);releaseThreadSearch();});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-check('Results from a previous account do not reappear',await p.evaluate(()=>
-    document.querySelector('.pw-conversation-before').hidden&&threadRequests.at(-1).account==='fixture-B'));
-await p.evaluate(()=>{
-    threadAccount='fixture-C';thirdReceived=null;
-    sourceRaw={...sourceRaw,uid:50,hash:'INBOX-50',messageId:'<single@example.test>',
-        references:'',inReplyTo:'',subject:'Un seul message reçu',dateTimestamp:1789000500,plain:'Message reçu seul'};
-    sentMatches=[{...sentMatches[0],uid:51,hash:'Sent-51',messageId:'<single-sent@example.test>',
-        inReplyTo:'<single@example.test>',references:'<single@example.test>',
-        subject:'Re: Un seul message reçu',dateTimestamp:1789000600,plain:'Réponse envoyée seule'}];
-    readerVM.message(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);
-});
-await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===51
-    &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===1);
-check('A single received message and its older Sent reply also form a native two-message stack',await p.evaluate(()=>
-    document.querySelector('#messageItem > .bodyText').textContent==='Réponse envoyée seule'
-    &&document.querySelector('.pw-conversation-before h2').textContent==='Un seul message reçu'
-    &&threadRequests.at(-1).account==='fixture-C'));
-const beforeDirectSent=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
-await p.evaluate(()=>{
-    listVM.messageList().folder='Sent';
-    readerVM.message(NativeDraftCollection.reviveFromJson([sentMatches[0]])[0]);
-});
-await p.waitForFunction(before=>document.querySelectorAll('.pw-conversation-card').length===1
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length>before,beforeDirectSent);
-check('Opening Sent directly discovers its exchange and keeps the selected sent message active',await p.evaluate(before=>
-    readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===51
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before+1
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account',beforeDirectSent));
-await p.evaluate(()=>{listVM.messageList().folder='INBOX';});
-await p.evaluate(()=>{
-    holdThreadSearch=true;releaseThreadSearch=null;
-    readerVM.message(NativeDraftCollection.reviveFromJson([{
-        ...sourceRaw,uid:60,hash:'INBOX-60',dateTimestamp:1789000550
-    }])[0]);
-    const body=document.querySelector('#messageItem > .bodyText');
-    body.textContent='Message sélectionné avant la fin de la recherche';
-    for(let i=0;i<40;i++){
-        const line=document.createElement('p');line.textContent='Ligne fictive '+i;
-        line.style.margin='0 0 16px';body.append(line);
-    }
-});
-await p.waitForFunction(()=>!!window.releaseThreadSearch);
-check('The selected message is readable while conversation discovery is still pending',await p.evaluate(()=>
-    document.querySelector('.pw-conversation-before h2').hidden
-    &&document.querySelector('.b-message > .messageItemHeader').getClientRects().length>0
-    &&document.querySelector('#messageItem > .bodyText').getClientRects().length>0
-    &&document.querySelector('#messageItem > .bodyText').firstChild.textContent==='Message sélectionné avant la fin de la recherche'
-    &&document.querySelector('.pw-conversation-before > [role="status"]').textContent.includes('Recherche')));
-const readingPosition=await p.evaluate(()=>{
-    const box=document.querySelector('.messageView'),line=document.querySelectorAll('#messageItem > .bodyText > p')[12];
-    box.dispatchEvent(new WheelEvent('wheel',{bubbles:true,deltaY:100}));
-    box.scrollTop+=line.getBoundingClientRect().top-box.getBoundingClientRect().top;
-    const top=line.getBoundingClientRect().top;
-    holdThreadSearch=false;releaseThreadSearch();
-    return top;
-});
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
-check('Late conversation results preserve the message and line already being read',await p.evaluate(top=>
-    readerVM.message()?.uid===60
-    &&Math.abs(document.querySelectorAll('#messageItem > .bodyText > p')[12].getBoundingClientRect().top-top)<2,readingPosition));
-await p.locator('.pw-conversation-before > button').first().click();
-await p.waitForFunction(()=>readerVM.message()?.uid===51);
-check('The newest reply stays available through the latest-message action',true);
-const requestsBeforeTrash=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
-await p.evaluate(()=>{
-    const trash={...sourceRaw,folder:'Trash',uid:70,hash:'Trash-70',messageId:'<trash@example.test>',
-        references:'',inReplyTo:'',subject:'Message supprimé',dateTimestamp:1789000800,plain:'Dans la corbeille'};
-    readerVM.message(NativeDraftCollection.reviveFromJson([trash])[0]);
-});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-active'));
-await p.waitForTimeout(250);
-check('A message opened from Trash stays in the single native reader with no conversation lookup',await p.evaluate(before=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before
-    &&document.querySelector('.pw-conversation-before').hidden
-    &&document.querySelector('.pw-conversation-after').hidden,requestsBeforeTrash));
+await history.getByRole('button',{name:'Revenir au message seul'}).click();
+await p.waitForFunction(()=>document.querySelector('.pw-conversation-history').hidden);
+check('The single-message option restores focus to the full-exchange action',await p.evaluate(()=>
+    readerVM.message()?.uid===80&&document.activeElement===document.querySelector('.pw-conversation-full')
+    &&document.querySelector('.pw-conversation-full').textContent.includes('complet')));
+const singleRequests=await p.evaluate(()=>threadRequests.length);
+await p.evaluate(()=>{readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);});
+await p.waitForTimeout(90);
+check('The single-message choice survives native loading notifications',await p.evaluate(before=>
+    document.querySelector('.pw-conversation-history').hidden&&threadRequests.length===before,singleRequests));
+await control.click();
+await waitForCount(6);
+check('The full-exchange action can reopen the previously opted-out message',await p.evaluate(()=>
+    !document.querySelector('.pw-conversation-history').hidden&&readerVM.message()?.uid===80));
 
 await p.setViewportSize({width:1280,height:620});
 await p.evaluate(()=>{
-    sentMatches[0].plain='Réponse envoyée seule. '+('Cette suite fictive permet de vérifier un aperçu réellement développé. '.repeat(5));
-    sentMatches[0].html='';
-    filedRaw={...sourceRaw,folder:'Projects',uid:80,hash:'Projects-80',messageId:'<filed@example.test>',
-        references:'<single@example.test>',inReplyTo:'<single@example.test>',subject:'Message classé',
-        dateTimestamp:1789000700,plain:'Message actif classé'};
-    threadRows=()=>[sourceRaw,...sentMatches,filedRaw];
-    readerVM.message(NativeDraftCollection.reviveFromJson([filedRaw])[0]);
-    document.querySelector('#messageItem > .bodyText').textContent=filedRaw.plain;
-});
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
-check('A filed message automatically opens its exchange without a full-exchange click',await p.evaluate(before=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before+1
-    &&document.querySelector('.pw-conversation-full').hidden,requestsBeforeTrash));
-check('Automatic full exchange keeps the filed message as the only native action target',await p.evaluate(()=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'
-    &&readerVM.message().folder==='Projects'&&readerVM.message().uid===80
-    &&document.querySelector('#messageItem > .bodyText').textContent==='Message actif classé'
-    &&!document.querySelector('.pw-conversation-current').hidden
-    &&document.querySelector('.pw-conversation-scope').textContent.includes('hors brouillons')));
-const beforeAccountPoll=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
-await p.evaluate(()=>{readerPoll();readerPoll();});
-await p.waitForTimeout(50);
-check('Automatic account exchanges are not periodically rescanned',await p.evaluate(before=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,beforeAccountPoll));
-await p.locator('.pw-conversation-preview-toggle').last().click();
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===1);
-check('A useful previous-message continuation expands without duplicating its one-line excerpt or changing reader state',await p.evaluate(()=>
-    readerVM.message().folder==='Projects'&&readerVM.message().uid===80
-    &&document.querySelectorAll('.pw-conversation-preview[hidden]').length===1
-    &&[...document.querySelectorAll('.pw-conversation-preview')].some(node=>!node.hidden&&node.textContent.length>180)
-    &&document.querySelector('.pw-conversation-card-summary[hidden]')
-    &&document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]')?.textContent==='Réduire'
-    &&threadRequests.every(request=>['PiedWebConversation','Message'].includes(request.action))));
-await p.setViewportSize({width:390,height:850});
-check('An expanded continuation fits a narrow reader',await p.evaluate(()=>{
-    const card=document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]')?.closest('.pw-conversation-card');
-    const box=card?.getBoundingClientRect();
-    return box&&box.left>=0&&box.right<=innerWidth&&document.documentElement.scrollWidth<=innerWidth;
-}));
-await p.setViewportSize({width:1280,height:620});
-await p.evaluate(()=>{
-    stableCards=[...document.querySelectorAll('.pw-conversation-card')];
-    document.querySelector('.pw-conversation-preview-toggle[aria-expanded="true"]').focus();
-    stableFocus=document.activeElement;
-    readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);
-});
-await p.waitForTimeout(250);
-check('Refresh preserves keyed card identity, keyboard focus and explicit preview state',await p.evaluate(()=>
-    stableCards.every((node,index)=>node===document.querySelectorAll('.pw-conversation-card')[index])
-    &&document.activeElement===stableFocus
-    &&document.querySelectorAll('.pw-conversation-preview:not([hidden])').length===1));
-await p.locator('.pw-conversation-preview-toggle').last().click();
-await p.evaluate(()=>{
-    const box=document.querySelector('.messageView'),head=document.querySelector('.b-message > .messageItemHeader');
-    box.scrollTop+=head.getBoundingClientRect().top-box.getBoundingClientRect().top-100;
-    box.dispatchEvent(new Event('scroll'));
-});
-const headerBeforeResize=await p.evaluate(()=>document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect().top);
-await p.evaluate(()=>{document.querySelector('.pw-conversation-card').style.paddingTop='96px';});
-await p.waitForFunction(top=>Math.abs(document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect().top-top)<2,headerBeforeResize);
-check('Late layout above the visible message preserves its viewport position',await p.evaluate(top=>
-    Math.abs(document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect().top-top)<2,headerBeforeResize));
-await p.evaluate(()=>{
-    const body=document.querySelector('#messageItem > .bodyText');body.replaceChildren();
-    const delayed=document.createElement('div');delayed.id='fictional-delayed-image';body.append(delayed);
+    const body=document.querySelector('#messageItem > .bodyText');
+    body.replaceChildren();
+    const delayed=document.createElement('div');delayed.id='fixture-delayed-image';body.append(delayed);
     for(let i=0;i<40;i++){
-        const paragraph=document.createElement('p');paragraph.id='fictional-line-'+i;
+        const paragraph=document.createElement('p');paragraph.id='fixture-line-'+i;
         paragraph.textContent='Fictional body paragraph '+i;paragraph.style.margin='0 0 16px';body.append(paragraph);
     }
     const box=document.querySelector('.messageView');
-    box.scrollTop+=document.getElementById('fictional-line-12').getBoundingClientRect().top-box.getBoundingClientRect().top;
+    box.scrollTop+=document.getElementById('fixture-line-12').getBoundingClientRect().top-box.getBoundingClientRect().top;
     box.dispatchEvent(new Event('scroll'));
 });
-const bodyLineBefore=await p.evaluate(()=>document.getElementById('fictional-line-12').getBoundingClientRect().top);
-await p.evaluate(()=>{document.getElementById('fictional-delayed-image').style.height='180px';});
-await p.waitForFunction(top=>Math.abs(document.getElementById('fictional-line-12').getBoundingClientRect().top-top)<2,bodyLineBefore);
-check('Late image-sized content preserves the body paragraph being read',true);
-await p.locator('.pw-conversation-before > button').filter({hasText:'Revenir au message seul'}).click();
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-check('Leaving explicit exchange restores the same individual filed message',await p.evaluate(()=>
-    readerVM.message().folder==='Projects'&&readerVM.message().uid===80
-    &&!document.querySelector('.pw-conversation-full').hidden));
-const singleRequests=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
-await p.evaluate(()=>{readerVM.messageLoadingThrottle(true);readerVM.messageLoadingThrottle(false);});
-await p.waitForTimeout(100);
-check('Single-message choice survives native loading updates without restarting discovery',await p.evaluate(before=>
-    document.querySelector('.pw-conversation-before').hidden
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').length===before,singleRequests));
-await p.locator('.pw-conversation-full').click();
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
-check('The full-exchange action can reopen an opted-out automatic exchange',await p.evaluate(()=>
-    readerVM.message().folder==='Projects'&&readerVM.message().uid===80));
+const bodyTop=await p.evaluate(()=>document.getElementById('fixture-line-12').getBoundingClientRect().top);
+await p.evaluate(()=>{document.getElementById('fixture-delayed-image').style.height='180px';});
+await p.waitForFunction(top=>Math.abs(document.getElementById('fixture-line-12').getBoundingClientRect().top-top)<2,bodyTop);
+check('The reader still anchors a body paragraph when an image above it gains height',true);
 
 await p.evaluate(()=>{
     rl.app.folderList([
@@ -441,92 +266,68 @@ await p.evaluate(()=>{
         {fullName:'INBOX.Scheduled',subFolders:[{fullName:'INBOX.Scheduled/Child'}]},
         {fullName:'INBOX.Reminders',subFolders:[{fullName:'INBOX.Reminders/Child'}]}
     ]);
-    window.openFixtureMessage=(raw,search='')=>{
-        listVM.messageList().folder=raw.folder;listVM.messageList().search=search;
-        readerVM.message(NativeDraftCollection.reviveFromJson([raw])[0]);
-        document.querySelector('#messageItem > .bodyText').textContent=raw.plain;
-    };
 });
 const protectedRequests=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
-for(const [index,folder] of ['Drafts','Junk','Trash','Quarantaine','Quarantaine/Child',
-    'Corbeille locale','Brouillons locaux','INBOX.Scheduled/Child','INBOX.Reminders/Child',
-    'INBOX.Scheduled','INBOX.Reminders'].entries()){
+for(const [index,folder] of ['Drafts','Junk','Trash','Quarantaine','Quarantaine/Child','Corbeille locale',
+    'Brouillons locaux','INBOX.Scheduled/Child','INBOX.Reminders/Child','INBOX.Scheduled','INBOX.Reminders'].entries()){
     await p.evaluate(({index,folder})=>openFixtureMessage({...filedRaw,folder,uid:90+index,
         messageId:'<excluded-'+index+'@example.test>',references:'',inReplyTo:''}),{index,folder});
-    await p.waitForTimeout(30);
+    await p.waitForTimeout(35);
 }
-check('Configured protected folders, native roles, descendants and nested queues never auto-discover exchanges',await p.evaluate(before=>
+check('Protected folders, descendants and queues skip automatic lookup',await p.evaluate(before=>
     threadRequests.filter(request=>request.action==='PiedWebConversation').length===before
-    &&document.querySelector('.pw-conversation-before').hidden,protectedRequests));
-await p.locator('.pw-conversation-full').click();
-await p.waitForFunction(()=>!document.querySelector('.pw-conversation-before').hidden
-    &&document.querySelector('.pw-conversation-before h2:not([hidden])'));
-check('A protected message still allows an explicitly requested full exchange',await p.evaluate(()=>
-    readerVM.message()?.folder==='INBOX.Reminders'
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
-await p.locator('.pw-conversation-before > button').filter({hasText:'Revenir au message seul'}).click();
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
+    &&document.querySelector('.pw-conversation-history').hidden,protectedRequests));
+await control.click();
+await waitForCount(1);
+check('A protected message permits an explicit full exchange with an informative empty state',await p.evaluate(()=>
+    readerVM.message()?.folder==='INBOX.Reminders' && !document.querySelector('.pw-conversation-history').hidden
+    &&threadRequests.at(-1).scope==='account' && document.querySelector('.pw-conversation-history [role="status"]').textContent.includes('Aucun autre')));
+await history.getByRole('button',{name:'Revenir au message seul'}).click();
 
 await p.evaluate(()=>{
-    window.readerCases=['Sent','Archive','Projects','Projects/Team'].map((folder,index)=>({...filedRaw,
+    window.readerCases=['Sent','Archive','Projects','Projects/Team','INBOX'].map((folder,index)=>({...filedRaw,
         folder,uid:110+index,messageId:'<selected-'+index+'@example.test>',
         dateTimestamp:1789000520+index,plain:'Selected fictional '+folder}));
-    threadRows=()=>[sourceRaw,...sentMatches,filedRaw,...readerCases];
+    threadRows=()=>[sourceRaw,receivedRaw,...sentMatches,filedRaw,...readerCases];
 });
-for(let index=0;index<4;index++){
-    await p.evaluate(index=>openFixtureMessage(readerCases[index],index===0?'subject:fixture':''),index);
-    await p.waitForFunction(index=>readerVM.message()?.uid===110+index
-        &&document.querySelectorAll('.pw-conversation-card').length===6,index);
-    check(['Sent search','Archive','Filed folder','Nested filed folder'][index]+' opens its exchange while keeping the selected older message active',await p.evaluate(index=>
-        document.querySelector('#messageItem > .bodyText').textContent===readerCases[index].plain
-        &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'
-        &&document.querySelector('.pw-conversation-full').hidden,index));
+for(let index=0;index<5;index++){
+    const requests=await p.evaluate(()=>threadRequests.length);
+    await p.evaluate(index=>openFixtureMessage(readerCases[index],index===4?'subject:fixture':''),index);
+    await p.waitForFunction(before=>threadRequests.length>before,requests);
+    await waitForCount(11);
+    check(['Sent','Archive','Filed folder','Nested folder','Inbox search'][index]+' discovers its account exchange and keeps selection',
+        await p.evaluate(index=>readerVM.message()?.uid===110+index&&document.querySelector('#messageItem > .bodyText').textContent===readerCases[index].plain
+        &&document.querySelector('.pw-conversation-history').hidden&&threadRequests.at(-1).scope==='account',index));
 }
-await p.evaluate(()=>openFixtureMessage(sourceRaw,'subject:fixture'));
-await p.waitForFunction(()=>readerVM.message()?.uid===50&&document.querySelectorAll('.pw-conversation-card').length===6);
-check('An Inbox search preserves its selected match instead of promoting a newer reply',await p.evaluate(()=>
-    readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
-const beforeWorkspaceSearch=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
 await p.evaluate(()=>{
     sessionStorage.setItem('pw-mail-feed-return',JSON.stringify({search:'subject:fixture',accountHash:threadAccount,
         key:[threadAccount,'INBOX',77,sourceRaw.uid].join('\x1f'),mode:'global'}));
     openFixtureMessage(sourceRaw);
 });
-await p.waitForFunction(before=>threadRequests.filter(request=>request.action==='PiedWebConversation').length>before
-    &&document.querySelector('.pw-conversation-before h2:not([hidden])'),beforeWorkspaceSearch);
-check('A workspace search also keeps the exact selected Inbox message active after native navigation clears its query',await p.evaluate(()=>
-    readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
-    &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
-await p.locator('.pw-conversation-before > button').filter({hasText:'Revenir au message seul'}).click();
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
-const beforeNextAccount=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
+await waitForCount(11);
+check('A workspace search preserves its account-wide scope for an Inbox result',await p.evaluate(()=>
+    readerVM.message()?.uid===11&&threadRequests.at(-1).scope==='account'));
 await p.evaluate(()=>{
-    threadAccount='fixture-D';sessionStorage.removeItem('pw-mail-feed-return');
-    sourceRaw={...sourceRaw,messageId:'<next-account@example.test>',plain:'Another account, same UID'};
-    openFixtureMessage(sourceRaw);
+    sessionStorage.removeItem('pw-mail-feed-return');
+    holdThreadSearch=true;window.releaseThreadSearch=null;
+    openFixtureMessage({...sourceRaw,uid:71});
 });
-await p.waitForFunction(before=>threadRequests.filter(request=>request.action==='PiedWebConversation').length>before,beforeNextAccount);
-check('A per-message opt-out and old history cannot cross accounts with the same folder and UID',await p.evaluate(()=>
-    threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).account==='fixture-D'
-    &&document.querySelectorAll('.pw-conversation-card').length===0));
-await p.evaluate(()=>{readerVM.message(null);});
-await p.waitForFunction(()=>document.querySelector('.pw-conversation-before').hidden);
+await p.waitForFunction(()=>!!window.releaseThreadSearch);
 await p.evaluate(()=>{
-    window.partialLookups=0;window.conversations=true;
-    const other=rl.pluginRemoteRequest;
-    rl.pluginRemoteRequest=(callback,action,params)=>{
-        if(action!=='PiedWebConversation')return other(callback,action,params);
-        ++partialLookups;setTimeout(()=>callback(0,{Result:{etag:'',messages:[],partial:true}}),20);
-    };
-    readerVM.message(NativeDraftCollection.reviveFromJson([sourceRaw])[0]);
+    threadAccount='fixture-B';holdThreadSearch=false;
+    openFixtureMessage({...sourceRaw,messageId:'<other@example.test>',references:'',inReplyTo:''});
+    releaseThreadSearch();
 });
-await p.waitForFunction(()=>!document.querySelector('.pw-conversation-before').hidden
-    &&document.querySelector('.pw-conversation-before [role="status"]').textContent.includes('Échange partiel'));
-check('An incomplete Inbox lookup remains visible even when only the original message was found',await p.evaluate(()=>
-    document.querySelectorAll('.pw-conversation-card').length===0
+await waitForCount(1);
+check('Results from the previous account cannot repopulate the current history',await p.evaluate(()=>
+    !document.querySelector('.pw-conversation-card')&&threadRequests.at(-1).account==='fixture-B'));
+await p.evaluate(()=>{
+    window.partialThreadSearch=true;
+    openFixtureMessage({...sourceRaw,uid:72});
+});
+await waitForCount('!');
+await openHistory(0);
+check('A partial Inbox lookup states the limitation and exposes refresh',await p.evaluate(()=>
+    document.querySelector('.pw-conversation-history [role="status"]').textContent.includes('Échange partiel')
     &&!document.querySelector('.pw-conversation-retry').hidden));
-await p.locator('.pw-conversation-retry').click();
-await p.waitForFunction(()=>partialLookups===2);
-check('A partial Inbox lookup offers an explicit retry',true);
 console.log(JSON.stringify({passed:checks.length}));

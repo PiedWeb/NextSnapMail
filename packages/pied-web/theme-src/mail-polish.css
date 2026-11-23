@@ -68,7 +68,7 @@
 }
 
 @media (min-width: 800px) {
-  #rl-app #V-MailMessageView .b-message:not(.pw-conversation-active) > .messageItemHeader .subjectParent {
+  #rl-app #V-MailMessageView .b-message > .messageItemHeader .subjectParent {
     font-size:var(--pw-text-lg); line-height:1.3; letter-spacing:var(--pw-tracking-tight);
   }
   #rl-app #V-MailMessageView .b-message > .messageItemHeader .informationShort:has(.pw-from) {

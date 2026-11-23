@@ -228,13 +228,14 @@ line, a refused clipboard, theme exit and a 320 px reader. The clipboard is mock
 message is sent.
 
 `test-virtual-conversation.js` opens the native reader fixture with fictional
-received and Sent messages. It verifies late mounting, the newest message from
-either folder opening natively, one-click access to earlier messages, read-only
-searches, retry, account isolation, theme exit, narrow layout, one card border,
-native Close placement, the earliest-subject heading, open-subject typography,
-conceal/reveal during delayed searches, and the successful-reply event that fetches,
-opens and scrolls to a new Sent copy while marking the feed row. It does not use an
-authenticated mailbox.
+received and Sent messages. It verifies retained selection, keyboard access to
+the history, chronological cards, native card and latest-reply actions,
+read-only requests, retry, account and search isolation, theme exit, mobile
+geometry, native Close placement, excerpt stability, late image anchoring and
+the successful-reply event. `test-conversation-performance.js` holds the lookup
+past the CLS input grace period for a 200-message thread and mobile success and
+failure. It requires a stable native body, zero unexpected shifts and a closed
+history with no card nodes or preview requests.
 
 `test-inline-reply.js` docks the native Reply and Reply all composer in a fictional
 active conversation, then promotes that exact editor DOM to its modal form. It checks

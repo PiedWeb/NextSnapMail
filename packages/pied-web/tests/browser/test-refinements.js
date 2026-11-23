@@ -35,7 +35,7 @@ for(const theme of ['light','dark']){
    const name=attachments.querySelector('.attachmentName');name.textContent='Document-de-travail-avec-un-nom-très-long-et-sans-espace-pour-vérifier-la-lecture-sur-téléphone.pdf';
    attachments.querySelector('.attachmentIcon').classList.add('hasPreview');
    document.querySelector('.bodyText').before(attachments);
-   const history=document.createElement('section');history.className='pw-conversation-before';
+   const history=document.createElement('section');history.className='pw-conversation-history';
    history.innerHTML='<div class="pw-conversation-card"><button class="pw-conversation-card-toggle"><strong>UnePersonneDontLeNomTrèsLongNeDoitPasÉlargirLaConversationSurUnTéléphone</strong><time>22 octobre 2026 à 10:42</time><span class="pw-conversation-card-recipient">Destinataire fictif</span><span class="pw-conversation-card-summary">Un extrait de message lisible sur téléphone</span></button></div>';
    document.querySelector('.b-message').prepend(history);
   });

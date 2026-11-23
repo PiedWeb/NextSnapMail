@@ -107,8 +107,8 @@
     .pw-message-extras,
     #messageItem .attachmentsPlace,
     .pw-reading-actions,
-    .pw-conversation-before,
-    .pw-conversation-after
+    .pw-conversation-history,
+    .pw-conversation-control
   ) {
     width:100%;
     max-width: var(--pw-measure);

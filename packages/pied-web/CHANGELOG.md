@@ -1,5 +1,13 @@
 # Releases
 
+## 1.10.46.3 — 2026-11-23
+
+- Keep the selected message and its reading position stable when the history
+  arrives. The conversation control opens chronological cards below the body
+  and gives explicit access to the latest message.
+- Create cards on demand and poll Inbox conversations while the history is
+  open. Improve the contrast of conversation actions in the dark theme.
+
 ## 1.10.46.2 — 2026-11-23
 
 - Save unassigned system folders per account when IMAP advertises a unique,
