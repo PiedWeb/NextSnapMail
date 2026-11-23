@@ -2,11 +2,12 @@
 
 ## Current interaction contract
 
-Since 1.10.41, opening an Inbox message automatically discovers its conversation
-and displays the newest received or sent message, with earlier messages folded
-around the native reader. This works when the native list's useThreads setting
-is false: list grouping and conversation reading are separate choices. No
-full-exchange click or preference migration is required.
+Opening an Inbox message shows the native body as soon as it is ready and looks
+up the conversation in the background. The newest received or sent reply opens
+automatically if the reader has yet to scroll or interact with the selected
+message. Otherwise that message and its viewport position are preserved, with
+the latest reply available through **Show latest message**. The behavior is
+independent of the native list's `useThreads` setting.
 
 Since 1.10.42, Sent, Archive and filed messages also open their account exchange
 automatically, keeping the selected message active. Native search results and

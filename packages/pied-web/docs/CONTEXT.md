@@ -6,6 +6,11 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
 
 ## Decisions to preserve
 
+- Show the native message while cross-folder discovery runs. When a reader
+  interacts with the selected message during discovery, keep that message and
+  its viewport position as the history arrives. The inbox can still promote
+  the newest reply when the reader has not interacted. See VIRTUAL_CONVERSATIONS.md.
+
 - Since 1.10.44 / NextSnapMail 0.1.17, keep the upstream admin session checks on
   legacy and integrated routes alongside URL-scoped account shell parameters.
   Account switches still navigate by URL; CardDAV read-only state comes from
@@ -133,12 +138,10 @@ navigation, integrated with the Nextcloud shell. Both phone and desktop matter.
   Existing copies from 1.7.8/1.7.9 are not deleted. See
   `VIRTUAL_CONVERSATIONS.md`.
 - The 1.7.21 reader keeps SnappyMail's bound Close action beside previous/next
-  on desktop, with the mobile header Back action serving the same purpose. Hide
-  the expanded message until its first cross-folder lookup and native load
-  settle so newly found folded cards do not shift visible content.
+  on desktop, with the mobile header Back action serving the same purpose.
 - Since 1.7.22, take the conversation heading from the earliest chronological
   message and keep the native open-message subject at sender-line size. Hide
-  the heading during initial lookup to avoid showing a transient later subject.
+  the conversation heading during initial lookup while showing the native subject.
 - Since 1.7.23, folded cards show a one-line plain-text body excerpt instead of
   the repeated subject. Fetch missing excerpts only for visible cards with the
   native read-only Message endpoint, at most two requests at once, and clear

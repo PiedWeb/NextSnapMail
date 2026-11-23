@@ -1,10 +1,9 @@
-/* Fictional 200-message stress test. Compare the former 160ms scheduling delay
- * with the current one-task coalescing on otherwise identical code/transport. */
+/* The selected message must be readable even while a large exchange is pending. */
 const fixtureBase=globalThis.PW_FIXTURE_URL||'http://127.0.0.1:8876';
 const p=await browser.getPage('agent-conversation-performance');p.setDefaultTimeout(7000);
 await p.setViewportSize({width:1280,height:900});
 const results=[];
-for(const baseline of [true,false,true,false,true,false]){
+for(let run=0;run<3;run++){
     await p.goto(fixtureBase+'/.local-work/images-native-preview.html?drafts=1&mode=reader&side=1');
     await p.bringToFront();
     await p.waitForFunction(()=>window.draftsReady);
@@ -21,11 +20,11 @@ for(const baseline of [true,false,true,false,true,false]){
         const collection=NativeDraftCollection.reviveFromJson([stressRows[0]]);collection.folder='INBOX';
         collection[0].threads(stressRows.filter(r=>r.folder==='INBOX').map(r=>r.uid));
         listVM.messageList(collection);readerVM.message(collection[0]);readerVM.messageLoadingThrottle=ko.observable(false);
+        document.querySelector('#messageItem > .bodyText').textContent='Selected fictional message';
         window.stress={requests:0,messageReads:0,nativeOpens:0,mutations:0};
         const ready=new MutationObserver(()=>{
             if(!stress.readyAt&&readerVM.message()?.uid===200
-                &&document.querySelectorAll('.pw-conversation-card').length===199
-                &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending')){
+                &&document.querySelectorAll('.pw-conversation-card').length===199){
                 stress.readyAt=performance.now();stress.visible=!document.hidden;ready.disconnect();
             }
         });
@@ -37,22 +36,27 @@ for(const baseline of [true,false,true,false,true,false]){
         const other=rl.pluginRemoteRequest;
         rl.pluginRemoteRequest=(cb,action,params)=>{
             if(action!=='PiedWebConversation')return other(cb,action,params);
-            ++stress.requests;setTimeout(()=>cb(0,{Result:{etag:'stress',messages:stressRows,unchanged:false}}),20);
+            ++stress.requests;
+            stress.finishLookup=()=>cb(0,{Result:{etag:'stress',messages:stressRows,unchanged:false}});
         };
         rl.app.Remote.post=async()=>{++stress.messageReads;return {Result:{plain:'Fictional preview'}};};
         ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageList'),{css:()=>({})},listVM);
         ko.applyBindingAccessorsToNode(document.getElementById('V-MailMessageView'),{css:()=>({})},readerVM);
     });
-    await p.evaluate(async({base,baseline})=>{
-        let source=await (await fetch(base+'/.local-work/pied-web-ux/conversation-thread.js')).text();
-        if(baseline)source=source.replace('timer = setTimeout(update,0);','timer = setTimeout(update,context ? 160 : 0);');
-        const script=document.createElement('script');script.textContent=source;stress.started=performance.now();document.head.append(script);
-    },{base:fixtureBase,baseline});
+    await p.evaluate(()=>{stress.started=performance.now();});
+    await p.addScriptTag({url:fixtureBase+'/.local-work/pied-web-ux/conversation-thread.js'});
+    await p.waitForFunction(()=>stress.finishLookup);
+    const firstReadableMs=await p.evaluate(()=>{
+        const body=document.querySelector('#messageItem > .bodyText');
+        if(!body.getClientRects().length||body.textContent!=='Selected fictional message')
+            throw new Error('Reader is hidden while the exchange is pending');
+        const elapsed=performance.now()-stress.started;
+        stress.lookupReleased=performance.now();stress.finishLookup();return elapsed;
+    });
     await p.waitForFunction(()=>readerVM.message()?.uid===200
-        &&document.querySelectorAll('.pw-conversation-card').length===199
-        &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+        &&document.querySelectorAll('.pw-conversation-card').length===199);
     const sample=await p.evaluate(()=>{
-        const result={totalMs:stress.readyAt-stress.started,afterNativeOpenMs:stress.readyAt-stress.opened,visible:stress.visible,
+        const result={afterLookupMs:stress.readyAt-stress.lookupReleased,visible:stress.visible,
             requests:stress.requests,messageReads:stress.messageReads,cards:document.querySelectorAll('.pw-conversation-card').length};
         stableStressCards=[...document.querySelectorAll('.pw-conversation-card')];
         stressObserver=new MutationObserver(records=>{stress.mutations+=records.filter(r=>r.type==='childList').length;});
@@ -64,9 +68,6 @@ for(const baseline of [true,false,true,false,true,false]){
         stressObserver.disconnect();return stress.mutations===0&&stableStressCards.every((node,i)=>node===document.querySelectorAll('.pw-conversation-card')[i]);
     });
     if(!sample.visible||sample.requests!==1||sample.cards!==199||!sample.stable||sample.messageReads>1)throw new Error('Conversation stress contract failed '+JSON.stringify(sample));
-    results.push({baseline,...sample});
+    results.push({firstReadableMs,...sample});
 }
-const median=items=>items.sort((a,b)=>a-b)[Math.floor(items.length/2)];
-console.log(JSON.stringify({fixture:'200 messages, 20ms simulated server, no real mailbox',results,
-    baselineMedianMs:median(results.filter(r=>r.baseline).map(r=>r.totalMs)),
-    currentMedianMs:median(results.filter(r=>!r.baseline).map(r=>r.totalMs))}));
+console.log(JSON.stringify({fixture:'200 messages with a held lookup and mocked transport',results}));

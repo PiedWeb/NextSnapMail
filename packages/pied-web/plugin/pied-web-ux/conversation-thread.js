@@ -165,7 +165,7 @@
         };
         const rememberPosition = () => {
             const box = scroller();
-            if (!box || !active() || host.classList.contains('pw-conversation-pending')) return;
+            if (!box || !active() || vm.messageLoadingThrottle?.()) return;
             const boxRect = box.getBoundingClientRect(), edge = boxRect.top;
             const nodes = [header, ...host.querySelectorAll('.pw-conversation-card')];
             let nearest = null, distance = Infinity, offset = 0;
@@ -192,7 +192,7 @@
         const restorePosition = () => {
             const saved = viewportAnchor;
             if (!saved || saved.key !== currentKey() || !saved.node.isConnected || !active()
-                || host.classList.contains('pw-conversation-pending')) return;
+                || vm.messageLoadingThrottle?.()) return;
             // Scroll events are asynchronous. A wheel/programmatic scroll may
             // happen in the same turn as a KO refresh, before our listener runs.
             // Never restore an older anchor over that deliberate new position.
@@ -213,12 +213,11 @@
         };
         const anchor = () => {
             const key = currentKey();
-            if (before.hidden || !key || anchored === key
-                || host.classList.contains('pw-conversation-pending')) return;
+            if (before.hidden || !key || anchored === key) return;
             const box = scroller();
             if (!box) return;
             anchored = key;
-            if (!manualDuringLoad) {
+            if (!manualDuringLoad && viewportAnchor?.key !== key) {
                 // Show the identifiable previous card, not its anonymous last
                 // 24px. Never let a very tall preview push the active header away.
                 const previous = beforeCards.lastElementChild;
@@ -230,11 +229,7 @@
             rememberPosition();
         };
         const settle = () => {
-            if (!loading && (!context?.followLatest || currentKey() === entries.at(-1)?.key)
-                && !vm.messageLoadingThrottle?.()) {
-                host.classList.remove('pw-conversation-pending');
-                anchor();
-            }
+            if (!loading && !vm.messageLoadingThrottle?.()) anchor();
         };
 
         function showMessage(entry, followLatest = false, preserveManual = false) {
@@ -242,7 +237,7 @@
             const CollectionModel = rl.app.messageList?.()?.constructor;
             const model = entry.model || CollectionModel?.reviveFromJson?.([entry.raw])?.[0];
             if (typeof callback !== 'function' || !model || itemKey(model) !== entry.key) {
-                error = true; host.classList.remove('pw-conversation-pending'); render(); return;
+                error = true; render(); return;
             }
             context.followLatest = followLatest;
             const wasManual = manualDuringLoad;
@@ -465,14 +460,14 @@
                 Number(a.raw.dateTimestamp || 0) - Number(b.raw.dateTimestamp || 0)
                 || a.key.localeCompare(b.key));
             const changed = entries.map(entry => entry.key).join('\n') !== nextEntries.map(entry => entry.key).join('\n');
-            if (changed && !silent && !anchored)
-                host.classList.add('pw-conversation-pending');
+            if (!silent && manualDuringLoad) ctx.followLatest = false;
+            const latest = nextEntries.at(-1);
+            const openLatest = ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key;
+            if (!silent && !openLatest) rememberPosition();
             entries = nextEntries;
             loading = silentRefresh = false; render();
             if (ctx.listFlag) reflectListFlag(ctx,ctx.listFlag);
-            const latest = entries.at(-1);
-            if (ctx.followLatest && latest && selectedBefore === currentKey() && currentKey() !== latest.key)
-                showMessage(latest,true,true);
+            if (openLatest) showMessage(latest,true,true);
             else if (changed) requestAnimationFrame(settle);
             else settle();
             repeat();
@@ -481,14 +476,13 @@
         function reset() {
             ++generation; context = null; entries = []; loading = error = silentRefresh = false;
             anchored = explicitOrigin = ''; viewportAnchor = null; cards.clear();
-            host.classList.remove('pw-conversation-pending'); render();
+            render();
         }
         function update() {
             if (disposed || !currentKey()) { reset(); return; }
             if (!active() || document.hidden) {
                 ++generation; loading = silentRefresh = false;
                 if (context) context.needsRefresh = true;
-                host.classList.remove('pw-conversation-pending');
                 render(); return;
             }
             if (inContext()) {
@@ -504,7 +498,6 @@
             const explicit = explicitOrigin === currentIdentity();
             const full = explicit || !isInbox(source.folder) || !!search;
             anchored = ''; viewportAnchor = null;
-            host.classList.add('pw-conversation-pending');
             context = {account:account(), folder:source.folder, listFolder:list?.folder, search, sent:sentFolder(), origin,
                 originModel:source,originKey:itemKey(source),threadUid:threads.length > 1
                     ? source.uid : Number(rl.app.messageList?.threadUid?.() || 0),followLatest:!full,full,explicit};
@@ -516,8 +509,6 @@
                 observedKey = currentIdentity(); manualDuringLoad = false; viewportAnchor = null;
                 if (singleOrigin !== currentIdentity()) singleOrigin = '';
             }
-            if (active() && currentKey() && (!context || !entries.some(entry => entry.key === currentKey())))
-                host.classList.add('pw-conversation-pending');
             // Coalesce native observables within this turn, without imposing a
             // second 160ms wait after the native reader has already loaded.
             clearTimeout(timer); timer = setTimeout(update,0);
@@ -553,11 +544,13 @@
                 || Math.abs(viewportAnchor.scrollTop - box.scrollTop) > 0.5)) rememberPosition();
         };
         const manual = event => {
+            if (event.type === 'pointerdown' && !header.contains(event.target) && !item.contains(event.target)) return;
             if (event.type === 'keydown' && (!['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(event.key)
                 || event.target.closest('input,textarea,select,[contenteditable="true"]'))) return;
             manualDuringLoad = true;
         };
         dom.addEventListener('scroll',scroll,true);
+        dom.addEventListener('pointerdown',manual,true);
         dom.addEventListener('wheel',manual,{passive:true});
         dom.addEventListener('touchstart',manual,{passive:true});
         dom.addEventListener('keydown',manual);
@@ -582,6 +575,7 @@
             cancelAnimationFrame(previewControlFrame);
             previews.clear(); geometry?.disconnect(); geometryMutations.disconnect();
             dom.removeEventListener('scroll',scroll,true);
+            dom.removeEventListener('pointerdown',manual,true);
             dom.removeEventListener('wheel',manual); dom.removeEventListener('touchstart',manual);
             dom.removeEventListener('keydown',manual); host.removeEventListener('load',restorePosition,true);
             subscriptions.forEach(subscription => subscription.dispose());

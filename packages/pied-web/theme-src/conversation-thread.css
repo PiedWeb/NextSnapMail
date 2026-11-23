@@ -15,10 +15,6 @@
 #rl-app #V-MailMessageView .b-message.pw-conversation-active > .messageItemHeader .subjectParent {
  font-size:var(--pw-text-sm); line-height:1.4; letter-spacing:0;
 }
-#rl-app #V-MailMessageView .b-message.pw-conversation-pending > .messageItemHeader,
-#rl-app #V-MailMessageView .b-message.pw-conversation-pending > #messageItem {
- display:none!important;
-}
 #rl-app #V-MailMessageView .pw-conversation-before,
 #rl-app #V-MailMessageView .pw-conversation-after {
  flex:0 0 auto; margin:0 var(--pw-space-6) var(--pw-space-4); font-family:var(--pw-font);

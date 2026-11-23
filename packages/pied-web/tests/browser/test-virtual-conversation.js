@@ -76,7 +76,6 @@ await p.waitForFunction(()=>readerVM.pwConversationThread===true);
 await p.evaluate(()=>{window.setInterval=nativeReaderInterval;delete window.nativeReaderInterval;});
 await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===32
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===3);
-await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
 const checks=[];const check=(label,ok)=>{if(!ok)throw new Error(label);checks.push(label);console.log('PASS '+label);};
 check('The newest Sent message opens in the native reader while three older messages stay one click away',await p.evaluate(()=>
     readerVM.message().folder==='Sent'&&readerVM.message().uid===32
@@ -184,8 +183,7 @@ await p.evaluate(()=>{
 });
 await p.waitForTimeout(400);
 check('A later settle leaves a manual scroll alone',await p.evaluate(()=>
-    document.querySelector('.messageView').scrollTop===0
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending')));
+    document.querySelector('.messageView').scrollTop===0));
 await p.evaluate(()=>{
     sentMatches.push({...sentMatches.at(-1),uid:33,hash:'Sent-33',messageId:'<sent-three@example.test>',
         inReplyTo:'<received-three@example.test>',
@@ -197,7 +195,7 @@ await p.evaluate(()=>{
 });
 await p.waitForFunction(()=>readerVM.message()?.folder==='Sent'&&readerVM.message()?.uid===33
     &&document.querySelectorAll('.pw-conversation-before .pw-conversation-card').length===5
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+    &&document.querySelector('.messageView').scrollTop>0);
 check('A successful reply refreshes the open stack immediately, marks its feed row and scrolls to the sent message',await p.evaluate(()=>{
     const box=document.querySelector('.messageView').getBoundingClientRect();
     const head=document.querySelector('.b-message > .messageItemHeader').getBoundingClientRect();
@@ -296,24 +294,35 @@ await p.evaluate(()=>{
     readerVM.message(NativeDraftCollection.reviveFromJson([{
         ...sourceRaw,uid:60,hash:'INBOX-60',dateTimestamp:1789000550
     }])[0]);
+    const body=document.querySelector('#messageItem > .bodyText');
+    body.textContent='Message sélectionné avant la fin de la recherche';
+    for(let i=0;i<40;i++){
+        const line=document.createElement('p');line.textContent='Ligne fictive '+i;
+        line.style.margin='0 0 16px';body.append(line);
+    }
 });
 await p.waitForFunction(()=>!!window.releaseThreadSearch);
-check('The old native reader is concealed while a new conversation lookup is pending',await p.evaluate(()=>
-    document.querySelector('.b-message').classList.contains('pw-conversation-pending')
-    &&document.querySelector('.pw-conversation-before h2').hidden
-    &&getComputedStyle(document.querySelector('.b-message > .messageItemHeader')).display==='none'
-    &&getComputedStyle(document.querySelector('#messageItem')).display==='none'
+check('The selected message is readable while conversation discovery is still pending',await p.evaluate(()=>
+    document.querySelector('.pw-conversation-before h2').hidden
+    &&document.querySelector('.b-message > .messageItemHeader').getClientRects().length>0
+    &&document.querySelector('#messageItem > .bodyText').getClientRects().length>0
+    &&document.querySelector('#messageItem > .bodyText').firstChild.textContent==='Message sélectionné avant la fin de la recherche'
     &&document.querySelector('.pw-conversation-before > [role="status"]').textContent.includes('Recherche')));
-await p.evaluate(()=>{
-    document.querySelector('.messageView').dispatchEvent(new WheelEvent('wheel',{bubbles:true,deltaY:-100}));
-    document.querySelector('.messageView').scrollTop=0;
+const readingPosition=await p.evaluate(()=>{
+    const box=document.querySelector('.messageView'),line=document.querySelectorAll('#messageItem > .bodyText > p')[12];
+    box.dispatchEvent(new WheelEvent('wheel',{bubbles:true,deltaY:100}));
+    box.scrollTop+=line.getBoundingClientRect().top-box.getBoundingClientRect().top;
+    const top=line.getBoundingClientRect().top;
     holdThreadSearch=false;releaseThreadSearch();
+    return top;
 });
-await p.waitForFunction(()=>!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
-check('The native reader reappears after the conversation lookup',await p.evaluate(()=>
-    getComputedStyle(document.querySelector('#messageItem')).display!=='none'));
-check('Manual scroll during lookup survives automatic opening of the latest message',await p.evaluate(()=>
-    document.querySelector('.messageView').scrollTop===0&&readerVM.message()?.uid===51));
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
+check('Late conversation results preserve the message and line already being read',await p.evaluate(top=>
+    readerVM.message()?.uid===60
+    &&Math.abs(document.querySelectorAll('#messageItem > .bodyText > p')[12].getBoundingClientRect().top-top)<2,readingPosition));
+await p.locator('.pw-conversation-before > button').first().click();
+await p.waitForFunction(()=>readerVM.message()?.uid===51);
+check('The newest reply stays available through the latest-message action',true);
 const requestsBeforeTrash=await p.evaluate(()=>threadRequests.filter(request=>request.action==='PiedWebConversation').length);
 await p.evaluate(()=>{
     const trash={...sourceRaw,folder:'Trash',uid:70,hash:'Trash-70',messageId:'<trash@example.test>',
@@ -339,8 +348,7 @@ await p.evaluate(()=>{
     readerVM.message(NativeDraftCollection.reviveFromJson([filedRaw])[0]);
     document.querySelector('#messageItem > .bodyText').textContent=filedRaw.plain;
 });
-await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+await p.waitForFunction(()=>document.querySelectorAll('.pw-conversation-card').length===2);
 check('A filed message automatically opens its exchange without a full-exchange click',await p.evaluate(before=>
     threadRequests.filter(request=>request.action==='PiedWebConversation').length===before+1
     &&document.querySelector('.pw-conversation-full').hidden,requestsBeforeTrash));
@@ -452,7 +460,7 @@ check('Configured protected folders, native roles, descendants and nested queues
     &&document.querySelector('.pw-conversation-before').hidden,protectedRequests));
 await p.locator('.pw-conversation-full').click();
 await p.waitForFunction(()=>!document.querySelector('.pw-conversation-before').hidden
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+    &&document.querySelector('.pw-conversation-before h2:not([hidden])'));
 check('A protected message still allows an explicitly requested full exchange',await p.evaluate(()=>
     readerVM.message()?.folder==='INBOX.Reminders'
     &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
@@ -468,16 +476,14 @@ await p.evaluate(()=>{
 for(let index=0;index<4;index++){
     await p.evaluate(index=>openFixtureMessage(readerCases[index],index===0?'subject:fixture':''),index);
     await p.waitForFunction(index=>readerVM.message()?.uid===110+index
-        &&document.querySelectorAll('.pw-conversation-card').length===6
-        &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'),index);
+        &&document.querySelectorAll('.pw-conversation-card').length===6,index);
     check(['Sent search','Archive','Filed folder','Nested filed folder'][index]+' opens its exchange while keeping the selected older message active',await p.evaluate(index=>
         document.querySelector('#messageItem > .bodyText').textContent===readerCases[index].plain
         &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'
         &&document.querySelector('.pw-conversation-full').hidden,index));
 }
 await p.evaluate(()=>openFixtureMessage(sourceRaw,'subject:fixture'));
-await p.waitForFunction(()=>readerVM.message()?.uid===50&&document.querySelectorAll('.pw-conversation-card').length===6
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'));
+await p.waitForFunction(()=>readerVM.message()?.uid===50&&document.querySelectorAll('.pw-conversation-card').length===6);
 check('An Inbox search preserves its selected match instead of promoting a newer reply',await p.evaluate(()=>
     readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
     &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));
@@ -488,7 +494,7 @@ await p.evaluate(()=>{
     openFixtureMessage(sourceRaw);
 });
 await p.waitForFunction(before=>threadRequests.filter(request=>request.action==='PiedWebConversation').length>before
-    &&!document.querySelector('.b-message').classList.contains('pw-conversation-pending'),beforeWorkspaceSearch);
+    &&document.querySelector('.pw-conversation-before h2:not([hidden])'),beforeWorkspaceSearch);
 check('A workspace search also keeps the exact selected Inbox message active after native navigation clears its query',await p.evaluate(()=>
     readerVM.message()?.folder==='INBOX'&&readerVM.message()?.uid===50
     &&threadRequests.filter(request=>request.action==='PiedWebConversation').at(-1).scope==='account'));

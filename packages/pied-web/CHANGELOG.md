@@ -1,5 +1,11 @@
 # Releases
 
+## 1.10.46.1 — 2026-11-23
+
+- Backport the progressive conversation reader to 1.10.46. The selected message
+  appears when the native body is ready, and late history preserves the reader's
+  place. The latest reply remains one click away if the reader has interacted.
+
 ## 1.10.46 — 2026-11-19
 
 - Move messages to the unique personal Trash advertised by IMAP when the source
