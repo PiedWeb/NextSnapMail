@@ -1,4 +1,4 @@
-/* Presentation of Squire's native controls. No replacement editor or commands. */
+/* Presentation and shortcuts for Squire's native controls. */
 (() => {
     'use strict';
     let sequence = 0;
@@ -42,11 +42,43 @@
         image.setAttribute('aria-hidden','true'); image.setAttribute('focusable','false');
         return image;
     };
+    const editLink = (squire, link, label) => {
+        const href = window.prompt(label, link.href)?.trim();
+        if (href == null || href === link.href) return;
+
+        if (!href) {
+            const range = document.createRange();
+            range.selectNode(link);
+            squire.setSelection(range);
+            squire.removeLink();
+        } else if (window.PiedWebUx.markdownDeps?.dompurify?.isValidAttribute('a', 'href', href)) {
+            // Squire's insertion command can nest another anchor inside formatted links.
+            squire.saveUndoState();
+            link.setAttribute('href', href);
+        }
+    };
+    const bindLinkClicks = (editor, linkAction) => {
+        editor.wysiwyg.addEventListener('click', event => {
+            const link = event.target.closest('a[href]');
+            if (!active() || editor.mode !== 'wysiwyg' || event.button !== 0 ||
+                !link?.isContentEditable || !editor.wysiwyg.contains(link)) return;
+
+            event.preventDefault();
+            if (event.ctrlKey || event.metaKey) {
+                if (link.getAttribute('href').trim() && ['https:', 'http:'].includes(link.protocol)) {
+                    window.open(link.href, '_blank', 'noopener,noreferrer');
+                }
+            } else if (!event.shiftKey && !event.altKey) {
+                editLink(editor.squire, link, linkAction.hint || (fr() ? 'Lien' : 'Link'));
+            }
+        });
+    };
     addEventListener('squire-toolbar', ({detail:{squire:editor,actions}}) => {
         const container = editor.container;
         syncPalette();
         if (!container.closest('#V-PopupsCompose') || container.dataset.pwComposeTools) return;
         container.dataset.pwComposeTools = '1';
+        if (actions.targets?.link) bindLinkClicks(editor, actions.targets.link);
         queueMicrotask(() => {
             const toolbar = container.querySelector('.squire-toolbar');
             if (!toolbar || !actions.views) return;

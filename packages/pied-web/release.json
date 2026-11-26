@@ -1,5 +1,5 @@
 {
-  "version": "1.10.46.3",
+  "version": "1.10.46.4",
   "tested": {
     "nextcloud": "35.0.2",
     "nextsnapmail": "0.1.17",
@@ -25,7 +25,7 @@
     "plugin/pied-web-ux/composer-icons.js": "753d6dabf52c9bd6fe9c8675eba0e267d1c2eb84c4a4b2ebf38104b0b46307e0",
     "plugin/pied-web-ux/composer-icons.json": "9b85eebbf3dd70b3c610e1dda95e357adb77b1f84ce489b32c1876753fddc776",
     "plugin/pied-web-ux/composer-images.js": "55e059249728bcdf62057377da79a9caf7f3d7183850ccfa80bcb06678874861",
-    "plugin/pied-web-ux/composer-toolbar.js": "0f98aa33f739fa31955ed64e675d64d374165712cde057de332f67c5db0b5dec",
+    "plugin/pied-web-ux/composer-toolbar.js": "c111747264eb703db43e8a56e1057c5c12ab47838e7c66dacd38410afa23fab4",
     "plugin/pied-web-ux/conversation-thread.js": "7f7c833b918b8ea6042edd1b9c56dcf493b5c5a5ad1cb954b8db711b077fa630",
     "plugin/pied-web-ux/feed-workspace.js": "3f4d80838d3d62147f1368ad14d5168fecbf7d8e5a2cb10a9702b38d4528eef2",
     "plugin/pied-web-ux/feed.js": "47a8260c83260d04d78cdc11e81d14a07dc241b1604207a3fa1b1e422555cc50",
@@ -36,7 +36,7 @@
     "plugin/pied-web-ux/image-tools.js": "e544a882f29a564f66a7850e9c84c1e924906b626d1de77af4b9d43533055a1b",
     "plugin/pied-web-ux/image-vendor.js": "932300633c9ef37f3327dce92e5f55f370bbbc406357f10babd988bfd95f82bb",
     "plugin/pied-web-ux/inbox-conversations.js": "f136d38aedde33a9b19de14308223830b2afa815fe002f698b1ab789602d0140",
-    "plugin/pied-web-ux/index.php": "23d471ef3b2893c4a0f21fe5ee57d74164a10a2936eb8dc6600e7f9d6c96aabc",
+    "plugin/pied-web-ux/index.php": "de1a6f543c20b862af40d70081feeb13f433d38068c8b9344615fcc5dedeb5cb",
     "plugin/pied-web-ux/inline-reply.js": "b93438b2bc79448b44261740f5f82cd5ba133e90d30ccdfe3696c0e65aaa08ff",
     "plugin/pied-web-ux/interface-comfort.js": "46055d544496cb8dd82bb50ec48cac52a08e81f50d86665b8554df8b093afa27",
     "plugin/pied-web-ux/keyboard-help.js": "72917a4e0dea702eb59370cfeeae71599fb7384674a9134dbfa5329400e4e3e8",

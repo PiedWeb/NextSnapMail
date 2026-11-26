@@ -24,6 +24,11 @@ to upstream's public font, size, text-color, highlight and clear-formatting meth
 draft saving, source mode, Markdown, signatures, images and sanitisation continue through the
 existing SnappyMail/Pied Web layers.
 
+Both Squire versions support editing an existing link with a click and opening
+a web link in a new tab with Ctrl-click or Command-click in the visual
+composer. Editing keeps the original label and formatting, uses Squire's undo
+history, and removes the link if the URL is cleared.
+
 The vendor source, package hash and built-file hash are recorded in
 `plugin/pied-web-ux/squire-source.json`; its MIT notice is retained in
 `plugin/pied-web-ux/squire-license.txt`. There is no runtime CDN request.
@@ -41,6 +46,8 @@ The script proves that loading the bundle leaves native Squire as the default, t
 multi-paragraph blockquotes, style compatibility and a representative HTML round trip with
 nested quotes, a table, a signature, a link and a CID image. Fixtures contain fictional data
 and do not connect to a mailbox.
+The link checks run with both editor versions and cover opening, editing, undo,
+cancellation, URL filtering and removal.
 
 User rollback is immediate: select **Squire** in General settings and open a new composer.
 Package rollback removes the three `squire-next*.js` registrations and the vendor/source/

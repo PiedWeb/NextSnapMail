@@ -1,5 +1,11 @@
 # Releases
 
+## 1.10.46.4 — 2026-11-26
+
+- Click a link in the visual composer to edit its URL. Ctrl-click or
+  Command-click opens an HTTP or HTTPS link in a new tab. URL edits preserve
+  the link's text and formatting and can be undone in either Squire editor.
+
 ## 1.10.46.3 — 2026-11-23
 
 - Keep the selected message and its reading position stable when the history

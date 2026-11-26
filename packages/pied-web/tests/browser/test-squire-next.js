@@ -4,6 +4,55 @@ const results=[];
 const check=(name,ok)=>{if(!ok)throw new Error(name);results.push(name);console.log('PASS '+name);};
 const fixture='http://127.0.0.1:8876/.local-work/images-native-preview.html';
 
+const checkLinkClicks = async name => {
+	const observed = await page.evaluate(async () => {
+		const before = 'https://example.test/old';
+		const after = 'https://example.test/new';
+		htmlEditor.setHtml(`<div>Before <a href="${before}" title="Example"><b>Example link</b></a> after</div>`);
+		const root = edit.wysiwyg;
+		const link = () => root.querySelector('a');
+		const click = options => (link().firstElementChild || link()).dispatchEvent(new MouseEvent('click', {
+			bubbles: true, cancelable: true, ...options
+		}));
+		const settle = () => new Promise(resolve => setTimeout(resolve, 0));
+		const originalPrompt = window.prompt;
+		const originalOpen = window.open;
+		const prompts = [];
+		const openings = [];
+		let answer = after;
+		window.prompt = (_label, value) => { prompts.push(value); return answer; };
+		window.open = (...args) => { openings.push(args); };
+		try {
+			await settle();
+			const editPreventedNavigation = !click();
+			await settle();
+			const changed = editPreventedNavigation && prompts[0] === before &&
+				link().href === after && link().title === 'Example' &&
+				link().querySelector('b')?.textContent === 'Example link' && root.querySelectorAll('a').length === 1;
+			const modifiedPreventedNavigation = !click({ctrlKey: true}) && !click({metaKey: true});
+			const opened = modifiedPreventedNavigation && prompts.length === 1 && openings.length === 2 &&
+				openings.every(([href, target, features]) => href === after && target === '_blank' && features === 'noopener,noreferrer');
+			edit.squire.undo();
+			const undone = link().href === before;
+			answer = null;
+			click();
+			const cancelled = link().href === before;
+			answer = 'javascript:';
+			click();
+			const rejected = link().href === before;
+			answer = '';
+			click();
+			const removed = !link() && root.querySelector('b')?.textContent === 'Example link' &&
+				root.textContent === 'Before Example link after';
+			return {changed, opened, undone, cancelled, rejected, removed};
+		} finally {
+			window.prompt = originalPrompt;
+			window.open = originalOpen;
+		}
+	});
+	for (const [behavior, passed] of Object.entries(observed)) check(`${name} link ${behavior}`, passed);
+};
+
 await page.goto(fixture);
 await page.waitForFunction(()=>window.markdownReady===true,null,{timeout:10000});
 check('The optional editor is registered beside the native editor',await page.evaluate(()=>
@@ -15,12 +64,14 @@ check('The native editor remains the default',await page.evaluate(()=>
 check('Loading the optional bundle does not replace the global native Squire',await page.evaluate(()=>
 	window.Squire!==window.PiedWebSquireNext
 ));
+await checkLinkClicks('Native Squire');
 
 await page.goto(fixture+'?squireNext=1');
 await page.waitForFunction(()=>window.markdownReady===true,null,{timeout:10000});
 check('The saved editor choice constructs Squire 2.4',await page.evaluate(()=>
 	edit.squire.constructor===window.PiedWebSquireNext && window.Squire!==window.PiedWebSquireNext
 ));
+await checkLinkClicks('Squire 2.4');
 
 await page.evaluate(()=>{
 	htmlEditor.setHtml('<div><br></div>');
